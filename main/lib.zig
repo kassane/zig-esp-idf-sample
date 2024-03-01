@@ -1,5 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
+const esp_idf = @import("esp_idf");
 
 export fn zig_main() callconv(.C) void {
     _ = std.c.printf("Hello, world from Zig!\n");
@@ -8,6 +9,7 @@ export fn zig_main() callconv(.C) void {
         builtin.zig_version_string,
         @tagName(builtin.zig_backend),
     );
+    _ = std.c.printf("ESP-IDF version %s!\n", esp_idf.esp_get_idf_version());
     _ = std.c.printf(
         "\nLet's have a look at your shiny %s - %s system! :)\n\n",
         @tagName(builtin.cpu.arch),
