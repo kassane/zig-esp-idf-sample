@@ -31,49 +31,54 @@ pub fn build(b: *std.Build) void {
 // Targets config
 const espressif_targets: []const std.Target.Query = if (std.mem.startsWith(
     u8,
-    @import("builtin").zig_version_string,
-    "0.12.0-dev.xtensa",
-)) &.{
-    // esp32-c3
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{
-            .m,
-            .c,
-        }),
-    },
-    // need zig-fork (using espressif-llvm backend) to support this
-    .{
-        .cpu_arch = .xtensa,
-        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-    },
-    .{
-        .cpu_arch = .xtensa,
-        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s2 },
-        .os_tag = .freestanding,
-        .abi = .none,
-    },
-    .{
-        .cpu_arch = .xtensa,
-        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s3 },
-        .os_tag = .freestanding,
-        .abi = .none,
-    },
-} else &.{
-    // esp32-c3
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{
-            .m,
-            .c,
-        }),
-    },
-};
+    @import("builtin").cpu.model.name,
+    "esp32",
+))
+    &[_]std.Target.Query{
+        // need zig-fork (using espressif-llvm backend) to support this
+        .{
+            .cpu_arch = .xtensa,
+            .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+        },
+        .{
+            .cpu_arch = .xtensa,
+            .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s2 },
+            .os_tag = .freestanding,
+            .abi = .none,
+        },
+        .{
+            .cpu_arch = .xtensa,
+            .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s3 },
+            .os_tag = .freestanding,
+            .abi = .none,
+        },
+    }
+else
+    &.{
+        // esp32-c3/c2
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c }),
+        },
+        // esp32-c6/61/h2
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c }),
+        },
+        // esp32-p4
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .f }),
+        },
+    };
