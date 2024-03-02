@@ -2,7 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const esp_idf = @import("esp_idf");
 
-export fn zig_main() callconv(.C) void {
+export fn app_main() callconv(.C) void {
     _ = std.c.printf("Hello, world from Zig!\n");
     _ = std.c.printf(
         "\nZig Info:\n\nVersion: %s\nStage: %s\n",

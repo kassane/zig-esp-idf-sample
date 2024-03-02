@@ -24,16 +24,18 @@ pub fn build(b: *std.Build) void {
             lib.addIncludePath(.{ .path = dir });
         }
     }
+    if (env.get("LIBRARIES")) |libraries| {
+        var it = std.mem.tokenize(u8, libraries, ";");
+        while (it.next()) |libname| {
+            lib.linkSystemLibrary(libname);
+        }
+    }
     lib.linkLibC();
     b.installArtifact(lib);
 }
 
 // Targets config
-const espressif_targets: []const std.Target.Query = if (std.mem.startsWith(
-    u8,
-    @import("builtin").cpu.model.name,
-    "esp32",
-))
+const espressif_targets: []const std.Target.Query = if (detectEsp32())
     &[_]std.Target.Query{
         // need zig-fork (using espressif-llvm backend) to support this
         .{
@@ -82,3 +84,12 @@ else
             .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .f }),
         },
     };
+
+fn detectEsp32() bool {
+    var result = false;
+    for (std.Target.Cpu.Arch.xtensa.allCpuModels()) |model| {
+        result = std.mem.startsWith(u8, model.name, "esp");
+        if (result) break;
+    }
+    return result;
+}
