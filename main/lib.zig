@@ -16,16 +16,37 @@ export fn app_main() callconv(.C) void {
         builtin.cpu.model.name[0.. :0],
     );
     var arena = std.heap.ArenaAllocator.init(
-        std.heap.raw_c_allocator,
+        esp_idf.raw_heap_caps_allocator,
     );
     defer arena.deinit();
     const allocator = arena.allocator();
+
     var arr = std.ArrayList(c_int).init(allocator);
+    defer arr.deinit();
+
     arr.append(10) catch |err| @panic(@errorName(err));
     arr.append(20) catch |err| @panic(@errorName(err));
     arr.append(30) catch |err| @panic(@errorName(err));
-    defer arr.deinit();
+
     for (arr.items) |index| {
         _ = std.c.printf("Arr value: %d!\n", index);
+    }
+
+    _ = esp_idf.xTaskCreate(foo, "foo", 1024, null, 1, null);
+    _ = esp_idf.xTaskCreate(bar, "bar", 1024, null, 0, null);
+}
+
+pub export fn foo(params: ?*anyopaque) callconv(.C) void {
+    _ = params; // autofix
+    while (true) {
+        _ = std.c.printf("Demo_Task printing..\n");
+        _ = esp_idf.vTaskDelay(6000 / std.time.ms_per_s);
+    }
+}
+pub export fn bar(params: ?*anyopaque) callconv(.C) void {
+    _ = params; // autofix
+    while (true) {
+        _ = std.c.printf("Demo_Task 2 printing..\n");
+        _ = esp_idf.vTaskDelay(1000 / std.time.ms_per_s);
     }
 }

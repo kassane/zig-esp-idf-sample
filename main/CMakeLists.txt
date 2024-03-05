@@ -1,5 +1,8 @@
-idf_component_register(SRCS "main.c"
-    INCLUDE_DIRS ".")
+set(DEPS "pthread" "driver" "vfs")
+idf_component_register(SRCS "placeholder.c"
+    INCLUDE_DIRS "."
+    PRIV_REQUIRES "${DEPS}"
+)
 set(include_dirs $<TARGET_PROPERTY:${COMPONENT_LIB},INCLUDE_DIRECTORIES> ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
 set(link_libs $<TARGET_PROPERTY:${COMPONENT_LIB},LINK_LIBRARIES> ${CMAKE_C_IMPLICIT_LINK_LIBRARIES})
 
@@ -40,6 +43,9 @@ add_custom_target(zig_build
     -Doptimize=${ZIG_BUILD_TYPE}
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
+    --sysroot "${IDF_PATH}/components"
+    -freference-trace
+    --prominent-compile-errors
     --cache-dir ${CMAKE_BINARY_DIR}/zig-cache
     --prefix ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

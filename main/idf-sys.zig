@@ -31,6 +31,55 @@ pub const esp_err_t = enum(c_int) {
     ESP_ERR_MEMPROT_BASE = 0xd000,
 };
 
+pub const raw_heap_caps_allocator: std.mem.Allocator = .{
+    .ptr = undefined,
+    .vtable = &raw_heap_caps_allocator_vtable,
+};
+const raw_heap_caps_allocator_vtable = std.mem.Allocator.VTable{
+    .alloc = rawHeapCapsAlloc,
+    .resize = rawHeapCapsResize,
+    .free = rawHeapCapsFree,
+};
+
+fn rawHeapCapsAlloc(
+    _: *anyopaque,
+    len: usize,
+    log2_ptr_align: u8,
+    ret_addr: usize,
+) ?[*]u8 {
+    _ = ret_addr;
+    std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(usize, @alignOf(std.c.max_align_t)));
+    // ref.: https://github.com/espressif/esp-idf/blob/master/components/heap/include/esp_heap_caps.h
+    return @as(?[*]u8, @ptrCast(heap_caps_malloc(len, (1 << 12) | (1 << 11))));
+}
+
+fn rawHeapCapsResize(
+    _: *anyopaque,
+    buf: []u8,
+    log2_old_align: u8,
+    new_len: usize,
+    ret_addr: usize,
+) bool {
+    _ = log2_old_align;
+    _ = ret_addr;
+
+    if (new_len <= buf.len)
+        return true;
+
+    return false;
+}
+
+fn rawHeapCapsFree(
+    _: *anyopaque,
+    buf: []u8,
+    log2_old_align: u8,
+    ret_addr: usize,
+) void {
+    _ = log2_old_align;
+    _ = ret_addr;
+    heap_caps_free(buf.ptr);
+}
+
 // Zig error
 const esp_error = error{
     Fail,
@@ -1557,8 +1606,31 @@ pub const eAbortSleep: c_int = 0;
 pub const eStandardSleep: c_int = 1;
 pub const eNoTasksWaitingTimeout: c_int = 2;
 pub const eSleepModeStatus = c_uint;
-pub extern fn xTaskCreate(pxTaskCode: TaskFunction_t, pcName: [*:0]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxCreatedTask: [*c]TaskHandle_t) BaseType_t;
-pub extern fn xTaskCreateStatic(pxTaskCode: TaskFunction_t, pcName: [*:0]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, puxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t) TaskHandle_t;
+pub extern fn xTaskCreatePinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pvCreatedTask: [*c]TaskHandle_t, xCoreID: BaseType_t) BaseType_t;
+pub inline fn xTaskCreate(arg_pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, arg_uxPriority: UBaseType_t, pxCreatedTask: [*c]TaskHandle_t) BaseType_t {
+    var pxTaskCode = arg_pxTaskCode;
+    _ = &pxTaskCode;
+    _ = &pcName;
+    _ = &usStackDepth;
+    _ = &pvParameters;
+    var uxPriority = arg_uxPriority;
+    _ = &uxPriority;
+    _ = &pxCreatedTask;
+    return xTaskCreatePinnedToCore(pxTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pxCreatedTask, @as(BaseType_t, @bitCast(@as(c_int, 2147483647))));
+}
+pub extern fn xTaskCreateStaticPinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t, xCoreID: BaseType_t) TaskHandle_t;
+pub inline fn xTaskCreateStatic(arg_pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, arg_uxPriority: UBaseType_t, puxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t) TaskHandle_t {
+    var pxTaskCode = arg_pxTaskCode;
+    _ = &pxTaskCode;
+    _ = &pcName;
+    _ = &ulStackDepth;
+    _ = &pvParameters;
+    var uxPriority = arg_uxPriority;
+    _ = &uxPriority;
+    _ = &puxStackBuffer;
+    _ = &pxTaskBuffer;
+    return xTaskCreateStaticPinnedToCore(pxTaskCode, pcName, ulStackDepth, pvParameters, uxPriority, puxStackBuffer, pxTaskBuffer, @as(BaseType_t, @bitCast(@as(c_int, 2147483647))));
+}
 pub extern fn vTaskAllocateMPURegions(xTask: TaskHandle_t, pxRegions: [*c]const MemoryRegion_t) void;
 pub extern fn vTaskDelete(xTaskToDelete: TaskHandle_t) void;
 pub extern fn vTaskDelay(xTicksToDelay: TickType_t) void;
