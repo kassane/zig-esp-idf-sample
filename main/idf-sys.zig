@@ -803,36 +803,36 @@ pub extern fn _xtos_core_save(flags: c_uint, savearea: [*c]XtosCoreState, code: 
 pub extern fn _xtos_core_restore(retvalue: c_uint, savearea: [*c]XtosCoreState) void;
 pub extern fn _xtos_timer_0_delta(cycles: c_int) void;
 pub extern fn _xtos_timer_1_delta(cycles: c_int) void;
-pub extern fn _xtos_timer_2_delta(cycles: c_int) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:37:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:28:50: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_core_id() u32; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:52:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:47:50: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_raw_core_id() u32; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:64:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:61:25: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_sp() ?*anyopaque; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:68:28: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_cycle_count() u32; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:75:20: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_cycle_count(arg_ccount: u32) callconv(.C) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:82:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:80:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_wait_for_intr() void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:95:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:93:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_vecbase(arg_vecbase: u32) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:100:28: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_intr_get_enabled_mask() u32; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:117:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_breakpoint(arg_bp_num: c_int, arg_bp_addr: u32) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:132:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_clear_breakpoint(arg_bp_num: c_int) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:156:35: warning: TODO implement function '__builtin_ffsll' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:148:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_watchpoint(arg_wp_num: c_int, arg_wp_addr: u32, arg_size: usize, arg_on_read: bool, arg_on_write: bool) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:174:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_clear_watchpoint(arg_wp_num: c_int) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:15:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:188:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_dbgr_is_attached() bool; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:198:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:196:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_dbgr_break() void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:216:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/xtensa/include/xt_utils.h:205:24: warning: unable to translate function, demoted to extern
+pub extern fn _xtos_timer_2_delta(cycles: c_int) void; // esp-idf/components/xtensa/include/xt_utils.h:37:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:28:50: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_get_core_id() u32; // esp-idf/components/xtensa/include/xt_utils.h:52:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:47:50: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_get_raw_core_id() u32; // esp-idf/components/xtensa/include/xt_utils.h:64:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:61:25: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_get_sp() ?*anyopaque; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:68:28: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_get_cycle_count() u32; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:75:20: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_set_cycle_count(arg_ccount: u32) callconv(.C) void; // esp-idf/components/xtensa/include/xt_utils.h:82:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:80:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_wait_for_intr() void; // esp-idf/components/xtensa/include/xt_utils.h:95:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:93:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_set_vecbase(arg_vecbase: u32) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:100:28: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_intr_get_enabled_mask() u32; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:117:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_set_breakpoint(arg_bp_num: c_int, arg_bp_addr: u32) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:132:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_clear_breakpoint(arg_bp_num: c_int) void; // esp-idf/components/xtensa/include/xt_utils.h:156:35: warning: TODO implement function '__builtin_ffsll' in std.zig.c_builtins
+// esp-idf/components/xtensa/include/xt_utils.h:148:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_set_watchpoint(arg_wp_num: c_int, arg_wp_addr: u32, arg_size: usize, arg_on_read: bool, arg_on_write: bool) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:174:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_clear_watchpoint(arg_wp_num: c_int) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:15:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:188:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_dbgr_is_attached() bool; // esp-idf/components/xtensa/include/xt_utils.h:198:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:196:24: warning: unable to translate function, demoted to extern
+pub extern fn xt_utils_dbgr_break() void; // esp-idf/components/xtensa/include/xt_utils.h:216:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/xtensa/include/xt_utils.h:205:24: warning: unable to translate function, demoted to extern
 pub extern fn xt_utils_compare_and_set(arg_addr: [*c]volatile u32, arg_compare_value: u32, arg_new_value: u32) bool;
 pub const intr_handler_t = ?*const fn (?*anyopaque) callconv(.C) void;
 pub const intr_handle_data_t = opaque {};
@@ -854,8 +854,8 @@ pub extern fn esp_intr_set_in_iram(handle: intr_handle_t, is_in_iram: bool) esp_
 pub extern fn esp_intr_noniram_disable() void;
 pub extern fn esp_intr_noniram_enable() void;
 pub extern fn esp_intr_enable_source(inum: c_int) void;
-pub extern fn esp_intr_disable_source(inum: c_int) void; // /home/kassane/espressif/esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:300:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:298:19: warning: unable to translate function, demoted to extern
+pub extern fn esp_intr_disable_source(inum: c_int) void; // esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:300:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:298:19: warning: unable to translate function, demoted to extern
 pub extern fn esp_intr_flags_to_level(arg_flags: c_int) callconv(.C) c_int;
 pub fn esp_intr_level_to_flags(arg_level: c_int) callconv(.C) c_int {
     var level = arg_level;
@@ -906,12 +906,12 @@ pub inline fn esp_cpu_intr_set_ivt_addr(arg_ivt_addr: ?*const anyopaque) void {
     var ivt_addr = arg_ivt_addr;
     _ = &ivt_addr;
     xt_utils_set_vecbase(@as(u32, @intCast(@intFromPtr(ivt_addr))));
-} // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/esp_cpu.h:324:24: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_has_handler(arg_intr_num: c_int) bool; // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/esp_cpu.h:348:24: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_set_handler(arg_intr_num: c_int, arg_handler: esp_cpu_intr_handler_t, arg_handler_arg: ?*anyopaque) void; // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/esp_cpu.h:366:25: warning: unable to translate function, demoted to extern
+} // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/esp_cpu.h:324:24: warning: unable to translate function, demoted to extern
+pub extern fn esp_cpu_intr_has_handler(arg_intr_num: c_int) bool; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/esp_cpu.h:348:24: warning: unable to translate function, demoted to extern
+pub extern fn esp_cpu_intr_set_handler(arg_intr_num: c_int, arg_handler: esp_cpu_intr_handler_t, arg_handler_arg: ?*anyopaque) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/esp_cpu.h:366:25: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_get_handler_arg(arg_intr_num: c_int) ?*anyopaque;
 pub inline fn esp_cpu_intr_enable(arg_intr_mask: u32) void {
     var intr_mask = arg_intr_mask;
@@ -925,8 +925,8 @@ pub inline fn esp_cpu_intr_disable(arg_intr_mask: u32) void {
 }
 pub inline fn esp_cpu_intr_get_enabled_mask() u32 {
     return xt_utils_intr_get_enabled_mask();
-} // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/esp_cpu.h:427:24: warning: unable to translate function, demoted to extern
+} // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/esp_cpu.h:427:24: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_edge_ack(arg_intr_num: c_int) void;
 pub extern fn esp_cpu_configure_region_protection() void;
 pub extern fn esp_cpu_set_breakpoint(bp_num: c_int, bp_addr: ?*const anyopaque) esp_err_t;
@@ -1214,12 +1214,12 @@ pub const TaskFunction_t = ?*const fn (?*anyopaque) callconv(.C) void;
 pub const spinlock_t = extern struct {
     owner: u32 = std.mem.zeroes(u32),
     count: u32 = std.mem.zeroes(u32),
-}; // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/spinlock.h:51:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_initialize(arg_lock: [*c]spinlock_t) void; // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/spinlock.h:74:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_acquire(arg_lock: [*c]spinlock_t, arg_timeout: i32) bool; // /home/kassane/espressif/esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-// /home/kassane/espressif/esp-idf/components/esp_hw_support/include/spinlock.h:172:51: warning: unable to translate function, demoted to extern
+}; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/spinlock.h:51:51: warning: unable to translate function, demoted to extern
+pub extern fn spinlock_initialize(arg_lock: [*c]spinlock_t) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/spinlock.h:74:51: warning: unable to translate function, demoted to extern
+pub extern fn spinlock_acquire(arg_lock: [*c]spinlock_t, arg_timeout: i32) bool; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// esp-idf/components/esp_hw_support/include/spinlock.h:172:51: warning: unable to translate function, demoted to extern
 pub extern fn spinlock_release(arg_lock: [*c]spinlock_t) void;
 pub extern fn esp_crosscore_int_init() void;
 pub extern fn esp_crosscore_int_send_yield(core_id: c_int) void;
@@ -1391,8 +1391,8 @@ pub const UBaseType_t = c_uint;
 pub const TickType_t = u32;
 pub extern fn xPortInIsrContext() BaseType_t;
 pub extern fn vPortAssertIfInISR() void;
-pub extern fn xPortInterruptedFromISRContext() BaseType_t; // /home/kassane/espressif/esp-idf/components/xtensa/include/xtensa/xtruntime.h:92:4: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:554:58: warning: unable to translate function, demoted to extern
+pub extern fn xPortInterruptedFromISRContext() BaseType_t; // esp-idf/components/xtensa/include/xtensa/xtruntime.h:92:4: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:554:58: warning: unable to translate function, demoted to extern
 pub extern fn xPortSetInterruptMaskFromISR() UBaseType_t;
 pub inline fn vPortClearInterruptMaskFromISR(arg_prev_level: UBaseType_t) void {
     var prev_level = arg_prev_level;
@@ -1443,8 +1443,8 @@ pub inline fn vPortExitCriticalSafe(arg_mux: [*c]portMUX_TYPE) void {
     }
 }
 pub extern fn vPortYield() void;
-pub extern fn vPortYieldOtherCore(coreid: BaseType_t) void; // /home/kassane/espressif/esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-// /home/kassane/espressif/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:606:24: warning: unable to translate function, demoted to extern
+pub extern fn vPortYieldOtherCore(coreid: BaseType_t) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:606:24: warning: unable to translate function, demoted to extern
 pub extern fn xPortCanYield() bool;
 pub extern fn vApplicationSleep(xExpectedIdleTime: TickType_t) void;
 pub extern fn xPortGetTickRateHz() u32;
@@ -2141,8 +2141,8 @@ pub const nvs_entry_info_t = extern struct {
     key: [16]u8 = std.mem.zeroes([16]u8),
     type: nvs_type_t = std.mem.zeroes(nvs_type_t),
 };
-pub const struct_nvs_opaque_iterator_t = opaque {};
-pub const nvs_iterator_t = ?*struct_nvs_opaque_iterator_t;
+pub const nvs_opaque_iterator_t = opaque {};
+pub const nvs_iterator_t = ?*nvs_opaque_iterator_t;
 pub extern fn nvs_open(namespace_name: [*c]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
 pub extern fn nvs_open_from_partition(part_name: [*c]const u8, namespace_name: [*c]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
 pub extern fn nvs_set_i8(handle: nvs_handle_t, key: [*c]const u8, value: i8) esp_err_t;
@@ -2184,8 +2184,7 @@ pub extern fn nvs_entry_find_in_handle(handle: nvs_handle_t, @"type": nvs_type_t
 pub extern fn nvs_entry_next(iterator: [*c]nvs_iterator_t) esp_err_t;
 pub extern fn nvs_entry_info(iterator: nvs_iterator_t, out_info: [*c]nvs_entry_info_t) esp_err_t;
 pub extern fn nvs_release_iterator(iterator: nvs_iterator_t) void;
-pub const struct_esp_flash_t = opaque {};
-pub const esp_flash_t = struct_esp_flash_t;
+pub const esp_flash_t = opaque {};
 pub const ESP_PARTITION_MMAP_DATA: c_int = 0;
 pub const ESP_PARTITION_MMAP_INST: c_int = 1;
 pub const esp_partition_mmap_memory_t = c_uint;
@@ -2227,8 +2226,8 @@ pub const ESP_PARTITION_SUBTYPE_DATA_SPIFFS: c_int = 130;
 pub const ESP_PARTITION_SUBTYPE_DATA_LITTLEFS: c_int = 131;
 pub const ESP_PARTITION_SUBTYPE_ANY: c_int = 255;
 pub const esp_partition_subtype_t = c_uint;
-pub const struct_esp_partition_iterator_opaque_ = opaque {};
-pub const esp_partition_iterator_t = ?*struct_esp_partition_iterator_opaque_;
+pub const esp_partition_iterator_opaque_ = opaque {};
+pub const esp_partition_iterator_t = ?*esp_partition_iterator_opaque_;
 pub const esp_partition_t = extern struct {
     flash_chip: ?*esp_flash_t = std.mem.zeroes(?*esp_flash_t),
     type: esp_partition_type_t = std.mem.zeroes(esp_partition_type_t),
@@ -2409,11 +2408,11 @@ pub extern fn esp_bt_controller_enable(mode: esp_bt_mode_t) esp_err_t;
 pub extern fn esp_bt_controller_disable() esp_err_t;
 pub extern fn esp_bt_controller_get_status() esp_bt_controller_status_t;
 pub extern fn esp_bt_get_tx_buf_num() u16;
-pub const struct_esp_vhci_host_callback = extern struct {
+pub const esp_vhci_host_callback = extern struct {
     notify_host_send_available: ?*const fn () callconv(.C) void = std.mem.zeroes(?*const fn () callconv(.C) void),
     notify_host_recv: ?*const fn ([*c]u8, u16) callconv(.C) c_int = std.mem.zeroes(?*const fn ([*c]u8, u16) callconv(.C) c_int),
 };
-pub const esp_vhci_host_callback_t = struct_esp_vhci_host_callback;
+pub const esp_vhci_host_callback_t = esp_vhci_host_callback;
 pub extern fn esp_vhci_host_check_send_available() bool;
 pub extern fn esp_vhci_host_send_packet(data: [*c]u8, len: u16) void;
 pub extern fn esp_vhci_host_register_callback(callback: [*c]const esp_vhci_host_callback_t) esp_err_t;
@@ -2559,12 +2558,12 @@ pub const esp_bt_dev_coex_type_t = c_uint;
 pub const ESP_BT_DEV_NAME_RES_EVT: c_int = 0;
 pub const ESP_BT_DEV_EVT_MAX: c_int = 1;
 pub const esp_bt_dev_cb_event_t = c_uint;
-pub const struct_name_res_param_18 = extern struct {
+pub const name_res_param_18 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     name: [*c]u8 = std.mem.zeroes([*c]u8),
 };
 pub const esp_bt_dev_cb_param_t = extern union {
-    name_res: struct_name_res_param_18,
+    name_res: name_res_param_18,
 };
 pub const esp_bt_dev_cb_t = ?*const fn (esp_bt_dev_cb_event_t, [*c]esp_bt_dev_cb_param_t) callconv(.C) void;
 pub extern fn esp_bt_dev_register_callback(callback: esp_bt_dev_cb_t) esp_err_t;
@@ -2713,8 +2712,8 @@ pub const wifi_cipher_type_t = c_uint;
 pub const WIFI_ANT_ANT0: c_int = 0;
 pub const WIFI_ANT_ANT1: c_int = 1;
 pub const WIFI_ANT_MAX: c_int = 2;
-pub const wifi_ant_t = c_uint; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:207:13: warning: struct demoted to opaque type - has bitfield
-pub const wifi_he_ap_info_t = opaque {}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:224:14: warning: struct demoted to opaque type - has bitfield
+pub const wifi_ant_t = c_uint; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:207:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_he_ap_info_t = opaque {}; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:224:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ap_record_t = opaque {};
 pub const WIFI_FAST_SCAN: c_int = 0;
 pub const WIFI_ALL_CHANNEL_SCAN: c_int = 1;
@@ -2759,7 +2758,7 @@ pub const wifi_ap_config_t = extern struct {
     ftm_responder: bool = std.mem.zeroes(bool),
     pmf_cfg: wifi_pmf_config_t = std.mem.zeroes(wifi_pmf_config_t),
     sae_pwe_h2e: wifi_sae_pwe_method_t = std.mem.zeroes(wifi_sae_pwe_method_t),
-}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:321:14: warning: struct demoted to opaque type - has bitfield
+}; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:321:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_sta_config_t = opaque {};
 pub const wifi_nan_config_t = extern struct {
     op_channel: u8 = std.mem.zeroes(u8),
@@ -2771,7 +2770,7 @@ pub const wifi_config_t = extern union {
     ap: wifi_ap_config_t,
     sta: wifi_sta_config_t,
     nan: wifi_nan_config_t,
-}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:371:14: warning: struct demoted to opaque type - has bitfield
+}; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:371:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_sta_info_t = opaque {};
 pub const WIFI_STORAGE_FLASH: c_int = 0;
 pub const WIFI_STORAGE_RAM: c_int = 1;
@@ -2797,9 +2796,9 @@ pub const vendor_ie_data_t = extern struct {
     length: u8 = std.mem.zeroes(u8),
     vendor_oui: [3]u8 = std.mem.zeroes([3]u8),
     vendor_oui_type: u8 = std.mem.zeroes(u8),
-    pub fn payload(self: anytype) @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
-        const Intermediate = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
-        const ReturnType = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+    pub fn payload(self: anytype) std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
+        const Intermediate = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
         return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 6)));
     }
 };
@@ -2811,7 +2810,7 @@ pub const wifi_promiscuous_pkt_type_t = c_uint;
 pub const wifi_promiscuous_filter_t = extern struct {
     filter_mask: u32 = std.mem.zeroes(u32),
 };
-pub const struct_wifi_csi_info_t = extern struct {
+pub const wifi_csi_info_t = extern struct {
     rx_ctrl: wifi_pkt_rx_ctrl_t = std.mem.zeroes(wifi_pkt_rx_ctrl_t),
     mac: [6]u8 = std.mem.zeroes([6]u8),
     dmac: [6]u8 = std.mem.zeroes([6]u8),
@@ -2822,7 +2821,7 @@ pub const struct_wifi_csi_info_t = extern struct {
     payload: [*c]u8 = std.mem.zeroes([*c]u8),
     payload_len: u16 = std.mem.zeroes(u16),
 };
-pub const wifi_csi_info_t = struct_wifi_csi_info_t; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:490:13: warning: struct demoted to opaque type - has bitfield
+// esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:490:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ant_gpio_t = opaque {};
 pub const wifi_ant_gpio_config_t = extern struct {
     gpio_cfg: [4]wifi_ant_gpio_t = std.mem.zeroes([4]wifi_ant_gpio_t),
@@ -2831,7 +2830,7 @@ pub const WIFI_ANT_MODE_ANT0: c_int = 0;
 pub const WIFI_ANT_MODE_ANT1: c_int = 1;
 pub const WIFI_ANT_MODE_AUTO: c_int = 2;
 pub const WIFI_ANT_MODE_MAX: c_int = 3;
-pub const wifi_ant_mode_t = c_uint; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:521:21: warning: struct demoted to opaque type - has bitfield
+pub const wifi_ant_mode_t = c_uint; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:521:21: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ant_config_t = opaque {};
 pub const wifi_action_rx_cb_t = ?*const fn ([*c]u8, [*c]u8, usize, u8) callconv(.C) c_int;
 pub const wifi_action_tx_req_t = extern struct {
@@ -2840,9 +2839,9 @@ pub const wifi_action_tx_req_t = extern struct {
     no_ack: bool = std.mem.zeroes(bool),
     rx_cb: wifi_action_rx_cb_t = std.mem.zeroes(wifi_action_rx_cb_t),
     data_len: u32 = std.mem.zeroes(u32),
-    pub fn data(self: anytype) @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
-        const Intermediate = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
-        const ReturnType = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+    pub fn data(self: anytype) std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
+        const Intermediate = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
         return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 20)));
     }
 };
@@ -2856,8 +2855,8 @@ pub const NAN_PUBLISH_SOLICITED: c_int = 0;
 pub const NAN_PUBLISH_UNSOLICITED: c_int = 1;
 pub const NAN_SUBSCRIBE_ACTIVE: c_int = 2;
 pub const NAN_SUBSCRIBE_PASSIVE: c_int = 3;
-pub const wifi_nan_service_type_t = c_uint; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:591:13: warning: struct demoted to opaque type - has bitfield
-pub const wifi_nan_publish_cfg_t = opaque {}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:605:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_nan_service_type_t = c_uint; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:591:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_nan_publish_cfg_t = opaque {}; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:605:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_nan_subscribe_cfg_t = opaque {};
 pub const wifi_nan_followup_params_t = extern struct {
     inst_id: u8 = std.mem.zeroes(u8),
@@ -2993,13 +2992,13 @@ pub const WPS_FAIL_REASON_NORMAL: c_int = 0;
 pub const WPS_FAIL_REASON_RECV_M2D: c_int = 1;
 pub const WPS_FAIL_REASON_MAX: c_int = 2;
 pub const wifi_event_sta_wps_fail_reason_t = c_uint;
-const struct_unnamed_19 = extern struct {
+const unnamed_19 = extern struct {
     ssid: [32]u8 = std.mem.zeroes([32]u8),
     passphrase: [64]u8 = std.mem.zeroes([64]u8),
 };
 pub const wifi_event_sta_wps_er_success_t = extern struct {
     ap_cred_cnt: u8 = std.mem.zeroes(u8),
-    ap_cred: [3]struct_unnamed_19 = std.mem.zeroes([3]struct_unnamed_19),
+    ap_cred: [3]unnamed_19 = std.mem.zeroes([3]unnamed_19),
 };
 pub const wifi_event_ap_staconnected_t = extern struct {
     mac: [6]u8 = std.mem.zeroes([6]u8),
@@ -3110,11 +3109,11 @@ pub const wifi_event_ndp_terminated_t = extern struct {
     ndp_id: u8 = std.mem.zeroes(u8),
     init_ndi: [6]u8 = std.mem.zeroes([6]u8),
 };
-pub const struct_wifi_sta_list_t = extern struct {
+pub const wifi_sta_list_t = extern struct {
     sta: [10]wifi_sta_info_t = std.mem.zeroes([10]wifi_sta_info_t),
     num: c_int = std.mem.zeroes(c_int),
 };
-pub const wifi_sta_list_t = struct_wifi_sta_list_t; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/local/esp_wifi_types_native.h:38:12: warning: struct demoted to opaque type - has bitfield
+// esp-idf/components/esp_wifi/include/local/esp_wifi_types_native.h:38:12: warning: struct demoted to opaque type - has bitfield
 pub const wifi_pkt_rx_ctrl_t = opaque {};
 pub const wifi_csi_config_t = extern struct {
     lltf_en: bool = std.mem.zeroes(bool),
@@ -3128,9 +3127,9 @@ pub const wifi_csi_config_t = extern struct {
 };
 pub const wifi_promiscuous_pkt_t = extern struct {
     rx_ctrl: wifi_pkt_rx_ctrl_t align(4) = std.mem.zeroes(wifi_pkt_rx_ctrl_t),
-    pub fn payload(self: anytype) @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
-        const Intermediate = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
-        const ReturnType = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+    pub fn payload(self: anytype) std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
+        const Intermediate = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
         return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 48)));
     }
 };
@@ -3216,104 +3215,104 @@ pub const esp_blufi_ap_record_t = extern struct {
     rssi: i8 = std.mem.zeroes(i8),
 };
 pub const esp_blufi_bd_addr_t = [6]u8;
-pub const struct_blufi_init_finish_evt_param_20 = extern struct {
+pub const blufi_init_finish_evt_param_20 = extern struct {
     state: esp_blufi_init_state_t = std.mem.zeroes(esp_blufi_init_state_t),
 };
-pub const struct_blufi_deinit_finish_evt_param_21 = extern struct {
+pub const blufi_deinit_finish_evt_param_21 = extern struct {
     state: esp_blufi_deinit_state_t = std.mem.zeroes(esp_blufi_deinit_state_t),
 };
-pub const struct_blufi_set_wifi_mode_evt_param_22 = extern struct {
+pub const blufi_set_wifi_mode_evt_param_22 = extern struct {
     op_mode: wifi_mode_t = std.mem.zeroes(wifi_mode_t),
 };
-pub const struct_blufi_connect_evt_param_23 = extern struct {
+pub const blufi_connect_evt_param_23 = extern struct {
     remote_bda: esp_blufi_bd_addr_t = std.mem.zeroes(esp_blufi_bd_addr_t),
     server_if: u8 = std.mem.zeroes(u8),
     conn_id: u16 = std.mem.zeroes(u16),
 };
-pub const struct_blufi_disconnect_evt_param_24 = extern struct {
+pub const blufi_disconnect_evt_param_24 = extern struct {
     remote_bda: esp_blufi_bd_addr_t = std.mem.zeroes(esp_blufi_bd_addr_t),
 };
-pub const struct_blufi_recv_sta_bssid_evt_param_25 = extern struct {
+pub const blufi_recv_sta_bssid_evt_param_25 = extern struct {
     bssid: [6]u8 = std.mem.zeroes([6]u8),
 };
-pub const struct_blufi_recv_sta_ssid_evt_param_26 = extern struct {
+pub const blufi_recv_sta_ssid_evt_param_26 = extern struct {
     ssid: [*c]u8 = std.mem.zeroes([*c]u8),
     ssid_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_sta_passwd_evt_param_27 = extern struct {
+pub const blufi_recv_sta_passwd_evt_param_27 = extern struct {
     passwd: [*c]u8 = std.mem.zeroes([*c]u8),
     passwd_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_softap_ssid_evt_param_28 = extern struct {
+pub const blufi_recv_softap_ssid_evt_param_28 = extern struct {
     ssid: [*c]u8 = std.mem.zeroes([*c]u8),
     ssid_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_softap_passwd_evt_param_29 = extern struct {
+pub const blufi_recv_softap_passwd_evt_param_29 = extern struct {
     passwd: [*c]u8 = std.mem.zeroes([*c]u8),
     passwd_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_softap_max_conn_num_evt_param_30 = extern struct {
+pub const blufi_recv_softap_max_conn_num_evt_param_30 = extern struct {
     max_conn_num: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_softap_auth_mode_evt_param_31 = extern struct {
+pub const blufi_recv_softap_auth_mode_evt_param_31 = extern struct {
     auth_mode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
 };
-pub const struct_blufi_recv_softap_channel_evt_param_32 = extern struct {
+pub const blufi_recv_softap_channel_evt_param_32 = extern struct {
     channel: u8 = std.mem.zeroes(u8),
 };
-pub const struct_blufi_recv_username_evt_param_33 = extern struct {
+pub const blufi_recv_username_evt_param_33 = extern struct {
     name: [*c]u8 = std.mem.zeroes([*c]u8),
     name_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_ca_evt_param_34 = extern struct {
+pub const blufi_recv_ca_evt_param_34 = extern struct {
     cert: [*c]u8 = std.mem.zeroes([*c]u8),
     cert_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_client_cert_evt_param_35 = extern struct {
+pub const blufi_recv_client_cert_evt_param_35 = extern struct {
     cert: [*c]u8 = std.mem.zeroes([*c]u8),
     cert_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_server_cert_evt_param_36 = extern struct {
+pub const blufi_recv_server_cert_evt_param_36 = extern struct {
     cert: [*c]u8 = std.mem.zeroes([*c]u8),
     cert_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_client_pkey_evt_param_37 = extern struct {
+pub const blufi_recv_client_pkey_evt_param_37 = extern struct {
     pkey: [*c]u8 = std.mem.zeroes([*c]u8),
     pkey_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_recv_server_pkey_evt_param_38 = extern struct {
+pub const blufi_recv_server_pkey_evt_param_38 = extern struct {
     pkey: [*c]u8 = std.mem.zeroes([*c]u8),
     pkey_len: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_blufi_get_error_evt_param_39 = extern struct {
+pub const blufi_get_error_evt_param_39 = extern struct {
     state: esp_blufi_error_state_t = std.mem.zeroes(esp_blufi_error_state_t),
 };
-pub const struct_blufi_recv_custom_data_evt_param_40 = extern struct {
+pub const blufi_recv_custom_data_evt_param_40 = extern struct {
     data: [*c]u8 = std.mem.zeroes([*c]u8),
     data_len: u32 = std.mem.zeroes(u32),
 };
 pub const esp_blufi_cb_param_t = extern union {
-    init_finish: struct_blufi_init_finish_evt_param_20,
-    deinit_finish: struct_blufi_deinit_finish_evt_param_21,
-    wifi_mode: struct_blufi_set_wifi_mode_evt_param_22,
-    connect: struct_blufi_connect_evt_param_23,
-    disconnect: struct_blufi_disconnect_evt_param_24,
-    sta_bssid: struct_blufi_recv_sta_bssid_evt_param_25,
-    sta_ssid: struct_blufi_recv_sta_ssid_evt_param_26,
-    sta_passwd: struct_blufi_recv_sta_passwd_evt_param_27,
-    softap_ssid: struct_blufi_recv_softap_ssid_evt_param_28,
-    softap_passwd: struct_blufi_recv_softap_passwd_evt_param_29,
-    softap_max_conn_num: struct_blufi_recv_softap_max_conn_num_evt_param_30,
-    softap_auth_mode: struct_blufi_recv_softap_auth_mode_evt_param_31,
-    softap_channel: struct_blufi_recv_softap_channel_evt_param_32,
-    username: struct_blufi_recv_username_evt_param_33,
-    ca: struct_blufi_recv_ca_evt_param_34,
-    client_cert: struct_blufi_recv_client_cert_evt_param_35,
-    server_cert: struct_blufi_recv_server_cert_evt_param_36,
-    client_pkey: struct_blufi_recv_client_pkey_evt_param_37,
-    server_pkey: struct_blufi_recv_server_pkey_evt_param_38,
-    report_error: struct_blufi_get_error_evt_param_39,
-    custom_data: struct_blufi_recv_custom_data_evt_param_40,
+    init_finish: blufi_init_finish_evt_param_20,
+    deinit_finish: blufi_deinit_finish_evt_param_21,
+    wifi_mode: blufi_set_wifi_mode_evt_param_22,
+    connect: blufi_connect_evt_param_23,
+    disconnect: blufi_disconnect_evt_param_24,
+    sta_bssid: blufi_recv_sta_bssid_evt_param_25,
+    sta_ssid: blufi_recv_sta_ssid_evt_param_26,
+    sta_passwd: blufi_recv_sta_passwd_evt_param_27,
+    softap_ssid: blufi_recv_softap_ssid_evt_param_28,
+    softap_passwd: blufi_recv_softap_passwd_evt_param_29,
+    softap_max_conn_num: blufi_recv_softap_max_conn_num_evt_param_30,
+    softap_auth_mode: blufi_recv_softap_auth_mode_evt_param_31,
+    softap_channel: blufi_recv_softap_channel_evt_param_32,
+    username: blufi_recv_username_evt_param_33,
+    ca: blufi_recv_ca_evt_param_34,
+    client_cert: blufi_recv_client_cert_evt_param_35,
+    server_cert: blufi_recv_server_cert_evt_param_36,
+    client_pkey: blufi_recv_client_pkey_evt_param_37,
+    server_pkey: blufi_recv_server_pkey_evt_param_38,
+    report_error: blufi_get_error_evt_param_39,
+    custom_data: blufi_recv_custom_data_evt_param_40,
 };
 pub const esp_blufi_event_cb_t = ?*const fn (esp_blufi_cb_event_t, [*c]esp_blufi_cb_param_t) callconv(.C) void;
 pub const esp_blufi_negotiate_data_handler_t = ?*const fn ([*c]u8, c_int, [*c][*c]u8, [*c]c_int, [*c]bool) callconv(.C) void;
@@ -3807,20 +3806,20 @@ pub const esp_ble_gap_past_params_t = extern struct {
     sync_timeout: u16 = std.mem.zeroes(u16),
     cte_type: u8 = std.mem.zeroes(u8),
 };
-pub const struct_ble_get_dev_name_cmpl_evt_param_41 = extern struct {
+pub const ble_get_dev_name_cmpl_evt_param_41 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     name: [*c]u8 = std.mem.zeroes([*c]u8),
 };
-pub const struct_ble_adv_data_cmpl_evt_param_42 = extern struct {
+pub const ble_adv_data_cmpl_evt_param_42 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_scan_rsp_data_cmpl_evt_param_43 = extern struct {
+pub const ble_scan_rsp_data_cmpl_evt_param_43 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_scan_param_cmpl_evt_param_44 = extern struct {
+pub const ble_scan_param_cmpl_evt_param_44 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_scan_result_evt_param_45 = extern struct {
+pub const ble_scan_result_evt_param_45 = extern struct {
     search_evt: esp_gap_search_evt_t = std.mem.zeroes(esp_gap_search_evt_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
     dev_type: esp_bt_dev_type_t = std.mem.zeroes(esp_bt_dev_type_t),
@@ -3834,31 +3833,31 @@ pub const struct_ble_scan_result_evt_param_45 = extern struct {
     scan_rsp_len: u8 = std.mem.zeroes(u8),
     num_dis: u32 = std.mem.zeroes(u32),
 };
-pub const struct_ble_adv_data_raw_cmpl_evt_param_46 = extern struct {
+pub const ble_adv_data_raw_cmpl_evt_param_46 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_scan_rsp_data_raw_cmpl_evt_param_47 = extern struct {
+pub const ble_scan_rsp_data_raw_cmpl_evt_param_47 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_adv_start_cmpl_evt_param_48 = extern struct {
+pub const ble_adv_start_cmpl_evt_param_48 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_scan_start_cmpl_evt_param_49 = extern struct {
+pub const ble_scan_start_cmpl_evt_param_49 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_scan_stop_cmpl_evt_param_50 = extern struct {
+pub const ble_scan_stop_cmpl_evt_param_50 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_adv_stop_cmpl_evt_param_51 = extern struct {
+pub const ble_adv_stop_cmpl_evt_param_51 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_adv_clear_cmpl_evt_param_52 = extern struct {
+pub const ble_adv_clear_cmpl_evt_param_52 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_set_rand_cmpl_evt_param_53 = extern struct {
+pub const ble_set_rand_cmpl_evt_param_53 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_update_conn_params_evt_param_54 = extern struct {
+pub const ble_update_conn_params_evt_param_54 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
     min_int: u16 = std.mem.zeroes(u16),
@@ -3867,140 +3866,140 @@ pub const struct_ble_update_conn_params_evt_param_54 = extern struct {
     conn_int: u16 = std.mem.zeroes(u16),
     timeout: u16 = std.mem.zeroes(u16),
 };
-pub const struct_ble_pkt_data_length_cmpl_evt_param_55 = extern struct {
+pub const ble_pkt_data_length_cmpl_evt_param_55 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     params: esp_ble_pkt_data_length_params_t = std.mem.zeroes(esp_ble_pkt_data_length_params_t),
 };
-pub const struct_ble_local_privacy_cmpl_evt_param_56 = extern struct {
+pub const ble_local_privacy_cmpl_evt_param_56 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_remove_bond_dev_cmpl_evt_param_57 = extern struct {
+pub const ble_remove_bond_dev_cmpl_evt_param_57 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
 };
-pub const struct_ble_clear_bond_dev_cmpl_evt_param_58 = extern struct {
+pub const ble_clear_bond_dev_cmpl_evt_param_58 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_get_bond_dev_cmpl_evt_param_59 = extern struct {
+pub const ble_get_bond_dev_cmpl_evt_param_59 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     dev_num: u8 = std.mem.zeroes(u8),
     bond_dev: [*c]esp_ble_bond_dev_t = std.mem.zeroes([*c]esp_ble_bond_dev_t),
 };
-pub const struct_ble_read_rssi_cmpl_evt_param_60 = extern struct {
+pub const ble_read_rssi_cmpl_evt_param_60 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     rssi: i8 = std.mem.zeroes(i8),
     remote_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
 };
-pub const struct_ble_update_whitelist_cmpl_evt_param_61 = extern struct {
+pub const ble_update_whitelist_cmpl_evt_param_61 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     wl_operation: esp_ble_wl_operation_t = std.mem.zeroes(esp_ble_wl_operation_t),
 };
-pub const struct_ble_update_duplicate_exceptional_list_cmpl_evt_param_62 = extern struct {
+pub const ble_update_duplicate_exceptional_list_cmpl_evt_param_62 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     subcode: u8 = std.mem.zeroes(u8),
     length: u16 = std.mem.zeroes(u16),
     device_info: esp_duplicate_info_t = std.mem.zeroes(esp_duplicate_info_t),
 };
-pub const struct_ble_set_channels_evt_param_63 = extern struct {
+pub const ble_set_channels_evt_param_63 = extern struct {
     stat: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_read_phy_cmpl_evt_param_64 = extern struct {
+pub const ble_read_phy_cmpl_evt_param_64 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
     tx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
     rx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
 };
-pub const struct_ble_set_perf_def_phy_cmpl_evt_param_65 = extern struct {
+pub const ble_set_perf_def_phy_cmpl_evt_param_65 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_set_perf_phy_cmpl_evt_param_66 = extern struct {
+pub const ble_set_perf_phy_cmpl_evt_param_66 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_set_rand_addr_cmpl_evt_param_67 = extern struct {
+pub const ble_ext_adv_set_rand_addr_cmpl_evt_param_67 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_set_params_cmpl_evt_param_68 = extern struct {
+pub const ble_ext_adv_set_params_cmpl_evt_param_68 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_data_set_cmpl_evt_param_69 = extern struct {
+pub const ble_ext_adv_data_set_cmpl_evt_param_69 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_scan_rsp_set_cmpl_evt_param_70 = extern struct {
+pub const ble_ext_adv_scan_rsp_set_cmpl_evt_param_70 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_start_cmpl_evt_param_71 = extern struct {
+pub const ble_ext_adv_start_cmpl_evt_param_71 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_stop_cmpl_evt_param_72 = extern struct {
+pub const ble_ext_adv_stop_cmpl_evt_param_72 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_set_remove_cmpl_evt_param_73 = extern struct {
+pub const ble_ext_adv_set_remove_cmpl_evt_param_73 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_adv_set_clear_cmpl_evt_param_74 = extern struct {
+pub const ble_ext_adv_set_clear_cmpl_evt_param_74 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_periodic_adv_set_params_cmpl_param_75 = extern struct {
+pub const ble_periodic_adv_set_params_cmpl_param_75 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_periodic_adv_data_set_cmpl_param_76 = extern struct {
+pub const ble_periodic_adv_data_set_cmpl_param_76 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_periodic_adv_start_cmpl_param_77 = extern struct {
+pub const ble_periodic_adv_start_cmpl_param_77 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_periodic_adv_stop_cmpl_param_78 = extern struct {
+pub const ble_periodic_adv_stop_cmpl_param_78 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_period_adv_create_sync_cmpl_param_79 = extern struct {
+pub const ble_period_adv_create_sync_cmpl_param_79 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_period_adv_sync_cancel_cmpl_param_80 = extern struct {
+pub const ble_period_adv_sync_cancel_cmpl_param_80 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_period_adv_sync_terminate_cmpl_param_81 = extern struct {
+pub const ble_period_adv_sync_terminate_cmpl_param_81 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_period_adv_add_dev_cmpl_param_82 = extern struct {
+pub const ble_period_adv_add_dev_cmpl_param_82 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_period_adv_remove_dev_cmpl_param_83 = extern struct {
+pub const ble_period_adv_remove_dev_cmpl_param_83 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_period_adv_clear_dev_cmpl_param_84 = extern struct {
+pub const ble_period_adv_clear_dev_cmpl_param_84 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_set_ext_scan_params_cmpl_param_85 = extern struct {
+pub const ble_set_ext_scan_params_cmpl_param_85 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_scan_start_cmpl_param_86 = extern struct {
+pub const ble_ext_scan_start_cmpl_param_86 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_scan_stop_cmpl_param_87 = extern struct {
+pub const ble_ext_scan_stop_cmpl_param_87 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_ext_conn_params_set_cmpl_param_88 = extern struct {
+pub const ble_ext_conn_params_set_cmpl_param_88 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_adv_terminate_param_89 = extern struct {
+pub const ble_adv_terminate_param_89 = extern struct {
     status: u8 = std.mem.zeroes(u8),
     adv_instance: u8 = std.mem.zeroes(u8),
     conn_idx: u16 = std.mem.zeroes(u16),
     completed_event: u8 = std.mem.zeroes(u8),
 };
-pub const struct_ble_scan_req_received_param_90 = extern struct {
+pub const ble_scan_req_received_param_90 = extern struct {
     adv_instance: u8 = std.mem.zeroes(u8),
     scan_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
     scan_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
 };
-pub const struct_ble_channel_sel_alg_param_91 = extern struct {
+pub const ble_channel_sel_alg_param_91 = extern struct {
     conn_handle: u16 = std.mem.zeroes(u16),
     channel_sel_alg: u8 = std.mem.zeroes(u8),
 };
-pub const struct_ble_periodic_adv_sync_lost_param_92 = extern struct {
+pub const ble_periodic_adv_sync_lost_param_92 = extern struct {
     sync_handle: u16 = std.mem.zeroes(u16),
 };
-pub const struct_ble_periodic_adv_sync_estab_param_93 = extern struct {
+pub const ble_periodic_adv_sync_estab_param_93 = extern struct {
     status: u8 = std.mem.zeroes(u8),
     sync_handle: u16 = std.mem.zeroes(u16),
     sid: u8 = std.mem.zeroes(u8),
@@ -4010,34 +4009,34 @@ pub const struct_ble_periodic_adv_sync_estab_param_93 = extern struct {
     period_adv_interval: u16 = std.mem.zeroes(u16),
     adv_clk_accuracy: u8 = std.mem.zeroes(u8),
 };
-pub const struct_ble_phy_update_cmpl_param_94 = extern struct {
+pub const ble_phy_update_cmpl_param_94 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
     tx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
     rx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
 };
-pub const struct_ble_ext_adv_report_param_95 = extern struct {
+pub const ble_ext_adv_report_param_95 = extern struct {
     params: esp_ble_gap_ext_adv_reprot_t = std.mem.zeroes(esp_ble_gap_ext_adv_reprot_t),
 };
-pub const struct_ble_periodic_adv_report_param_96 = extern struct {
+pub const ble_periodic_adv_report_param_96 = extern struct {
     params: esp_ble_gap_periodic_adv_report_t = std.mem.zeroes(esp_ble_gap_periodic_adv_report_t),
 };
-pub const struct_ble_periodic_adv_recv_enable_cmpl_param_97 = extern struct {
+pub const ble_periodic_adv_recv_enable_cmpl_param_97 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
 };
-pub const struct_ble_periodic_adv_sync_trans_cmpl_param_98 = extern struct {
-    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
-    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
-};
-pub const struct_ble_periodic_adv_set_info_trans_cmpl_param_99 = extern struct {
+pub const ble_periodic_adv_sync_trans_cmpl_param_98 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
 };
-pub const struct_ble_set_past_params_cmpl_param_100 = extern struct {
+pub const ble_periodic_adv_set_info_trans_cmpl_param_99 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
 };
-pub const struct_ble_periodic_adv_sync_trans_recv_param_101 = extern struct {
+pub const ble_set_past_params_cmpl_param_100 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const ble_periodic_adv_sync_trans_recv_param_101 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
     service_data: u16 = std.mem.zeroes(u16),
@@ -4049,75 +4048,75 @@ pub const struct_ble_periodic_adv_sync_trans_recv_param_101 = extern struct {
     adv_interval: u16 = std.mem.zeroes(u16),
     adv_clk_accuracy: u8 = std.mem.zeroes(u8),
 };
-pub const struct_ble_dtm_state_update_evt_param_102 = extern struct {
+pub const ble_dtm_state_update_evt_param_102 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     update_evt: esp_ble_dtm_update_evt_t = std.mem.zeroes(esp_ble_dtm_update_evt_t),
     num_of_pkt: u16 = std.mem.zeroes(u16),
 };
 pub const esp_ble_gap_cb_param_t = extern union {
-    get_dev_name_cmpl: struct_ble_get_dev_name_cmpl_evt_param_41,
-    adv_data_cmpl: struct_ble_adv_data_cmpl_evt_param_42,
-    scan_rsp_data_cmpl: struct_ble_scan_rsp_data_cmpl_evt_param_43,
-    scan_param_cmpl: struct_ble_scan_param_cmpl_evt_param_44,
-    scan_rst: struct_ble_scan_result_evt_param_45,
-    adv_data_raw_cmpl: struct_ble_adv_data_raw_cmpl_evt_param_46,
-    scan_rsp_data_raw_cmpl: struct_ble_scan_rsp_data_raw_cmpl_evt_param_47,
-    adv_start_cmpl: struct_ble_adv_start_cmpl_evt_param_48,
-    scan_start_cmpl: struct_ble_scan_start_cmpl_evt_param_49,
+    get_dev_name_cmpl: ble_get_dev_name_cmpl_evt_param_41,
+    adv_data_cmpl: ble_adv_data_cmpl_evt_param_42,
+    scan_rsp_data_cmpl: ble_scan_rsp_data_cmpl_evt_param_43,
+    scan_param_cmpl: ble_scan_param_cmpl_evt_param_44,
+    scan_rst: ble_scan_result_evt_param_45,
+    adv_data_raw_cmpl: ble_adv_data_raw_cmpl_evt_param_46,
+    scan_rsp_data_raw_cmpl: ble_scan_rsp_data_raw_cmpl_evt_param_47,
+    adv_start_cmpl: ble_adv_start_cmpl_evt_param_48,
+    scan_start_cmpl: ble_scan_start_cmpl_evt_param_49,
     ble_security: esp_ble_sec_t,
-    scan_stop_cmpl: struct_ble_scan_stop_cmpl_evt_param_50,
-    adv_stop_cmpl: struct_ble_adv_stop_cmpl_evt_param_51,
-    adv_clear_cmpl: struct_ble_adv_clear_cmpl_evt_param_52,
-    set_rand_addr_cmpl: struct_ble_set_rand_cmpl_evt_param_53,
-    update_conn_params: struct_ble_update_conn_params_evt_param_54,
-    pkt_data_length_cmpl: struct_ble_pkt_data_length_cmpl_evt_param_55,
-    local_privacy_cmpl: struct_ble_local_privacy_cmpl_evt_param_56,
-    remove_bond_dev_cmpl: struct_ble_remove_bond_dev_cmpl_evt_param_57,
-    clear_bond_dev_cmpl: struct_ble_clear_bond_dev_cmpl_evt_param_58,
-    get_bond_dev_cmpl: struct_ble_get_bond_dev_cmpl_evt_param_59,
-    read_rssi_cmpl: struct_ble_read_rssi_cmpl_evt_param_60,
-    update_whitelist_cmpl: struct_ble_update_whitelist_cmpl_evt_param_61,
-    update_duplicate_exceptional_list_cmpl: struct_ble_update_duplicate_exceptional_list_cmpl_evt_param_62,
-    ble_set_channels: struct_ble_set_channels_evt_param_63,
-    read_phy: struct_ble_read_phy_cmpl_evt_param_64,
-    set_perf_def_phy: struct_ble_set_perf_def_phy_cmpl_evt_param_65,
-    set_perf_phy: struct_ble_set_perf_phy_cmpl_evt_param_66,
-    ext_adv_set_rand_addr: struct_ble_ext_adv_set_rand_addr_cmpl_evt_param_67,
-    ext_adv_set_params: struct_ble_ext_adv_set_params_cmpl_evt_param_68,
-    ext_adv_data_set: struct_ble_ext_adv_data_set_cmpl_evt_param_69,
-    scan_rsp_set: struct_ble_ext_adv_scan_rsp_set_cmpl_evt_param_70,
-    ext_adv_start: struct_ble_ext_adv_start_cmpl_evt_param_71,
-    ext_adv_stop: struct_ble_ext_adv_stop_cmpl_evt_param_72,
-    ext_adv_remove: struct_ble_ext_adv_set_remove_cmpl_evt_param_73,
-    ext_adv_clear: struct_ble_ext_adv_set_clear_cmpl_evt_param_74,
-    peroid_adv_set_params: struct_ble_periodic_adv_set_params_cmpl_param_75,
-    period_adv_data_set: struct_ble_periodic_adv_data_set_cmpl_param_76,
-    period_adv_start: struct_ble_periodic_adv_start_cmpl_param_77,
-    period_adv_stop: struct_ble_periodic_adv_stop_cmpl_param_78,
-    period_adv_create_sync: struct_ble_period_adv_create_sync_cmpl_param_79,
-    period_adv_sync_cancel: struct_ble_period_adv_sync_cancel_cmpl_param_80,
-    period_adv_sync_term: struct_ble_period_adv_sync_terminate_cmpl_param_81,
-    period_adv_add_dev: struct_ble_period_adv_add_dev_cmpl_param_82,
-    period_adv_remove_dev: struct_ble_period_adv_remove_dev_cmpl_param_83,
-    period_adv_clear_dev: struct_ble_period_adv_clear_dev_cmpl_param_84,
-    set_ext_scan_params: struct_ble_set_ext_scan_params_cmpl_param_85,
-    ext_scan_start: struct_ble_ext_scan_start_cmpl_param_86,
-    ext_scan_stop: struct_ble_ext_scan_stop_cmpl_param_87,
-    ext_conn_params_set: struct_ble_ext_conn_params_set_cmpl_param_88,
-    adv_terminate: struct_ble_adv_terminate_param_89,
-    scan_req_received: struct_ble_scan_req_received_param_90,
-    channel_sel_alg: struct_ble_channel_sel_alg_param_91,
-    periodic_adv_sync_lost: struct_ble_periodic_adv_sync_lost_param_92,
-    periodic_adv_sync_estab: struct_ble_periodic_adv_sync_estab_param_93,
-    phy_update: struct_ble_phy_update_cmpl_param_94,
-    ext_adv_report: struct_ble_ext_adv_report_param_95,
-    period_adv_report: struct_ble_periodic_adv_report_param_96,
-    period_adv_recv_enable: struct_ble_periodic_adv_recv_enable_cmpl_param_97,
-    period_adv_sync_trans: struct_ble_periodic_adv_sync_trans_cmpl_param_98,
-    period_adv_set_info_trans: struct_ble_periodic_adv_set_info_trans_cmpl_param_99,
-    set_past_params: struct_ble_set_past_params_cmpl_param_100,
-    past_received: struct_ble_periodic_adv_sync_trans_recv_param_101,
-    dtm_state_update: struct_ble_dtm_state_update_evt_param_102,
+    scan_stop_cmpl: ble_scan_stop_cmpl_evt_param_50,
+    adv_stop_cmpl: ble_adv_stop_cmpl_evt_param_51,
+    adv_clear_cmpl: ble_adv_clear_cmpl_evt_param_52,
+    set_rand_addr_cmpl: ble_set_rand_cmpl_evt_param_53,
+    update_conn_params: ble_update_conn_params_evt_param_54,
+    pkt_data_length_cmpl: ble_pkt_data_length_cmpl_evt_param_55,
+    local_privacy_cmpl: ble_local_privacy_cmpl_evt_param_56,
+    remove_bond_dev_cmpl: ble_remove_bond_dev_cmpl_evt_param_57,
+    clear_bond_dev_cmpl: ble_clear_bond_dev_cmpl_evt_param_58,
+    get_bond_dev_cmpl: ble_get_bond_dev_cmpl_evt_param_59,
+    read_rssi_cmpl: ble_read_rssi_cmpl_evt_param_60,
+    update_whitelist_cmpl: ble_update_whitelist_cmpl_evt_param_61,
+    update_duplicate_exceptional_list_cmpl: ble_update_duplicate_exceptional_list_cmpl_evt_param_62,
+    ble_set_channels: ble_set_channels_evt_param_63,
+    read_phy: ble_read_phy_cmpl_evt_param_64,
+    set_perf_def_phy: ble_set_perf_def_phy_cmpl_evt_param_65,
+    set_perf_phy: ble_set_perf_phy_cmpl_evt_param_66,
+    ext_adv_set_rand_addr: ble_ext_adv_set_rand_addr_cmpl_evt_param_67,
+    ext_adv_set_params: ble_ext_adv_set_params_cmpl_evt_param_68,
+    ext_adv_data_set: ble_ext_adv_data_set_cmpl_evt_param_69,
+    scan_rsp_set: ble_ext_adv_scan_rsp_set_cmpl_evt_param_70,
+    ext_adv_start: ble_ext_adv_start_cmpl_evt_param_71,
+    ext_adv_stop: ble_ext_adv_stop_cmpl_evt_param_72,
+    ext_adv_remove: ble_ext_adv_set_remove_cmpl_evt_param_73,
+    ext_adv_clear: ble_ext_adv_set_clear_cmpl_evt_param_74,
+    peroid_adv_set_params: ble_periodic_adv_set_params_cmpl_param_75,
+    period_adv_data_set: ble_periodic_adv_data_set_cmpl_param_76,
+    period_adv_start: ble_periodic_adv_start_cmpl_param_77,
+    period_adv_stop: ble_periodic_adv_stop_cmpl_param_78,
+    period_adv_create_sync: ble_period_adv_create_sync_cmpl_param_79,
+    period_adv_sync_cancel: ble_period_adv_sync_cancel_cmpl_param_80,
+    period_adv_sync_term: ble_period_adv_sync_terminate_cmpl_param_81,
+    period_adv_add_dev: ble_period_adv_add_dev_cmpl_param_82,
+    period_adv_remove_dev: ble_period_adv_remove_dev_cmpl_param_83,
+    period_adv_clear_dev: ble_period_adv_clear_dev_cmpl_param_84,
+    set_ext_scan_params: ble_set_ext_scan_params_cmpl_param_85,
+    ext_scan_start: ble_ext_scan_start_cmpl_param_86,
+    ext_scan_stop: ble_ext_scan_stop_cmpl_param_87,
+    ext_conn_params_set: ble_ext_conn_params_set_cmpl_param_88,
+    adv_terminate: ble_adv_terminate_param_89,
+    scan_req_received: ble_scan_req_received_param_90,
+    channel_sel_alg: ble_channel_sel_alg_param_91,
+    periodic_adv_sync_lost: ble_periodic_adv_sync_lost_param_92,
+    periodic_adv_sync_estab: ble_periodic_adv_sync_estab_param_93,
+    phy_update: ble_phy_update_cmpl_param_94,
+    ext_adv_report: ble_ext_adv_report_param_95,
+    period_adv_report: ble_periodic_adv_report_param_96,
+    period_adv_recv_enable: ble_periodic_adv_recv_enable_cmpl_param_97,
+    period_adv_sync_trans: ble_periodic_adv_sync_trans_cmpl_param_98,
+    period_adv_set_info_trans: ble_periodic_adv_set_info_trans_cmpl_param_99,
+    set_past_params: ble_set_past_params_cmpl_param_100,
+    past_received: ble_periodic_adv_sync_trans_recv_param_101,
+    dtm_state_update: ble_dtm_state_update_evt_param_102,
 };
 pub const esp_gap_ble_cb_t = ?*const fn (esp_gap_ble_cb_event_t, [*c]esp_ble_gap_cb_param_t) callconv(.C) void;
 pub extern fn esp_ble_gap_register_callback(callback: esp_gap_ble_cb_t) esp_err_t;
@@ -4209,7 +4208,7 @@ pub extern fn esp_blufi_adv_stop() void;
 pub extern fn esp_blufi_adv_start() void;
 pub extern fn esp_blufi_send_encap(arg: ?*anyopaque) void;
 
-pub const struct_sched_param = extern struct {
+pub const sched_param = extern struct {
     sched_priority: c_int = std.mem.zeroes(c_int),
 };
 pub extern fn sched_yield() c_int;
@@ -4221,7 +4220,7 @@ pub const pthread_attr_t = extern struct {
     contentionscope: c_int = std.mem.zeroes(c_int),
     inheritsched: c_int = std.mem.zeroes(c_int),
     schedpolicy: c_int = std.mem.zeroes(c_int),
-    schedparam: struct_sched_param = std.mem.zeroes(struct_sched_param),
+    schedparam: sched_param = std.mem.zeroes(sched_param),
     detachstate: c_int = std.mem.zeroes(c_int),
 };
 pub const pthread_mutex_t = c_uint;
@@ -4240,7 +4239,7 @@ pub const pthread_once_t = extern struct {
     is_initialized: c_int = std.mem.zeroes(c_int),
     init_executed: c_int = std.mem.zeroes(c_int),
 };
-pub const struct_bintime = extern struct {
+pub const bintime = extern struct {
     sec: i64 = std.mem.zeroes(i64),
     frac: u64 = std.mem.zeroes(u64),
 };
@@ -4274,8 +4273,8 @@ pub extern fn pthread_cond_signal(__cond: [*c]pthread_cond_t) c_int;
 pub extern fn pthread_cond_broadcast(__cond: [*c]pthread_cond_t) c_int;
 pub extern fn pthread_cond_wait(__cond: [*c]pthread_cond_t, __mutex: [*c]pthread_mutex_t) c_int;
 pub extern fn pthread_cond_timedwait(__cond: [*c]pthread_cond_t, __mutex: [*c]pthread_mutex_t, __abstime: [*c]const timespec) c_int;
-pub extern fn pthread_attr_setschedparam(__attr: [*c]pthread_attr_t, __param: [*c]const struct_sched_param) c_int;
-pub extern fn pthread_attr_getschedparam(__attr: [*c]const pthread_attr_t, __param: [*c]struct_sched_param) c_int;
+pub extern fn pthread_attr_setschedparam(__attr: [*c]pthread_attr_t, __param: [*c]const sched_param) c_int;
+pub extern fn pthread_attr_getschedparam(__attr: [*c]const pthread_attr_t, __param: [*c]sched_param) c_int;
 pub extern fn pthread_attr_init(__attr: [*c]pthread_attr_t) c_int;
 pub extern fn pthread_attr_destroy(__attr: [*c]pthread_attr_t) c_int;
 pub extern fn pthread_attr_setstack(attr: [*c]pthread_attr_t, __stackaddr: ?*anyopaque, __stacksize: usize) c_int;
