@@ -209,13 +209,10 @@ pub const esp_log_level_t = enum(c_uint) {
     ESP_LOG_DEBUG = 4,
     ESP_LOG_VERBOSE = 5,
 };
-pub fn ESP_LOGI(comptime level: esp_log_level_t, tag: [*:0]const u8, comptime cfmt: [*:0]const u8) void {
+pub fn ESP_LOGI(level: esp_log_level_t, tag: [*:0]const u8, comptime cfmt: []const u8, args: anytype) void {
     std.debug.assert(level != .ESP_LOG_NONE);
-    const fmt = std.fmt.comptimePrint("{s}: {s}{s}\n", .{
-        @tagName(level),
-        LOG_RESET_COLOR,
-        cfmt,
-    });
+    const fmt = std.fmt.allocPrintZ(raw_heap_caps_allocator, cfmt, args) catch unreachable;
+    defer raw_heap_caps_allocator.free(fmt);
     esp_log_write(level, tag, fmt, esp_log_timestamp(), tag);
 }
 pub const LOG_COLOR_BLACK = "30";
