@@ -1,34 +1,11 @@
 //! esp-idf headers 'zig translate-c' v0.12.0 for xtensa target (re-edited by @kassane)
 
 const std = @import("std");
+
 pub const va_list = extern struct {
     __va_stk: [*c]c_int = std.mem.zeroes([*c]c_int),
     __va_reg: [*c]c_int = std.mem.zeroes([*c]c_int),
     __va_ndx: c_int = std.mem.zeroes(c_int),
-};
-
-// C error
-pub const esp_err_t = enum(c_int) {
-    ESP_OK = 0,
-    ESP_FAIL = -1,
-    ESP_ERR_NO_MEM = 0x101,
-    ESP_ERR_INVALID_ARG = 0x102,
-    ESP_ERR_INVALID_STATE = 0x103,
-    ESP_ERR_INVALID_SIZE = 0x104,
-    ESP_ERR_NOT_FOUND = 0x105,
-    ESP_ERR_NOT_SUPPORTED = 0x106,
-    ESP_ERR_TIMEOUT = 0x107,
-    ESP_ERR_INVALID_RESPONSE = 0x108,
-    ESP_ERR_INVALID_CRC = 0x109,
-    ESP_ERR_INVALID_VERSION = 0x10A,
-    ESP_ERR_INVALID_MAC = 0x10B,
-    ESP_ERR_NOT_FINISHED = 0x10C,
-    ESP_ERR_NOT_ALLOWED = 0x10D,
-    ESP_ERR_WIFI_BASE = 0x3000,
-    ESP_ERR_MESH_BASE = 0x4000,
-    ESP_ERR_FLASH_BASE = 0x6000,
-    ESP_ERR_HW_CRYPTO_BASE = 0xc000,
-    ESP_ERR_MEMPROT_BASE = 0xd000,
 };
 
 pub const raw_heap_caps_allocator: std.mem.Allocator = .{
@@ -80,6 +57,30 @@ fn rawHeapCapsFree(
     heap_caps_free(buf.ptr);
 }
 
+// C error
+pub const esp_err_t = enum(c_int) {
+    ESP_OK = 0,
+    ESP_FAIL = -1,
+    ESP_ERR_NO_MEM = 0x101,
+    ESP_ERR_INVALID_ARG = 0x102,
+    ESP_ERR_INVALID_STATE = 0x103,
+    ESP_ERR_INVALID_SIZE = 0x104,
+    ESP_ERR_NOT_FOUND = 0x105,
+    ESP_ERR_NOT_SUPPORTED = 0x106,
+    ESP_ERR_TIMEOUT = 0x107,
+    ESP_ERR_INVALID_RESPONSE = 0x108,
+    ESP_ERR_INVALID_CRC = 0x109,
+    ESP_ERR_INVALID_VERSION = 0x10A,
+    ESP_ERR_INVALID_MAC = 0x10B,
+    ESP_ERR_NOT_FINISHED = 0x10C,
+    ESP_ERR_NOT_ALLOWED = 0x10D,
+    ESP_ERR_WIFI_BASE = 0x3000,
+    ESP_ERR_MESH_BASE = 0x4000,
+    ESP_ERR_FLASH_BASE = 0x6000,
+    ESP_ERR_HW_CRYPTO_BASE = 0xc000,
+    ESP_ERR_MEMPROT_BASE = 0xd000,
+};
+
 // Zig error
 const esp_error = error{
     Fail,
@@ -90,7 +91,7 @@ const esp_error = error{
     ErrorNotFound,
     ErrorNotSupported,
     ErrorTimeout,
-    ErrorInvalidRonse,
+    ErrorInvalidResponse,
     ErrorInvalidCRC,
     ErrorInvalidVersion,
     ErrorInvalidMAC,
@@ -125,10 +126,11 @@ pub fn espError(err: esp_err_t) esp_error!esp_err_t {
         .ESP_ERR_FLASH_BASE => esp_error.ErrorFlashBase,
         .ESP_ERR_HW_CRYPTO_BASE => esp_error.ErrorHWCryptoBase,
         .ESP_ERR_MEMPROT_BASE => esp_error.ErrorMemProtectBase,
+        else => .ESP_OK,
     };
 }
 
-pub fn getIDFError(errc: esp_err_t) !void {
+pub fn espCheckError(errc: esp_err_t) esp_error!void {
     if (try espError(errc) == esp_err_t.ESP_OK)
         return;
 }
@@ -155,11 +157,11 @@ pub const esp_reset_reason_t = enum(c_uint) {
 pub const shutdown_handler_t = ?*const fn () callconv(.C) void;
 extern fn esp_register_shutdown_handler(handle: shutdown_handler_t) esp_err_t;
 pub fn espRegisterShutdownHandler(handle: shutdown_handler_t) !void {
-    try getIDFError(esp_register_shutdown_handler(handle));
+    try espCheckError(esp_register_shutdown_handler(handle));
 }
 extern fn esp_unregister_shutdown_handler(handle: shutdown_handler_t) esp_err_t;
 pub fn espUnregisterShutdownHandler(handle: shutdown_handler_t) !void {
-    try getIDFError(esp_unregister_shutdown_handler(handle));
+    try espCheckError(esp_unregister_shutdown_handler(handle));
 }
 pub extern fn esp_restart() noreturn;
 pub extern fn esp_reset_reason() esp_reset_reason_t;
