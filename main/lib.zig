@@ -1,9 +1,10 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const esp_idf = @import("esp_idf");
+const led = @import("led-strip.zig");
 
 export fn app_main() callconv(.C) void {
-    _ = std.c.printf("Hello, world from Zig!\n");
+    esp_idf.ESP_LOGI(.ESP_LOG_INFO, "zig-example", "Hello, world from Zig!");
     _ = std.c.printf(
         "\nZig Info:\n\nVersion: %s\nStage: %s\n",
         builtin.zig_version_string,
@@ -32,21 +33,53 @@ export fn app_main() callconv(.C) void {
         _ = std.c.printf("Arr value: %d!\n", index);
     }
 
-    _ = esp_idf.xTaskCreate(foo, "foo", 1024, null, 1, null);
-    _ = esp_idf.xTaskCreate(bar, "bar", 1024, null, 0, null);
+    // _ = esp_idf.xTaskCreate(foo, "foo", 1024, null, 1, null);
+    // _ = esp_idf.xTaskCreate(bar, "bar", 1024, null, 0, null);
+    // configure_led();
+    // while (true) {
+    //     blink_led();
+    //     s_led_state = !s_led_state;
+    //     _ = esp_idf.vTaskDelay(led.CONFIG_BLINK_PERIOD / esp_idf.portTICK_PERIOD_MS);
+    // }
 }
 
 pub export fn foo(params: ?*anyopaque) callconv(.C) void {
     _ = params; // autofix
     while (true) {
         _ = std.c.printf("Demo_Task printing..\n");
-        _ = esp_idf.vTaskDelay(6000 / std.time.ms_per_s);
+        _ = esp_idf.vTaskDelay(6000 / esp_idf.portTICK_PERIOD_MS);
     }
 }
 pub export fn bar(params: ?*anyopaque) callconv(.C) void {
     _ = params; // autofix
     while (true) {
         _ = std.c.printf("Demo_Task 2 printing..\n");
-        _ = esp_idf.vTaskDelay(1000 / std.time.ms_per_s);
+        _ = esp_idf.vTaskDelay(1000 / esp_idf.portTICK_PERIOD_MS);
     }
 }
+
+// export fn blink_led() void {
+//     //* If the addressable LED is enabled */
+//     if (s_led_state) {
+//         //* Set the LED pixel using RGB from 0 (0%) to 255 (100%) for each color */
+//         _ = led.led_strip_set_pixel(led_strip, 0, 16, 16, 16);
+//         //* Refresh the strip to send data */
+//         _ = led.led_strip_refresh(led_strip);
+//     } else {
+//         //* Set all LED off to clear all pixels */
+//         _ = led.led_strip_clear(led_strip);
+//     }
+// }
+export fn blink_led() void {
+    _ = led.gpio_set_level(BLINK_GPIO, @intFromBool(s_led_state));
+}
+export fn configure_led() void {
+    // ESP_LOGI(TAG, "Example configured to blink GPIO LED!");
+    _ = led.gpio_reset_pin(BLINK_GPIO);
+    // Set the GPIO as a push/pull output
+    _ = led.gpio_set_direction(BLINK_GPIO, esp_idf.gpio_mode_t.GPIO_MODE_OUTPUT);
+}
+
+const BLINK_GPIO: esp_idf.gpio_num_t = @enumFromInt(led.CONFIG_BLINK_GPIO);
+var s_led_state: bool = false;
+const led_strip = led.led_strip_handle_t;

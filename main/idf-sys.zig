@@ -209,6 +209,34 @@ pub const esp_log_level_t = enum(c_uint) {
     ESP_LOG_DEBUG = 4,
     ESP_LOG_VERBOSE = 5,
 };
+pub fn ESP_LOGI(comptime level: esp_log_level_t, tag: [*:0]const u8, comptime cfmt: [*:0]const u8) void {
+    std.debug.assert(level != .ESP_LOG_NONE);
+    const fmt = std.fmt.comptimePrint("{s}: {s}{s}\n", .{
+        @tagName(level),
+        LOG_RESET_COLOR,
+        cfmt,
+    });
+    esp_log_write(level, tag, fmt, esp_log_timestamp(), tag);
+}
+pub const LOG_COLOR_BLACK = "30";
+pub const LOG_COLOR_RED = "31";
+pub const LOG_COLOR_GREEN = "32";
+pub const LOG_COLOR_BROWN = "33";
+pub const LOG_COLOR_BLUE = "34";
+pub const LOG_COLOR_PURPLE = "35";
+pub const LOG_COLOR_CYAN = "36";
+pub inline fn LOG_COLOR(COLOR: anytype) @TypeOf("\x1b[0;" ++ COLOR ++ "m") {
+    _ = &COLOR;
+    return "\x1b[0;" ++ COLOR ++ "m";
+}
+pub inline fn LOG_BOLD(COLOR: anytype) @TypeOf("\x1b[1;" ++ COLOR ++ "m") {
+    _ = &COLOR;
+    return "\x1b[1;" ++ COLOR ++ "m";
+}
+pub const LOG_RESET_COLOR = "\x1b[0m";
+pub const LOG_COLOR_E = LOG_COLOR(LOG_COLOR_RED);
+pub const LOG_COLOR_W = LOG_COLOR(LOG_COLOR_BROWN);
+pub const LOG_COLOR_I = LOG_COLOR(LOG_COLOR_GREEN);
 pub const vprintf_like_t = ?*const fn ([*:0]const u8, va_list) callconv(.C) c_int;
 pub extern var esp_log_default_level: esp_log_level_t;
 pub extern fn esp_log_level_set(tag: [*:0]const u8, level: esp_log_level_t) void;
@@ -2059,3 +2087,2235 @@ pub extern fn uxTaskGetSnapshotAll(pxTaskSnapshotArray: [*c]TaskSnapshot_t, uxAr
 pub extern fn pvTaskGetCurrentTCBForCore(xCoreID: BaseType_t) ?*anyopaque;
 pub extern fn esp_int_wdt_init() void;
 pub extern fn esp_int_wdt_cpu_init() void;
+pub const portTICK_PERIOD_MS: TickType_t = @as(TickType_t, @divExact(@as(c_int, 1000), configTICK_RATE_HZ));
+pub const configTICK_RATE_HZ: c_int = 100;
+
+pub const esp_event_base_t = [*c]const u8;
+pub const esp_event_loop_handle_t = ?*anyopaque;
+pub const esp_event_handler_t = ?*const fn (?*anyopaque, esp_event_base_t, i32, ?*anyopaque) callconv(.C) void;
+pub const esp_event_handler_instance_t = ?*anyopaque;
+pub const esp_event_loop_args_t = extern struct {
+    queue_size: i32 = std.mem.zeroes(i32),
+    task_name: [*c]const u8 = std.mem.zeroes([*c]const u8),
+    task_priority: UBaseType_t = std.mem.zeroes(UBaseType_t),
+    task_stack_size: u32 = std.mem.zeroes(u32),
+    task_core_id: BaseType_t = std.mem.zeroes(BaseType_t),
+};
+pub extern fn esp_event_loop_create(event_loop_args: [*c]const esp_event_loop_args_t, event_loop: [*c]esp_event_loop_handle_t) esp_err_t;
+pub extern fn esp_event_loop_delete(event_loop: esp_event_loop_handle_t) esp_err_t;
+pub extern fn esp_event_loop_create_default() esp_err_t;
+pub extern fn esp_event_loop_delete_default() esp_err_t;
+pub extern fn esp_event_loop_run(event_loop: esp_event_loop_handle_t, ticks_to_run: TickType_t) esp_err_t;
+pub extern fn esp_event_handler_register(event_base: esp_event_base_t, event_id: i32, event_handler: esp_event_handler_t, event_handler_arg: ?*anyopaque) esp_err_t;
+pub extern fn esp_event_handler_register_with(event_loop: esp_event_loop_handle_t, event_base: esp_event_base_t, event_id: i32, event_handler: esp_event_handler_t, event_handler_arg: ?*anyopaque) esp_err_t;
+pub extern fn esp_event_handler_instance_register_with(event_loop: esp_event_loop_handle_t, event_base: esp_event_base_t, event_id: i32, event_handler: esp_event_handler_t, event_handler_arg: ?*anyopaque, instance: [*c]esp_event_handler_instance_t) esp_err_t;
+pub extern fn esp_event_handler_instance_register(event_base: esp_event_base_t, event_id: i32, event_handler: esp_event_handler_t, event_handler_arg: ?*anyopaque, instance: [*c]esp_event_handler_instance_t) esp_err_t;
+pub extern fn esp_event_handler_unregister(event_base: esp_event_base_t, event_id: i32, event_handler: esp_event_handler_t) esp_err_t;
+pub extern fn esp_event_handler_unregister_with(event_loop: esp_event_loop_handle_t, event_base: esp_event_base_t, event_id: i32, event_handler: esp_event_handler_t) esp_err_t;
+pub extern fn esp_event_handler_instance_unregister_with(event_loop: esp_event_loop_handle_t, event_base: esp_event_base_t, event_id: i32, instance: esp_event_handler_instance_t) esp_err_t;
+pub extern fn esp_event_handler_instance_unregister(event_base: esp_event_base_t, event_id: i32, instance: esp_event_handler_instance_t) esp_err_t;
+pub extern fn esp_event_post(event_base: esp_event_base_t, event_id: i32, event_data: ?*const anyopaque, event_data_size: usize, ticks_to_wait: TickType_t) esp_err_t;
+pub extern fn esp_event_post_to(event_loop: esp_event_loop_handle_t, event_base: esp_event_base_t, event_id: i32, event_data: ?*const anyopaque, event_data_size: usize, ticks_to_wait: TickType_t) esp_err_t;
+pub extern fn esp_event_isr_post(event_base: esp_event_base_t, event_id: i32, event_data: ?*const anyopaque, event_data_size: usize, task_unblocked: [*c]BaseType_t) esp_err_t;
+pub extern fn esp_event_isr_post_to(event_loop: esp_event_loop_handle_t, event_base: esp_event_base_t, event_id: i32, event_data: ?*const anyopaque, event_data_size: usize, task_unblocked: [*c]BaseType_t) esp_err_t;
+pub extern fn esp_event_dump(file: std.c.FILE) esp_err_t;
+pub const nvs_handle_t = u32;
+pub const nvs_handle = nvs_handle_t;
+pub const NVS_READONLY: c_int = 0;
+pub const NVS_READWRITE: c_int = 1;
+pub const nvs_open_mode_t = c_uint;
+pub const nvs_open_mode = nvs_open_mode_t;
+pub const NVS_TYPE_U8: c_int = 1;
+pub const NVS_TYPE_I8: c_int = 17;
+pub const NVS_TYPE_U16: c_int = 2;
+pub const NVS_TYPE_I16: c_int = 18;
+pub const NVS_TYPE_U32: c_int = 4;
+pub const NVS_TYPE_I32: c_int = 20;
+pub const NVS_TYPE_U64: c_int = 8;
+pub const NVS_TYPE_I64: c_int = 24;
+pub const NVS_TYPE_STR: c_int = 33;
+pub const NVS_TYPE_BLOB: c_int = 66;
+pub const NVS_TYPE_ANY: c_int = 255;
+pub const nvs_type_t = c_uint;
+pub const nvs_entry_info_t = extern struct {
+    namespace_name: [16]u8 = std.mem.zeroes([16]u8),
+    key: [16]u8 = std.mem.zeroes([16]u8),
+    type: nvs_type_t = std.mem.zeroes(nvs_type_t),
+};
+pub const struct_nvs_opaque_iterator_t = opaque {};
+pub const nvs_iterator_t = ?*struct_nvs_opaque_iterator_t;
+pub extern fn nvs_open(namespace_name: [*c]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
+pub extern fn nvs_open_from_partition(part_name: [*c]const u8, namespace_name: [*c]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
+pub extern fn nvs_set_i8(handle: nvs_handle_t, key: [*c]const u8, value: i8) esp_err_t;
+pub extern fn nvs_set_u8(handle: nvs_handle_t, key: [*c]const u8, value: u8) esp_err_t;
+pub extern fn nvs_set_i16(handle: nvs_handle_t, key: [*c]const u8, value: i16) esp_err_t;
+pub extern fn nvs_set_u16(handle: nvs_handle_t, key: [*c]const u8, value: u16) esp_err_t;
+pub extern fn nvs_set_i32(handle: nvs_handle_t, key: [*c]const u8, value: i32) esp_err_t;
+pub extern fn nvs_set_u32(handle: nvs_handle_t, key: [*c]const u8, value: u32) esp_err_t;
+pub extern fn nvs_set_i64(handle: nvs_handle_t, key: [*c]const u8, value: i64) esp_err_t;
+pub extern fn nvs_set_u64(handle: nvs_handle_t, key: [*c]const u8, value: u64) esp_err_t;
+pub extern fn nvs_set_str(handle: nvs_handle_t, key: [*c]const u8, value: [*c]const u8) esp_err_t;
+pub extern fn nvs_set_blob(handle: nvs_handle_t, key: [*c]const u8, value: ?*const anyopaque, length: usize) esp_err_t;
+pub extern fn nvs_get_i8(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i8) esp_err_t;
+pub extern fn nvs_get_u8(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u8) esp_err_t;
+pub extern fn nvs_get_i16(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i16) esp_err_t;
+pub extern fn nvs_get_u16(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u16) esp_err_t;
+pub extern fn nvs_get_i32(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i32) esp_err_t;
+pub extern fn nvs_get_u32(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u32) esp_err_t;
+pub extern fn nvs_get_i64(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i64) esp_err_t;
+pub extern fn nvs_get_u64(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u64) esp_err_t;
+pub extern fn nvs_get_str(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u8, length: [*c]usize) esp_err_t;
+pub extern fn nvs_get_blob(handle: nvs_handle_t, key: [*c]const u8, out_value: ?*anyopaque, length: [*c]usize) esp_err_t;
+pub extern fn nvs_find_key(handle: nvs_handle_t, key: [*c]const u8, out_type: [*c]nvs_type_t) esp_err_t;
+pub extern fn nvs_erase_key(handle: nvs_handle_t, key: [*c]const u8) esp_err_t;
+pub extern fn nvs_erase_all(handle: nvs_handle_t) esp_err_t;
+pub extern fn nvs_commit(handle: nvs_handle_t) esp_err_t;
+pub extern fn nvs_close(handle: nvs_handle_t) void;
+pub const nvs_stats_t = extern struct {
+    used_entries: usize = std.mem.zeroes(usize),
+    free_entries: usize = std.mem.zeroes(usize),
+    available_entries: usize = std.mem.zeroes(usize),
+    total_entries: usize = std.mem.zeroes(usize),
+    namespace_count: usize = std.mem.zeroes(usize),
+};
+pub extern fn nvs_get_stats(part_name: [*c]const u8, nvs_stats: [*c]nvs_stats_t) esp_err_t;
+pub extern fn nvs_get_used_entry_count(handle: nvs_handle_t, used_entries: [*c]usize) esp_err_t;
+pub extern fn nvs_entry_find(part_name: [*c]const u8, namespace_name: [*c]const u8, @"type": nvs_type_t, output_iterator: [*c]nvs_iterator_t) esp_err_t;
+pub extern fn nvs_entry_find_in_handle(handle: nvs_handle_t, @"type": nvs_type_t, output_iterator: [*c]nvs_iterator_t) esp_err_t;
+pub extern fn nvs_entry_next(iterator: [*c]nvs_iterator_t) esp_err_t;
+pub extern fn nvs_entry_info(iterator: nvs_iterator_t, out_info: [*c]nvs_entry_info_t) esp_err_t;
+pub extern fn nvs_release_iterator(iterator: nvs_iterator_t) void;
+pub const struct_esp_flash_t = opaque {};
+pub const esp_flash_t = struct_esp_flash_t;
+pub const ESP_PARTITION_MMAP_DATA: c_int = 0;
+pub const ESP_PARTITION_MMAP_INST: c_int = 1;
+pub const esp_partition_mmap_memory_t = c_uint;
+pub const esp_partition_mmap_handle_t = u32;
+pub const ESP_PARTITION_TYPE_APP: c_int = 0;
+pub const ESP_PARTITION_TYPE_DATA: c_int = 1;
+pub const ESP_PARTITION_TYPE_ANY: c_int = 255;
+pub const esp_partition_type_t = c_uint;
+pub const ESP_PARTITION_SUBTYPE_APP_FACTORY: c_int = 0;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_MIN: c_int = 16;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_0: c_int = 16;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_1: c_int = 17;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_2: c_int = 18;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_3: c_int = 19;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_4: c_int = 20;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_5: c_int = 21;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_6: c_int = 22;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_7: c_int = 23;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_8: c_int = 24;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_9: c_int = 25;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_10: c_int = 26;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_11: c_int = 27;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_12: c_int = 28;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_13: c_int = 29;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_14: c_int = 30;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_15: c_int = 31;
+pub const ESP_PARTITION_SUBTYPE_APP_OTA_MAX: c_int = 32;
+pub const ESP_PARTITION_SUBTYPE_APP_TEST: c_int = 32;
+pub const ESP_PARTITION_SUBTYPE_DATA_OTA: c_int = 0;
+pub const ESP_PARTITION_SUBTYPE_DATA_PHY: c_int = 1;
+pub const ESP_PARTITION_SUBTYPE_DATA_NVS: c_int = 2;
+pub const ESP_PARTITION_SUBTYPE_DATA_COREDUMP: c_int = 3;
+pub const ESP_PARTITION_SUBTYPE_DATA_NVS_KEYS: c_int = 4;
+pub const ESP_PARTITION_SUBTYPE_DATA_EFUSE_EM: c_int = 5;
+pub const ESP_PARTITION_SUBTYPE_DATA_UNDEFINED: c_int = 6;
+pub const ESP_PARTITION_SUBTYPE_DATA_ESPHTTPD: c_int = 128;
+pub const ESP_PARTITION_SUBTYPE_DATA_FAT: c_int = 129;
+pub const ESP_PARTITION_SUBTYPE_DATA_SPIFFS: c_int = 130;
+pub const ESP_PARTITION_SUBTYPE_DATA_LITTLEFS: c_int = 131;
+pub const ESP_PARTITION_SUBTYPE_ANY: c_int = 255;
+pub const esp_partition_subtype_t = c_uint;
+pub const struct_esp_partition_iterator_opaque_ = opaque {};
+pub const esp_partition_iterator_t = ?*struct_esp_partition_iterator_opaque_;
+pub const esp_partition_t = extern struct {
+    flash_chip: ?*esp_flash_t = std.mem.zeroes(?*esp_flash_t),
+    type: esp_partition_type_t = std.mem.zeroes(esp_partition_type_t),
+    subtype: esp_partition_subtype_t = std.mem.zeroes(esp_partition_subtype_t),
+    address: u32 = std.mem.zeroes(u32),
+    size: u32 = std.mem.zeroes(u32),
+    erase_size: u32 = std.mem.zeroes(u32),
+    label: [17]u8 = std.mem.zeroes([17]u8),
+    encrypted: bool = std.mem.zeroes(bool),
+    readonly: bool = std.mem.zeroes(bool),
+};
+pub extern fn esp_partition_find(@"type": esp_partition_type_t, subtype: esp_partition_subtype_t, label: [*c]const u8) esp_partition_iterator_t;
+pub extern fn esp_partition_find_first(@"type": esp_partition_type_t, subtype: esp_partition_subtype_t, label: [*c]const u8) [*c]const esp_partition_t;
+pub extern fn esp_partition_get(iterator: esp_partition_iterator_t) [*c]const esp_partition_t;
+pub extern fn esp_partition_next(iterator: esp_partition_iterator_t) esp_partition_iterator_t;
+pub extern fn esp_partition_iterator_release(iterator: esp_partition_iterator_t) void;
+pub extern fn esp_partition_verify(partition: [*c]const esp_partition_t) [*c]const esp_partition_t;
+pub extern fn esp_partition_read(partition: [*c]const esp_partition_t, src_offset: usize, dst: ?*anyopaque, size: usize) esp_err_t;
+pub extern fn esp_partition_write(partition: [*c]const esp_partition_t, dst_offset: usize, src: ?*const anyopaque, size: usize) esp_err_t;
+pub extern fn esp_partition_read_raw(partition: [*c]const esp_partition_t, src_offset: usize, dst: ?*anyopaque, size: usize) esp_err_t;
+pub extern fn esp_partition_write_raw(partition: [*c]const esp_partition_t, dst_offset: usize, src: ?*const anyopaque, size: usize) esp_err_t;
+pub extern fn esp_partition_erase_range(partition: [*c]const esp_partition_t, offset: usize, size: usize) esp_err_t;
+pub extern fn esp_partition_mmap(partition: [*c]const esp_partition_t, offset: usize, size: usize, memory: esp_partition_mmap_memory_t, out_ptr: [*c]?*const anyopaque, out_handle: [*c]esp_partition_mmap_handle_t) esp_err_t;
+pub extern fn esp_partition_munmap(handle: esp_partition_mmap_handle_t) void;
+pub extern fn esp_partition_get_sha256(partition: [*c]const esp_partition_t, sha_256: [*c]u8) esp_err_t;
+pub extern fn esp_partition_check_identity(partition_1: [*c]const esp_partition_t, partition_2: [*c]const esp_partition_t) bool;
+pub extern fn esp_partition_register_external(flash_chip: ?*esp_flash_t, offset: usize, size: usize, label: [*c]const u8, @"type": esp_partition_type_t, subtype: esp_partition_subtype_t, out_partition: [*c][*c]const esp_partition_t) esp_err_t;
+pub extern fn esp_partition_deregister_external(partition: [*c]const esp_partition_t) esp_err_t;
+pub extern fn esp_partition_unload_all() void;
+pub const nvs_sec_cfg_t = extern struct {
+    eky: [32]u8 = std.mem.zeroes([32]u8),
+    tky: [32]u8 = std.mem.zeroes([32]u8),
+};
+pub const nvs_flash_generate_keys_t = ?*const fn (?*const anyopaque, [*c]nvs_sec_cfg_t) callconv(.C) esp_err_t;
+pub const nvs_flash_read_cfg_t = ?*const fn (?*const anyopaque, [*c]nvs_sec_cfg_t) callconv(.C) esp_err_t;
+pub const nvs_sec_scheme_t = extern struct {
+    scheme_id: c_int = std.mem.zeroes(c_int),
+    scheme_data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    nvs_flash_key_gen: nvs_flash_generate_keys_t = std.mem.zeroes(nvs_flash_generate_keys_t),
+    nvs_flash_read_cfg: nvs_flash_read_cfg_t = std.mem.zeroes(nvs_flash_read_cfg_t),
+};
+pub extern fn nvs_flash_init() esp_err_t;
+pub extern fn nvs_flash_init_partition(partition_label: [*c]const u8) esp_err_t;
+pub extern fn nvs_flash_init_partition_ptr(partition: [*c]const esp_partition_t) esp_err_t;
+pub extern fn nvs_flash_deinit() esp_err_t;
+pub extern fn nvs_flash_deinit_partition(partition_label: [*c]const u8) esp_err_t;
+pub extern fn nvs_flash_erase() esp_err_t;
+pub extern fn nvs_flash_erase_partition(part_name: [*c]const u8) esp_err_t;
+pub extern fn nvs_flash_erase_partition_ptr(partition: [*c]const esp_partition_t) esp_err_t;
+pub extern fn nvs_flash_secure_init(cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+pub extern fn nvs_flash_secure_init_partition(partition_label: [*c]const u8, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+pub extern fn nvs_flash_generate_keys(partition: [*c]const esp_partition_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+pub extern fn nvs_flash_read_security_cfg(partition: [*c]const esp_partition_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+pub extern fn nvs_flash_register_security_scheme(scheme_cfg: [*c]nvs_sec_scheme_t) esp_err_t;
+pub extern fn nvs_flash_get_default_security_scheme() [*c]nvs_sec_scheme_t;
+pub extern fn nvs_flash_generate_keys_v2(scheme_cfg: [*c]nvs_sec_scheme_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+pub extern fn nvs_flash_read_security_cfg_v2(scheme_cfg: [*c]nvs_sec_scheme_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+
+pub const ESP_BT_MODE_IDLE: c_int = 0;
+pub const ESP_BT_MODE_BLE: c_int = 1;
+pub const ESP_BT_MODE_CLASSIC_BT: c_int = 2;
+pub const ESP_BT_MODE_BTDM: c_int = 3;
+pub const esp_bt_mode_t = c_uint;
+pub const ESP_BT_CTRL_HCI_TL_UART: c_int = 0;
+pub const ESP_BT_CTRL_HCI_TL_VHCI: c_int = 1;
+pub const esp_bt_ctrl_hci_tl_t = c_uint;
+pub const ESP_BLE_CE_LEN_TYPE_ORIG: c_int = 0;
+pub const ESP_BLE_CE_LEN_TYPE_CE: c_int = 1;
+pub const ESP_BLE_CE_LEN_TYPE_SD: c_int = 1;
+pub const esp_ble_ce_len_t = c_uint;
+pub const ESP_BT_SLEEP_MODE_NONE: c_int = 0;
+pub const ESP_BT_SLEEP_MODE_1: c_int = 1;
+pub const esp_bt_sleep_mode_t = c_uint;
+pub const ESP_BT_SLEEP_CLOCK_NONE: c_int = 0;
+pub const ESP_BT_SLEEP_CLOCK_MAIN_XTAL: c_int = 1;
+pub const ESP_BT_SLEEP_CLOCK_EXT_32K_XTAL: c_int = 2;
+pub const ESP_BT_SLEEP_CLOCK_RTC_SLOW: c_int = 3;
+pub const ESP_BT_SLEEP_CLOCK_FPGA_32K: c_int = 4;
+pub const esp_bt_sleep_clock_t = c_uint;
+pub const ESP_BT_ANT_IDX_0: c_int = 0;
+pub const ESP_BT_ANT_IDX_1: c_int = 1;
+const enum_unnamed_15 = c_uint;
+pub const ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_DISABLE: c_int = 0;
+pub const ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_ENABLE: c_int = 1;
+const enum_unnamed_16 = c_uint;
+pub const esp_bt_hci_tl_callback_t = ?*const fn (?*anyopaque, u8) callconv(.C) void;
+pub const esp_bt_hci_tl_t = extern struct {
+    _magic: u32 = std.mem.zeroes(u32),
+    _version: u32 = std.mem.zeroes(u32),
+    _reserved: u32 = std.mem.zeroes(u32),
+    _open: ?*const fn () callconv(.C) c_int = std.mem.zeroes(?*const fn () callconv(.C) c_int),
+    _close: ?*const fn () callconv(.C) void = std.mem.zeroes(?*const fn () callconv(.C) void),
+    _finish_transfers: ?*const fn () callconv(.C) void = std.mem.zeroes(?*const fn () callconv(.C) void),
+    _recv: ?*const fn ([*c]u8, u32, esp_bt_hci_tl_callback_t, ?*anyopaque) callconv(.C) void = std.mem.zeroes(?*const fn ([*c]u8, u32, esp_bt_hci_tl_callback_t, ?*anyopaque) callconv(.C) void),
+    _send: ?*const fn ([*c]u8, u32, esp_bt_hci_tl_callback_t, ?*anyopaque) callconv(.C) void = std.mem.zeroes(?*const fn ([*c]u8, u32, esp_bt_hci_tl_callback_t, ?*anyopaque) callconv(.C) void),
+    _flow_off: ?*const fn () callconv(.C) bool = std.mem.zeroes(?*const fn () callconv(.C) bool),
+    _flow_on: ?*const fn () callconv(.C) void = std.mem.zeroes(?*const fn () callconv(.C) void),
+};
+pub const esp_bt_controller_config_t = extern struct {
+    magic: u32 = std.mem.zeroes(u32),
+    version: u32 = std.mem.zeroes(u32),
+    controller_task_stack_size: u16 = std.mem.zeroes(u16),
+    controller_task_prio: u8 = std.mem.zeroes(u8),
+    controller_task_run_cpu: u8 = std.mem.zeroes(u8),
+    bluetooth_mode: u8 = std.mem.zeroes(u8),
+    ble_max_act: u8 = std.mem.zeroes(u8),
+    sleep_mode: u8 = std.mem.zeroes(u8),
+    sleep_clock: u8 = std.mem.zeroes(u8),
+    ble_st_acl_tx_buf_nb: u8 = std.mem.zeroes(u8),
+    ble_hw_cca_check: u8 = std.mem.zeroes(u8),
+    ble_adv_dup_filt_max: u16 = std.mem.zeroes(u16),
+    coex_param_en: bool = std.mem.zeroes(bool),
+    ce_len_type: u8 = std.mem.zeroes(u8),
+    coex_use_hooks: bool = std.mem.zeroes(bool),
+    hci_tl_type: u8 = std.mem.zeroes(u8),
+    hci_tl_funcs: [*c]esp_bt_hci_tl_t = std.mem.zeroes([*c]esp_bt_hci_tl_t),
+    txant_dft: u8 = std.mem.zeroes(u8),
+    rxant_dft: u8 = std.mem.zeroes(u8),
+    txpwr_dft: u8 = std.mem.zeroes(u8),
+    cfg_mask: u32 = std.mem.zeroes(u32),
+    scan_duplicate_mode: u8 = std.mem.zeroes(u8),
+    scan_duplicate_type: u8 = std.mem.zeroes(u8),
+    normal_adv_size: u16 = std.mem.zeroes(u16),
+    mesh_adv_size: u16 = std.mem.zeroes(u16),
+    coex_phy_coded_tx_rx_time_limit: u8 = std.mem.zeroes(u8),
+    hw_target_code: u32 = std.mem.zeroes(u32),
+    slave_ce_len_min: u8 = std.mem.zeroes(u8),
+    hw_recorrect_en: u8 = std.mem.zeroes(u8),
+    cca_thresh: u8 = std.mem.zeroes(u8),
+    scan_backoff_upperlimitmax: u16 = std.mem.zeroes(u16),
+    dup_list_refresh_period: u16 = std.mem.zeroes(u16),
+    ble_50_feat_supp: bool = std.mem.zeroes(bool),
+    ble_cca_mode: u8 = std.mem.zeroes(u8),
+    ble_data_lenth_zero_aux: u8 = std.mem.zeroes(u8),
+};
+pub const ESP_BT_CONTROLLER_STATUS_IDLE: c_int = 0;
+pub const ESP_BT_CONTROLLER_STATUS_INITED: c_int = 1;
+pub const ESP_BT_CONTROLLER_STATUS_ENABLED: c_int = 2;
+pub const ESP_BT_CONTROLLER_STATUS_NUM: c_int = 3;
+pub const esp_bt_controller_status_t = c_uint;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL0: c_int = 0;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL1: c_int = 1;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL2: c_int = 2;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL3: c_int = 3;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL4: c_int = 4;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL5: c_int = 5;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL6: c_int = 6;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL7: c_int = 7;
+pub const ESP_BLE_PWR_TYPE_CONN_HDL8: c_int = 8;
+pub const ESP_BLE_PWR_TYPE_ADV: c_int = 9;
+pub const ESP_BLE_PWR_TYPE_SCAN: c_int = 10;
+pub const ESP_BLE_PWR_TYPE_DEFAULT: c_int = 11;
+pub const ESP_BLE_PWR_TYPE_NUM: c_int = 12;
+pub const esp_ble_power_type_t = c_uint;
+pub const ESP_PWR_LVL_N24: c_int = 0;
+pub const ESP_PWR_LVL_N21: c_int = 1;
+pub const ESP_PWR_LVL_N18: c_int = 2;
+pub const ESP_PWR_LVL_N15: c_int = 3;
+pub const ESP_PWR_LVL_N12: c_int = 4;
+pub const ESP_PWR_LVL_N9: c_int = 5;
+pub const ESP_PWR_LVL_N6: c_int = 6;
+pub const ESP_PWR_LVL_N3: c_int = 7;
+pub const ESP_PWR_LVL_N0: c_int = 8;
+pub const ESP_PWR_LVL_P3: c_int = 9;
+pub const ESP_PWR_LVL_P6: c_int = 10;
+pub const ESP_PWR_LVL_P9: c_int = 11;
+pub const ESP_PWR_LVL_P12: c_int = 12;
+pub const ESP_PWR_LVL_P15: c_int = 13;
+pub const ESP_PWR_LVL_P18: c_int = 14;
+pub const ESP_PWR_LVL_P21: c_int = 15;
+pub const ESP_PWR_LVL_INVALID: c_int = 255;
+pub const esp_power_level_t = c_uint;
+pub extern fn esp_ble_tx_power_set(power_type: esp_ble_power_type_t, power_level: esp_power_level_t) esp_err_t;
+pub extern fn esp_ble_tx_power_get(power_type: esp_ble_power_type_t) esp_power_level_t;
+pub extern fn esp_bt_controller_init(cfg: [*c]esp_bt_controller_config_t) esp_err_t;
+pub extern fn esp_bt_controller_deinit() esp_err_t;
+pub extern fn esp_bt_controller_enable(mode: esp_bt_mode_t) esp_err_t;
+pub extern fn esp_bt_controller_disable() esp_err_t;
+pub extern fn esp_bt_controller_get_status() esp_bt_controller_status_t;
+pub extern fn esp_bt_get_tx_buf_num() u16;
+pub const struct_esp_vhci_host_callback = extern struct {
+    notify_host_send_available: ?*const fn () callconv(.C) void = std.mem.zeroes(?*const fn () callconv(.C) void),
+    notify_host_recv: ?*const fn ([*c]u8, u16) callconv(.C) c_int = std.mem.zeroes(?*const fn ([*c]u8, u16) callconv(.C) c_int),
+};
+pub const esp_vhci_host_callback_t = struct_esp_vhci_host_callback;
+pub extern fn esp_vhci_host_check_send_available() bool;
+pub extern fn esp_vhci_host_send_packet(data: [*c]u8, len: u16) void;
+pub extern fn esp_vhci_host_register_callback(callback: [*c]const esp_vhci_host_callback_t) esp_err_t;
+pub extern fn esp_bt_controller_mem_release(mode: esp_bt_mode_t) esp_err_t;
+pub extern fn esp_bt_mem_release(mode: esp_bt_mode_t) esp_err_t;
+pub extern fn esp_bt_sleep_enable() esp_err_t;
+pub extern fn esp_bt_sleep_disable() esp_err_t;
+pub extern fn esp_bt_controller_is_sleeping() bool;
+pub extern fn esp_bt_controller_wakeup_request() void;
+pub extern fn esp_bt_h4tl_eif_io_event_notify(event: c_int) c_int;
+pub extern fn esp_wifi_bt_power_domain_on() void;
+pub extern fn esp_wifi_bt_power_domain_off() void;
+pub const ESP_BLUEDROID_STATUS_UNINITIALIZED: c_int = 0;
+pub const ESP_BLUEDROID_STATUS_INITIALIZED: c_int = 1;
+pub const ESP_BLUEDROID_STATUS_ENABLED: c_int = 2;
+pub const esp_bluedroid_status_t = c_uint;
+pub const esp_bluedroid_config_t = extern struct {
+    ssp_en: bool = std.mem.zeroes(bool),
+};
+pub extern fn esp_bluedroid_get_status() esp_bluedroid_status_t;
+pub extern fn esp_bluedroid_enable() esp_err_t;
+pub extern fn esp_bluedroid_disable() esp_err_t;
+pub extern fn esp_bluedroid_init() esp_err_t;
+pub extern fn esp_bluedroid_init_with_cfg(cfg: [*c]esp_bluedroid_config_t) esp_err_t;
+pub extern fn esp_bluedroid_deinit() esp_err_t;
+pub const ESP_BT_STATUS_SUCCESS: c_int = 0;
+pub const ESP_BT_STATUS_FAIL: c_int = 1;
+pub const ESP_BT_STATUS_NOT_READY: c_int = 2;
+pub const ESP_BT_STATUS_NOMEM: c_int = 3;
+pub const ESP_BT_STATUS_BUSY: c_int = 4;
+pub const ESP_BT_STATUS_DONE: c_int = 5;
+pub const ESP_BT_STATUS_UNSUPPORTED: c_int = 6;
+pub const ESP_BT_STATUS_PARM_INVALID: c_int = 7;
+pub const ESP_BT_STATUS_UNHANDLED: c_int = 8;
+pub const ESP_BT_STATUS_AUTH_FAILURE: c_int = 9;
+pub const ESP_BT_STATUS_RMT_DEV_DOWN: c_int = 10;
+pub const ESP_BT_STATUS_AUTH_REJECTED: c_int = 11;
+pub const ESP_BT_STATUS_INVALID_STATIC_RAND_ADDR: c_int = 12;
+pub const ESP_BT_STATUS_PENDING: c_int = 13;
+pub const ESP_BT_STATUS_UNACCEPT_CONN_INTERVAL: c_int = 14;
+pub const ESP_BT_STATUS_PARAM_OUT_OF_RANGE: c_int = 15;
+pub const ESP_BT_STATUS_TIMEOUT: c_int = 16;
+pub const ESP_BT_STATUS_PEER_LE_DATA_LEN_UNSUPPORTED: c_int = 17;
+pub const ESP_BT_STATUS_CONTROL_LE_DATA_LEN_UNSUPPORTED: c_int = 18;
+pub const ESP_BT_STATUS_ERR_ILLEGAL_PARAMETER_FMT: c_int = 19;
+pub const ESP_BT_STATUS_MEMORY_FULL: c_int = 20;
+pub const ESP_BT_STATUS_EIR_TOO_LARGE: c_int = 21;
+pub const ESP_BT_STATUS_HCI_SUCCESS: c_int = 256;
+pub const ESP_BT_STATUS_HCI_ILLEGAL_COMMAND: c_int = 257;
+pub const ESP_BT_STATUS_HCI_NO_CONNECTION: c_int = 258;
+pub const ESP_BT_STATUS_HCI_HW_FAILURE: c_int = 259;
+pub const ESP_BT_STATUS_HCI_PAGE_TIMEOUT: c_int = 260;
+pub const ESP_BT_STATUS_HCI_AUTH_FAILURE: c_int = 261;
+pub const ESP_BT_STATUS_HCI_KEY_MISSING: c_int = 262;
+pub const ESP_BT_STATUS_HCI_MEMORY_FULL: c_int = 263;
+pub const ESP_BT_STATUS_HCI_CONNECTION_TOUT: c_int = 264;
+pub const ESP_BT_STATUS_HCI_MAX_NUM_OF_CONNECTIONS: c_int = 265;
+pub const ESP_BT_STATUS_HCI_MAX_NUM_OF_SCOS: c_int = 266;
+pub const ESP_BT_STATUS_HCI_CONNECTION_EXISTS: c_int = 267;
+pub const ESP_BT_STATUS_HCI_COMMAND_DISALLOWED: c_int = 268;
+pub const ESP_BT_STATUS_HCI_HOST_REJECT_RESOURCES: c_int = 269;
+pub const ESP_BT_STATUS_HCI_HOST_REJECT_SECURITY: c_int = 270;
+pub const ESP_BT_STATUS_HCI_HOST_REJECT_DEVICE: c_int = 271;
+pub const ESP_BT_STATUS_HCI_HOST_TIMEOUT: c_int = 272;
+pub const ESP_BT_STATUS_HCI_UNSUPPORTED_VALUE: c_int = 273;
+pub const ESP_BT_STATUS_HCI_ILLEGAL_PARAMETER_FMT: c_int = 274;
+pub const ESP_BT_STATUS_HCI_PEER_USER: c_int = 275;
+pub const ESP_BT_STATUS_HCI_PEER_LOW_RESOURCES: c_int = 276;
+pub const ESP_BT_STATUS_HCI_PEER_POWER_OFF: c_int = 277;
+pub const ESP_BT_STATUS_HCI_CONN_CAUSE_LOCAL_HOST: c_int = 278;
+pub const ESP_BT_STATUS_HCI_REPEATED_ATTEMPTS: c_int = 279;
+pub const ESP_BT_STATUS_HCI_PAIRING_NOT_ALLOWED: c_int = 280;
+pub const ESP_BT_STATUS_HCI_UNKNOWN_LMP_PDU: c_int = 281;
+pub const ESP_BT_STATUS_HCI_UNSUPPORTED_REM_FEATURE: c_int = 282;
+pub const ESP_BT_STATUS_HCI_SCO_OFFSET_REJECTED: c_int = 283;
+pub const ESP_BT_STATUS_HCI_SCO_INTERVAL_REJECTED: c_int = 284;
+pub const ESP_BT_STATUS_HCI_SCO_AIR_MODE: c_int = 285;
+pub const ESP_BT_STATUS_HCI_INVALID_LMP_PARAM: c_int = 286;
+pub const ESP_BT_STATUS_HCI_UNSPECIFIED: c_int = 287;
+pub const ESP_BT_STATUS_HCI_UNSUPPORTED_LMP_PARAMETERS: c_int = 288;
+pub const ESP_BT_STATUS_HCI_ROLE_CHANGE_NOT_ALLOWED: c_int = 289;
+pub const ESP_BT_STATUS_HCI_LMP_RESPONSE_TIMEOUT: c_int = 290;
+pub const ESP_BT_STATUS_HCI_LMP_ERR_TRANS_COLLISION: c_int = 291;
+pub const ESP_BT_STATUS_HCI_LMP_PDU_NOT_ALLOWED: c_int = 292;
+pub const ESP_BT_STATUS_HCI_ENCRY_MODE_NOT_ACCEPTABLE: c_int = 293;
+pub const ESP_BT_STATUS_HCI_UNIT_KEY_USED: c_int = 294;
+pub const ESP_BT_STATUS_HCI_QOS_NOT_SUPPORTED: c_int = 295;
+pub const ESP_BT_STATUS_HCI_INSTANT_PASSED: c_int = 296;
+pub const ESP_BT_STATUS_HCI_PAIRING_WITH_UNIT_KEY_NOT_SUPPORTED: c_int = 297;
+pub const ESP_BT_STATUS_HCI_DIFF_TRANSACTION_COLLISION: c_int = 298;
+pub const ESP_BT_STATUS_HCI_UNDEFINED_0x2B: c_int = 299;
+pub const ESP_BT_STATUS_HCI_QOS_UNACCEPTABLE_PARAM: c_int = 300;
+pub const ESP_BT_STATUS_HCI_QOS_REJECTED: c_int = 301;
+pub const ESP_BT_STATUS_HCI_CHAN_CLASSIF_NOT_SUPPORTED: c_int = 302;
+pub const ESP_BT_STATUS_HCI_INSUFFCIENT_SECURITY: c_int = 303;
+pub const ESP_BT_STATUS_HCI_PARAM_OUT_OF_RANGE: c_int = 304;
+pub const ESP_BT_STATUS_HCI_UNDEFINED_0x31: c_int = 305;
+pub const ESP_BT_STATUS_HCI_ROLE_SWITCH_PENDING: c_int = 306;
+pub const ESP_BT_STATUS_HCI_UNDEFINED_0x33: c_int = 307;
+pub const ESP_BT_STATUS_HCI_RESERVED_SLOT_VIOLATION: c_int = 308;
+pub const ESP_BT_STATUS_HCI_ROLE_SWITCH_FAILED: c_int = 309;
+pub const ESP_BT_STATUS_HCI_INQ_RSP_DATA_TOO_LARGE: c_int = 310;
+pub const ESP_BT_STATUS_HCI_SIMPLE_PAIRING_NOT_SUPPORTED: c_int = 311;
+pub const ESP_BT_STATUS_HCI_HOST_BUSY_PAIRING: c_int = 312;
+pub const ESP_BT_STATUS_HCI_REJ_NO_SUITABLE_CHANNEL: c_int = 313;
+pub const ESP_BT_STATUS_HCI_CONTROLLER_BUSY: c_int = 314;
+pub const ESP_BT_STATUS_HCI_UNACCEPT_CONN_INTERVAL: c_int = 315;
+pub const ESP_BT_STATUS_HCI_DIRECTED_ADVERTISING_TIMEOUT: c_int = 316;
+pub const ESP_BT_STATUS_HCI_CONN_TOUT_DUE_TO_MIC_FAILURE: c_int = 317;
+pub const ESP_BT_STATUS_HCI_CONN_FAILED_ESTABLISHMENT: c_int = 318;
+pub const ESP_BT_STATUS_HCI_MAC_CONNECTION_FAILED: c_int = 319;
+pub const esp_bt_status_t = c_uint;
+pub const esp_bt_octet16_t = [16]u8;
+pub const esp_bt_octet8_t = [8]u8;
+pub const esp_link_key = [16]u8;
+const union_unnamed_17 = extern union {
+    uuid16: u16,
+    uuid32: u32,
+    uuid128: [16]u8,
+};
+pub const esp_bt_uuid_t = extern struct {
+    len: u16 align(1) = std.mem.zeroes(u16),
+    uuid: union_unnamed_17 align(1) = std.mem.zeroes(union_unnamed_17),
+};
+pub const ESP_BT_DEVICE_TYPE_BREDR: c_int = 1;
+pub const ESP_BT_DEVICE_TYPE_BLE: c_int = 2;
+pub const ESP_BT_DEVICE_TYPE_DUMO: c_int = 3;
+pub const esp_bt_dev_type_t = c_uint;
+pub const esp_bd_addr_t = [6]u8;
+pub const BLE_ADDR_TYPE_PUBLIC: c_int = 0;
+pub const BLE_ADDR_TYPE_RANDOM: c_int = 1;
+pub const BLE_ADDR_TYPE_RPA_PUBLIC: c_int = 2;
+pub const BLE_ADDR_TYPE_RPA_RANDOM: c_int = 3;
+pub const esp_ble_addr_type_t = c_uint;
+pub const BLE_WL_ADDR_TYPE_PUBLIC: c_int = 0;
+pub const BLE_WL_ADDR_TYPE_RANDOM: c_int = 1;
+pub const esp_ble_wl_addr_type_t = c_uint;
+pub const esp_ble_key_mask_t = u8;
+pub const esp_bt_dev_coex_op_t = u8;
+pub const ESP_BT_DEV_COEX_TYPE_BLE: c_int = 1;
+pub const ESP_BT_DEV_COEX_TYPE_BT: c_int = 2;
+pub const esp_bt_dev_coex_type_t = c_uint;
+pub const ESP_BT_DEV_NAME_RES_EVT: c_int = 0;
+pub const ESP_BT_DEV_EVT_MAX: c_int = 1;
+pub const esp_bt_dev_cb_event_t = c_uint;
+pub const struct_name_res_param_18 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    name: [*c]u8 = std.mem.zeroes([*c]u8),
+};
+pub const esp_bt_dev_cb_param_t = extern union {
+    name_res: struct_name_res_param_18,
+};
+pub const esp_bt_dev_cb_t = ?*const fn (esp_bt_dev_cb_event_t, [*c]esp_bt_dev_cb_param_t) callconv(.C) void;
+pub extern fn esp_bt_dev_register_callback(callback: esp_bt_dev_cb_t) esp_err_t;
+pub extern fn esp_bt_dev_get_address() [*c]const u8;
+pub extern fn esp_bt_dev_set_device_name(name: [*c]const u8) esp_err_t;
+pub extern fn esp_bt_dev_get_device_name() esp_err_t;
+pub extern fn esp_bt_dev_coex_status_config(@"type": esp_bt_dev_coex_type_t, op: esp_bt_dev_coex_op_t, status: u8) esp_err_t;
+pub extern fn esp_bt_config_file_path_update(file_path: [*c]const u8) esp_err_t;
+pub const WIFI_MODE_NULL: c_int = 0;
+pub const WIFI_MODE_STA: c_int = 1;
+pub const WIFI_MODE_AP: c_int = 2;
+pub const WIFI_MODE_APSTA: c_int = 3;
+pub const WIFI_MODE_NAN: c_int = 4;
+pub const WIFI_MODE_MAX: c_int = 5;
+pub const wifi_mode_t = c_uint;
+pub const WIFI_IF_STA: c_int = 0;
+pub const WIFI_IF_AP: c_int = 1;
+pub const WIFI_IF_NAN: c_int = 2;
+pub const WIFI_IF_MAX: c_int = 3;
+pub const wifi_interface_t = c_uint;
+pub const WIFI_COUNTRY_POLICY_AUTO: c_int = 0;
+pub const WIFI_COUNTRY_POLICY_MANUAL: c_int = 1;
+pub const wifi_country_policy_t = c_uint;
+pub const wifi_country_t = extern struct {
+    cc: [3]u8 = std.mem.zeroes([3]u8),
+    schan: u8 = std.mem.zeroes(u8),
+    nchan: u8 = std.mem.zeroes(u8),
+    max_tx_power: i8 = std.mem.zeroes(i8),
+    policy: wifi_country_policy_t = std.mem.zeroes(wifi_country_policy_t),
+};
+pub const WIFI_AUTH_OPEN: c_int = 0;
+pub const WIFI_AUTH_WEP: c_int = 1;
+pub const WIFI_AUTH_WPA_PSK: c_int = 2;
+pub const WIFI_AUTH_WPA2_PSK: c_int = 3;
+pub const WIFI_AUTH_WPA_WPA2_PSK: c_int = 4;
+pub const WIFI_AUTH_ENTERPRISE: c_int = 5;
+pub const WIFI_AUTH_WPA2_ENTERPRISE: c_int = 5;
+pub const WIFI_AUTH_WPA3_PSK: c_int = 6;
+pub const WIFI_AUTH_WPA2_WPA3_PSK: c_int = 7;
+pub const WIFI_AUTH_WAPI_PSK: c_int = 8;
+pub const WIFI_AUTH_OWE: c_int = 9;
+pub const WIFI_AUTH_WPA3_ENT_192: c_int = 10;
+pub const WIFI_AUTH_WPA3_EXT_PSK: c_int = 11;
+pub const WIFI_AUTH_WPA3_EXT_PSK_MIXED_MODE: c_int = 12;
+pub const WIFI_AUTH_MAX: c_int = 13;
+pub const wifi_auth_mode_t = c_uint;
+pub const WIFI_REASON_UNSPECIFIED: c_int = 1;
+pub const WIFI_REASON_AUTH_EXPIRE: c_int = 2;
+pub const WIFI_REASON_AUTH_LEAVE: c_int = 3;
+pub const WIFI_REASON_ASSOC_EXPIRE: c_int = 4;
+pub const WIFI_REASON_ASSOC_TOOMANY: c_int = 5;
+pub const WIFI_REASON_NOT_AUTHED: c_int = 6;
+pub const WIFI_REASON_NOT_ASSOCED: c_int = 7;
+pub const WIFI_REASON_ASSOC_LEAVE: c_int = 8;
+pub const WIFI_REASON_ASSOC_NOT_AUTHED: c_int = 9;
+pub const WIFI_REASON_DISASSOC_PWRCAP_BAD: c_int = 10;
+pub const WIFI_REASON_DISASSOC_SUPCHAN_BAD: c_int = 11;
+pub const WIFI_REASON_BSS_TRANSITION_DISASSOC: c_int = 12;
+pub const WIFI_REASON_IE_INVALID: c_int = 13;
+pub const WIFI_REASON_MIC_FAILURE: c_int = 14;
+pub const WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT: c_int = 15;
+pub const WIFI_REASON_GROUP_KEY_UPDATE_TIMEOUT: c_int = 16;
+pub const WIFI_REASON_IE_IN_4WAY_DIFFERS: c_int = 17;
+pub const WIFI_REASON_GROUP_CIPHER_INVALID: c_int = 18;
+pub const WIFI_REASON_PAIRWISE_CIPHER_INVALID: c_int = 19;
+pub const WIFI_REASON_AKMP_INVALID: c_int = 20;
+pub const WIFI_REASON_UNSUPP_RSN_IE_VERSION: c_int = 21;
+pub const WIFI_REASON_INVALID_RSN_IE_CAP: c_int = 22;
+pub const WIFI_REASON_802_1X_AUTH_FAILED: c_int = 23;
+pub const WIFI_REASON_CIPHER_SUITE_REJECTED: c_int = 24;
+pub const WIFI_REASON_TDLS_PEER_UNREACHABLE: c_int = 25;
+pub const WIFI_REASON_TDLS_UNSPECIFIED: c_int = 26;
+pub const WIFI_REASON_SSP_REQUESTED_DISASSOC: c_int = 27;
+pub const WIFI_REASON_NO_SSP_ROAMING_AGREEMENT: c_int = 28;
+pub const WIFI_REASON_BAD_CIPHER_OR_AKM: c_int = 29;
+pub const WIFI_REASON_NOT_AUTHORIZED_THIS_LOCATION: c_int = 30;
+pub const WIFI_REASON_SERVICE_CHANGE_PERCLUDES_TS: c_int = 31;
+pub const WIFI_REASON_UNSPECIFIED_QOS: c_int = 32;
+pub const WIFI_REASON_NOT_ENOUGH_BANDWIDTH: c_int = 33;
+pub const WIFI_REASON_MISSING_ACKS: c_int = 34;
+pub const WIFI_REASON_EXCEEDED_TXOP: c_int = 35;
+pub const WIFI_REASON_STA_LEAVING: c_int = 36;
+pub const WIFI_REASON_END_BA: c_int = 37;
+pub const WIFI_REASON_UNKNOWN_BA: c_int = 38;
+pub const WIFI_REASON_TIMEOUT: c_int = 39;
+pub const WIFI_REASON_PEER_INITIATED: c_int = 46;
+pub const WIFI_REASON_AP_INITIATED: c_int = 47;
+pub const WIFI_REASON_INVALID_FT_ACTION_FRAME_COUNT: c_int = 48;
+pub const WIFI_REASON_INVALID_PMKID: c_int = 49;
+pub const WIFI_REASON_INVALID_MDE: c_int = 50;
+pub const WIFI_REASON_INVALID_FTE: c_int = 51;
+pub const WIFI_REASON_TRANSMISSION_LINK_ESTABLISH_FAILED: c_int = 67;
+pub const WIFI_REASON_ALTERATIVE_CHANNEL_OCCUPIED: c_int = 68;
+pub const WIFI_REASON_BEACON_TIMEOUT: c_int = 200;
+pub const WIFI_REASON_NO_AP_FOUND: c_int = 201;
+pub const WIFI_REASON_AUTH_FAIL: c_int = 202;
+pub const WIFI_REASON_ASSOC_FAIL: c_int = 203;
+pub const WIFI_REASON_HANDSHAKE_TIMEOUT: c_int = 204;
+pub const WIFI_REASON_CONNECTION_FAIL: c_int = 205;
+pub const WIFI_REASON_AP_TSF_RESET: c_int = 206;
+pub const WIFI_REASON_ROAMING: c_int = 207;
+pub const WIFI_REASON_ASSOC_COMEBACK_TIME_TOO_LONG: c_int = 208;
+pub const WIFI_REASON_SA_QUERY_TIMEOUT: c_int = 209;
+pub const WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY: c_int = 210;
+pub const WIFI_REASON_NO_AP_FOUND_IN_AUTHMODE_THRESHOLD: c_int = 211;
+pub const WIFI_REASON_NO_AP_FOUND_IN_RSSI_THRESHOLD: c_int = 212;
+pub const wifi_err_reason_t = c_uint;
+pub const WIFI_SECOND_CHAN_NONE: c_int = 0;
+pub const WIFI_SECOND_CHAN_ABOVE: c_int = 1;
+pub const WIFI_SECOND_CHAN_BELOW: c_int = 2;
+pub const wifi_second_chan_t = c_uint;
+pub const WIFI_SCAN_TYPE_ACTIVE: c_int = 0;
+pub const WIFI_SCAN_TYPE_PASSIVE: c_int = 1;
+pub const wifi_scan_type_t = c_uint;
+pub const wifi_active_scan_time_t = extern struct {
+    min: u32 = std.mem.zeroes(u32),
+    max: u32 = std.mem.zeroes(u32),
+};
+pub const wifi_scan_time_t = extern struct {
+    active: wifi_active_scan_time_t = std.mem.zeroes(wifi_active_scan_time_t),
+    passive: u32 = std.mem.zeroes(u32),
+};
+pub const wifi_scan_config_t = extern struct {
+    ssid: [*c]u8 = std.mem.zeroes([*c]u8),
+    bssid: [*c]u8 = std.mem.zeroes([*c]u8),
+    channel: u8 = std.mem.zeroes(u8),
+    show_hidden: bool = std.mem.zeroes(bool),
+    scan_type: wifi_scan_type_t = std.mem.zeroes(wifi_scan_type_t),
+    scan_time: wifi_scan_time_t = std.mem.zeroes(wifi_scan_time_t),
+    home_chan_dwell_time: u8 = std.mem.zeroes(u8),
+};
+pub const WIFI_CIPHER_TYPE_NONE: c_int = 0;
+pub const WIFI_CIPHER_TYPE_WEP40: c_int = 1;
+pub const WIFI_CIPHER_TYPE_WEP104: c_int = 2;
+pub const WIFI_CIPHER_TYPE_TKIP: c_int = 3;
+pub const WIFI_CIPHER_TYPE_CCMP: c_int = 4;
+pub const WIFI_CIPHER_TYPE_TKIP_CCMP: c_int = 5;
+pub const WIFI_CIPHER_TYPE_AES_CMAC128: c_int = 6;
+pub const WIFI_CIPHER_TYPE_SMS4: c_int = 7;
+pub const WIFI_CIPHER_TYPE_GCMP: c_int = 8;
+pub const WIFI_CIPHER_TYPE_GCMP256: c_int = 9;
+pub const WIFI_CIPHER_TYPE_AES_GMAC128: c_int = 10;
+pub const WIFI_CIPHER_TYPE_AES_GMAC256: c_int = 11;
+pub const WIFI_CIPHER_TYPE_UNKNOWN: c_int = 12;
+pub const wifi_cipher_type_t = c_uint;
+pub const WIFI_ANT_ANT0: c_int = 0;
+pub const WIFI_ANT_ANT1: c_int = 1;
+pub const WIFI_ANT_MAX: c_int = 2;
+pub const wifi_ant_t = c_uint; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:207:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_he_ap_info_t = opaque {}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:224:14: warning: struct demoted to opaque type - has bitfield
+pub const wifi_ap_record_t = opaque {};
+pub const WIFI_FAST_SCAN: c_int = 0;
+pub const WIFI_ALL_CHANNEL_SCAN: c_int = 1;
+pub const wifi_scan_method_t = c_uint;
+pub const WIFI_CONNECT_AP_BY_SIGNAL: c_int = 0;
+pub const WIFI_CONNECT_AP_BY_SECURITY: c_int = 1;
+pub const wifi_sort_method_t = c_uint;
+pub const wifi_scan_threshold_t = extern struct {
+    rssi: i8 = std.mem.zeroes(i8),
+    authmode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
+};
+pub const WIFI_PS_NONE: c_int = 0;
+pub const WIFI_PS_MIN_MODEM: c_int = 1;
+pub const WIFI_PS_MAX_MODEM: c_int = 2;
+pub const wifi_ps_type_t = c_uint;
+pub const WIFI_BW_HT20: c_int = 1;
+pub const WIFI_BW_HT40: c_int = 2;
+pub const wifi_bandwidth_t = c_uint;
+pub const wifi_pmf_config_t = extern struct {
+    capable: bool = std.mem.zeroes(bool),
+    required: bool = std.mem.zeroes(bool),
+};
+pub const WPA3_SAE_PWE_UNSPECIFIED: c_int = 0;
+pub const WPA3_SAE_PWE_HUNT_AND_PECK: c_int = 1;
+pub const WPA3_SAE_PWE_HASH_TO_ELEMENT: c_int = 2;
+pub const WPA3_SAE_PWE_BOTH: c_int = 3;
+pub const wifi_sae_pwe_method_t = c_uint;
+pub const WPA3_SAE_PK_MODE_AUTOMATIC: c_int = 0;
+pub const WPA3_SAE_PK_MODE_ONLY: c_int = 1;
+pub const WPA3_SAE_PK_MODE_DISABLED: c_int = 2;
+pub const wifi_sae_pk_mode_t = c_uint;
+pub const wifi_ap_config_t = extern struct {
+    ssid: [32]u8 = std.mem.zeroes([32]u8),
+    password: [64]u8 = std.mem.zeroes([64]u8),
+    ssid_len: u8 = std.mem.zeroes(u8),
+    channel: u8 = std.mem.zeroes(u8),
+    authmode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
+    ssid_hidden: u8 = std.mem.zeroes(u8),
+    max_connection: u8 = std.mem.zeroes(u8),
+    beacon_interval: u16 = std.mem.zeroes(u16),
+    pairwise_cipher: wifi_cipher_type_t = std.mem.zeroes(wifi_cipher_type_t),
+    ftm_responder: bool = std.mem.zeroes(bool),
+    pmf_cfg: wifi_pmf_config_t = std.mem.zeroes(wifi_pmf_config_t),
+    sae_pwe_h2e: wifi_sae_pwe_method_t = std.mem.zeroes(wifi_sae_pwe_method_t),
+}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:321:14: warning: struct demoted to opaque type - has bitfield
+pub const wifi_sta_config_t = opaque {};
+pub const wifi_nan_config_t = extern struct {
+    op_channel: u8 = std.mem.zeroes(u8),
+    master_pref: u8 = std.mem.zeroes(u8),
+    scan_time: u8 = std.mem.zeroes(u8),
+    warm_up_sec: u16 = std.mem.zeroes(u16),
+};
+pub const wifi_config_t = extern union {
+    ap: wifi_ap_config_t,
+    sta: wifi_sta_config_t,
+    nan: wifi_nan_config_t,
+}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:371:14: warning: struct demoted to opaque type - has bitfield
+pub const wifi_sta_info_t = opaque {};
+pub const WIFI_STORAGE_FLASH: c_int = 0;
+pub const WIFI_STORAGE_RAM: c_int = 1;
+pub const wifi_storage_t = c_uint;
+pub const WIFI_VND_IE_TYPE_BEACON: c_int = 0;
+pub const WIFI_VND_IE_TYPE_PROBE_REQ: c_int = 1;
+pub const WIFI_VND_IE_TYPE_PROBE_RESP: c_int = 2;
+pub const WIFI_VND_IE_TYPE_ASSOC_REQ: c_int = 3;
+pub const WIFI_VND_IE_TYPE_ASSOC_RESP: c_int = 4;
+pub const wifi_vendor_ie_type_t = c_uint;
+pub const WIFI_VND_IE_ID_0: c_int = 0;
+pub const WIFI_VND_IE_ID_1: c_int = 1;
+pub const wifi_vendor_ie_id_t = c_uint;
+pub const WIFI_PHY_MODE_LR: c_int = 0;
+pub const WIFI_PHY_MODE_11B: c_int = 1;
+pub const WIFI_PHY_MODE_11G: c_int = 2;
+pub const WIFI_PHY_MODE_HT20: c_int = 3;
+pub const WIFI_PHY_MODE_HT40: c_int = 4;
+pub const WIFI_PHY_MODE_HE20: c_int = 5;
+pub const wifi_phy_mode_t = c_uint;
+pub const vendor_ie_data_t = extern struct {
+    element_id: u8 align(1) = std.mem.zeroes(u8),
+    length: u8 = std.mem.zeroes(u8),
+    vendor_oui: [3]u8 = std.mem.zeroes([3]u8),
+    vendor_oui_type: u8 = std.mem.zeroes(u8),
+    pub fn payload(self: anytype) @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
+        const Intermediate = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 6)));
+    }
+};
+pub const WIFI_PKT_MGMT: c_int = 0;
+pub const WIFI_PKT_CTRL: c_int = 1;
+pub const WIFI_PKT_DATA: c_int = 2;
+pub const WIFI_PKT_MISC: c_int = 3;
+pub const wifi_promiscuous_pkt_type_t = c_uint;
+pub const wifi_promiscuous_filter_t = extern struct {
+    filter_mask: u32 = std.mem.zeroes(u32),
+};
+pub const struct_wifi_csi_info_t = extern struct {
+    rx_ctrl: wifi_pkt_rx_ctrl_t = std.mem.zeroes(wifi_pkt_rx_ctrl_t),
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+    dmac: [6]u8 = std.mem.zeroes([6]u8),
+    first_word_invalid: bool = std.mem.zeroes(bool),
+    buf: [*c]i8 = std.mem.zeroes([*c]i8),
+    len: u16 = std.mem.zeroes(u16),
+    hdr: [*c]u8 = std.mem.zeroes([*c]u8),
+    payload: [*c]u8 = std.mem.zeroes([*c]u8),
+    payload_len: u16 = std.mem.zeroes(u16),
+};
+pub const wifi_csi_info_t = struct_wifi_csi_info_t; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:490:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_ant_gpio_t = opaque {};
+pub const wifi_ant_gpio_config_t = extern struct {
+    gpio_cfg: [4]wifi_ant_gpio_t = std.mem.zeroes([4]wifi_ant_gpio_t),
+};
+pub const WIFI_ANT_MODE_ANT0: c_int = 0;
+pub const WIFI_ANT_MODE_ANT1: c_int = 1;
+pub const WIFI_ANT_MODE_AUTO: c_int = 2;
+pub const WIFI_ANT_MODE_MAX: c_int = 3;
+pub const wifi_ant_mode_t = c_uint; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:521:21: warning: struct demoted to opaque type - has bitfield
+pub const wifi_ant_config_t = opaque {};
+pub const wifi_action_rx_cb_t = ?*const fn ([*c]u8, [*c]u8, usize, u8) callconv(.C) c_int;
+pub const wifi_action_tx_req_t = extern struct {
+    ifx: wifi_interface_t align(4) = std.mem.zeroes(wifi_interface_t),
+    dest_mac: [6]u8 = std.mem.zeroes([6]u8),
+    no_ack: bool = std.mem.zeroes(bool),
+    rx_cb: wifi_action_rx_cb_t = std.mem.zeroes(wifi_action_rx_cb_t),
+    data_len: u32 = std.mem.zeroes(u32),
+    pub fn data(self: anytype) @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
+        const Intermediate = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 20)));
+    }
+};
+pub const wifi_ftm_initiator_cfg_t = extern struct {
+    resp_mac: [6]u8 = std.mem.zeroes([6]u8),
+    channel: u8 = std.mem.zeroes(u8),
+    frm_count: u8 = std.mem.zeroes(u8),
+    burst_period: u16 = std.mem.zeroes(u16),
+};
+pub const NAN_PUBLISH_SOLICITED: c_int = 0;
+pub const NAN_PUBLISH_UNSOLICITED: c_int = 1;
+pub const NAN_SUBSCRIBE_ACTIVE: c_int = 2;
+pub const NAN_SUBSCRIBE_PASSIVE: c_int = 3;
+pub const wifi_nan_service_type_t = c_uint; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:591:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_nan_publish_cfg_t = opaque {}; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:605:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_nan_subscribe_cfg_t = opaque {};
+pub const wifi_nan_followup_params_t = extern struct {
+    inst_id: u8 = std.mem.zeroes(u8),
+    peer_inst_id: u8 = std.mem.zeroes(u8),
+    peer_mac: [6]u8 = std.mem.zeroes([6]u8),
+    svc_info: [64]u8 = std.mem.zeroes([64]u8),
+};
+pub const wifi_nan_datapath_req_t = extern struct {
+    pub_id: u8 = std.mem.zeroes(u8),
+    peer_mac: [6]u8 = std.mem.zeroes([6]u8),
+    confirm_required: bool = std.mem.zeroes(bool),
+};
+pub const wifi_nan_datapath_resp_t = extern struct {
+    accept: bool = std.mem.zeroes(bool),
+    ndp_id: u8 = std.mem.zeroes(u8),
+    peer_mac: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const wifi_nan_datapath_end_req_t = extern struct {
+    ndp_id: u8 = std.mem.zeroes(u8),
+    peer_mac: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const WIFI_PHY_RATE_1M_L: c_int = 0;
+pub const WIFI_PHY_RATE_2M_L: c_int = 1;
+pub const WIFI_PHY_RATE_5M_L: c_int = 2;
+pub const WIFI_PHY_RATE_11M_L: c_int = 3;
+pub const WIFI_PHY_RATE_2M_S: c_int = 5;
+pub const WIFI_PHY_RATE_5M_S: c_int = 6;
+pub const WIFI_PHY_RATE_11M_S: c_int = 7;
+pub const WIFI_PHY_RATE_48M: c_int = 8;
+pub const WIFI_PHY_RATE_24M: c_int = 9;
+pub const WIFI_PHY_RATE_12M: c_int = 10;
+pub const WIFI_PHY_RATE_6M: c_int = 11;
+pub const WIFI_PHY_RATE_54M: c_int = 12;
+pub const WIFI_PHY_RATE_36M: c_int = 13;
+pub const WIFI_PHY_RATE_18M: c_int = 14;
+pub const WIFI_PHY_RATE_9M: c_int = 15;
+pub const WIFI_PHY_RATE_MCS0_LGI: c_int = 16;
+pub const WIFI_PHY_RATE_MCS1_LGI: c_int = 17;
+pub const WIFI_PHY_RATE_MCS2_LGI: c_int = 18;
+pub const WIFI_PHY_RATE_MCS3_LGI: c_int = 19;
+pub const WIFI_PHY_RATE_MCS4_LGI: c_int = 20;
+pub const WIFI_PHY_RATE_MCS5_LGI: c_int = 21;
+pub const WIFI_PHY_RATE_MCS6_LGI: c_int = 22;
+pub const WIFI_PHY_RATE_MCS7_LGI: c_int = 23;
+pub const WIFI_PHY_RATE_MCS8_LGI: c_int = 24;
+pub const WIFI_PHY_RATE_MCS9_LGI: c_int = 25;
+pub const WIFI_PHY_RATE_MCS0_SGI: c_int = 26;
+pub const WIFI_PHY_RATE_MCS1_SGI: c_int = 27;
+pub const WIFI_PHY_RATE_MCS2_SGI: c_int = 28;
+pub const WIFI_PHY_RATE_MCS3_SGI: c_int = 29;
+pub const WIFI_PHY_RATE_MCS4_SGI: c_int = 30;
+pub const WIFI_PHY_RATE_MCS5_SGI: c_int = 31;
+pub const WIFI_PHY_RATE_MCS6_SGI: c_int = 32;
+pub const WIFI_PHY_RATE_MCS7_SGI: c_int = 33;
+pub const WIFI_PHY_RATE_MCS8_SGI: c_int = 34;
+pub const WIFI_PHY_RATE_MCS9_SGI: c_int = 35;
+pub const WIFI_PHY_RATE_LORA_250K: c_int = 41;
+pub const WIFI_PHY_RATE_LORA_500K: c_int = 42;
+pub const WIFI_PHY_RATE_MAX: c_int = 43;
+pub const wifi_phy_rate_t = c_uint;
+pub const WIFI_EVENT_WIFI_READY: c_int = 0;
+pub const WIFI_EVENT_SCAN_DONE: c_int = 1;
+pub const WIFI_EVENT_STA_START: c_int = 2;
+pub const WIFI_EVENT_STA_STOP: c_int = 3;
+pub const WIFI_EVENT_STA_CONNECTED: c_int = 4;
+pub const WIFI_EVENT_STA_DISCONNECTED: c_int = 5;
+pub const WIFI_EVENT_STA_AUTHMODE_CHANGE: c_int = 6;
+pub const WIFI_EVENT_STA_WPS_ER_SUCCESS: c_int = 7;
+pub const WIFI_EVENT_STA_WPS_ER_FAILED: c_int = 8;
+pub const WIFI_EVENT_STA_WPS_ER_TIMEOUT: c_int = 9;
+pub const WIFI_EVENT_STA_WPS_ER_PIN: c_int = 10;
+pub const WIFI_EVENT_STA_WPS_ER_PBC_OVERLAP: c_int = 11;
+pub const WIFI_EVENT_AP_START: c_int = 12;
+pub const WIFI_EVENT_AP_STOP: c_int = 13;
+pub const WIFI_EVENT_AP_STACONNECTED: c_int = 14;
+pub const WIFI_EVENT_AP_STADISCONNECTED: c_int = 15;
+pub const WIFI_EVENT_AP_PROBEREQRECVED: c_int = 16;
+pub const WIFI_EVENT_FTM_REPORT: c_int = 17;
+pub const WIFI_EVENT_STA_BSS_RSSI_LOW: c_int = 18;
+pub const WIFI_EVENT_ACTION_TX_STATUS: c_int = 19;
+pub const WIFI_EVENT_ROC_DONE: c_int = 20;
+pub const WIFI_EVENT_STA_BEACON_TIMEOUT: c_int = 21;
+pub const WIFI_EVENT_CONNECTIONLESS_MODULE_WAKE_INTERVAL_START: c_int = 22;
+pub const WIFI_EVENT_AP_WPS_RG_SUCCESS: c_int = 23;
+pub const WIFI_EVENT_AP_WPS_RG_FAILED: c_int = 24;
+pub const WIFI_EVENT_AP_WPS_RG_TIMEOUT: c_int = 25;
+pub const WIFI_EVENT_AP_WPS_RG_PIN: c_int = 26;
+pub const WIFI_EVENT_AP_WPS_RG_PBC_OVERLAP: c_int = 27;
+pub const WIFI_EVENT_ITWT_SETUP: c_int = 28;
+pub const WIFI_EVENT_ITWT_TEARDOWN: c_int = 29;
+pub const WIFI_EVENT_ITWT_PROBE: c_int = 30;
+pub const WIFI_EVENT_ITWT_SUSPEND: c_int = 31;
+pub const WIFI_EVENT_NAN_STARTED: c_int = 32;
+pub const WIFI_EVENT_NAN_STOPPED: c_int = 33;
+pub const WIFI_EVENT_NAN_SVC_MATCH: c_int = 34;
+pub const WIFI_EVENT_NAN_REPLIED: c_int = 35;
+pub const WIFI_EVENT_NAN_RECEIVE: c_int = 36;
+pub const WIFI_EVENT_NDP_INDICATION: c_int = 37;
+pub const WIFI_EVENT_NDP_CONFIRM: c_int = 38;
+pub const WIFI_EVENT_NDP_TERMINATED: c_int = 39;
+pub const WIFI_EVENT_HOME_CHANNEL_CHANGE: c_int = 40;
+pub const WIFI_EVENT_MAX: c_int = 41;
+pub const wifi_event_t = c_uint;
+pub extern const WIFI_EVENT: esp_event_base_t;
+pub const wifi_event_sta_scan_done_t = extern struct {
+    status: u32 = std.mem.zeroes(u32),
+    number: u8 = std.mem.zeroes(u8),
+    scan_id: u8 = std.mem.zeroes(u8),
+};
+pub const wifi_event_sta_connected_t = extern struct {
+    ssid: [32]u8 = std.mem.zeroes([32]u8),
+    ssid_len: u8 = std.mem.zeroes(u8),
+    bssid: [6]u8 = std.mem.zeroes([6]u8),
+    channel: u8 = std.mem.zeroes(u8),
+    authmode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
+    aid: u16 = std.mem.zeroes(u16),
+};
+pub const wifi_event_sta_disconnected_t = extern struct {
+    ssid: [32]u8 = std.mem.zeroes([32]u8),
+    ssid_len: u8 = std.mem.zeroes(u8),
+    bssid: [6]u8 = std.mem.zeroes([6]u8),
+    reason: u8 = std.mem.zeroes(u8),
+    rssi: i8 = std.mem.zeroes(i8),
+};
+pub const wifi_event_sta_authmode_change_t = extern struct {
+    old_mode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
+    new_mode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
+};
+pub const wifi_event_sta_wps_er_pin_t = extern struct {
+    pin_code: [8]u8 = std.mem.zeroes([8]u8),
+};
+pub const WPS_FAIL_REASON_NORMAL: c_int = 0;
+pub const WPS_FAIL_REASON_RECV_M2D: c_int = 1;
+pub const WPS_FAIL_REASON_MAX: c_int = 2;
+pub const wifi_event_sta_wps_fail_reason_t = c_uint;
+const struct_unnamed_19 = extern struct {
+    ssid: [32]u8 = std.mem.zeroes([32]u8),
+    passphrase: [64]u8 = std.mem.zeroes([64]u8),
+};
+pub const wifi_event_sta_wps_er_success_t = extern struct {
+    ap_cred_cnt: u8 = std.mem.zeroes(u8),
+    ap_cred: [3]struct_unnamed_19 = std.mem.zeroes([3]struct_unnamed_19),
+};
+pub const wifi_event_ap_staconnected_t = extern struct {
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+    aid: u8 = std.mem.zeroes(u8),
+    is_mesh_child: bool = std.mem.zeroes(bool),
+};
+pub const wifi_event_ap_stadisconnected_t = extern struct {
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+    aid: u8 = std.mem.zeroes(u8),
+    is_mesh_child: bool = std.mem.zeroes(bool),
+    reason: u8 = std.mem.zeroes(u8),
+};
+pub const wifi_event_ap_probe_req_rx_t = extern struct {
+    rssi: c_int = std.mem.zeroes(c_int),
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const wifi_event_bss_rssi_low_t = extern struct {
+    rssi: i32 = std.mem.zeroes(i32),
+};
+pub const wifi_event_home_channel_change_t = extern struct {
+    old_chan: u8 = std.mem.zeroes(u8),
+    old_snd: wifi_second_chan_t = std.mem.zeroes(wifi_second_chan_t),
+    new_chan: u8 = std.mem.zeroes(u8),
+    new_snd: wifi_second_chan_t = std.mem.zeroes(wifi_second_chan_t),
+};
+pub const FTM_STATUS_SUCCESS: c_int = 0;
+pub const FTM_STATUS_UNSUPPORTED: c_int = 1;
+pub const FTM_STATUS_CONF_REJECTED: c_int = 2;
+pub const FTM_STATUS_NO_RESPONSE: c_int = 3;
+pub const FTM_STATUS_FAIL: c_int = 4;
+pub const wifi_ftm_status_t = c_uint;
+pub const wifi_ftm_report_entry_t = extern struct {
+    dlog_token: u8 = std.mem.zeroes(u8),
+    rssi: i8 = std.mem.zeroes(i8),
+    rtt: u32 = std.mem.zeroes(u32),
+    t1: u64 = std.mem.zeroes(u64),
+    t2: u64 = std.mem.zeroes(u64),
+    t3: u64 = std.mem.zeroes(u64),
+    t4: u64 = std.mem.zeroes(u64),
+};
+pub const wifi_event_ftm_report_t = extern struct {
+    peer_mac: [6]u8 = std.mem.zeroes([6]u8),
+    status: wifi_ftm_status_t = std.mem.zeroes(wifi_ftm_status_t),
+    rtt_raw: u32 = std.mem.zeroes(u32),
+    rtt_est: u32 = std.mem.zeroes(u32),
+    dist_est: u32 = std.mem.zeroes(u32),
+    ftm_report_data: [*c]wifi_ftm_report_entry_t = std.mem.zeroes([*c]wifi_ftm_report_entry_t),
+    ftm_report_num_entries: u8 = std.mem.zeroes(u8),
+};
+pub const wifi_event_action_tx_status_t = extern struct {
+    ifx: wifi_interface_t = std.mem.zeroes(wifi_interface_t),
+    context: u32 = std.mem.zeroes(u32),
+    da: [6]u8 = std.mem.zeroes([6]u8),
+    status: u8 = std.mem.zeroes(u8),
+};
+pub const wifi_event_roc_done_t = extern struct {
+    context: u32 = std.mem.zeroes(u32),
+};
+pub const wifi_event_ap_wps_rg_pin_t = extern struct {
+    pin_code: [8]u8 = std.mem.zeroes([8]u8),
+};
+pub const WPS_AP_FAIL_REASON_NORMAL: c_int = 0;
+pub const WPS_AP_FAIL_REASON_CONFIG: c_int = 1;
+pub const WPS_AP_FAIL_REASON_AUTH: c_int = 2;
+pub const WPS_AP_FAIL_REASON_MAX: c_int = 3;
+pub const wps_fail_reason_t = c_uint;
+pub const wifi_event_ap_wps_rg_fail_reason_t = extern struct {
+    reason: wps_fail_reason_t = std.mem.zeroes(wps_fail_reason_t),
+    peer_macaddr: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const wifi_event_ap_wps_rg_success_t = extern struct {
+    peer_macaddr: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const wifi_event_nan_svc_match_t = extern struct {
+    subscribe_id: u8 = std.mem.zeroes(u8),
+    publish_id: u8 = std.mem.zeroes(u8),
+    pub_if_mac: [6]u8 = std.mem.zeroes([6]u8),
+    update_pub_id: bool = std.mem.zeroes(bool),
+};
+pub const wifi_event_nan_replied_t = extern struct {
+    publish_id: u8 = std.mem.zeroes(u8),
+    subscribe_id: u8 = std.mem.zeroes(u8),
+    sub_if_mac: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const wifi_event_nan_receive_t = extern struct {
+    inst_id: u8 = std.mem.zeroes(u8),
+    peer_inst_id: u8 = std.mem.zeroes(u8),
+    peer_if_mac: [6]u8 = std.mem.zeroes([6]u8),
+    peer_svc_info: [64]u8 = std.mem.zeroes([64]u8),
+};
+pub const wifi_event_ndp_indication_t = extern struct {
+    publish_id: u8 = std.mem.zeroes(u8),
+    ndp_id: u8 = std.mem.zeroes(u8),
+    peer_nmi: [6]u8 = std.mem.zeroes([6]u8),
+    peer_ndi: [6]u8 = std.mem.zeroes([6]u8),
+    svc_info: [64]u8 = std.mem.zeroes([64]u8),
+};
+pub const wifi_event_ndp_confirm_t = extern struct {
+    status: u8 = std.mem.zeroes(u8),
+    ndp_id: u8 = std.mem.zeroes(u8),
+    peer_nmi: [6]u8 = std.mem.zeroes([6]u8),
+    peer_ndi: [6]u8 = std.mem.zeroes([6]u8),
+    own_ndi: [6]u8 = std.mem.zeroes([6]u8),
+    svc_info: [64]u8 = std.mem.zeroes([64]u8),
+};
+pub const wifi_event_ndp_terminated_t = extern struct {
+    reason: u8 = std.mem.zeroes(u8),
+    ndp_id: u8 = std.mem.zeroes(u8),
+    init_ndi: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const struct_wifi_sta_list_t = extern struct {
+    sta: [10]wifi_sta_info_t = std.mem.zeroes([10]wifi_sta_info_t),
+    num: c_int = std.mem.zeroes(c_int),
+};
+pub const wifi_sta_list_t = struct_wifi_sta_list_t; // /home/kassane/espressif/esp-idf/components/esp_wifi/include/local/esp_wifi_types_native.h:38:12: warning: struct demoted to opaque type - has bitfield
+pub const wifi_pkt_rx_ctrl_t = opaque {};
+pub const wifi_csi_config_t = extern struct {
+    lltf_en: bool = std.mem.zeroes(bool),
+    htltf_en: bool = std.mem.zeroes(bool),
+    stbc_htltf2_en: bool = std.mem.zeroes(bool),
+    ltf_merge_en: bool = std.mem.zeroes(bool),
+    channel_filter_en: bool = std.mem.zeroes(bool),
+    manu_scale: bool = std.mem.zeroes(bool),
+    shift: u8 = std.mem.zeroes(u8),
+    dump_ack_en: bool = std.mem.zeroes(bool),
+};
+pub const wifi_promiscuous_pkt_t = extern struct {
+    rx_ctrl: wifi_pkt_rx_ctrl_t align(4) = std.mem.zeroes(wifi_pkt_rx_ctrl_t),
+    pub fn payload(self: anytype) @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8) {
+        const Intermediate = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = @import("std").zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 48)));
+    }
+};
+pub const ESP_BLUFI_EVENT_INIT_FINISH: c_int = 0;
+pub const ESP_BLUFI_EVENT_DEINIT_FINISH: c_int = 1;
+pub const ESP_BLUFI_EVENT_SET_WIFI_OPMODE: c_int = 2;
+pub const ESP_BLUFI_EVENT_BLE_CONNECT: c_int = 3;
+pub const ESP_BLUFI_EVENT_BLE_DISCONNECT: c_int = 4;
+pub const ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP: c_int = 5;
+pub const ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP: c_int = 6;
+pub const ESP_BLUFI_EVENT_GET_WIFI_STATUS: c_int = 7;
+pub const ESP_BLUFI_EVENT_DEAUTHENTICATE_STA: c_int = 8;
+pub const ESP_BLUFI_EVENT_RECV_STA_BSSID: c_int = 9;
+pub const ESP_BLUFI_EVENT_RECV_STA_SSID: c_int = 10;
+pub const ESP_BLUFI_EVENT_RECV_STA_PASSWD: c_int = 11;
+pub const ESP_BLUFI_EVENT_RECV_SOFTAP_SSID: c_int = 12;
+pub const ESP_BLUFI_EVENT_RECV_SOFTAP_PASSWD: c_int = 13;
+pub const ESP_BLUFI_EVENT_RECV_SOFTAP_MAX_CONN_NUM: c_int = 14;
+pub const ESP_BLUFI_EVENT_RECV_SOFTAP_AUTH_MODE: c_int = 15;
+pub const ESP_BLUFI_EVENT_RECV_SOFTAP_CHANNEL: c_int = 16;
+pub const ESP_BLUFI_EVENT_RECV_USERNAME: c_int = 17;
+pub const ESP_BLUFI_EVENT_RECV_CA_CERT: c_int = 18;
+pub const ESP_BLUFI_EVENT_RECV_CLIENT_CERT: c_int = 19;
+pub const ESP_BLUFI_EVENT_RECV_SERVER_CERT: c_int = 20;
+pub const ESP_BLUFI_EVENT_RECV_CLIENT_PRIV_KEY: c_int = 21;
+pub const ESP_BLUFI_EVENT_RECV_SERVER_PRIV_KEY: c_int = 22;
+pub const ESP_BLUFI_EVENT_RECV_SLAVE_DISCONNECT_BLE: c_int = 23;
+pub const ESP_BLUFI_EVENT_GET_WIFI_LIST: c_int = 24;
+pub const ESP_BLUFI_EVENT_REPORT_ERROR: c_int = 25;
+pub const ESP_BLUFI_EVENT_RECV_CUSTOM_DATA: c_int = 26;
+pub const esp_blufi_cb_event_t = c_uint;
+pub const ESP_BLUFI_STA_CONN_SUCCESS: c_int = 0;
+pub const ESP_BLUFI_STA_CONN_FAIL: c_int = 1;
+pub const ESP_BLUFI_STA_CONNECTING: c_int = 2;
+pub const ESP_BLUFI_STA_NO_IP: c_int = 3;
+pub const esp_blufi_sta_conn_state_t = c_uint;
+pub const ESP_BLUFI_INIT_OK: c_int = 0;
+pub const ESP_BLUFI_INIT_FAILED: c_int = 1;
+pub const esp_blufi_init_state_t = c_uint;
+pub const ESP_BLUFI_DEINIT_OK: c_int = 0;
+pub const ESP_BLUFI_DEINIT_FAILED: c_int = 1;
+pub const esp_blufi_deinit_state_t = c_uint;
+pub const ESP_BLUFI_SEQUENCE_ERROR: c_int = 0;
+pub const ESP_BLUFI_CHECKSUM_ERROR: c_int = 1;
+pub const ESP_BLUFI_DECRYPT_ERROR: c_int = 2;
+pub const ESP_BLUFI_ENCRYPT_ERROR: c_int = 3;
+pub const ESP_BLUFI_INIT_SECURITY_ERROR: c_int = 4;
+pub const ESP_BLUFI_DH_MALLOC_ERROR: c_int = 5;
+pub const ESP_BLUFI_DH_PARAM_ERROR: c_int = 6;
+pub const ESP_BLUFI_READ_PARAM_ERROR: c_int = 7;
+pub const ESP_BLUFI_MAKE_PUBLIC_ERROR: c_int = 8;
+pub const ESP_BLUFI_DATA_FORMAT_ERROR: c_int = 9;
+pub const ESP_BLUFI_CALC_MD5_ERROR: c_int = 10;
+pub const ESP_BLUFI_WIFI_SCAN_FAIL: c_int = 11;
+pub const ESP_BLUFI_MSG_STATE_ERROR: c_int = 12;
+pub const esp_blufi_error_state_t = c_uint;
+pub const esp_blufi_extra_info_t = extern struct {
+    sta_bssid: [6]u8 = std.mem.zeroes([6]u8),
+    sta_bssid_set: bool = std.mem.zeroes(bool),
+    sta_ssid: [*c]u8 = std.mem.zeroes([*c]u8),
+    sta_ssid_len: c_int = std.mem.zeroes(c_int),
+    sta_passwd: [*c]u8 = std.mem.zeroes([*c]u8),
+    sta_passwd_len: c_int = std.mem.zeroes(c_int),
+    softap_ssid: [*c]u8 = std.mem.zeroes([*c]u8),
+    softap_ssid_len: c_int = std.mem.zeroes(c_int),
+    softap_passwd: [*c]u8 = std.mem.zeroes([*c]u8),
+    softap_passwd_len: c_int = std.mem.zeroes(c_int),
+    softap_authmode: u8 = std.mem.zeroes(u8),
+    softap_authmode_set: bool = std.mem.zeroes(bool),
+    softap_max_conn_num: u8 = std.mem.zeroes(u8),
+    softap_max_conn_num_set: bool = std.mem.zeroes(bool),
+    softap_channel: u8 = std.mem.zeroes(u8),
+    softap_channel_set: bool = std.mem.zeroes(bool),
+    sta_max_conn_retry: u8 = std.mem.zeroes(u8),
+    sta_max_conn_retry_set: bool = std.mem.zeroes(bool),
+    sta_conn_end_reason: u8 = std.mem.zeroes(u8),
+    sta_conn_end_reason_set: bool = std.mem.zeroes(bool),
+    sta_conn_rssi: i8 = std.mem.zeroes(i8),
+    sta_conn_rssi_set: bool = std.mem.zeroes(bool),
+};
+pub const esp_blufi_ap_record_t = extern struct {
+    ssid: [33]u8 = std.mem.zeroes([33]u8),
+    rssi: i8 = std.mem.zeroes(i8),
+};
+pub const esp_blufi_bd_addr_t = [6]u8;
+pub const struct_blufi_init_finish_evt_param_20 = extern struct {
+    state: esp_blufi_init_state_t = std.mem.zeroes(esp_blufi_init_state_t),
+};
+pub const struct_blufi_deinit_finish_evt_param_21 = extern struct {
+    state: esp_blufi_deinit_state_t = std.mem.zeroes(esp_blufi_deinit_state_t),
+};
+pub const struct_blufi_set_wifi_mode_evt_param_22 = extern struct {
+    op_mode: wifi_mode_t = std.mem.zeroes(wifi_mode_t),
+};
+pub const struct_blufi_connect_evt_param_23 = extern struct {
+    remote_bda: esp_blufi_bd_addr_t = std.mem.zeroes(esp_blufi_bd_addr_t),
+    server_if: u8 = std.mem.zeroes(u8),
+    conn_id: u16 = std.mem.zeroes(u16),
+};
+pub const struct_blufi_disconnect_evt_param_24 = extern struct {
+    remote_bda: esp_blufi_bd_addr_t = std.mem.zeroes(esp_blufi_bd_addr_t),
+};
+pub const struct_blufi_recv_sta_bssid_evt_param_25 = extern struct {
+    bssid: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const struct_blufi_recv_sta_ssid_evt_param_26 = extern struct {
+    ssid: [*c]u8 = std.mem.zeroes([*c]u8),
+    ssid_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_sta_passwd_evt_param_27 = extern struct {
+    passwd: [*c]u8 = std.mem.zeroes([*c]u8),
+    passwd_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_softap_ssid_evt_param_28 = extern struct {
+    ssid: [*c]u8 = std.mem.zeroes([*c]u8),
+    ssid_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_softap_passwd_evt_param_29 = extern struct {
+    passwd: [*c]u8 = std.mem.zeroes([*c]u8),
+    passwd_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_softap_max_conn_num_evt_param_30 = extern struct {
+    max_conn_num: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_softap_auth_mode_evt_param_31 = extern struct {
+    auth_mode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
+};
+pub const struct_blufi_recv_softap_channel_evt_param_32 = extern struct {
+    channel: u8 = std.mem.zeroes(u8),
+};
+pub const struct_blufi_recv_username_evt_param_33 = extern struct {
+    name: [*c]u8 = std.mem.zeroes([*c]u8),
+    name_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_ca_evt_param_34 = extern struct {
+    cert: [*c]u8 = std.mem.zeroes([*c]u8),
+    cert_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_client_cert_evt_param_35 = extern struct {
+    cert: [*c]u8 = std.mem.zeroes([*c]u8),
+    cert_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_server_cert_evt_param_36 = extern struct {
+    cert: [*c]u8 = std.mem.zeroes([*c]u8),
+    cert_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_client_pkey_evt_param_37 = extern struct {
+    pkey: [*c]u8 = std.mem.zeroes([*c]u8),
+    pkey_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_recv_server_pkey_evt_param_38 = extern struct {
+    pkey: [*c]u8 = std.mem.zeroes([*c]u8),
+    pkey_len: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_blufi_get_error_evt_param_39 = extern struct {
+    state: esp_blufi_error_state_t = std.mem.zeroes(esp_blufi_error_state_t),
+};
+pub const struct_blufi_recv_custom_data_evt_param_40 = extern struct {
+    data: [*c]u8 = std.mem.zeroes([*c]u8),
+    data_len: u32 = std.mem.zeroes(u32),
+};
+pub const esp_blufi_cb_param_t = extern union {
+    init_finish: struct_blufi_init_finish_evt_param_20,
+    deinit_finish: struct_blufi_deinit_finish_evt_param_21,
+    wifi_mode: struct_blufi_set_wifi_mode_evt_param_22,
+    connect: struct_blufi_connect_evt_param_23,
+    disconnect: struct_blufi_disconnect_evt_param_24,
+    sta_bssid: struct_blufi_recv_sta_bssid_evt_param_25,
+    sta_ssid: struct_blufi_recv_sta_ssid_evt_param_26,
+    sta_passwd: struct_blufi_recv_sta_passwd_evt_param_27,
+    softap_ssid: struct_blufi_recv_softap_ssid_evt_param_28,
+    softap_passwd: struct_blufi_recv_softap_passwd_evt_param_29,
+    softap_max_conn_num: struct_blufi_recv_softap_max_conn_num_evt_param_30,
+    softap_auth_mode: struct_blufi_recv_softap_auth_mode_evt_param_31,
+    softap_channel: struct_blufi_recv_softap_channel_evt_param_32,
+    username: struct_blufi_recv_username_evt_param_33,
+    ca: struct_blufi_recv_ca_evt_param_34,
+    client_cert: struct_blufi_recv_client_cert_evt_param_35,
+    server_cert: struct_blufi_recv_server_cert_evt_param_36,
+    client_pkey: struct_blufi_recv_client_pkey_evt_param_37,
+    server_pkey: struct_blufi_recv_server_pkey_evt_param_38,
+    report_error: struct_blufi_get_error_evt_param_39,
+    custom_data: struct_blufi_recv_custom_data_evt_param_40,
+};
+pub const esp_blufi_event_cb_t = ?*const fn (esp_blufi_cb_event_t, [*c]esp_blufi_cb_param_t) callconv(.C) void;
+pub const esp_blufi_negotiate_data_handler_t = ?*const fn ([*c]u8, c_int, [*c][*c]u8, [*c]c_int, [*c]bool) callconv(.C) void;
+pub const esp_blufi_encrypt_func_t = ?*const fn (u8, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_blufi_decrypt_func_t = ?*const fn (u8, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_blufi_checksum_func_t = ?*const fn (u8, [*c]u8, c_int) callconv(.C) u16;
+pub const esp_blufi_callbacks_t = extern struct {
+    event_cb: esp_blufi_event_cb_t = std.mem.zeroes(esp_blufi_event_cb_t),
+    negotiate_data_handler: esp_blufi_negotiate_data_handler_t = std.mem.zeroes(esp_blufi_negotiate_data_handler_t),
+    encrypt_func: esp_blufi_encrypt_func_t = std.mem.zeroes(esp_blufi_encrypt_func_t),
+    decrypt_func: esp_blufi_decrypt_func_t = std.mem.zeroes(esp_blufi_decrypt_func_t),
+    checksum_func: esp_blufi_checksum_func_t = std.mem.zeroes(esp_blufi_checksum_func_t),
+};
+pub extern fn esp_blufi_register_callbacks(callbacks: [*c]esp_blufi_callbacks_t) esp_err_t;
+pub extern fn esp_blufi_profile_init() esp_err_t;
+pub extern fn esp_blufi_profile_deinit() esp_err_t;
+pub extern fn esp_blufi_send_wifi_conn_report(opmode: wifi_mode_t, sta_conn_state: esp_blufi_sta_conn_state_t, softap_conn_num: u8, extra_info: [*c]esp_blufi_extra_info_t) esp_err_t;
+pub extern fn esp_blufi_send_wifi_list(apCount: u16, list: [*c]esp_blufi_ap_record_t) esp_err_t;
+pub extern fn esp_blufi_get_version() u16;
+pub extern fn esp_blufi_send_error_info(state: esp_blufi_error_state_t) esp_err_t;
+pub extern fn esp_blufi_send_custom_data(data: [*c]u8, data_len: u32) esp_err_t;
+pub const esp_ble_key_type_t = u8;
+pub const esp_ble_auth_req_t = u8;
+pub const esp_ble_io_cap_t = u8;
+pub const esp_ble_dtm_pkt_payload_t = u8;
+pub const ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT: c_int = 0;
+pub const ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT: c_int = 1;
+pub const ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: c_int = 2;
+pub const ESP_GAP_BLE_SCAN_RESULT_EVT: c_int = 3;
+pub const ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT: c_int = 4;
+pub const ESP_GAP_BLE_SCAN_RSP_DATA_RAW_SET_COMPLETE_EVT: c_int = 5;
+pub const ESP_GAP_BLE_ADV_START_COMPLETE_EVT: c_int = 6;
+pub const ESP_GAP_BLE_SCAN_START_COMPLETE_EVT: c_int = 7;
+pub const ESP_GAP_BLE_AUTH_CMPL_EVT: c_int = 8;
+pub const ESP_GAP_BLE_KEY_EVT: c_int = 9;
+pub const ESP_GAP_BLE_SEC_REQ_EVT: c_int = 10;
+pub const ESP_GAP_BLE_PASSKEY_NOTIF_EVT: c_int = 11;
+pub const ESP_GAP_BLE_PASSKEY_REQ_EVT: c_int = 12;
+pub const ESP_GAP_BLE_OOB_REQ_EVT: c_int = 13;
+pub const ESP_GAP_BLE_LOCAL_IR_EVT: c_int = 14;
+pub const ESP_GAP_BLE_LOCAL_ER_EVT: c_int = 15;
+pub const ESP_GAP_BLE_NC_REQ_EVT: c_int = 16;
+pub const ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: c_int = 17;
+pub const ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT: c_int = 18;
+pub const ESP_GAP_BLE_SET_STATIC_RAND_ADDR_EVT: c_int = 19;
+pub const ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT: c_int = 20;
+pub const ESP_GAP_BLE_SET_PKT_LENGTH_COMPLETE_EVT: c_int = 21;
+pub const ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: c_int = 22;
+pub const ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: c_int = 23;
+pub const ESP_GAP_BLE_CLEAR_BOND_DEV_COMPLETE_EVT: c_int = 24;
+pub const ESP_GAP_BLE_GET_BOND_DEV_COMPLETE_EVT: c_int = 25;
+pub const ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT: c_int = 26;
+pub const ESP_GAP_BLE_UPDATE_WHITELIST_COMPLETE_EVT: c_int = 27;
+pub const ESP_GAP_BLE_UPDATE_DUPLICATE_EXCEPTIONAL_LIST_COMPLETE_EVT: c_int = 28;
+pub const ESP_GAP_BLE_SET_CHANNELS_EVT: c_int = 29;
+pub const ESP_GAP_BLE_READ_PHY_COMPLETE_EVT: c_int = 30;
+pub const ESP_GAP_BLE_SET_PREFERRED_DEFAULT_PHY_COMPLETE_EVT: c_int = 31;
+pub const ESP_GAP_BLE_SET_PREFERRED_PHY_COMPLETE_EVT: c_int = 32;
+pub const ESP_GAP_BLE_EXT_ADV_SET_RAND_ADDR_COMPLETE_EVT: c_int = 33;
+pub const ESP_GAP_BLE_EXT_ADV_SET_PARAMS_COMPLETE_EVT: c_int = 34;
+pub const ESP_GAP_BLE_EXT_ADV_DATA_SET_COMPLETE_EVT: c_int = 35;
+pub const ESP_GAP_BLE_EXT_SCAN_RSP_DATA_SET_COMPLETE_EVT: c_int = 36;
+pub const ESP_GAP_BLE_EXT_ADV_START_COMPLETE_EVT: c_int = 37;
+pub const ESP_GAP_BLE_EXT_ADV_STOP_COMPLETE_EVT: c_int = 38;
+pub const ESP_GAP_BLE_EXT_ADV_SET_REMOVE_COMPLETE_EVT: c_int = 39;
+pub const ESP_GAP_BLE_EXT_ADV_SET_CLEAR_COMPLETE_EVT: c_int = 40;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SET_PARAMS_COMPLETE_EVT: c_int = 41;
+pub const ESP_GAP_BLE_PERIODIC_ADV_DATA_SET_COMPLETE_EVT: c_int = 42;
+pub const ESP_GAP_BLE_PERIODIC_ADV_START_COMPLETE_EVT: c_int = 43;
+pub const ESP_GAP_BLE_PERIODIC_ADV_STOP_COMPLETE_EVT: c_int = 44;
+pub const ESP_GAP_BLE_PERIODIC_ADV_CREATE_SYNC_COMPLETE_EVT: c_int = 45;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_CANCEL_COMPLETE_EVT: c_int = 46;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_TERMINATE_COMPLETE_EVT: c_int = 47;
+pub const ESP_GAP_BLE_PERIODIC_ADV_ADD_DEV_COMPLETE_EVT: c_int = 48;
+pub const ESP_GAP_BLE_PERIODIC_ADV_REMOVE_DEV_COMPLETE_EVT: c_int = 49;
+pub const ESP_GAP_BLE_PERIODIC_ADV_CLEAR_DEV_COMPLETE_EVT: c_int = 50;
+pub const ESP_GAP_BLE_SET_EXT_SCAN_PARAMS_COMPLETE_EVT: c_int = 51;
+pub const ESP_GAP_BLE_EXT_SCAN_START_COMPLETE_EVT: c_int = 52;
+pub const ESP_GAP_BLE_EXT_SCAN_STOP_COMPLETE_EVT: c_int = 53;
+pub const ESP_GAP_BLE_PREFER_EXT_CONN_PARAMS_SET_COMPLETE_EVT: c_int = 54;
+pub const ESP_GAP_BLE_PHY_UPDATE_COMPLETE_EVT: c_int = 55;
+pub const ESP_GAP_BLE_EXT_ADV_REPORT_EVT: c_int = 56;
+pub const ESP_GAP_BLE_SCAN_TIMEOUT_EVT: c_int = 57;
+pub const ESP_GAP_BLE_ADV_TERMINATED_EVT: c_int = 58;
+pub const ESP_GAP_BLE_SCAN_REQ_RECEIVED_EVT: c_int = 59;
+pub const ESP_GAP_BLE_CHANNEL_SELECT_ALGORITHM_EVT: c_int = 60;
+pub const ESP_GAP_BLE_PERIODIC_ADV_REPORT_EVT: c_int = 61;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_LOST_EVT: c_int = 62;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_ESTAB_EVT: c_int = 63;
+pub const ESP_GAP_BLE_SC_OOB_REQ_EVT: c_int = 64;
+pub const ESP_GAP_BLE_SC_CR_LOC_OOB_EVT: c_int = 65;
+pub const ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT: c_int = 66;
+pub const ESP_GAP_BLE_PERIODIC_ADV_RECV_ENABLE_COMPLETE_EVT: c_int = 67;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_TRANS_COMPLETE_EVT: c_int = 68;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SET_INFO_TRANS_COMPLETE_EVT: c_int = 69;
+pub const ESP_GAP_BLE_SET_PAST_PARAMS_COMPLETE_EVT: c_int = 70;
+pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_TRANS_RECV_EVT: c_int = 71;
+pub const ESP_GAP_BLE_DTM_TEST_UPDATE_EVT: c_int = 72;
+pub const ESP_GAP_BLE_ADV_CLEAR_COMPLETE_EVT: c_int = 73;
+pub const ESP_GAP_BLE_EVT_MAX: c_int = 74;
+pub const esp_gap_ble_cb_event_t = c_uint;
+pub const esp_gap_ble_channels = [5]u8;
+pub const ESP_BLE_AD_TYPE_FLAG: c_int = 1;
+pub const ESP_BLE_AD_TYPE_16SRV_PART: c_int = 2;
+pub const ESP_BLE_AD_TYPE_16SRV_CMPL: c_int = 3;
+pub const ESP_BLE_AD_TYPE_32SRV_PART: c_int = 4;
+pub const ESP_BLE_AD_TYPE_32SRV_CMPL: c_int = 5;
+pub const ESP_BLE_AD_TYPE_128SRV_PART: c_int = 6;
+pub const ESP_BLE_AD_TYPE_128SRV_CMPL: c_int = 7;
+pub const ESP_BLE_AD_TYPE_NAME_SHORT: c_int = 8;
+pub const ESP_BLE_AD_TYPE_NAME_CMPL: c_int = 9;
+pub const ESP_BLE_AD_TYPE_TX_PWR: c_int = 10;
+pub const ESP_BLE_AD_TYPE_DEV_CLASS: c_int = 13;
+pub const ESP_BLE_AD_TYPE_SM_TK: c_int = 16;
+pub const ESP_BLE_AD_TYPE_SM_OOB_FLAG: c_int = 17;
+pub const ESP_BLE_AD_TYPE_INT_RANGE: c_int = 18;
+pub const ESP_BLE_AD_TYPE_SOL_SRV_UUID: c_int = 20;
+pub const ESP_BLE_AD_TYPE_128SOL_SRV_UUID: c_int = 21;
+pub const ESP_BLE_AD_TYPE_SERVICE_DATA: c_int = 22;
+pub const ESP_BLE_AD_TYPE_PUBLIC_TARGET: c_int = 23;
+pub const ESP_BLE_AD_TYPE_RANDOM_TARGET: c_int = 24;
+pub const ESP_BLE_AD_TYPE_APPEARANCE: c_int = 25;
+pub const ESP_BLE_AD_TYPE_ADV_INT: c_int = 26;
+pub const ESP_BLE_AD_TYPE_LE_DEV_ADDR: c_int = 27;
+pub const ESP_BLE_AD_TYPE_LE_ROLE: c_int = 28;
+pub const ESP_BLE_AD_TYPE_SPAIR_C256: c_int = 29;
+pub const ESP_BLE_AD_TYPE_SPAIR_R256: c_int = 30;
+pub const ESP_BLE_AD_TYPE_32SOL_SRV_UUID: c_int = 31;
+pub const ESP_BLE_AD_TYPE_32SERVICE_DATA: c_int = 32;
+pub const ESP_BLE_AD_TYPE_128SERVICE_DATA: c_int = 33;
+pub const ESP_BLE_AD_TYPE_LE_SECURE_CONFIRM: c_int = 34;
+pub const ESP_BLE_AD_TYPE_LE_SECURE_RANDOM: c_int = 35;
+pub const ESP_BLE_AD_TYPE_URI: c_int = 36;
+pub const ESP_BLE_AD_TYPE_INDOOR_POSITION: c_int = 37;
+pub const ESP_BLE_AD_TYPE_TRANS_DISC_DATA: c_int = 38;
+pub const ESP_BLE_AD_TYPE_LE_SUPPORT_FEATURE: c_int = 39;
+pub const ESP_BLE_AD_TYPE_CHAN_MAP_UPDATE: c_int = 40;
+pub const ESP_BLE_AD_MANUFACTURER_SPECIFIC_TYPE: c_int = 255;
+pub const esp_ble_adv_data_type = c_uint;
+pub const ADV_TYPE_IND: c_int = 0;
+pub const ADV_TYPE_DIRECT_IND_HIGH: c_int = 1;
+pub const ADV_TYPE_SCAN_IND: c_int = 2;
+pub const ADV_TYPE_NONCONN_IND: c_int = 3;
+pub const ADV_TYPE_DIRECT_IND_LOW: c_int = 4;
+pub const esp_ble_adv_type_t = c_uint;
+pub const ADV_CHNL_37: c_int = 1;
+pub const ADV_CHNL_38: c_int = 2;
+pub const ADV_CHNL_39: c_int = 4;
+pub const ADV_CHNL_ALL: c_int = 7;
+pub const esp_ble_adv_channel_t = c_uint;
+pub const ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY: c_int = 0;
+pub const ADV_FILTER_ALLOW_SCAN_WLST_CON_ANY: c_int = 1;
+pub const ADV_FILTER_ALLOW_SCAN_ANY_CON_WLST: c_int = 2;
+pub const ADV_FILTER_ALLOW_SCAN_WLST_CON_WLST: c_int = 3;
+pub const esp_ble_adv_filter_t = c_uint;
+pub const ESP_BLE_SEC_ENCRYPT: c_int = 1;
+pub const ESP_BLE_SEC_ENCRYPT_NO_MITM: c_int = 2;
+pub const ESP_BLE_SEC_ENCRYPT_MITM: c_int = 3;
+pub const esp_ble_sec_act_t = c_uint;
+pub const ESP_BLE_SM_PASSKEY: c_int = 0;
+pub const ESP_BLE_SM_AUTHEN_REQ_MODE: c_int = 1;
+pub const ESP_BLE_SM_IOCAP_MODE: c_int = 2;
+pub const ESP_BLE_SM_SET_INIT_KEY: c_int = 3;
+pub const ESP_BLE_SM_SET_RSP_KEY: c_int = 4;
+pub const ESP_BLE_SM_MAX_KEY_SIZE: c_int = 5;
+pub const ESP_BLE_SM_MIN_KEY_SIZE: c_int = 6;
+pub const ESP_BLE_SM_SET_STATIC_PASSKEY: c_int = 7;
+pub const ESP_BLE_SM_CLEAR_STATIC_PASSKEY: c_int = 8;
+pub const ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH: c_int = 9;
+pub const ESP_BLE_SM_OOB_SUPPORT: c_int = 10;
+pub const ESP_BLE_APP_ENC_KEY_SIZE: c_int = 11;
+pub const ESP_BLE_SM_MAX_PARAM: c_int = 12;
+pub const esp_ble_sm_param_t = c_uint;
+pub const DTM_TX_START_EVT: c_int = 0;
+pub const DTM_RX_START_EVT: c_int = 1;
+pub const DTM_TEST_STOP_EVT: c_int = 2;
+pub const esp_ble_dtm_update_evt_t = c_uint;
+pub const esp_ble_dtm_tx_t = extern struct {
+    tx_channel: u8 = std.mem.zeroes(u8),
+    len_of_data: u8 = std.mem.zeroes(u8),
+    pkt_payload: esp_ble_dtm_pkt_payload_t = std.mem.zeroes(esp_ble_dtm_pkt_payload_t),
+};
+pub const esp_ble_dtm_rx_t = extern struct {
+    rx_channel: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_adv_params_t = extern struct {
+    adv_int_min: u16 = std.mem.zeroes(u16),
+    adv_int_max: u16 = std.mem.zeroes(u16),
+    adv_type: esp_ble_adv_type_t = std.mem.zeroes(esp_ble_adv_type_t),
+    own_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    peer_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    peer_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    channel_map: esp_ble_adv_channel_t = std.mem.zeroes(esp_ble_adv_channel_t),
+    adv_filter_policy: esp_ble_adv_filter_t = std.mem.zeroes(esp_ble_adv_filter_t),
+};
+pub const esp_ble_adv_data_t = extern struct {
+    set_scan_rsp: bool = std.mem.zeroes(bool),
+    include_name: bool = std.mem.zeroes(bool),
+    include_txpower: bool = std.mem.zeroes(bool),
+    min_interval: c_int = std.mem.zeroes(c_int),
+    max_interval: c_int = std.mem.zeroes(c_int),
+    appearance: c_int = std.mem.zeroes(c_int),
+    manufacturer_len: u16 = std.mem.zeroes(u16),
+    p_manufacturer_data: [*c]u8 = std.mem.zeroes([*c]u8),
+    service_data_len: u16 = std.mem.zeroes(u16),
+    p_service_data: [*c]u8 = std.mem.zeroes([*c]u8),
+    service_uuid_len: u16 = std.mem.zeroes(u16),
+    p_service_uuid: [*c]u8 = std.mem.zeroes([*c]u8),
+    flag: u8 = std.mem.zeroes(u8),
+};
+pub const BLE_SCAN_TYPE_PASSIVE: c_int = 0;
+pub const BLE_SCAN_TYPE_ACTIVE: c_int = 1;
+pub const esp_ble_scan_type_t = c_uint;
+pub const BLE_SCAN_FILTER_ALLOW_ALL: c_int = 0;
+pub const BLE_SCAN_FILTER_ALLOW_ONLY_WLST: c_int = 1;
+pub const BLE_SCAN_FILTER_ALLOW_UND_RPA_DIR: c_int = 2;
+pub const BLE_SCAN_FILTER_ALLOW_WLIST_RPA_DIR: c_int = 3;
+pub const esp_ble_scan_filter_t = c_uint;
+pub const BLE_SCAN_DUPLICATE_DISABLE: c_int = 0;
+pub const BLE_SCAN_DUPLICATE_ENABLE: c_int = 1;
+pub const BLE_SCAN_DUPLICATE_ENABLE_RESET: c_int = 2;
+pub const BLE_SCAN_DUPLICATE_MAX: c_int = 3;
+pub const esp_ble_scan_duplicate_t = c_uint;
+pub const esp_ble_scan_params_t = extern struct {
+    scan_type: esp_ble_scan_type_t = std.mem.zeroes(esp_ble_scan_type_t),
+    own_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    scan_filter_policy: esp_ble_scan_filter_t = std.mem.zeroes(esp_ble_scan_filter_t),
+    scan_interval: u16 = std.mem.zeroes(u16),
+    scan_window: u16 = std.mem.zeroes(u16),
+    scan_duplicate: esp_ble_scan_duplicate_t = std.mem.zeroes(esp_ble_scan_duplicate_t),
+};
+pub const esp_gap_conn_params_t = extern struct {
+    interval: u16 = std.mem.zeroes(u16),
+    latency: u16 = std.mem.zeroes(u16),
+    timeout: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_conn_update_params_t = extern struct {
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    min_int: u16 = std.mem.zeroes(u16),
+    max_int: u16 = std.mem.zeroes(u16),
+    latency: u16 = std.mem.zeroes(u16),
+    timeout: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_pkt_data_length_params_t = extern struct {
+    rx_len: u16 = std.mem.zeroes(u16),
+    tx_len: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_penc_keys_t = extern struct {
+    ltk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    rand: esp_bt_octet8_t = std.mem.zeroes(esp_bt_octet8_t),
+    ediv: u16 = std.mem.zeroes(u16),
+    sec_level: u8 = std.mem.zeroes(u8),
+    key_size: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_pcsrk_keys_t = extern struct {
+    counter: u32 = std.mem.zeroes(u32),
+    csrk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    sec_level: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_pid_keys_t = extern struct {
+    irk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    static_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const esp_ble_lenc_keys_t = extern struct {
+    ltk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    div: u16 = std.mem.zeroes(u16),
+    key_size: u8 = std.mem.zeroes(u8),
+    sec_level: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_lcsrk_keys = extern struct {
+    counter: u32 = std.mem.zeroes(u32),
+    div: u16 = std.mem.zeroes(u16),
+    sec_level: u8 = std.mem.zeroes(u8),
+    csrk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+};
+pub const esp_ble_sec_key_notif_t = extern struct {
+    bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    passkey: u32 = std.mem.zeroes(u32),
+};
+pub const esp_ble_sec_req_t = extern struct {
+    bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const esp_ble_key_value_t = extern union {
+    penc_key: esp_ble_penc_keys_t,
+    pcsrk_key: esp_ble_pcsrk_keys_t,
+    pid_key: esp_ble_pid_keys_t,
+    lenc_key: esp_ble_lenc_keys_t,
+    lcsrk_key: esp_ble_lcsrk_keys,
+};
+pub const esp_ble_bond_key_info_t = extern struct {
+    key_mask: esp_ble_key_mask_t = std.mem.zeroes(esp_ble_key_mask_t),
+    penc_key: esp_ble_penc_keys_t = std.mem.zeroes(esp_ble_penc_keys_t),
+    pcsrk_key: esp_ble_pcsrk_keys_t = std.mem.zeroes(esp_ble_pcsrk_keys_t),
+    pid_key: esp_ble_pid_keys_t = std.mem.zeroes(esp_ble_pid_keys_t),
+};
+pub const esp_ble_bond_dev_t = extern struct {
+    bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    bond_key: esp_ble_bond_key_info_t = std.mem.zeroes(esp_ble_bond_key_info_t),
+};
+pub const esp_ble_key_t = extern struct {
+    bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    key_type: esp_ble_key_type_t = std.mem.zeroes(esp_ble_key_type_t),
+    p_key_value: esp_ble_key_value_t = std.mem.zeroes(esp_ble_key_value_t),
+};
+pub const esp_ble_local_id_keys_t = extern struct {
+    ir: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    irk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    dhk: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+};
+pub const esp_ble_local_oob_data_t = extern struct {
+    oob_c: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+    oob_r: esp_bt_octet16_t = std.mem.zeroes(esp_bt_octet16_t),
+};
+pub const esp_ble_auth_cmpl_t = extern struct {
+    bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    key_present: bool = std.mem.zeroes(bool),
+    key: esp_link_key = std.mem.zeroes(esp_link_key),
+    key_type: u8 = std.mem.zeroes(u8),
+    success: bool = std.mem.zeroes(bool),
+    fail_reason: u8 = std.mem.zeroes(u8),
+    addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    dev_type: esp_bt_dev_type_t = std.mem.zeroes(esp_bt_dev_type_t),
+    auth_mode: esp_ble_auth_req_t = std.mem.zeroes(esp_ble_auth_req_t),
+};
+pub const esp_ble_sec_t = extern union {
+    key_notif: esp_ble_sec_key_notif_t,
+    ble_req: esp_ble_sec_req_t,
+    ble_key: esp_ble_key_t,
+    ble_id_keys: esp_ble_local_id_keys_t,
+    oob_data: esp_ble_local_oob_data_t,
+    auth_cmpl: esp_ble_auth_cmpl_t,
+};
+pub const ESP_GAP_SEARCH_INQ_RES_EVT: c_int = 0;
+pub const ESP_GAP_SEARCH_INQ_CMPL_EVT: c_int = 1;
+pub const ESP_GAP_SEARCH_DISC_RES_EVT: c_int = 2;
+pub const ESP_GAP_SEARCH_DISC_BLE_RES_EVT: c_int = 3;
+pub const ESP_GAP_SEARCH_DISC_CMPL_EVT: c_int = 4;
+pub const ESP_GAP_SEARCH_DI_DISC_CMPL_EVT: c_int = 5;
+pub const ESP_GAP_SEARCH_SEARCH_CANCEL_CMPL_EVT: c_int = 6;
+pub const ESP_GAP_SEARCH_INQ_DISCARD_NUM_EVT: c_int = 7;
+pub const esp_gap_search_evt_t = c_uint;
+pub const ESP_BLE_EVT_CONN_ADV: c_int = 0;
+pub const ESP_BLE_EVT_CONN_DIR_ADV: c_int = 1;
+pub const ESP_BLE_EVT_DISC_ADV: c_int = 2;
+pub const ESP_BLE_EVT_NON_CONN_ADV: c_int = 3;
+pub const ESP_BLE_EVT_SCAN_RSP: c_int = 4;
+pub const esp_ble_evt_type_t = c_uint;
+pub const ESP_BLE_WHITELIST_REMOVE: c_int = 0;
+pub const ESP_BLE_WHITELIST_ADD: c_int = 1;
+pub const ESP_BLE_WHITELIST_CLEAR: c_int = 2;
+pub const esp_ble_wl_operation_t = c_uint;
+pub const ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_ADD: c_int = 0;
+pub const ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_REMOVE: c_int = 1;
+pub const ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_CLEAN: c_int = 2;
+pub const esp_bt_duplicate_exceptional_subcode_type_t = c_uint;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_ADV_ADDR: c_int = 0;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_LINK_ID: c_int = 1;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_BEACON_TYPE: c_int = 2;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROV_SRV_ADV: c_int = 3;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROXY_SRV_ADV: c_int = 4;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROXY_SOLIC_ADV: c_int = 5;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_URI_ADV: c_int = 6;
+pub const esp_ble_duplicate_exceptional_info_type_t = c_uint;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_ADDR_LIST: c_int = 1;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_LINK_ID_LIST: c_int = 2;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_BEACON_TYPE_LIST: c_int = 4;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROV_SRV_ADV_LIST: c_int = 8;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROXY_SRV_ADV_LIST: c_int = 16;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROXY_SOLIC_ADV_LIST: c_int = 32;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_URI_ADV_LIST: c_int = 64;
+pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_ALL_LIST: c_int = 65535;
+pub const esp_duplicate_scan_exceptional_list_type_t = c_uint;
+pub const esp_duplicate_info_t = [6]u8;
+pub const esp_ble_ext_adv_type_mask_t = u16;
+pub const esp_ble_gap_phy_t = u8;
+pub const esp_ble_gap_all_phys_t = u8;
+pub const esp_ble_gap_pri_phy_t = u8;
+pub const esp_ble_gap_phy_mask_t = u8;
+pub const esp_ble_gap_prefer_phy_options_t = u16;
+pub const esp_ble_ext_scan_cfg_mask_t = u8;
+pub const esp_ble_gap_ext_adv_data_status_t = u8;
+pub const esp_ble_gap_sync_t = u8;
+pub const esp_ble_gap_adv_type_t = u8;
+pub const esp_ble_gap_ext_adv_params_t = extern struct {
+    type: esp_ble_ext_adv_type_mask_t = std.mem.zeroes(esp_ble_ext_adv_type_mask_t),
+    interval_min: u32 = std.mem.zeroes(u32),
+    interval_max: u32 = std.mem.zeroes(u32),
+    channel_map: esp_ble_adv_channel_t = std.mem.zeroes(esp_ble_adv_channel_t),
+    own_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    peer_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    peer_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    filter_policy: esp_ble_adv_filter_t = std.mem.zeroes(esp_ble_adv_filter_t),
+    tx_power: i8 = std.mem.zeroes(i8),
+    primary_phy: esp_ble_gap_pri_phy_t = std.mem.zeroes(esp_ble_gap_pri_phy_t),
+    max_skip: u8 = std.mem.zeroes(u8),
+    secondary_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    sid: u8 = std.mem.zeroes(u8),
+    scan_req_notif: bool = std.mem.zeroes(bool),
+};
+pub const esp_ble_ext_scan_cfg_t = extern struct {
+    scan_type: esp_ble_scan_type_t = std.mem.zeroes(esp_ble_scan_type_t),
+    scan_interval: u16 = std.mem.zeroes(u16),
+    scan_window: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_ext_scan_params_t = extern struct {
+    own_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    filter_policy: esp_ble_scan_filter_t = std.mem.zeroes(esp_ble_scan_filter_t),
+    scan_duplicate: esp_ble_scan_duplicate_t = std.mem.zeroes(esp_ble_scan_duplicate_t),
+    cfg_mask: esp_ble_ext_scan_cfg_mask_t = std.mem.zeroes(esp_ble_ext_scan_cfg_mask_t),
+    uncoded_cfg: esp_ble_ext_scan_cfg_t = std.mem.zeroes(esp_ble_ext_scan_cfg_t),
+    coded_cfg: esp_ble_ext_scan_cfg_t = std.mem.zeroes(esp_ble_ext_scan_cfg_t),
+};
+pub const esp_ble_gap_conn_params_t = extern struct {
+    scan_interval: u16 = std.mem.zeroes(u16),
+    scan_window: u16 = std.mem.zeroes(u16),
+    interval_min: u16 = std.mem.zeroes(u16),
+    interval_max: u16 = std.mem.zeroes(u16),
+    latency: u16 = std.mem.zeroes(u16),
+    supervision_timeout: u16 = std.mem.zeroes(u16),
+    min_ce_len: u16 = std.mem.zeroes(u16),
+    max_ce_len: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_gap_ext_adv_t = extern struct {
+    instance: u8 = std.mem.zeroes(u8),
+    duration: c_int = std.mem.zeroes(c_int),
+    max_events: c_int = std.mem.zeroes(c_int),
+};
+pub const esp_ble_gap_periodic_adv_params_t = extern struct {
+    interval_min: u16 = std.mem.zeroes(u16),
+    interval_max: u16 = std.mem.zeroes(u16),
+    properties: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_gap_periodic_adv_sync_params_t = extern struct {
+    filter_policy: esp_ble_gap_sync_t = std.mem.zeroes(esp_ble_gap_sync_t),
+    sid: u8 = std.mem.zeroes(u8),
+    addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    skip: u16 = std.mem.zeroes(u16),
+    sync_timeout: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_gap_ext_adv_reprot_t = extern struct {
+    event_type: esp_ble_gap_adv_type_t = std.mem.zeroes(esp_ble_gap_adv_type_t),
+    addr_type: u8 = std.mem.zeroes(u8),
+    addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    primary_phy: esp_ble_gap_pri_phy_t = std.mem.zeroes(esp_ble_gap_pri_phy_t),
+    secondly_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    sid: u8 = std.mem.zeroes(u8),
+    tx_power: u8 = std.mem.zeroes(u8),
+    rssi: i8 = std.mem.zeroes(i8),
+    per_adv_interval: u16 = std.mem.zeroes(u16),
+    dir_addr_type: u8 = std.mem.zeroes(u8),
+    dir_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    data_status: esp_ble_gap_ext_adv_data_status_t = std.mem.zeroes(esp_ble_gap_ext_adv_data_status_t),
+    adv_data_len: u8 = std.mem.zeroes(u8),
+    adv_data: [251]u8 = std.mem.zeroes([251]u8),
+};
+pub const esp_ble_gap_periodic_adv_report_t = extern struct {
+    sync_handle: u16 = std.mem.zeroes(u16),
+    tx_power: u8 = std.mem.zeroes(u8),
+    rssi: i8 = std.mem.zeroes(i8),
+    data_status: esp_ble_gap_ext_adv_data_status_t = std.mem.zeroes(esp_ble_gap_ext_adv_data_status_t),
+    data_length: u8 = std.mem.zeroes(u8),
+    data: [251]u8 = std.mem.zeroes([251]u8),
+};
+pub const esp_ble_gap_periodic_adv_sync_estab_t = extern struct {
+    status: u8 = std.mem.zeroes(u8),
+    sync_handle: u16 = std.mem.zeroes(u16),
+    sid: u8 = std.mem.zeroes(u8),
+    addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    adv_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    adv_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    period_adv_interval: u16 = std.mem.zeroes(u16),
+    adv_clk_accuracy: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_dtm_enh_tx_t = extern struct {
+    tx_channel: u8 = std.mem.zeroes(u8),
+    len_of_data: u8 = std.mem.zeroes(u8),
+    pkt_payload: esp_ble_dtm_pkt_payload_t = std.mem.zeroes(esp_ble_dtm_pkt_payload_t),
+    phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+};
+pub const esp_ble_dtm_enh_rx_t = extern struct {
+    rx_channel: u8 = std.mem.zeroes(u8),
+    phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    modulation_idx: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ble_gap_past_mode_t = u8;
+pub const esp_ble_gap_past_params_t = extern struct {
+    mode: esp_ble_gap_past_mode_t = std.mem.zeroes(esp_ble_gap_past_mode_t),
+    skip: u16 = std.mem.zeroes(u16),
+    sync_timeout: u16 = std.mem.zeroes(u16),
+    cte_type: u8 = std.mem.zeroes(u8),
+};
+pub const struct_ble_get_dev_name_cmpl_evt_param_41 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    name: [*c]u8 = std.mem.zeroes([*c]u8),
+};
+pub const struct_ble_adv_data_cmpl_evt_param_42 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_scan_rsp_data_cmpl_evt_param_43 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_scan_param_cmpl_evt_param_44 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_scan_result_evt_param_45 = extern struct {
+    search_evt: esp_gap_search_evt_t = std.mem.zeroes(esp_gap_search_evt_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    dev_type: esp_bt_dev_type_t = std.mem.zeroes(esp_bt_dev_type_t),
+    ble_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    ble_evt_type: esp_ble_evt_type_t = std.mem.zeroes(esp_ble_evt_type_t),
+    rssi: c_int = std.mem.zeroes(c_int),
+    ble_adv: [62]u8 = std.mem.zeroes([62]u8),
+    flag: c_int = std.mem.zeroes(c_int),
+    num_resps: c_int = std.mem.zeroes(c_int),
+    adv_data_len: u8 = std.mem.zeroes(u8),
+    scan_rsp_len: u8 = std.mem.zeroes(u8),
+    num_dis: u32 = std.mem.zeroes(u32),
+};
+pub const struct_ble_adv_data_raw_cmpl_evt_param_46 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_scan_rsp_data_raw_cmpl_evt_param_47 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_adv_start_cmpl_evt_param_48 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_scan_start_cmpl_evt_param_49 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_scan_stop_cmpl_evt_param_50 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_adv_stop_cmpl_evt_param_51 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_adv_clear_cmpl_evt_param_52 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_set_rand_cmpl_evt_param_53 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_update_conn_params_evt_param_54 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    min_int: u16 = std.mem.zeroes(u16),
+    max_int: u16 = std.mem.zeroes(u16),
+    latency: u16 = std.mem.zeroes(u16),
+    conn_int: u16 = std.mem.zeroes(u16),
+    timeout: u16 = std.mem.zeroes(u16),
+};
+pub const struct_ble_pkt_data_length_cmpl_evt_param_55 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    params: esp_ble_pkt_data_length_params_t = std.mem.zeroes(esp_ble_pkt_data_length_params_t),
+};
+pub const struct_ble_local_privacy_cmpl_evt_param_56 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_remove_bond_dev_cmpl_evt_param_57 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bd_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const struct_ble_clear_bond_dev_cmpl_evt_param_58 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_get_bond_dev_cmpl_evt_param_59 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    dev_num: u8 = std.mem.zeroes(u8),
+    bond_dev: [*c]esp_ble_bond_dev_t = std.mem.zeroes([*c]esp_ble_bond_dev_t),
+};
+pub const struct_ble_read_rssi_cmpl_evt_param_60 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    rssi: i8 = std.mem.zeroes(i8),
+    remote_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const struct_ble_update_whitelist_cmpl_evt_param_61 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    wl_operation: esp_ble_wl_operation_t = std.mem.zeroes(esp_ble_wl_operation_t),
+};
+pub const struct_ble_update_duplicate_exceptional_list_cmpl_evt_param_62 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    subcode: u8 = std.mem.zeroes(u8),
+    length: u16 = std.mem.zeroes(u16),
+    device_info: esp_duplicate_info_t = std.mem.zeroes(esp_duplicate_info_t),
+};
+pub const struct_ble_set_channels_evt_param_63 = extern struct {
+    stat: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_read_phy_cmpl_evt_param_64 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    tx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    rx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+};
+pub const struct_ble_set_perf_def_phy_cmpl_evt_param_65 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_set_perf_phy_cmpl_evt_param_66 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_set_rand_addr_cmpl_evt_param_67 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_set_params_cmpl_evt_param_68 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_data_set_cmpl_evt_param_69 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_scan_rsp_set_cmpl_evt_param_70 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_start_cmpl_evt_param_71 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_stop_cmpl_evt_param_72 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_set_remove_cmpl_evt_param_73 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_adv_set_clear_cmpl_evt_param_74 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_periodic_adv_set_params_cmpl_param_75 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_periodic_adv_data_set_cmpl_param_76 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_periodic_adv_start_cmpl_param_77 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_periodic_adv_stop_cmpl_param_78 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_period_adv_create_sync_cmpl_param_79 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_period_adv_sync_cancel_cmpl_param_80 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_period_adv_sync_terminate_cmpl_param_81 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_period_adv_add_dev_cmpl_param_82 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_period_adv_remove_dev_cmpl_param_83 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_period_adv_clear_dev_cmpl_param_84 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_set_ext_scan_params_cmpl_param_85 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_scan_start_cmpl_param_86 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_scan_stop_cmpl_param_87 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_ext_conn_params_set_cmpl_param_88 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_adv_terminate_param_89 = extern struct {
+    status: u8 = std.mem.zeroes(u8),
+    adv_instance: u8 = std.mem.zeroes(u8),
+    conn_idx: u16 = std.mem.zeroes(u16),
+    completed_event: u8 = std.mem.zeroes(u8),
+};
+pub const struct_ble_scan_req_received_param_90 = extern struct {
+    adv_instance: u8 = std.mem.zeroes(u8),
+    scan_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    scan_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const struct_ble_channel_sel_alg_param_91 = extern struct {
+    conn_handle: u16 = std.mem.zeroes(u16),
+    channel_sel_alg: u8 = std.mem.zeroes(u8),
+};
+pub const struct_ble_periodic_adv_sync_lost_param_92 = extern struct {
+    sync_handle: u16 = std.mem.zeroes(u16),
+};
+pub const struct_ble_periodic_adv_sync_estab_param_93 = extern struct {
+    status: u8 = std.mem.zeroes(u8),
+    sync_handle: u16 = std.mem.zeroes(u16),
+    sid: u8 = std.mem.zeroes(u8),
+    adv_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
+    adv_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    adv_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    period_adv_interval: u16 = std.mem.zeroes(u16),
+    adv_clk_accuracy: u8 = std.mem.zeroes(u8),
+};
+pub const struct_ble_phy_update_cmpl_param_94 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    tx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    rx_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+};
+pub const struct_ble_ext_adv_report_param_95 = extern struct {
+    params: esp_ble_gap_ext_adv_reprot_t = std.mem.zeroes(esp_ble_gap_ext_adv_reprot_t),
+};
+pub const struct_ble_periodic_adv_report_param_96 = extern struct {
+    params: esp_ble_gap_periodic_adv_report_t = std.mem.zeroes(esp_ble_gap_periodic_adv_report_t),
+};
+pub const struct_ble_periodic_adv_recv_enable_cmpl_param_97 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+};
+pub const struct_ble_periodic_adv_sync_trans_cmpl_param_98 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const struct_ble_periodic_adv_set_info_trans_cmpl_param_99 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const struct_ble_set_past_params_cmpl_param_100 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+};
+pub const struct_ble_periodic_adv_sync_trans_recv_param_101 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    bda: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    service_data: u16 = std.mem.zeroes(u16),
+    sync_handle: u16 = std.mem.zeroes(u16),
+    adv_sid: u8 = std.mem.zeroes(u8),
+    adv_addr_type: u8 = std.mem.zeroes(u8),
+    adv_addr: esp_bd_addr_t = std.mem.zeroes(esp_bd_addr_t),
+    adv_phy: esp_ble_gap_phy_t = std.mem.zeroes(esp_ble_gap_phy_t),
+    adv_interval: u16 = std.mem.zeroes(u16),
+    adv_clk_accuracy: u8 = std.mem.zeroes(u8),
+};
+pub const struct_ble_dtm_state_update_evt_param_102 = extern struct {
+    status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
+    update_evt: esp_ble_dtm_update_evt_t = std.mem.zeroes(esp_ble_dtm_update_evt_t),
+    num_of_pkt: u16 = std.mem.zeroes(u16),
+};
+pub const esp_ble_gap_cb_param_t = extern union {
+    get_dev_name_cmpl: struct_ble_get_dev_name_cmpl_evt_param_41,
+    adv_data_cmpl: struct_ble_adv_data_cmpl_evt_param_42,
+    scan_rsp_data_cmpl: struct_ble_scan_rsp_data_cmpl_evt_param_43,
+    scan_param_cmpl: struct_ble_scan_param_cmpl_evt_param_44,
+    scan_rst: struct_ble_scan_result_evt_param_45,
+    adv_data_raw_cmpl: struct_ble_adv_data_raw_cmpl_evt_param_46,
+    scan_rsp_data_raw_cmpl: struct_ble_scan_rsp_data_raw_cmpl_evt_param_47,
+    adv_start_cmpl: struct_ble_adv_start_cmpl_evt_param_48,
+    scan_start_cmpl: struct_ble_scan_start_cmpl_evt_param_49,
+    ble_security: esp_ble_sec_t,
+    scan_stop_cmpl: struct_ble_scan_stop_cmpl_evt_param_50,
+    adv_stop_cmpl: struct_ble_adv_stop_cmpl_evt_param_51,
+    adv_clear_cmpl: struct_ble_adv_clear_cmpl_evt_param_52,
+    set_rand_addr_cmpl: struct_ble_set_rand_cmpl_evt_param_53,
+    update_conn_params: struct_ble_update_conn_params_evt_param_54,
+    pkt_data_length_cmpl: struct_ble_pkt_data_length_cmpl_evt_param_55,
+    local_privacy_cmpl: struct_ble_local_privacy_cmpl_evt_param_56,
+    remove_bond_dev_cmpl: struct_ble_remove_bond_dev_cmpl_evt_param_57,
+    clear_bond_dev_cmpl: struct_ble_clear_bond_dev_cmpl_evt_param_58,
+    get_bond_dev_cmpl: struct_ble_get_bond_dev_cmpl_evt_param_59,
+    read_rssi_cmpl: struct_ble_read_rssi_cmpl_evt_param_60,
+    update_whitelist_cmpl: struct_ble_update_whitelist_cmpl_evt_param_61,
+    update_duplicate_exceptional_list_cmpl: struct_ble_update_duplicate_exceptional_list_cmpl_evt_param_62,
+    ble_set_channels: struct_ble_set_channels_evt_param_63,
+    read_phy: struct_ble_read_phy_cmpl_evt_param_64,
+    set_perf_def_phy: struct_ble_set_perf_def_phy_cmpl_evt_param_65,
+    set_perf_phy: struct_ble_set_perf_phy_cmpl_evt_param_66,
+    ext_adv_set_rand_addr: struct_ble_ext_adv_set_rand_addr_cmpl_evt_param_67,
+    ext_adv_set_params: struct_ble_ext_adv_set_params_cmpl_evt_param_68,
+    ext_adv_data_set: struct_ble_ext_adv_data_set_cmpl_evt_param_69,
+    scan_rsp_set: struct_ble_ext_adv_scan_rsp_set_cmpl_evt_param_70,
+    ext_adv_start: struct_ble_ext_adv_start_cmpl_evt_param_71,
+    ext_adv_stop: struct_ble_ext_adv_stop_cmpl_evt_param_72,
+    ext_adv_remove: struct_ble_ext_adv_set_remove_cmpl_evt_param_73,
+    ext_adv_clear: struct_ble_ext_adv_set_clear_cmpl_evt_param_74,
+    peroid_adv_set_params: struct_ble_periodic_adv_set_params_cmpl_param_75,
+    period_adv_data_set: struct_ble_periodic_adv_data_set_cmpl_param_76,
+    period_adv_start: struct_ble_periodic_adv_start_cmpl_param_77,
+    period_adv_stop: struct_ble_periodic_adv_stop_cmpl_param_78,
+    period_adv_create_sync: struct_ble_period_adv_create_sync_cmpl_param_79,
+    period_adv_sync_cancel: struct_ble_period_adv_sync_cancel_cmpl_param_80,
+    period_adv_sync_term: struct_ble_period_adv_sync_terminate_cmpl_param_81,
+    period_adv_add_dev: struct_ble_period_adv_add_dev_cmpl_param_82,
+    period_adv_remove_dev: struct_ble_period_adv_remove_dev_cmpl_param_83,
+    period_adv_clear_dev: struct_ble_period_adv_clear_dev_cmpl_param_84,
+    set_ext_scan_params: struct_ble_set_ext_scan_params_cmpl_param_85,
+    ext_scan_start: struct_ble_ext_scan_start_cmpl_param_86,
+    ext_scan_stop: struct_ble_ext_scan_stop_cmpl_param_87,
+    ext_conn_params_set: struct_ble_ext_conn_params_set_cmpl_param_88,
+    adv_terminate: struct_ble_adv_terminate_param_89,
+    scan_req_received: struct_ble_scan_req_received_param_90,
+    channel_sel_alg: struct_ble_channel_sel_alg_param_91,
+    periodic_adv_sync_lost: struct_ble_periodic_adv_sync_lost_param_92,
+    periodic_adv_sync_estab: struct_ble_periodic_adv_sync_estab_param_93,
+    phy_update: struct_ble_phy_update_cmpl_param_94,
+    ext_adv_report: struct_ble_ext_adv_report_param_95,
+    period_adv_report: struct_ble_periodic_adv_report_param_96,
+    period_adv_recv_enable: struct_ble_periodic_adv_recv_enable_cmpl_param_97,
+    period_adv_sync_trans: struct_ble_periodic_adv_sync_trans_cmpl_param_98,
+    period_adv_set_info_trans: struct_ble_periodic_adv_set_info_trans_cmpl_param_99,
+    set_past_params: struct_ble_set_past_params_cmpl_param_100,
+    past_received: struct_ble_periodic_adv_sync_trans_recv_param_101,
+    dtm_state_update: struct_ble_dtm_state_update_evt_param_102,
+};
+pub const esp_gap_ble_cb_t = ?*const fn (esp_gap_ble_cb_event_t, [*c]esp_ble_gap_cb_param_t) callconv(.C) void;
+pub extern fn esp_ble_gap_register_callback(callback: esp_gap_ble_cb_t) esp_err_t;
+pub extern fn esp_ble_gap_get_callback() esp_gap_ble_cb_t;
+pub extern fn esp_ble_gap_config_adv_data(adv_data: [*c]esp_ble_adv_data_t) esp_err_t;
+pub extern fn esp_ble_gap_set_scan_params(scan_params: [*c]esp_ble_scan_params_t) esp_err_t;
+pub extern fn esp_ble_gap_start_scanning(duration: u32) esp_err_t;
+pub extern fn esp_ble_gap_stop_scanning() esp_err_t;
+pub extern fn esp_ble_gap_start_advertising(adv_params: [*c]esp_ble_adv_params_t) esp_err_t;
+pub extern fn esp_ble_gap_stop_advertising() esp_err_t;
+pub extern fn esp_ble_gap_update_conn_params(params: [*c]esp_ble_conn_update_params_t) esp_err_t;
+pub extern fn esp_ble_gap_set_pkt_data_len(remote_device: [*c]u8, tx_data_length: u16) esp_err_t;
+pub extern fn esp_ble_gap_set_rand_addr(rand_addr: [*c]u8) esp_err_t;
+pub extern fn esp_ble_gap_clear_rand_addr() esp_err_t;
+pub extern fn esp_ble_gap_config_local_privacy(privacy_enable: bool) esp_err_t;
+pub extern fn esp_ble_gap_config_local_icon(icon: u16) esp_err_t;
+pub extern fn esp_ble_gap_update_whitelist(add_remove: bool, remote_bda: [*c]u8, wl_addr_type: esp_ble_wl_addr_type_t) esp_err_t;
+pub extern fn esp_ble_gap_clear_whitelist() esp_err_t;
+pub extern fn esp_ble_gap_get_whitelist_size(length: [*c]u16) esp_err_t;
+pub extern fn esp_ble_gap_set_prefer_conn_params(bd_addr: [*c]u8, min_conn_int: u16, max_conn_int: u16, slave_latency: u16, supervision_tout: u16) esp_err_t;
+pub extern fn esp_ble_gap_set_device_name(name: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_get_device_name() esp_err_t;
+pub extern fn esp_ble_gap_get_local_used_addr(local_used_addr: [*c]u8, addr_type: [*c]u8) esp_err_t;
+pub extern fn esp_ble_resolve_adv_data(adv_data: [*c]u8, @"type": u8, length: [*c]u8) [*c]u8;
+pub extern fn esp_ble_gap_config_adv_data_raw(raw_data: [*c]u8, raw_data_len: u32) esp_err_t;
+pub extern fn esp_ble_gap_config_scan_rsp_data_raw(raw_data: [*c]u8, raw_data_len: u32) esp_err_t;
+pub extern fn esp_ble_gap_read_rssi(remote_addr: [*c]u8) esp_err_t;
+pub extern fn esp_ble_gap_add_duplicate_scan_exceptional_device(@"type": esp_ble_duplicate_exceptional_info_type_t, device_info: [*c]u8) esp_err_t;
+pub extern fn esp_ble_gap_remove_duplicate_scan_exceptional_device(@"type": esp_ble_duplicate_exceptional_info_type_t, device_info: [*c]u8) esp_err_t;
+pub extern fn esp_ble_gap_clean_duplicate_scan_exceptional_list(list_type: esp_duplicate_scan_exceptional_list_type_t) esp_err_t;
+pub extern fn esp_ble_gap_set_security_param(param_type: esp_ble_sm_param_t, value: ?*anyopaque, len: u8) esp_err_t;
+pub extern fn esp_ble_gap_security_rsp(bd_addr: [*c]u8, accept: bool) esp_err_t;
+pub extern fn esp_ble_set_encryption(bd_addr: [*c]u8, sec_act: esp_ble_sec_act_t) esp_err_t;
+pub extern fn esp_ble_passkey_reply(bd_addr: [*c]u8, accept: bool, passkey: u32) esp_err_t;
+pub extern fn esp_ble_confirm_reply(bd_addr: [*c]u8, accept: bool) esp_err_t;
+pub extern fn esp_ble_remove_bond_device(bd_addr: [*c]u8) esp_err_t;
+pub extern fn esp_ble_get_bond_device_num() c_int;
+pub extern fn esp_ble_get_bond_device_list(dev_num: [*c]c_int, dev_list: [*c]esp_ble_bond_dev_t) esp_err_t;
+pub extern fn esp_ble_oob_req_reply(bd_addr: [*c]u8, TK: [*c]u8, len: u8) esp_err_t;
+pub extern fn esp_ble_sc_oob_req_reply(bd_addr: [*c]u8, p_c: [*c]u8, p_r: [*c]u8) esp_err_t;
+pub extern fn esp_ble_create_sc_oob_data() esp_err_t;
+pub extern fn esp_ble_gap_disconnect(remote_device: [*c]u8) esp_err_t;
+pub extern fn esp_ble_get_current_conn_params(bd_addr: [*c]u8, conn_params: [*c]esp_gap_conn_params_t) esp_err_t;
+pub extern fn esp_gap_ble_set_channels(channels: [*c]u8) esp_err_t;
+pub extern fn esp_gap_ble_set_authorization(bd_addr: [*c]u8, authorize: bool) esp_err_t;
+pub extern fn esp_ble_gap_read_phy(bd_addr: [*c]u8) esp_err_t;
+pub extern fn esp_ble_gap_set_preferred_default_phy(tx_phy_mask: esp_ble_gap_phy_mask_t, rx_phy_mask: esp_ble_gap_phy_mask_t) esp_err_t;
+pub extern fn esp_ble_gap_set_preferred_phy(bd_addr: [*c]u8, all_phys_mask: esp_ble_gap_all_phys_t, tx_phy_mask: esp_ble_gap_phy_mask_t, rx_phy_mask: esp_ble_gap_phy_mask_t, phy_options: esp_ble_gap_prefer_phy_options_t) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_set_rand_addr(instance: u8, rand_addr: [*c]u8) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_set_params(instance: u8, params: [*c]const esp_ble_gap_ext_adv_params_t) esp_err_t;
+pub extern fn esp_ble_gap_config_ext_adv_data_raw(instance: u8, length: u16, data: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_config_ext_scan_rsp_data_raw(instance: u8, length: u16, scan_rsp_data: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_start(num_adv: u8, ext_adv: [*c]const esp_ble_gap_ext_adv_t) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_stop(num_adv: u8, ext_adv_inst: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_set_remove(instance: u8) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_set_clear() esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_set_params(instance: u8, params: [*c]const esp_ble_gap_periodic_adv_params_t) esp_err_t;
+pub extern fn esp_ble_gap_config_periodic_adv_data_raw(instance: u8, length: u16, data: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_start(instance: u8) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_stop(instance: u8) esp_err_t;
+pub extern fn esp_ble_gap_set_ext_scan_params(params: [*c]const esp_ble_ext_scan_params_t) esp_err_t;
+pub extern fn esp_ble_gap_start_ext_scan(duration: u32, period: u16) esp_err_t;
+pub extern fn esp_ble_gap_stop_ext_scan() esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_create_sync(params: [*c]const esp_ble_gap_periodic_adv_sync_params_t) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_sync_cancel() esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_sync_terminate(sync_handle: u16) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_add_dev_to_list(addr_type: esp_ble_addr_type_t, addr: [*c]u8, sid: u8) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_remove_dev_from_list(addr_type: esp_ble_addr_type_t, addr: [*c]u8, sid: u8) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_clear_dev() esp_err_t;
+pub extern fn esp_ble_gap_prefer_ext_connect_params_set(addr: [*c]u8, phy_mask: esp_ble_gap_phy_mask_t, phy_1m_conn_params: [*c]const esp_ble_gap_conn_params_t, phy_2m_conn_params: [*c]const esp_ble_gap_conn_params_t, phy_coded_conn_params: [*c]const esp_ble_gap_conn_params_t) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_recv_enable(sync_handle: u16, enable: u8) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_sync_trans(addr: [*c]u8, service_data: u16, sync_handle: u16) esp_err_t;
+pub extern fn esp_ble_gap_periodic_adv_set_info_trans(addr: [*c]u8, service_data: u16, adv_handle: u8) esp_err_t;
+pub extern fn esp_ble_gap_set_periodic_adv_sync_trans_params(addr: [*c]u8, params: [*c]const esp_ble_gap_past_params_t) esp_err_t;
+pub extern fn esp_ble_dtm_tx_start(tx_params: [*c]const esp_ble_dtm_tx_t) esp_err_t;
+pub extern fn esp_ble_dtm_rx_start(rx_params: [*c]const esp_ble_dtm_rx_t) esp_err_t;
+pub extern fn esp_ble_dtm_enh_tx_start(tx_params: [*c]const esp_ble_dtm_enh_tx_t) esp_err_t;
+pub extern fn esp_ble_dtm_enh_rx_start(rx_params: [*c]const esp_ble_dtm_enh_rx_t) esp_err_t;
+pub extern fn esp_ble_dtm_stop() esp_err_t;
+pub extern fn esp_ble_gap_clear_advertising() esp_err_t;
+pub extern fn esp_blufi_close(gatts_if: u8, conn_id: u16) esp_err_t;
+pub extern fn esp_blufi_gap_event_handler(event: esp_gap_ble_cb_event_t, param: [*c]esp_ble_gap_cb_param_t) void;
+pub extern fn esp_blufi_init() u8;
+pub extern fn bleprph_advertise() void;
+pub extern fn esp_blufi_send_notify(arg: ?*anyopaque) void;
+pub extern fn esp_blufi_deinit() void;
+pub extern fn esp_blufi_disconnect() void;
+pub extern fn esp_blufi_adv_stop() void;
+pub extern fn esp_blufi_adv_start() void;
+pub extern fn esp_blufi_send_encap(arg: ?*anyopaque) void;
+
+pub const struct_sched_param = extern struct {
+    sched_priority: c_int = std.mem.zeroes(c_int),
+};
+pub extern fn sched_yield() c_int;
+pub const pthread_t = c_uint;
+pub const pthread_attr_t = extern struct {
+    is_initialized: c_int = std.mem.zeroes(c_int),
+    stackaddr: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    stacksize: c_int = std.mem.zeroes(c_int),
+    contentionscope: c_int = std.mem.zeroes(c_int),
+    inheritsched: c_int = std.mem.zeroes(c_int),
+    schedpolicy: c_int = std.mem.zeroes(c_int),
+    schedparam: struct_sched_param = std.mem.zeroes(struct_sched_param),
+    detachstate: c_int = std.mem.zeroes(c_int),
+};
+pub const pthread_mutex_t = c_uint;
+pub const pthread_mutexattr_t = extern struct {
+    is_initialized: c_int = std.mem.zeroes(c_int),
+    type: c_int = std.mem.zeroes(c_int),
+    recursive: c_int = std.mem.zeroes(c_int),
+};
+pub const pthread_cond_t = c_uint;
+pub const pthread_condattr_t = extern struct {
+    is_initialized: c_int = std.mem.zeroes(c_int),
+    clock: c_ulong = std.mem.zeroes(c_ulong),
+};
+pub const pthread_key_t = c_uint;
+pub const pthread_once_t = extern struct {
+    is_initialized: c_int = std.mem.zeroes(c_int),
+    init_executed: c_int = std.mem.zeroes(c_int),
+};
+pub const struct_bintime = extern struct {
+    sec: i64 = std.mem.zeroes(i64),
+    frac: u64 = std.mem.zeroes(u64),
+};
+pub const pthread_cleanup_context = extern struct {
+    _routine: ?*const fn (?*anyopaque) callconv(.C) void = std.mem.zeroes(?*const fn (?*anyopaque) callconv(.C) void),
+    _arg: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    _canceltype: c_int = std.mem.zeroes(c_int),
+    _previous: [*c]pthread_cleanup_context = std.mem.zeroes([*c]pthread_cleanup_context),
+};
+pub extern fn pthread_mutexattr_init(__attr: [*c]pthread_mutexattr_t) c_int;
+pub extern fn pthread_mutexattr_destroy(__attr: [*c]pthread_mutexattr_t) c_int;
+pub extern fn pthread_mutexattr_getpshared(__attr: [*c]const pthread_mutexattr_t, __pshared: [*c]c_int) c_int;
+pub extern fn pthread_mutexattr_setpshared(__attr: [*c]pthread_mutexattr_t, __pshared: c_int) c_int;
+pub extern fn pthread_mutexattr_gettype(__attr: [*c]const pthread_mutexattr_t, __kind: [*c]c_int) c_int;
+pub extern fn pthread_mutexattr_settype(__attr: [*c]pthread_mutexattr_t, __kind: c_int) c_int;
+pub extern fn pthread_mutex_init(__mutex: [*c]pthread_mutex_t, __attr: [*c]const pthread_mutexattr_t) c_int;
+pub extern fn pthread_mutex_destroy(__mutex: [*c]pthread_mutex_t) c_int;
+pub extern fn pthread_mutex_lock(__mutex: [*c]pthread_mutex_t) c_int;
+pub extern fn pthread_mutex_trylock(__mutex: [*c]pthread_mutex_t) c_int;
+pub extern fn pthread_mutex_unlock(__mutex: [*c]pthread_mutex_t) c_int;
+pub extern fn pthread_mutex_timedlock(__mutex: [*c]pthread_mutex_t, __timeout: [*c]const timespec) c_int;
+pub extern fn pthread_condattr_init(__attr: [*c]pthread_condattr_t) c_int;
+pub extern fn pthread_condattr_destroy(__attr: [*c]pthread_condattr_t) c_int;
+pub extern fn pthread_condattr_getclock(noalias __attr: [*c]const pthread_condattr_t, noalias __clock_id: [*c]c_ulong) c_int;
+pub extern fn pthread_condattr_setclock(__attr: [*c]pthread_condattr_t, __clock_id: c_ulong) c_int;
+pub extern fn pthread_condattr_getpshared(__attr: [*c]const pthread_condattr_t, __pshared: [*c]c_int) c_int;
+pub extern fn pthread_condattr_setpshared(__attr: [*c]pthread_condattr_t, __pshared: c_int) c_int;
+pub extern fn pthread_cond_init(__cond: [*c]pthread_cond_t, __attr: [*c]const pthread_condattr_t) c_int;
+pub extern fn pthread_cond_destroy(__mutex: [*c]pthread_cond_t) c_int;
+pub extern fn pthread_cond_signal(__cond: [*c]pthread_cond_t) c_int;
+pub extern fn pthread_cond_broadcast(__cond: [*c]pthread_cond_t) c_int;
+pub extern fn pthread_cond_wait(__cond: [*c]pthread_cond_t, __mutex: [*c]pthread_mutex_t) c_int;
+pub extern fn pthread_cond_timedwait(__cond: [*c]pthread_cond_t, __mutex: [*c]pthread_mutex_t, __abstime: [*c]const timespec) c_int;
+pub extern fn pthread_attr_setschedparam(__attr: [*c]pthread_attr_t, __param: [*c]const struct_sched_param) c_int;
+pub extern fn pthread_attr_getschedparam(__attr: [*c]const pthread_attr_t, __param: [*c]struct_sched_param) c_int;
+pub extern fn pthread_attr_init(__attr: [*c]pthread_attr_t) c_int;
+pub extern fn pthread_attr_destroy(__attr: [*c]pthread_attr_t) c_int;
+pub extern fn pthread_attr_setstack(attr: [*c]pthread_attr_t, __stackaddr: ?*anyopaque, __stacksize: usize) c_int;
+pub extern fn pthread_attr_getstack(attr: [*c]const pthread_attr_t, __stackaddr: [*c]?*anyopaque, __stacksize: [*c]usize) c_int;
+pub extern fn pthread_attr_getstacksize(__attr: [*c]const pthread_attr_t, __stacksize: [*c]usize) c_int;
+pub extern fn pthread_attr_setstacksize(__attr: [*c]pthread_attr_t, __stacksize: usize) c_int;
+pub extern fn pthread_attr_getstackaddr(__attr: [*c]const pthread_attr_t, __stackaddr: [*c]?*anyopaque) c_int;
+pub extern fn pthread_attr_setstackaddr(__attr: [*c]pthread_attr_t, __stackaddr: ?*anyopaque) c_int;
+pub extern fn pthread_attr_getdetachstate(__attr: [*c]const pthread_attr_t, __detachstate: [*c]c_int) c_int;
+pub extern fn pthread_attr_setdetachstate(__attr: [*c]pthread_attr_t, __detachstate: c_int) c_int;
+pub extern fn pthread_attr_getguardsize(__attr: [*c]const pthread_attr_t, __guardsize: [*c]usize) c_int;
+pub extern fn pthread_attr_setguardsize(__attr: [*c]pthread_attr_t, __guardsize: usize) c_int;
+pub extern fn pthread_create(__pthread: [*c]pthread_t, __attr: [*c]const pthread_attr_t, __start_routine: ?*const fn (?*anyopaque) callconv(.C) ?*anyopaque, __arg: ?*anyopaque) c_int;
+pub extern fn pthread_join(__pthread: pthread_t, __value_ptr: [*c]?*anyopaque) c_int;
+pub extern fn pthread_detach(__pthread: pthread_t) c_int;
+pub extern fn pthread_exit(__value_ptr: ?*anyopaque) noreturn;
+pub extern fn pthread_self() pthread_t;
+pub extern fn pthread_equal(__t1: pthread_t, __t2: pthread_t) c_int;
+pub extern fn pthread_getcpuclockid(thread: pthread_t, clock_id: [*c]c_ulong) c_int;
+pub extern fn pthread_setconcurrency(new_level: c_int) c_int;
+pub extern fn pthread_getconcurrency() c_int;
+pub extern fn pthread_yield() void;
+pub extern fn pthread_once(__once_control: [*c]pthread_once_t, __init_routine: ?*const fn () callconv(.C) void) c_int;
+pub extern fn pthread_key_create(__key: [*c]pthread_key_t, __destructor: ?*const fn (?*anyopaque) callconv(.C) void) c_int;
+pub extern fn pthread_setspecific(__key: pthread_key_t, __value: ?*const anyopaque) c_int;
+pub extern fn pthread_getspecific(__key: pthread_key_t) ?*anyopaque;
+pub extern fn pthread_key_delete(__key: pthread_key_t) c_int;
+pub extern fn pthread_cancel(__pthread: pthread_t) c_int;
+pub extern fn pthread_setcancelstate(__state: c_int, __oldstate: [*c]c_int) c_int;
+pub extern fn pthread_setcanceltype(__type: c_int, __oldtype: [*c]c_int) c_int;
+pub extern fn pthread_testcancel() void;
+pub extern fn _pthread_cleanup_push(_context: [*c]pthread_cleanup_context, _routine: ?*const fn (?*anyopaque) callconv(.C) void, _arg: ?*anyopaque) void;
+pub extern fn _pthread_cleanup_pop(_context: [*c]pthread_cleanup_context, _execute: c_int) void;
+pub const timespec = extern struct {
+    tv_sec: i64 = std.mem.zeroes(i64),
+    tv_nsec: c_long = std.mem.zeroes(c_long),
+};
+pub const itimerspec = extern struct {
+    it_interval: timespec = std.mem.zeroes(timespec),
+    it_value: timespec = std.mem.zeroes(timespec),
+};
+// TODO: port zig (std.Thread) to FreeRTOS
