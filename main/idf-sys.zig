@@ -163,6 +163,36 @@ extern fn esp_unregister_shutdown_handler(handle: shutdown_handler_t) esp_err_t;
 pub fn espUnregisterShutdownHandler(handle: shutdown_handler_t) !void {
     try espCheckError(esp_unregister_shutdown_handler(handle));
 }
+// fixme: need to find a way to get the esp_chip_info_t
+// pub const esp_chip_model_t = enum(c_uint) {
+//     CHIP_ESP32 = 1,
+//     CHIP_ESP32S2 = 2,
+//     CHIP_ESP32S3 = 9,
+//     CHIP_ESP32C3 = 5,
+//     CHIP_ESP32C2 = 12,
+//     CHIP_ESP32C6 = 13,
+//     CHIP_ESP32H2 = 16,
+//     CHIP_ESP32C5 = 17,
+//     CHIP_ESP32P4 = 18,
+//     CHIP_POSIX_LINUX = 999,
+// };
+// pub const esp_chip_info_t = extern struct {
+//     model: esp_chip_model_t = std.mem.zeroes(esp_chip_model_t),
+//     features: u32 = std.mem.zeroes(u32),
+//     revision: u16 = std.mem.zeroes(u16),
+//     cores: u8 = std.mem.zeroes(u8),
+// };
+// pub const CHIP_FEATURE_EMB_FLASH = BIT(@as(c_int, 0));
+// pub const CHIP_FEATURE_WIFI_BGN = BIT(@as(c_int, 1));
+// pub const CHIP_FEATURE_BLE = BIT(@as(c_int, 4));
+// pub const CHIP_FEATURE_BT = BIT(@as(c_int, 5));
+// pub const CHIP_FEATURE_IEEE802154 = BIT(@as(c_int, 6));
+// pub const CHIP_FEATURE_EMB_PSRAM = BIT(@as(c_int, 7));
+// pub inline fn BIT(nr: anytype) @TypeOf(@as(c_ulong, 1) << nr) {
+//     _ = &nr;
+//     return @as(c_ulong, 1) << nr;
+// }
+// pub extern fn esp_chip_info(out_info: [*c]esp_chip_info_t) void;
 pub extern fn esp_restart() noreturn;
 pub extern fn esp_reset_reason() esp_reset_reason_t;
 pub extern fn esp_get_free_heap_size() u32;
@@ -203,7 +233,7 @@ pub extern fn esp_rom_get_reset_reason(cpu_no: c_int) soc_reset_reason_t;
 pub extern fn esp_rom_route_intr_matrix(cpu_core: c_int, periph_intr_id: u32, cpu_intr_num: u32) void;
 pub extern fn esp_rom_get_cpu_ticks_per_us() u32;
 pub extern fn esp_rom_set_cpu_ticks_per_us(ticks_per_us: u32) void;
-pub const esp_log_level_t = enum(c_uint) {
+const esp_log_level_t = enum(c_uint) {
     ESP_LOG_NONE = 0,
     ESP_LOG_ERROR = 1,
     ESP_LOG_WARN = 2,
@@ -211,11 +241,14 @@ pub const esp_log_level_t = enum(c_uint) {
     ESP_LOG_DEBUG = 4,
     ESP_LOG_VERBOSE = 5,
 };
-pub fn ESP_LOGI(level: esp_log_level_t, tag: [*:0]const u8, comptime cfmt: []const u8, args: anytype) void {
-    std.debug.assert(level != .ESP_LOG_NONE);
-    const fmt = std.fmt.allocPrintZ(raw_heap_caps_allocator, cfmt, args) catch unreachable;
-    defer raw_heap_caps_allocator.free(fmt);
-    esp_log_write(level, tag, fmt, esp_log_timestamp(), tag);
+const default_level: esp_log_level_t = switch (@import("builtin").mode) {
+    .Debug => .ESP_LOG_DEBUG,
+    .ReleaseSafe => .ESP_LOG_INFO,
+    .ReleaseFast, .ReleaseSmall => .ESP_LOG_ERROR,
+};
+pub fn ESP_LOGI(allocator: std.mem.Allocator, tag: [*:0]const u8, comptime cfmt: []const u8, args: anytype) void {
+    const fmt = std.fmt.allocPrintZ(allocator, cfmt, args) catch |err| @errorName(err);
+    esp_log_write(default_level, tag, fmt, esp_log_timestamp(), tag);
 }
 pub const LOG_COLOR_BLACK = "30";
 pub const LOG_COLOR_RED = "31";
