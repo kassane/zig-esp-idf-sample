@@ -8,6 +8,7 @@ pub const va_list = extern struct {
     __va_ndx: c_int = std.mem.zeroes(c_int),
 };
 
+// Alocator for use with raw_heap_caps_allocator
 pub const raw_heap_caps_allocator: std.mem.Allocator = .{
     .ptr = undefined,
     .vtable = &raw_heap_caps_allocator_vtable,
@@ -25,9 +26,16 @@ fn rawHeapCapsAlloc(
     ret_addr: usize,
 ) ?[*]u8 {
     _ = ret_addr;
-    std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(usize, @alignOf(std.c.max_align_t)));
-    // ref.: https://github.com/espressif/esp-idf/blob/master/components/heap/include/esp_heap_caps.h
-    return @as(?[*]u8, @ptrCast(heap_caps_malloc(len, (1 << 12) | (1 << 11))));
+    std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(
+        usize,
+        @alignOf(std.c.max_align_t),
+    ));
+    return @as(?[*]u8, @ptrCast(
+        heap_caps_malloc(
+            len,
+            @intFromEnum(Caps.MALLOC_CAP_DEFAULT) | @intFromEnum(Caps.MALLOC_CAP_INTERNAL),
+        ),
+    ));
 }
 
 fn rawHeapCapsResize(
@@ -43,6 +51,10 @@ fn rawHeapCapsResize(
     if (new_len <= buf.len)
         return true;
 
+    const full_len = if (@TypeOf(heap_caps_get_allocated_size) != void)
+        heap_caps_get_allocated_size(buf.ptr);
+    if (new_len <= full_len) return true;
+
     return false;
 }
 
@@ -54,7 +66,67 @@ fn rawHeapCapsFree(
 ) void {
     _ = log2_old_align;
     _ = ret_addr;
+    std.debug.assert(heap_caps_check_integrity_all(true));
     heap_caps_free(buf.ptr);
+}
+// Alocator for use with raw_multi_heap_allocator
+pub const raw_multi_heap_allocator: std.mem.Allocator = .{
+    .ptr = undefined,
+    .vtable = &raw_heap_caps_allocator_vtable,
+};
+const raw_multi_heap_allocator_vtable = std.mem.Allocator.VTable{
+    .alloc = rawMultiHeapAlloc,
+    .resize = rawMultiHeapResize,
+    .free = rawMultiHeapFree,
+};
+
+var multi_heap_alloc: multi_heap_handle_t = null;
+fn rawMultiHeapAlloc(
+    _: *anyopaque,
+    len: usize,
+    log2_ptr_align: u8,
+    ret_addr: usize,
+) ?[*]u8 {
+    _ = ret_addr;
+    std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(
+        usize,
+        @alignOf(std.c.max_align_t),
+    ));
+    return @as(?[*]u8, @ptrCast(
+        multi_heap_malloc(multi_heap_alloc, len),
+    ));
+}
+
+fn rawMultiHeapResize(
+    _: *anyopaque,
+    buf: []u8,
+    log2_old_align: u8,
+    new_len: usize,
+    ret_addr: usize,
+) bool {
+    _ = log2_old_align;
+    _ = ret_addr;
+
+    if (new_len <= buf.len)
+        return true;
+
+    if (@TypeOf(multi_heap_get_allocated_size) != void)
+        if (new_len <= multi_heap_get_allocated_size(multi_heap_alloc, buf.ptr))
+            return true;
+
+    return false;
+}
+
+fn rawMultiHeapFree(
+    _: *anyopaque,
+    buf: []u8,
+    log2_old_align: u8,
+    ret_addr: usize,
+) void {
+    _ = log2_old_align;
+    _ = ret_addr;
+    defer std.debug.assert(multi_heap_check(multi_heap_alloc, true));
+    multi_heap_free(multi_heap_alloc, buf.ptr);
 }
 
 // C error
@@ -1392,6 +1464,28 @@ pub extern fn multi_heap_aligned_alloc_offs(heap: multi_heap_handle_t, size: usi
 pub extern fn multi_heap_reset_minimum_free_bytes(heap: multi_heap_handle_t) usize;
 pub extern fn multi_heap_restore_minimum_free_bytes(heap: multi_heap_handle_t, new_minimum_free_bytes_value: usize) void;
 pub const esp_alloc_failed_hook_t = ?*const fn (usize, u32, [*:0]const u8) callconv(.C) void;
+pub const Caps = enum(u32) {
+    // @brief Flags to indicate the capabilities of the various memory systems
+    MALLOC_CAP_EXEC = (1 << 0), //< Memory must be able to run executable code
+    MALLOC_CAP_32BIT = (1 << 1), //< Memory must allow for aligned 32-bit data accesses
+    MALLOC_CAP_8BIT = (1 << 2), //< Memory must allow for 8/16/...-bit data accesses
+    MALLOC_CAP_DMA = (1 << 3), //< Memory must be able to accessed by DMA
+    MALLOC_CAP_PID2 = (1 << 4), //< Memory must be mapped to PID2 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID3 = (1 << 5), //< Memory must be mapped to PID3 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID4 = (1 << 6), //< Memory must be mapped to PID4 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID5 = (1 << 7), //< Memory must be mapped to PID5 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID6 = (1 << 8), //< Memory must be mapped to PID6 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID7 = (1 << 9), //< Memory must be mapped to PID7 memory space (PIDs are not currently used)
+    MALLOC_CAP_SPIRAM = (1 << 10), //< Memory must be in SPI RAM
+    MALLOC_CAP_INTERNAL = (1 << 11), //< Memory must be internal; specifically it should not disappear when flash/spiram cache is switched off
+    MALLOC_CAP_DEFAULT = (1 << 12), //< Memory can be returned in a non-capability-specific memory allocation (e.g. malloc(), calloc()) call
+    MALLOC_CAP_IRAM_8BIT = (1 << 13), //< Memory must be in IRAM and allow unaligned access
+    MALLOC_CAP_RETENTION = (1 << 14), //< Memory must be able to accessed by retention DMA
+    MALLOC_CAP_RTCRAM = (1 << 15), //< Memory must be in RTC fast memory
+    MALLOC_CAP_TCM = (1 << 16), //< Memory must be in TCM memory
+
+    MALLOC_CAP_INVALID = (1 << 31), //< Memory can't be used / list end marker
+};
 pub extern fn heap_caps_register_failed_alloc_callback(callback: esp_alloc_failed_hook_t) esp_err_t;
 pub extern fn heap_caps_malloc(size: usize, caps: u32) ?*anyopaque;
 pub extern fn heap_caps_free(ptr: ?*anyopaque) void;
