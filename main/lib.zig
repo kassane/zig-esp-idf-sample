@@ -60,11 +60,11 @@ export fn app_main() callconv(.C) void {
     defer arr.deinit();
 
     arr.append(10) catch |err|
-        esp_idf.ESP_LOGI(allocator, tag, "Error: {s}", .{@errorName(err)});
+        @panic(@errorName(err));
     arr.append(20) catch |err|
-        esp_idf.ESP_LOGI(allocator, tag, "Error: {s}", .{@errorName(err)});
+        @panic(@errorName(err));
     arr.append(30) catch |err|
-        esp_idf.ESP_LOGI(allocator, tag, "Error: {s}", .{@errorName(err)});
+        @panic(@errorName(err));
 
     for (arr.items) |index| {
         esp_idf.ESP_LOGI(allocator, tag, "Arr value: {}\n", .{index});
@@ -74,21 +74,29 @@ export fn app_main() callconv(.C) void {
 
     // FreeRTOS Tasks
     if (esp_idf.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
-        esp_idf.ESP_LOGI(allocator, tag, "Error: Task not created!\n", .{});
+        @panic("Error: Task foo not created!\n");
     }
     if (esp_idf.xTaskCreate(bar, "bar", 1024 * 3, null, 2, null) == 0) {
-        esp_idf.ESP_LOGI(allocator, tag, "Error: Task not created!\n", .{});
+        @panic("Error: Task bar not created!\n");
     }
 }
 export fn foo(_: ?*anyopaque) callconv(.C) void {
     while (true) {
-        _ = std.c.printf("Demo_Task 1 printing..\n");
+        _ = std.c.printf("Demo_Task foo printing..\n");
         esp_idf.vTaskDelay(2000 / esp_idf.portTICK_PERIOD_MS);
     }
 }
 export fn bar(_: ?*anyopaque) callconv(.C) void {
     while (true) {
-        _ = std.c.printf("Demo_Task 2 printing..\n");
+        _ = std.c.printf("Demo_Task bar printing..\n");
         esp_idf.vTaskDelay(1000 / esp_idf.portTICK_PERIOD_MS);
     }
 }
+
+// zig panic handler overritten by esp_idf.panic
+pub usingnamespace if (!@hasDecl(@This(), "panic"))
+    struct {
+        pub const panic = esp_idf.panic;
+    }
+else
+    struct {};

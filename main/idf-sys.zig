@@ -1,12 +1,7 @@
 //! esp-idf headers 'zig translate-c' v0.12.0 for xtensa target (re-edited by @kassane)
 
 const std = @import("std");
-
-pub const va_list = extern struct {
-    __va_stk: [*c]c_int = std.mem.zeroes([*c]c_int),
-    __va_reg: [*c]c_int = std.mem.zeroes([*c]c_int),
-    __va_ndx: c_int = std.mem.zeroes(c_int),
-};
+const builtin = @import("builtin");
 
 // Alocator for use with raw_heap_caps_allocator
 pub const raw_heap_caps_allocator: std.mem.Allocator = .{
@@ -271,12 +266,30 @@ pub extern fn esp_get_free_heap_size() u32;
 pub extern fn esp_get_free_internal_heap_size() u32;
 pub extern fn esp_get_minimum_free_heap_size() u32;
 pub extern fn esp_system_abort(details: [*:0]const u8) noreturn;
-pub extern fn esp_rom_crc32_le(crc: u32, buf: [*:0]const u8, len: u32) u32;
-pub extern fn esp_rom_crc32_be(crc: u32, buf: [*:0]const u8, len: u32) u32;
-pub extern fn esp_rom_crc16_le(crc: u16, buf: [*:0]const u8, len: u32) u16;
-pub extern fn esp_rom_crc16_be(crc: u16, buf: [*:0]const u8, len: u32) u16;
-pub extern fn esp_rom_crc8_le(crc: u8, buf: [*:0]const u8, len: u32) u8;
-pub extern fn esp_rom_crc8_be(crc: u8, buf: [*:0]const u8, len: u32) u8;
+pub fn esp_rom_crc32(crc: u32, buf: [*:0]const u8, len: u32) u32 {
+    return switch (builtin.cpu.arch.endian()) {
+        .little => esp_rom_crc32_le(crc, buf, len),
+        else => esp_rom_crc32_be(crc, buf, len),
+    };
+}
+extern fn esp_rom_crc32_be(crc: u32, buf: [*:0]const u8, len: u32) u32;
+extern fn esp_rom_crc32_le(crc: u32, buf: [*:0]const u8, len: u32) u32;
+pub fn esp_rom_crc16(crc: u32, buf: [*:0]const u8, len: u32) u32 {
+    return switch (builtin.cpu.arch.endian()) {
+        .little => esp_rom_crc16_le(crc, buf, len),
+        else => esp_rom_crc16_be(crc, buf, len),
+    };
+}
+extern fn esp_rom_crc16_le(crc: u16, buf: [*:0]const u8, len: u32) u16;
+extern fn esp_rom_crc16_be(crc: u16, buf: [*:0]const u8, len: u32) u16;
+pub fn esp_rom_crc8(crc: u32, buf: [*:0]const u8, len: u32) u32 {
+    return switch (builtin.cpu.arch.endian()) {
+        .little => esp_rom_crc8_le(crc, buf, len),
+        else => esp_rom_crc8_be(crc, buf, len),
+    };
+}
+extern fn esp_rom_crc8_le(crc: u8, buf: [*:0]const u8, len: u32) u8;
+extern fn esp_rom_crc8_be(crc: u8, buf: [*:0]const u8, len: u32) u8;
 pub const soc_reset_reason_t = enum(c_uint) {
     RESET_REASON_CHIP_POWER_ON = 1,
     RESET_REASON_CORE_SW = 3,
@@ -305,7 +318,7 @@ pub extern fn esp_rom_get_reset_reason(cpu_no: c_int) soc_reset_reason_t;
 pub extern fn esp_rom_route_intr_matrix(cpu_core: c_int, periph_intr_id: u32, cpu_intr_num: u32) void;
 pub extern fn esp_rom_get_cpu_ticks_per_us() u32;
 pub extern fn esp_rom_set_cpu_ticks_per_us(ticks_per_us: u32) void;
-const esp_log_level_t = enum(c_uint) {
+pub const esp_log_level_t = enum(c_uint) {
     ESP_LOG_NONE = 0,
     ESP_LOG_ERROR = 1,
     ESP_LOG_WARN = 2,
@@ -313,14 +326,14 @@ const esp_log_level_t = enum(c_uint) {
     ESP_LOG_DEBUG = 4,
     ESP_LOG_VERBOSE = 5,
 };
-const default_level: esp_log_level_t = switch (@import("builtin").mode) {
+const default_level: esp_log_level_t = switch (builtin.mode) {
     .Debug => .ESP_LOG_DEBUG,
     .ReleaseSafe => .ESP_LOG_INFO,
     .ReleaseFast, .ReleaseSmall => .ESP_LOG_ERROR,
 };
-pub fn ESP_LOGI(allocator: std.mem.Allocator, tag: [*:0]const u8, comptime cfmt: []const u8, args: anytype) void {
-    const fmt = std.fmt.allocPrintZ(allocator, cfmt, args) catch |err| @errorName(err);
-    esp_log_write(default_level, tag, fmt, esp_log_timestamp(), tag);
+pub fn ESP_LOGI(allocator: std.mem.Allocator, comptime tag: [*:0]const u8, comptime fmt: []const u8, args: anytype) void {
+    const buffer = std.fmt.allocPrintZ(allocator, fmt, args) catch |err| @panic(@errorName(err));
+    esp_log_write(default_level, tag, buffer, esp_log_timestamp(), tag);
 }
 pub const LOG_COLOR_BLACK = "30";
 pub const LOG_COLOR_RED = "31";
@@ -942,10 +955,11 @@ pub extern fn xt_utils_compare_and_set(arg_addr: [*c]volatile u32, arg_compare_v
 pub const intr_handler_t = ?*const fn (?*anyopaque) callconv(.C) void;
 pub const intr_handle_data_t = opaque {};
 pub const intr_handle_t = ?*intr_handle_data_t;
-pub const ESP_INTR_CPU_AFFINITY_AUTO: c_int = 0;
-pub const ESP_INTR_CPU_AFFINITY_0: c_int = 1;
-pub const ESP_INTR_CPU_AFFINITY_1: c_int = 2;
-pub const esp_intr_cpu_affinity_t = c_uint;
+pub const esp_intr_cpu_affinity_t = enum(c_uint) {
+    ESP_INTR_CPU_AFFINITY_AUTO = 0,
+    ESP_INTR_CPU_AFFINITY_0 = 1,
+    ESP_INTR_CPU_AFFINITY_1 = 2,
+};
 pub extern fn esp_intr_mark_shared(intno: c_int, cpu: c_int, is_in_iram: bool) esp_err_t;
 pub extern fn esp_intr_reserve(intno: c_int, cpu: c_int) esp_err_t;
 pub extern fn esp_intr_alloc(source: c_int, flags: c_int, handler: intr_handler_t, arg: ?*anyopaque, ret_handle: [*c]intr_handle_t) esp_err_t;
@@ -959,30 +973,31 @@ pub extern fn esp_intr_set_in_iram(handle: intr_handle_t, is_in_iram: bool) esp_
 pub extern fn esp_intr_noniram_disable() void;
 pub extern fn esp_intr_noniram_enable() void;
 pub extern fn esp_intr_enable_source(inum: c_int) void;
-pub extern fn esp_intr_disable_source(inum: c_int) void; // esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:300:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
+pub extern fn esp_intr_disable_source(inum: c_int) void;
+// esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:300:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:298:19: warning: unable to translate function, demoted to extern
 pub extern fn esp_intr_flags_to_level(arg_flags: c_int) callconv(.C) c_int;
-pub fn esp_intr_level_to_flags(arg_level: c_int) callconv(.C) c_int {
-    var level = arg_level;
-    _ = &level;
+pub fn esp_intr_level_to_flags(level: c_int) callconv(.C) c_int {
     return if (level > @as(c_int, 0)) (@as(c_int, 1) << @intCast(level)) & (((((((@as(c_int, 1) << @intCast(1)) | (@as(c_int, 1) << @intCast(2))) | (@as(c_int, 1) << @intCast(3))) | (@as(c_int, 1) << @intCast(4))) | (@as(c_int, 1) << @intCast(5))) | (@as(c_int, 1) << @intCast(6))) | (@as(c_int, 1) << @intCast(7))) else @as(c_int, 0);
 }
 pub extern fn esp_intr_dump(stream: std.c.FILE) esp_err_t;
 pub const esp_cpu_cycle_count_t = u32;
-pub const ESP_CPU_INTR_TYPE_LEVEL: c_int = 0;
-pub const ESP_CPU_INTR_TYPE_EDGE: c_int = 1;
-pub const ESP_CPU_INTR_TYPE_NA: c_int = 2;
-pub const esp_cpu_intr_type_t = c_uint;
+pub const esp_cpu_intr_type_t = enum(c_uint) {
+    ESP_CPU_INTR_TYPE_LEVEL = 0,
+    ESP_CPU_INTR_TYPE_EDGE = 1,
+    ESP_CPU_INTR_TYPE_NA = 2,
+};
 pub const esp_cpu_intr_desc_t = extern struct {
     priority: c_int = std.mem.zeroes(c_int),
     type: esp_cpu_intr_type_t = std.mem.zeroes(esp_cpu_intr_type_t),
     flags: u32 = std.mem.zeroes(u32),
 };
 pub const esp_cpu_intr_handler_t = ?*const fn (?*anyopaque) callconv(.C) void;
-pub const ESP_CPU_WATCHPOINT_LOAD: c_int = 0;
-pub const ESP_CPU_WATCHPOINT_STORE: c_int = 1;
-pub const ESP_CPU_WATCHPOINT_ACCESS: c_int = 2;
-pub const esp_cpu_watchpoint_trigger_t = c_uint;
+pub const esp_cpu_watchpoint_trigger_t = enum(c_uint) {
+    ESP_CPU_WATCHPOINT_LOAD = 0,
+    ESP_CPU_WATCHPOINT_STORE = 1,
+    ESP_CPU_WATCHPOINT_ACCESS = 2,
+};
 pub extern fn esp_cpu_stall(core_id: c_int) void;
 pub extern fn esp_cpu_unstall(core_id: c_int) void;
 pub extern fn esp_cpu_reset(core_id: c_int) void;
@@ -1011,21 +1026,19 @@ pub inline fn esp_cpu_intr_set_ivt_addr(arg_ivt_addr: ?*const anyopaque) void {
     var ivt_addr = arg_ivt_addr;
     _ = &ivt_addr;
     xt_utils_set_vecbase(@as(u32, @intCast(@intFromPtr(ivt_addr))));
-} // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+}
+// esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:324:24: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_has_handler(arg_intr_num: c_int) bool; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+pub extern fn esp_cpu_intr_has_handler(arg_intr_num: c_int) bool;
+// esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:348:24: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_set_handler(arg_intr_num: c_int, arg_handler: esp_cpu_intr_handler_t, arg_handler_arg: ?*anyopaque) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:366:25: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_get_handler_arg(arg_intr_num: c_int) ?*anyopaque;
-pub inline fn esp_cpu_intr_enable(arg_intr_mask: u32) void {
-    var intr_mask = arg_intr_mask;
-    _ = &intr_mask;
+pub inline fn esp_cpu_intr_enable(intr_mask: u32) void {
     xt_ints_on(intr_mask);
 }
-pub inline fn esp_cpu_intr_disable(arg_intr_mask: u32) void {
-    var intr_mask = arg_intr_mask;
-    _ = &intr_mask;
+pub inline fn esp_cpu_intr_disable(intr_mask: u32) void {
     xt_ints_off(intr_mask);
 }
 pub inline fn esp_cpu_intr_get_enabled_mask() u32 {
@@ -1044,9 +1057,7 @@ pub inline fn esp_cpu_dbgr_is_attached() bool {
 pub inline fn esp_cpu_dbgr_break() void {
     xt_utils_dbgr_break();
 }
-pub inline fn esp_cpu_get_call_addr(arg_return_address: isize) isize {
-    var return_address = arg_return_address;
-    _ = &return_address;
+pub inline fn esp_cpu_get_call_addr(return_address: isize) isize {
     return return_address - @as(c_int, 3);
 }
 pub extern fn esp_cpu_compare_and_set(addr: [*c]volatile u32, compare_value: u32, new_value: u32) bool;
@@ -1331,8 +1342,8 @@ pub extern fn esp_crosscore_int_send_yield(core_id: c_int) void;
 pub extern fn esp_crosscore_int_send_freq_switch(core_id: c_int) void;
 pub extern fn esp_crosscore_int_send_gdb_call(core_id: c_int) void;
 pub extern fn esp_crosscore_int_send_print_backtrace(core_id: c_int) void;
-pub extern fn esp_crosscore_int_send_twdt_abort(core_id: c_int) void; // /home/kassane/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/assert.h:45:24: warning: ignoring StaticAssert declaration
-// /home/kassane/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/assert.h:45:24: warning: ignoring StaticAssert declaration
+pub extern fn esp_crosscore_int_send_twdt_abort(core_id: c_int) void; // /.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/assert.h:45:24: warning: ignoring StaticAssert declaration
+// /.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/assert.h:45:24: warning: ignoring StaticAssert declaration
 pub inline fn esp_dram_match_iram() bool {
     return (@as(c_int, 1073405952) == @as(c_int, 1074266112)) and (@as(c_int, 1073741824) == @as(c_int, 1074438144));
 }
@@ -1417,14 +1428,10 @@ pub inline fn esp_ptr_in_drom(arg_p: ?*const anyopaque) bool {
     _ = &drom_start_addr;
     return (@as(isize, @intCast(@intFromPtr(p))) >= drom_start_addr) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1065353216));
 }
-pub inline fn esp_stack_ptr_in_dram(arg_sp: u32) bool {
-    var sp = arg_sp;
-    _ = &sp;
+pub inline fn esp_stack_ptr_in_dram(sp: u32) bool {
     return !(((sp < @as(u32, @bitCast(@as(c_int, 1073405952) + @as(c_int, 16)))) or (sp > @as(u32, @bitCast(@as(c_int, 1073741824) - @as(c_int, 16))))) or ((sp & @as(u32, @bitCast(@as(c_int, 15)))) != @as(u32, @bitCast(@as(c_int, 0)))));
 }
-pub inline fn esp_stack_ptr_is_sane(arg_sp: u32) bool {
-    var sp = arg_sp;
-    _ = &sp;
+pub inline fn esp_stack_ptr_is_sane(sp: u32) bool {
     return esp_stack_ptr_in_dram(sp);
 }
 pub extern fn esp_newlib_time_init() void;
@@ -1465,7 +1472,6 @@ pub extern fn multi_heap_reset_minimum_free_bytes(heap: multi_heap_handle_t) usi
 pub extern fn multi_heap_restore_minimum_free_bytes(heap: multi_heap_handle_t, new_minimum_free_bytes_value: usize) void;
 pub const esp_alloc_failed_hook_t = ?*const fn (usize, u32, [*:0]const u8) callconv(.C) void;
 pub const Caps = enum(u32) {
-    // @brief Flags to indicate the capabilities of the various memory systems
     MALLOC_CAP_EXEC = (1 << 0), //< Memory must be able to run executable code
     MALLOC_CAP_32BIT = (1 << 1), //< Memory must allow for aligned 32-bit data accesses
     MALLOC_CAP_8BIT = (1 << 2), //< Memory must allow for 8/16/...-bit data accesses
@@ -1518,12 +1524,11 @@ pub const UBaseType_t = c_uint;
 pub const TickType_t = u32;
 pub extern fn xPortInIsrContext() BaseType_t;
 pub extern fn vPortAssertIfInISR() void;
-pub extern fn xPortInterruptedFromISRContext() BaseType_t; // esp-idf/components/xtensa/include/xtensa/xtruntime.h:92:4: warning: TODO implement translation of stmt class GCCAsmStmtClass
+pub extern fn xPortInterruptedFromISRContext() BaseType_t;
+// esp-idf/components/xtensa/include/xtensa/xtruntime.h:92:4: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:554:58: warning: unable to translate function, demoted to extern
 pub extern fn xPortSetInterruptMaskFromISR() UBaseType_t;
-pub inline fn vPortClearInterruptMaskFromISR(arg_prev_level: UBaseType_t) void {
-    var prev_level = arg_prev_level;
-    _ = &prev_level;
+pub inline fn vPortClearInterruptMaskFromISR(prev_level: UBaseType_t) void {
     _ = _xtos_set_intlevel(@as(c_int, @bitCast(prev_level)));
 }
 pub const portMUX_TYPE = spinlock_t;
@@ -1710,19 +1715,21 @@ pub extern fn uxListRemove(pxItemToRemove: [*c]ListItem_t) UBaseType_t;
 pub const tskTaskControlBlock = opaque {};
 pub const TaskHandle_t = ?*tskTaskControlBlock;
 pub const TaskHookFunction_t = ?*const fn (?*anyopaque) callconv(.C) BaseType_t;
-pub const eRunning: c_int = 0;
-pub const eReady: c_int = 1;
-pub const eBlocked: c_int = 2;
-pub const eSuspended: c_int = 3;
-pub const eDeleted: c_int = 4;
-pub const eInvalid: c_int = 5;
-pub const eTaskState = c_uint;
-pub const eNoAction: c_int = 0;
-pub const eSetBits: c_int = 1;
-pub const eIncrement: c_int = 2;
-pub const eSetValueWithOverwrite: c_int = 3;
-pub const eSetValueWithoutOverwrite: c_int = 4;
-pub const eNotifyAction = c_uint;
+pub const eTaskState = enum(c_uint) {
+    eRunning = 0,
+    eReady = 1,
+    eBlocked = 2,
+    eSuspended = 3,
+    eDeleted = 4,
+    eInvalid = 5,
+};
+pub const eNotifyAction = enum(c_uint) {
+    eNoAction = 0,
+    eSetBits = 1,
+    eIncrement = 2,
+    eSetValueWithOverwrite = 3,
+    eSetValueWithoutOverwrite = 4,
+};
 pub const xTIME_OUT = extern struct {
     xOverflowCount: BaseType_t = std.mem.zeroes(BaseType_t),
     xTimeOnEntering: TickType_t = std.mem.zeroes(TickType_t),
@@ -1756,33 +1763,17 @@ pub const xTASK_STATUS = extern struct {
     usStackHighWaterMark: u32 = std.mem.zeroes(u32),
 };
 pub const TaskStatus_t = xTASK_STATUS;
-pub const eAbortSleep: c_int = 0;
-pub const eStandardSleep: c_int = 1;
-pub const eNoTasksWaitingTimeout: c_int = 2;
-pub const eSleepModeStatus = c_uint;
+pub const eSleepModeStatus = enum(c_uint) {
+    eAbortSleep = 0,
+    eStandardSleep = 1,
+    eNoTasksWaitingTimeout = 2,
+};
 pub extern fn xTaskCreatePinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pvCreatedTask: [*c]TaskHandle_t, xCoreID: BaseType_t) BaseType_t;
-pub inline fn xTaskCreate(arg_pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, arg_uxPriority: UBaseType_t, pxCreatedTask: [*c]TaskHandle_t) BaseType_t {
-    var pxTaskCode = arg_pxTaskCode;
-    _ = &pxTaskCode;
-    _ = &pcName;
-    _ = &usStackDepth;
-    _ = &pvParameters;
-    var uxPriority = arg_uxPriority;
-    _ = &uxPriority;
-    _ = &pxCreatedTask;
+pub inline fn xTaskCreate(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxCreatedTask: [*c]TaskHandle_t) BaseType_t {
     return xTaskCreatePinnedToCore(pxTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pxCreatedTask, @as(BaseType_t, @bitCast(@as(c_int, 2147483647))));
 }
 pub extern fn xTaskCreateStaticPinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t, xCoreID: BaseType_t) TaskHandle_t;
-pub inline fn xTaskCreateStatic(arg_pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, arg_uxPriority: UBaseType_t, puxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t) TaskHandle_t {
-    var pxTaskCode = arg_pxTaskCode;
-    _ = &pxTaskCode;
-    _ = &pcName;
-    _ = &ulStackDepth;
-    _ = &pvParameters;
-    var uxPriority = arg_uxPriority;
-    _ = &uxPriority;
-    _ = &puxStackBuffer;
-    _ = &pxTaskBuffer;
+pub inline fn xTaskCreateStatic(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, puxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t) TaskHandle_t {
     return xTaskCreateStaticPinnedToCore(pxTaskCode, pcName, ulStackDepth, pvParameters, uxPriority, puxStackBuffer, pxTaskBuffer, @as(BaseType_t, @bitCast(@as(c_int, 2147483647))));
 }
 pub extern fn vTaskAllocateMPURegions(xTask: TaskHandle_t, pxRegions: [*c]const MemoryRegion_t) void;
@@ -2247,22 +2238,24 @@ pub extern fn esp_event_isr_post_to(event_loop: esp_event_loop_handle_t, event_b
 pub extern fn esp_event_dump(file: std.c.FILE) esp_err_t;
 pub const nvs_handle_t = u32;
 pub const nvs_handle = nvs_handle_t;
-pub const NVS_READONLY: c_int = 0;
-pub const NVS_READWRITE: c_int = 1;
-pub const nvs_open_mode_t = c_uint;
+pub const nvs_open_mode_t = enum(c_uint) {
+    NVS_READONLY = 0,
+    NVS_READWRITE = 1,
+};
 pub const nvs_open_mode = nvs_open_mode_t;
-pub const NVS_TYPE_U8: c_int = 1;
-pub const NVS_TYPE_I8: c_int = 17;
-pub const NVS_TYPE_U16: c_int = 2;
-pub const NVS_TYPE_I16: c_int = 18;
-pub const NVS_TYPE_U32: c_int = 4;
-pub const NVS_TYPE_I32: c_int = 20;
-pub const NVS_TYPE_U64: c_int = 8;
-pub const NVS_TYPE_I64: c_int = 24;
-pub const NVS_TYPE_STR: c_int = 33;
-pub const NVS_TYPE_BLOB: c_int = 66;
-pub const NVS_TYPE_ANY: c_int = 255;
-pub const nvs_type_t = c_uint;
+pub const nvs_type_t = enum(c_uint) {
+    NVS_TYPE_U8 = 1,
+    NVS_TYPE_I8 = 17,
+    NVS_TYPE_U16 = 2,
+    NVS_TYPE_I16 = 18,
+    NVS_TYPE_U32 = 4,
+    NVS_TYPE_I32 = 20,
+    NVS_TYPE_U64 = 8,
+    NVS_TYPE_I64 = 24,
+    NVS_TYPE_STR = 33,
+    NVS_TYPE_BLOB = 66,
+    NVS_TYPE_ANY = 255,
+};
 pub const nvs_entry_info_t = extern struct {
     namespace_name: [16]u8 = std.mem.zeroes([16]u8),
     key: [16]u8 = std.mem.zeroes([16]u8),
@@ -2312,47 +2305,50 @@ pub extern fn nvs_entry_next(iterator: [*c]nvs_iterator_t) esp_err_t;
 pub extern fn nvs_entry_info(iterator: nvs_iterator_t, out_info: [*c]nvs_entry_info_t) esp_err_t;
 pub extern fn nvs_release_iterator(iterator: nvs_iterator_t) void;
 pub const esp_flash_t = opaque {};
-pub const ESP_PARTITION_MMAP_DATA: c_int = 0;
-pub const ESP_PARTITION_MMAP_INST: c_int = 1;
-pub const esp_partition_mmap_memory_t = c_uint;
+pub const esp_partition_mmap_memory_t = enum(c_uint) {
+    ESP_PARTITION_MMAP_DATA = 0,
+    ESP_PARTITION_MMAP_INST = 1,
+};
 pub const esp_partition_mmap_handle_t = u32;
-pub const ESP_PARTITION_TYPE_APP: c_int = 0;
-pub const ESP_PARTITION_TYPE_DATA: c_int = 1;
-pub const ESP_PARTITION_TYPE_ANY: c_int = 255;
-pub const esp_partition_type_t = c_uint;
-pub const ESP_PARTITION_SUBTYPE_APP_FACTORY: c_int = 0;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_MIN: c_int = 16;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_0: c_int = 16;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_1: c_int = 17;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_2: c_int = 18;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_3: c_int = 19;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_4: c_int = 20;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_5: c_int = 21;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_6: c_int = 22;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_7: c_int = 23;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_8: c_int = 24;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_9: c_int = 25;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_10: c_int = 26;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_11: c_int = 27;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_12: c_int = 28;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_13: c_int = 29;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_14: c_int = 30;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_15: c_int = 31;
-pub const ESP_PARTITION_SUBTYPE_APP_OTA_MAX: c_int = 32;
-pub const ESP_PARTITION_SUBTYPE_APP_TEST: c_int = 32;
-pub const ESP_PARTITION_SUBTYPE_DATA_OTA: c_int = 0;
-pub const ESP_PARTITION_SUBTYPE_DATA_PHY: c_int = 1;
-pub const ESP_PARTITION_SUBTYPE_DATA_NVS: c_int = 2;
-pub const ESP_PARTITION_SUBTYPE_DATA_COREDUMP: c_int = 3;
-pub const ESP_PARTITION_SUBTYPE_DATA_NVS_KEYS: c_int = 4;
-pub const ESP_PARTITION_SUBTYPE_DATA_EFUSE_EM: c_int = 5;
-pub const ESP_PARTITION_SUBTYPE_DATA_UNDEFINED: c_int = 6;
-pub const ESP_PARTITION_SUBTYPE_DATA_ESPHTTPD: c_int = 128;
-pub const ESP_PARTITION_SUBTYPE_DATA_FAT: c_int = 129;
-pub const ESP_PARTITION_SUBTYPE_DATA_SPIFFS: c_int = 130;
-pub const ESP_PARTITION_SUBTYPE_DATA_LITTLEFS: c_int = 131;
-pub const ESP_PARTITION_SUBTYPE_ANY: c_int = 255;
-pub const esp_partition_subtype_t = c_uint;
+pub const esp_partition_type_t = enum(c_uint) {
+    ESP_PARTITION_TYPE_APP = 0,
+    ESP_PARTITION_TYPE_DATA = 1,
+    ESP_PARTITION_TYPE_ANY = 255,
+};
+pub const esp_partition_subtype_t = enum(c_uint) {
+    ESP_PARTITION_SUBTYPE_APP_FACTORY = 0,
+    ESP_PARTITION_SUBTYPE_APP_OTA_MIN = 16,
+    ESP_PARTITION_SUBTYPE_APP_OTA_0 = 16,
+    ESP_PARTITION_SUBTYPE_APP_OTA_1 = 17,
+    ESP_PARTITION_SUBTYPE_APP_OTA_2 = 18,
+    ESP_PARTITION_SUBTYPE_APP_OTA_3 = 19,
+    ESP_PARTITION_SUBTYPE_APP_OTA_4 = 20,
+    ESP_PARTITION_SUBTYPE_APP_OTA_5 = 21,
+    ESP_PARTITION_SUBTYPE_APP_OTA_6 = 22,
+    ESP_PARTITION_SUBTYPE_APP_OTA_7 = 23,
+    ESP_PARTITION_SUBTYPE_APP_OTA_8 = 24,
+    ESP_PARTITION_SUBTYPE_APP_OTA_9 = 25,
+    ESP_PARTITION_SUBTYPE_APP_OTA_10 = 26,
+    ESP_PARTITION_SUBTYPE_APP_OTA_11 = 27,
+    ESP_PARTITION_SUBTYPE_APP_OTA_12 = 28,
+    ESP_PARTITION_SUBTYPE_APP_OTA_13 = 29,
+    ESP_PARTITION_SUBTYPE_APP_OTA_14 = 30,
+    ESP_PARTITION_SUBTYPE_APP_OTA_15 = 31,
+    ESP_PARTITION_SUBTYPE_APP_OTA_MAX = 32,
+    ESP_PARTITION_SUBTYPE_APP_TEST = 32,
+    ESP_PARTITION_SUBTYPE_DATA_OTA = 0,
+    ESP_PARTITION_SUBTYPE_DATA_PHY = 1,
+    ESP_PARTITION_SUBTYPE_DATA_NVS = 2,
+    ESP_PARTITION_SUBTYPE_DATA_COREDUMP = 3,
+    ESP_PARTITION_SUBTYPE_DATA_NVS_KEYS = 4,
+    ESP_PARTITION_SUBTYPE_DATA_EFUSE_EM = 5,
+    ESP_PARTITION_SUBTYPE_DATA_UNDEFINED = 6,
+    ESP_PARTITION_SUBTYPE_DATA_ESPHTTPD = 128,
+    ESP_PARTITION_SUBTYPE_DATA_FAT = 129,
+    ESP_PARTITION_SUBTYPE_DATA_SPIFFS = 130,
+    ESP_PARTITION_SUBTYPE_DATA_LITTLEFS = 131,
+    ESP_PARTITION_SUBTYPE_ANY = 255,
+};
 pub const esp_partition_iterator_opaque_ = opaque {};
 pub const esp_partition_iterator_t = ?*esp_partition_iterator_opaque_;
 pub const esp_partition_t = extern struct {
@@ -2413,33 +2409,40 @@ pub extern fn nvs_flash_get_default_security_scheme() [*c]nvs_sec_scheme_t;
 pub extern fn nvs_flash_generate_keys_v2(scheme_cfg: [*c]nvs_sec_scheme_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
 pub extern fn nvs_flash_read_security_cfg_v2(scheme_cfg: [*c]nvs_sec_scheme_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
 
-pub const ESP_BT_MODE_IDLE: c_int = 0;
-pub const ESP_BT_MODE_BLE: c_int = 1;
-pub const ESP_BT_MODE_CLASSIC_BT: c_int = 2;
-pub const ESP_BT_MODE_BTDM: c_int = 3;
-pub const esp_bt_mode_t = c_uint;
-pub const ESP_BT_CTRL_HCI_TL_UART: c_int = 0;
-pub const ESP_BT_CTRL_HCI_TL_VHCI: c_int = 1;
-pub const esp_bt_ctrl_hci_tl_t = c_uint;
-pub const ESP_BLE_CE_LEN_TYPE_ORIG: c_int = 0;
-pub const ESP_BLE_CE_LEN_TYPE_CE: c_int = 1;
-pub const ESP_BLE_CE_LEN_TYPE_SD: c_int = 1;
-pub const esp_ble_ce_len_t = c_uint;
-pub const ESP_BT_SLEEP_MODE_NONE: c_int = 0;
-pub const ESP_BT_SLEEP_MODE_1: c_int = 1;
-pub const esp_bt_sleep_mode_t = c_uint;
-pub const ESP_BT_SLEEP_CLOCK_NONE: c_int = 0;
-pub const ESP_BT_SLEEP_CLOCK_MAIN_XTAL: c_int = 1;
-pub const ESP_BT_SLEEP_CLOCK_EXT_32K_XTAL: c_int = 2;
-pub const ESP_BT_SLEEP_CLOCK_RTC_SLOW: c_int = 3;
-pub const ESP_BT_SLEEP_CLOCK_FPGA_32K: c_int = 4;
-pub const esp_bt_sleep_clock_t = c_uint;
-pub const ESP_BT_ANT_IDX_0: c_int = 0;
-pub const ESP_BT_ANT_IDX_1: c_int = 1;
-const enum_unnamed_15 = c_uint;
-pub const ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_DISABLE: c_int = 0;
-pub const ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_ENABLE: c_int = 1;
-const enum_unnamed_16 = c_uint;
+pub const esp_bt_mode_t = enum(c_uint) {
+    ESP_BT_MODE_IDLE = 0,
+    ESP_BT_MODE_BLE = 1,
+    ESP_BT_MODE_CLASSIC_BT = 2,
+    ESP_BT_MODE_BTDM = 3,
+};
+pub const esp_bt_ctrl_hci_tl_t = enum(c_uint) {
+    ESP_BT_CTRL_HCI_TL_UART = 0,
+    ESP_BT_CTRL_HCI_TL_VHCI = 1,
+};
+pub const esp_ble_ce_len_t = enum(c_uint) {
+    ESP_BLE_CE_LEN_TYPE_ORIG = 0,
+    ESP_BLE_CE_LEN_TYPE_CE = 1,
+    ESP_BLE_CE_LEN_TYPE_SD = 1,
+};
+pub const esp_bt_sleep_mode_t = enum(c_uint) {
+    ESP_BT_SLEEP_MODE_NONE = 0,
+    ESP_BT_SLEEP_MODE_1 = 1,
+};
+pub const esp_bt_sleep_clock_t = enum(c_uint) {
+    ESP_BT_SLEEP_CLOCK_NONE = 0,
+    ESP_BT_SLEEP_CLOCK_MAIN_XTAL = 1,
+    ESP_BT_SLEEP_CLOCK_EXT_32K_XTAL = 2,
+    ESP_BT_SLEEP_CLOCK_RTC_SLOW = 3,
+    ESP_BT_SLEEP_CLOCK_FPGA_32K = 4,
+};
+const enum_unnamed_15 = enum(c_uint) {
+    ESP_BT_ANT_IDX_0 = 0,
+    ESP_BT_ANT_IDX_1 = 1,
+};
+const enum_unnamed_16 = enum(c_uint) {
+    ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_DISABLE = 0,
+    ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_ENABLE = 1,
+};
 pub const esp_bt_hci_tl_callback_t = ?*const fn (?*anyopaque, u8) callconv(.C) void;
 pub const esp_bt_hci_tl_t = extern struct {
     _magic: u32 = std.mem.zeroes(u32),
@@ -2490,43 +2493,46 @@ pub const esp_bt_controller_config_t = extern struct {
     ble_cca_mode: u8 = std.mem.zeroes(u8),
     ble_data_lenth_zero_aux: u8 = std.mem.zeroes(u8),
 };
-pub const ESP_BT_CONTROLLER_STATUS_IDLE: c_int = 0;
-pub const ESP_BT_CONTROLLER_STATUS_INITED: c_int = 1;
-pub const ESP_BT_CONTROLLER_STATUS_ENABLED: c_int = 2;
-pub const ESP_BT_CONTROLLER_STATUS_NUM: c_int = 3;
-pub const esp_bt_controller_status_t = c_uint;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL0: c_int = 0;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL1: c_int = 1;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL2: c_int = 2;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL3: c_int = 3;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL4: c_int = 4;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL5: c_int = 5;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL6: c_int = 6;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL7: c_int = 7;
-pub const ESP_BLE_PWR_TYPE_CONN_HDL8: c_int = 8;
-pub const ESP_BLE_PWR_TYPE_ADV: c_int = 9;
-pub const ESP_BLE_PWR_TYPE_SCAN: c_int = 10;
-pub const ESP_BLE_PWR_TYPE_DEFAULT: c_int = 11;
-pub const ESP_BLE_PWR_TYPE_NUM: c_int = 12;
-pub const esp_ble_power_type_t = c_uint;
-pub const ESP_PWR_LVL_N24: c_int = 0;
-pub const ESP_PWR_LVL_N21: c_int = 1;
-pub const ESP_PWR_LVL_N18: c_int = 2;
-pub const ESP_PWR_LVL_N15: c_int = 3;
-pub const ESP_PWR_LVL_N12: c_int = 4;
-pub const ESP_PWR_LVL_N9: c_int = 5;
-pub const ESP_PWR_LVL_N6: c_int = 6;
-pub const ESP_PWR_LVL_N3: c_int = 7;
-pub const ESP_PWR_LVL_N0: c_int = 8;
-pub const ESP_PWR_LVL_P3: c_int = 9;
-pub const ESP_PWR_LVL_P6: c_int = 10;
-pub const ESP_PWR_LVL_P9: c_int = 11;
-pub const ESP_PWR_LVL_P12: c_int = 12;
-pub const ESP_PWR_LVL_P15: c_int = 13;
-pub const ESP_PWR_LVL_P18: c_int = 14;
-pub const ESP_PWR_LVL_P21: c_int = 15;
-pub const ESP_PWR_LVL_INVALID: c_int = 255;
-pub const esp_power_level_t = c_uint;
+pub const esp_bt_controller_status_t = enum(c_uint) {
+    ESP_BT_CONTROLLER_STATUS_IDLE = 0,
+    ESP_BT_CONTROLLER_STATUS_INITED = 1,
+    ESP_BT_CONTROLLER_STATUS_ENABLED = 2,
+    ESP_BT_CONTROLLER_STATUS_NUM = 3,
+};
+pub const esp_ble_power_type_t = enum(c_uint) {
+    ESP_BLE_PWR_TYPE_CONN_HDL0 = 0,
+    ESP_BLE_PWR_TYPE_CONN_HDL1 = 1,
+    ESP_BLE_PWR_TYPE_CONN_HDL2 = 2,
+    ESP_BLE_PWR_TYPE_CONN_HDL3 = 3,
+    ESP_BLE_PWR_TYPE_CONN_HDL4 = 4,
+    ESP_BLE_PWR_TYPE_CONN_HDL5 = 5,
+    ESP_BLE_PWR_TYPE_CONN_HDL6 = 6,
+    ESP_BLE_PWR_TYPE_CONN_HDL7 = 7,
+    ESP_BLE_PWR_TYPE_CONN_HDL8 = 8,
+    ESP_BLE_PWR_TYPE_ADV = 9,
+    ESP_BLE_PWR_TYPE_SCAN = 10,
+    ESP_BLE_PWR_TYPE_DEFAULT = 11,
+    ESP_BLE_PWR_TYPE_NUM = 12,
+};
+pub const esp_power_level_t = enum(c_uint) {
+    ESP_PWR_LVL_N24 = 0,
+    ESP_PWR_LVL_N21 = 1,
+    ESP_PWR_LVL_N18 = 2,
+    ESP_PWR_LVL_N15 = 3,
+    ESP_PWR_LVL_N12 = 4,
+    ESP_PWR_LVL_N9 = 5,
+    ESP_PWR_LVL_N6 = 6,
+    ESP_PWR_LVL_N3 = 7,
+    ESP_PWR_LVL_N0 = 8,
+    ESP_PWR_LVL_P3 = 9,
+    ESP_PWR_LVL_P6 = 10,
+    ESP_PWR_LVL_P9 = 11,
+    ESP_PWR_LVL_P12 = 12,
+    ESP_PWR_LVL_P15 = 13,
+    ESP_PWR_LVL_P18 = 14,
+    ESP_PWR_LVL_P21 = 15,
+    ESP_PWR_LVL_INVALID = 255,
+};
 pub extern fn esp_ble_tx_power_set(power_type: esp_ble_power_type_t, power_level: esp_power_level_t) esp_err_t;
 pub extern fn esp_ble_tx_power_get(power_type: esp_ble_power_type_t) esp_power_level_t;
 pub extern fn esp_bt_controller_init(cfg: [*c]esp_bt_controller_config_t) esp_err_t;
@@ -2552,10 +2558,11 @@ pub extern fn esp_bt_controller_wakeup_request() void;
 pub extern fn esp_bt_h4tl_eif_io_event_notify(event: c_int) c_int;
 pub extern fn esp_wifi_bt_power_domain_on() void;
 pub extern fn esp_wifi_bt_power_domain_off() void;
-pub const ESP_BLUEDROID_STATUS_UNINITIALIZED: c_int = 0;
-pub const ESP_BLUEDROID_STATUS_INITIALIZED: c_int = 1;
-pub const ESP_BLUEDROID_STATUS_ENABLED: c_int = 2;
-pub const esp_bluedroid_status_t = c_uint;
+pub const esp_bluedroid_status_t = enum(c_uint) {
+    ESP_BLUEDROID_STATUS_UNINITIALIZED = 0,
+    ESP_BLUEDROID_STATUS_INITIALIZED = 1,
+    ESP_BLUEDROID_STATUS_ENABLED = 2,
+};
 pub const esp_bluedroid_config_t = extern struct {
     ssp_en: bool = std.mem.zeroes(bool),
 };
@@ -2565,93 +2572,94 @@ pub extern fn esp_bluedroid_disable() esp_err_t;
 pub extern fn esp_bluedroid_init() esp_err_t;
 pub extern fn esp_bluedroid_init_with_cfg(cfg: [*c]esp_bluedroid_config_t) esp_err_t;
 pub extern fn esp_bluedroid_deinit() esp_err_t;
-pub const ESP_BT_STATUS_SUCCESS: c_int = 0;
-pub const ESP_BT_STATUS_FAIL: c_int = 1;
-pub const ESP_BT_STATUS_NOT_READY: c_int = 2;
-pub const ESP_BT_STATUS_NOMEM: c_int = 3;
-pub const ESP_BT_STATUS_BUSY: c_int = 4;
-pub const ESP_BT_STATUS_DONE: c_int = 5;
-pub const ESP_BT_STATUS_UNSUPPORTED: c_int = 6;
-pub const ESP_BT_STATUS_PARM_INVALID: c_int = 7;
-pub const ESP_BT_STATUS_UNHANDLED: c_int = 8;
-pub const ESP_BT_STATUS_AUTH_FAILURE: c_int = 9;
-pub const ESP_BT_STATUS_RMT_DEV_DOWN: c_int = 10;
-pub const ESP_BT_STATUS_AUTH_REJECTED: c_int = 11;
-pub const ESP_BT_STATUS_INVALID_STATIC_RAND_ADDR: c_int = 12;
-pub const ESP_BT_STATUS_PENDING: c_int = 13;
-pub const ESP_BT_STATUS_UNACCEPT_CONN_INTERVAL: c_int = 14;
-pub const ESP_BT_STATUS_PARAM_OUT_OF_RANGE: c_int = 15;
-pub const ESP_BT_STATUS_TIMEOUT: c_int = 16;
-pub const ESP_BT_STATUS_PEER_LE_DATA_LEN_UNSUPPORTED: c_int = 17;
-pub const ESP_BT_STATUS_CONTROL_LE_DATA_LEN_UNSUPPORTED: c_int = 18;
-pub const ESP_BT_STATUS_ERR_ILLEGAL_PARAMETER_FMT: c_int = 19;
-pub const ESP_BT_STATUS_MEMORY_FULL: c_int = 20;
-pub const ESP_BT_STATUS_EIR_TOO_LARGE: c_int = 21;
-pub const ESP_BT_STATUS_HCI_SUCCESS: c_int = 256;
-pub const ESP_BT_STATUS_HCI_ILLEGAL_COMMAND: c_int = 257;
-pub const ESP_BT_STATUS_HCI_NO_CONNECTION: c_int = 258;
-pub const ESP_BT_STATUS_HCI_HW_FAILURE: c_int = 259;
-pub const ESP_BT_STATUS_HCI_PAGE_TIMEOUT: c_int = 260;
-pub const ESP_BT_STATUS_HCI_AUTH_FAILURE: c_int = 261;
-pub const ESP_BT_STATUS_HCI_KEY_MISSING: c_int = 262;
-pub const ESP_BT_STATUS_HCI_MEMORY_FULL: c_int = 263;
-pub const ESP_BT_STATUS_HCI_CONNECTION_TOUT: c_int = 264;
-pub const ESP_BT_STATUS_HCI_MAX_NUM_OF_CONNECTIONS: c_int = 265;
-pub const ESP_BT_STATUS_HCI_MAX_NUM_OF_SCOS: c_int = 266;
-pub const ESP_BT_STATUS_HCI_CONNECTION_EXISTS: c_int = 267;
-pub const ESP_BT_STATUS_HCI_COMMAND_DISALLOWED: c_int = 268;
-pub const ESP_BT_STATUS_HCI_HOST_REJECT_RESOURCES: c_int = 269;
-pub const ESP_BT_STATUS_HCI_HOST_REJECT_SECURITY: c_int = 270;
-pub const ESP_BT_STATUS_HCI_HOST_REJECT_DEVICE: c_int = 271;
-pub const ESP_BT_STATUS_HCI_HOST_TIMEOUT: c_int = 272;
-pub const ESP_BT_STATUS_HCI_UNSUPPORTED_VALUE: c_int = 273;
-pub const ESP_BT_STATUS_HCI_ILLEGAL_PARAMETER_FMT: c_int = 274;
-pub const ESP_BT_STATUS_HCI_PEER_USER: c_int = 275;
-pub const ESP_BT_STATUS_HCI_PEER_LOW_RESOURCES: c_int = 276;
-pub const ESP_BT_STATUS_HCI_PEER_POWER_OFF: c_int = 277;
-pub const ESP_BT_STATUS_HCI_CONN_CAUSE_LOCAL_HOST: c_int = 278;
-pub const ESP_BT_STATUS_HCI_REPEATED_ATTEMPTS: c_int = 279;
-pub const ESP_BT_STATUS_HCI_PAIRING_NOT_ALLOWED: c_int = 280;
-pub const ESP_BT_STATUS_HCI_UNKNOWN_LMP_PDU: c_int = 281;
-pub const ESP_BT_STATUS_HCI_UNSUPPORTED_REM_FEATURE: c_int = 282;
-pub const ESP_BT_STATUS_HCI_SCO_OFFSET_REJECTED: c_int = 283;
-pub const ESP_BT_STATUS_HCI_SCO_INTERVAL_REJECTED: c_int = 284;
-pub const ESP_BT_STATUS_HCI_SCO_AIR_MODE: c_int = 285;
-pub const ESP_BT_STATUS_HCI_INVALID_LMP_PARAM: c_int = 286;
-pub const ESP_BT_STATUS_HCI_UNSPECIFIED: c_int = 287;
-pub const ESP_BT_STATUS_HCI_UNSUPPORTED_LMP_PARAMETERS: c_int = 288;
-pub const ESP_BT_STATUS_HCI_ROLE_CHANGE_NOT_ALLOWED: c_int = 289;
-pub const ESP_BT_STATUS_HCI_LMP_RESPONSE_TIMEOUT: c_int = 290;
-pub const ESP_BT_STATUS_HCI_LMP_ERR_TRANS_COLLISION: c_int = 291;
-pub const ESP_BT_STATUS_HCI_LMP_PDU_NOT_ALLOWED: c_int = 292;
-pub const ESP_BT_STATUS_HCI_ENCRY_MODE_NOT_ACCEPTABLE: c_int = 293;
-pub const ESP_BT_STATUS_HCI_UNIT_KEY_USED: c_int = 294;
-pub const ESP_BT_STATUS_HCI_QOS_NOT_SUPPORTED: c_int = 295;
-pub const ESP_BT_STATUS_HCI_INSTANT_PASSED: c_int = 296;
-pub const ESP_BT_STATUS_HCI_PAIRING_WITH_UNIT_KEY_NOT_SUPPORTED: c_int = 297;
-pub const ESP_BT_STATUS_HCI_DIFF_TRANSACTION_COLLISION: c_int = 298;
-pub const ESP_BT_STATUS_HCI_UNDEFINED_0x2B: c_int = 299;
-pub const ESP_BT_STATUS_HCI_QOS_UNACCEPTABLE_PARAM: c_int = 300;
-pub const ESP_BT_STATUS_HCI_QOS_REJECTED: c_int = 301;
-pub const ESP_BT_STATUS_HCI_CHAN_CLASSIF_NOT_SUPPORTED: c_int = 302;
-pub const ESP_BT_STATUS_HCI_INSUFFCIENT_SECURITY: c_int = 303;
-pub const ESP_BT_STATUS_HCI_PARAM_OUT_OF_RANGE: c_int = 304;
-pub const ESP_BT_STATUS_HCI_UNDEFINED_0x31: c_int = 305;
-pub const ESP_BT_STATUS_HCI_ROLE_SWITCH_PENDING: c_int = 306;
-pub const ESP_BT_STATUS_HCI_UNDEFINED_0x33: c_int = 307;
-pub const ESP_BT_STATUS_HCI_RESERVED_SLOT_VIOLATION: c_int = 308;
-pub const ESP_BT_STATUS_HCI_ROLE_SWITCH_FAILED: c_int = 309;
-pub const ESP_BT_STATUS_HCI_INQ_RSP_DATA_TOO_LARGE: c_int = 310;
-pub const ESP_BT_STATUS_HCI_SIMPLE_PAIRING_NOT_SUPPORTED: c_int = 311;
-pub const ESP_BT_STATUS_HCI_HOST_BUSY_PAIRING: c_int = 312;
-pub const ESP_BT_STATUS_HCI_REJ_NO_SUITABLE_CHANNEL: c_int = 313;
-pub const ESP_BT_STATUS_HCI_CONTROLLER_BUSY: c_int = 314;
-pub const ESP_BT_STATUS_HCI_UNACCEPT_CONN_INTERVAL: c_int = 315;
-pub const ESP_BT_STATUS_HCI_DIRECTED_ADVERTISING_TIMEOUT: c_int = 316;
-pub const ESP_BT_STATUS_HCI_CONN_TOUT_DUE_TO_MIC_FAILURE: c_int = 317;
-pub const ESP_BT_STATUS_HCI_CONN_FAILED_ESTABLISHMENT: c_int = 318;
-pub const ESP_BT_STATUS_HCI_MAC_CONNECTION_FAILED: c_int = 319;
-pub const esp_bt_status_t = c_uint;
+pub const esp_bt_status_t = enum(c_uint) {
+    ESP_BT_STATUS_SUCCESS = 0,
+    ESP_BT_STATUS_FAIL = 1,
+    ESP_BT_STATUS_NOT_READY = 2,
+    ESP_BT_STATUS_NOMEM = 3,
+    ESP_BT_STATUS_BUSY = 4,
+    ESP_BT_STATUS_DONE = 5,
+    ESP_BT_STATUS_UNSUPPORTED = 6,
+    ESP_BT_STATUS_PARM_INVALID = 7,
+    ESP_BT_STATUS_UNHANDLED = 8,
+    ESP_BT_STATUS_AUTH_FAILURE = 9,
+    ESP_BT_STATUS_RMT_DEV_DOWN = 10,
+    ESP_BT_STATUS_AUTH_REJECTED = 11,
+    ESP_BT_STATUS_INVALID_STATIC_RAND_ADDR = 12,
+    ESP_BT_STATUS_PENDING = 13,
+    ESP_BT_STATUS_UNACCEPT_CONN_INTERVAL = 14,
+    ESP_BT_STATUS_PARAM_OUT_OF_RANGE = 15,
+    ESP_BT_STATUS_TIMEOUT = 16,
+    ESP_BT_STATUS_PEER_LE_DATA_LEN_UNSUPPORTED = 17,
+    ESP_BT_STATUS_CONTROL_LE_DATA_LEN_UNSUPPORTED = 18,
+    ESP_BT_STATUS_ERR_ILLEGAL_PARAMETER_FMT = 19,
+    ESP_BT_STATUS_MEMORY_FULL = 20,
+    ESP_BT_STATUS_EIR_TOO_LARGE = 21,
+    ESP_BT_STATUS_HCI_SUCCESS = 256,
+    ESP_BT_STATUS_HCI_ILLEGAL_COMMAND = 257,
+    ESP_BT_STATUS_HCI_NO_CONNECTION = 258,
+    ESP_BT_STATUS_HCI_HW_FAILURE = 259,
+    ESP_BT_STATUS_HCI_PAGE_TIMEOUT = 260,
+    ESP_BT_STATUS_HCI_AUTH_FAILURE = 261,
+    ESP_BT_STATUS_HCI_KEY_MISSING = 262,
+    ESP_BT_STATUS_HCI_MEMORY_FULL = 263,
+    ESP_BT_STATUS_HCI_CONNECTION_TOUT = 264,
+    ESP_BT_STATUS_HCI_MAX_NUM_OF_CONNECTIONS = 265,
+    ESP_BT_STATUS_HCI_MAX_NUM_OF_SCOS = 266,
+    ESP_BT_STATUS_HCI_CONNECTION_EXISTS = 267,
+    ESP_BT_STATUS_HCI_COMMAND_DISALLOWED = 268,
+    ESP_BT_STATUS_HCI_HOST_REJECT_RESOURCES = 269,
+    ESP_BT_STATUS_HCI_HOST_REJECT_SECURITY = 270,
+    ESP_BT_STATUS_HCI_HOST_REJECT_DEVICE = 271,
+    ESP_BT_STATUS_HCI_HOST_TIMEOUT = 272,
+    ESP_BT_STATUS_HCI_UNSUPPORTED_VALUE = 273,
+    ESP_BT_STATUS_HCI_ILLEGAL_PARAMETER_FMT = 274,
+    ESP_BT_STATUS_HCI_PEER_USER = 275,
+    ESP_BT_STATUS_HCI_PEER_LOW_RESOURCES = 276,
+    ESP_BT_STATUS_HCI_PEER_POWER_OFF = 277,
+    ESP_BT_STATUS_HCI_CONN_CAUSE_LOCAL_HOST = 278,
+    ESP_BT_STATUS_HCI_REPEATED_ATTEMPTS = 279,
+    ESP_BT_STATUS_HCI_PAIRING_NOT_ALLOWED = 280,
+    ESP_BT_STATUS_HCI_UNKNOWN_LMP_PDU = 281,
+    ESP_BT_STATUS_HCI_UNSUPPORTED_REM_FEATURE = 282,
+    ESP_BT_STATUS_HCI_SCO_OFFSET_REJECTED = 283,
+    ESP_BT_STATUS_HCI_SCO_INTERVAL_REJECTED = 284,
+    ESP_BT_STATUS_HCI_SCO_AIR_MODE = 285,
+    ESP_BT_STATUS_HCI_INVALID_LMP_PARAM = 286,
+    ESP_BT_STATUS_HCI_UNSPECIFIED = 287,
+    ESP_BT_STATUS_HCI_UNSUPPORTED_LMP_PARAMETERS = 288,
+    ESP_BT_STATUS_HCI_ROLE_CHANGE_NOT_ALLOWED = 289,
+    ESP_BT_STATUS_HCI_LMP_RESPONSE_TIMEOUT = 290,
+    ESP_BT_STATUS_HCI_LMP_ERR_TRANS_COLLISION = 291,
+    ESP_BT_STATUS_HCI_LMP_PDU_NOT_ALLOWED = 292,
+    ESP_BT_STATUS_HCI_ENCRY_MODE_NOT_ACCEPTABLE = 293,
+    ESP_BT_STATUS_HCI_UNIT_KEY_USED = 294,
+    ESP_BT_STATUS_HCI_QOS_NOT_SUPPORTED = 295,
+    ESP_BT_STATUS_HCI_INSTANT_PASSED = 296,
+    ESP_BT_STATUS_HCI_PAIRING_WITH_UNIT_KEY_NOT_SUPPORTED = 297,
+    ESP_BT_STATUS_HCI_DIFF_TRANSACTION_COLLISION = 298,
+    ESP_BT_STATUS_HCI_UNDEFINED_0x2B = 299,
+    ESP_BT_STATUS_HCI_QOS_UNACCEPTABLE_PARAM = 300,
+    ESP_BT_STATUS_HCI_QOS_REJECTED = 301,
+    ESP_BT_STATUS_HCI_CHAN_CLASSIF_NOT_SUPPORTED = 302,
+    ESP_BT_STATUS_HCI_INSUFFCIENT_SECURITY = 303,
+    ESP_BT_STATUS_HCI_PARAM_OUT_OF_RANGE = 304,
+    ESP_BT_STATUS_HCI_UNDEFINED_0x31 = 305,
+    ESP_BT_STATUS_HCI_ROLE_SWITCH_PENDING = 306,
+    ESP_BT_STATUS_HCI_UNDEFINED_0x33 = 307,
+    ESP_BT_STATUS_HCI_RESERVED_SLOT_VIOLATION = 308,
+    ESP_BT_STATUS_HCI_ROLE_SWITCH_FAILED = 309,
+    ESP_BT_STATUS_HCI_INQ_RSP_DATA_TOO_LARGE = 310,
+    ESP_BT_STATUS_HCI_SIMPLE_PAIRING_NOT_SUPPORTED = 311,
+    ESP_BT_STATUS_HCI_HOST_BUSY_PAIRING = 312,
+    ESP_BT_STATUS_HCI_REJ_NO_SUITABLE_CHANNEL = 313,
+    ESP_BT_STATUS_HCI_CONTROLLER_BUSY = 314,
+    ESP_BT_STATUS_HCI_UNACCEPT_CONN_INTERVAL = 315,
+    ESP_BT_STATUS_HCI_DIRECTED_ADVERTISING_TIMEOUT = 316,
+    ESP_BT_STATUS_HCI_CONN_TOUT_DUE_TO_MIC_FAILURE = 317,
+    ESP_BT_STATUS_HCI_CONN_FAILED_ESTABLISHMENT = 318,
+    ESP_BT_STATUS_HCI_MAC_CONNECTION_FAILED = 319,
+};
 pub const esp_bt_octet16_t = [16]u8;
 pub const esp_bt_octet8_t = [8]u8;
 pub const esp_link_key = [16]u8;
@@ -2664,27 +2672,32 @@ pub const esp_bt_uuid_t = extern struct {
     len: u16 align(1) = std.mem.zeroes(u16),
     uuid: union_unnamed_17 align(1) = std.mem.zeroes(union_unnamed_17),
 };
-pub const ESP_BT_DEVICE_TYPE_BREDR: c_int = 1;
-pub const ESP_BT_DEVICE_TYPE_BLE: c_int = 2;
-pub const ESP_BT_DEVICE_TYPE_DUMO: c_int = 3;
-pub const esp_bt_dev_type_t = c_uint;
+pub const esp_bt_dev_type_t = enum(c_uint) {
+    ESP_BT_DEVICE_TYPE_BREDR = 1,
+    ESP_BT_DEVICE_TYPE_BLE = 2,
+    ESP_BT_DEVICE_TYPE_DUMO = 3,
+};
 pub const esp_bd_addr_t = [6]u8;
-pub const BLE_ADDR_TYPE_PUBLIC: c_int = 0;
-pub const BLE_ADDR_TYPE_RANDOM: c_int = 1;
-pub const BLE_ADDR_TYPE_RPA_PUBLIC: c_int = 2;
-pub const BLE_ADDR_TYPE_RPA_RANDOM: c_int = 3;
-pub const esp_ble_addr_type_t = c_uint;
-pub const BLE_WL_ADDR_TYPE_PUBLIC: c_int = 0;
-pub const BLE_WL_ADDR_TYPE_RANDOM: c_int = 1;
-pub const esp_ble_wl_addr_type_t = c_uint;
+pub const esp_ble_addr_type_t = enum(c_uint) {
+    BLE_ADDR_TYPE_PUBLIC = 0,
+    BLE_ADDR_TYPE_RANDOM = 1,
+    BLE_ADDR_TYPE_RPA_PUBLIC = 2,
+    BLE_ADDR_TYPE_RPA_RANDOM = 3,
+};
+pub const esp_ble_wl_addr_type_t = enum(c_uint) {
+    BLE_WL_ADDR_TYPE_PUBLIC = 0,
+    BLE_WL_ADDR_TYPE_RANDOM = 1,
+};
 pub const esp_ble_key_mask_t = u8;
 pub const esp_bt_dev_coex_op_t = u8;
-pub const ESP_BT_DEV_COEX_TYPE_BLE: c_int = 1;
-pub const ESP_BT_DEV_COEX_TYPE_BT: c_int = 2;
-pub const esp_bt_dev_coex_type_t = c_uint;
-pub const ESP_BT_DEV_NAME_RES_EVT: c_int = 0;
-pub const ESP_BT_DEV_EVT_MAX: c_int = 1;
-pub const esp_bt_dev_cb_event_t = c_uint;
+pub const esp_bt_dev_coex_type_t = enum(c_uint) {
+    ESP_BT_DEV_COEX_TYPE_BLE = 1,
+    ESP_BT_DEV_COEX_TYPE_BT = 2,
+};
+pub const esp_bt_dev_cb_event_t = enum(c_uint) {
+    ESP_BT_DEV_NAME_RES_EVT = 0,
+    ESP_BT_DEV_EVT_MAX = 1,
+};
 pub const name_res_param_18 = extern struct {
     status: esp_bt_status_t = std.mem.zeroes(esp_bt_status_t),
     name: [*c]u8 = std.mem.zeroes([*c]u8),
@@ -2699,21 +2712,24 @@ pub extern fn esp_bt_dev_set_device_name(name: [*c]const u8) esp_err_t;
 pub extern fn esp_bt_dev_get_device_name() esp_err_t;
 pub extern fn esp_bt_dev_coex_status_config(@"type": esp_bt_dev_coex_type_t, op: esp_bt_dev_coex_op_t, status: u8) esp_err_t;
 pub extern fn esp_bt_config_file_path_update(file_path: [*c]const u8) esp_err_t;
-pub const WIFI_MODE_NULL: c_int = 0;
-pub const WIFI_MODE_STA: c_int = 1;
-pub const WIFI_MODE_AP: c_int = 2;
-pub const WIFI_MODE_APSTA: c_int = 3;
-pub const WIFI_MODE_NAN: c_int = 4;
-pub const WIFI_MODE_MAX: c_int = 5;
-pub const wifi_mode_t = c_uint;
-pub const WIFI_IF_STA: c_int = 0;
-pub const WIFI_IF_AP: c_int = 1;
-pub const WIFI_IF_NAN: c_int = 2;
-pub const WIFI_IF_MAX: c_int = 3;
-pub const wifi_interface_t = c_uint;
-pub const WIFI_COUNTRY_POLICY_AUTO: c_int = 0;
-pub const WIFI_COUNTRY_POLICY_MANUAL: c_int = 1;
-pub const wifi_country_policy_t = c_uint;
+pub const wifi_mode_t = enum(c_uint) {
+    WIFI_MODE_NULL = 0,
+    WIFI_MODE_STA = 1,
+    WIFI_MODE_AP = 2,
+    WIFI_MODE_APSTA = 3,
+    WIFI_MODE_NAN = 4,
+    WIFI_MODE_MAX = 5,
+};
+pub const wifi_interface_t = enum(c_uint) {
+    WIFI_IF_STA = 0,
+    WIFI_IF_AP = 1,
+    WIFI_IF_NAN = 2,
+    WIFI_IF_MAX = 3,
+};
+pub const wifi_country_policy_t = enum(c_uint) {
+    WIFI_COUNTRY_POLICY_AUTO = 0,
+    WIFI_COUNTRY_POLICY_MANUAL = 1,
+};
 pub const wifi_country_t = extern struct {
     cc: [3]u8 = std.mem.zeroes([3]u8),
     schan: u8 = std.mem.zeroes(u8),
@@ -2721,90 +2737,94 @@ pub const wifi_country_t = extern struct {
     max_tx_power: i8 = std.mem.zeroes(i8),
     policy: wifi_country_policy_t = std.mem.zeroes(wifi_country_policy_t),
 };
-pub const WIFI_AUTH_OPEN: c_int = 0;
-pub const WIFI_AUTH_WEP: c_int = 1;
-pub const WIFI_AUTH_WPA_PSK: c_int = 2;
-pub const WIFI_AUTH_WPA2_PSK: c_int = 3;
-pub const WIFI_AUTH_WPA_WPA2_PSK: c_int = 4;
-pub const WIFI_AUTH_ENTERPRISE: c_int = 5;
-pub const WIFI_AUTH_WPA2_ENTERPRISE: c_int = 5;
-pub const WIFI_AUTH_WPA3_PSK: c_int = 6;
-pub const WIFI_AUTH_WPA2_WPA3_PSK: c_int = 7;
-pub const WIFI_AUTH_WAPI_PSK: c_int = 8;
-pub const WIFI_AUTH_OWE: c_int = 9;
-pub const WIFI_AUTH_WPA3_ENT_192: c_int = 10;
-pub const WIFI_AUTH_WPA3_EXT_PSK: c_int = 11;
-pub const WIFI_AUTH_WPA3_EXT_PSK_MIXED_MODE: c_int = 12;
-pub const WIFI_AUTH_MAX: c_int = 13;
-pub const wifi_auth_mode_t = c_uint;
-pub const WIFI_REASON_UNSPECIFIED: c_int = 1;
-pub const WIFI_REASON_AUTH_EXPIRE: c_int = 2;
-pub const WIFI_REASON_AUTH_LEAVE: c_int = 3;
-pub const WIFI_REASON_ASSOC_EXPIRE: c_int = 4;
-pub const WIFI_REASON_ASSOC_TOOMANY: c_int = 5;
-pub const WIFI_REASON_NOT_AUTHED: c_int = 6;
-pub const WIFI_REASON_NOT_ASSOCED: c_int = 7;
-pub const WIFI_REASON_ASSOC_LEAVE: c_int = 8;
-pub const WIFI_REASON_ASSOC_NOT_AUTHED: c_int = 9;
-pub const WIFI_REASON_DISASSOC_PWRCAP_BAD: c_int = 10;
-pub const WIFI_REASON_DISASSOC_SUPCHAN_BAD: c_int = 11;
-pub const WIFI_REASON_BSS_TRANSITION_DISASSOC: c_int = 12;
-pub const WIFI_REASON_IE_INVALID: c_int = 13;
-pub const WIFI_REASON_MIC_FAILURE: c_int = 14;
-pub const WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT: c_int = 15;
-pub const WIFI_REASON_GROUP_KEY_UPDATE_TIMEOUT: c_int = 16;
-pub const WIFI_REASON_IE_IN_4WAY_DIFFERS: c_int = 17;
-pub const WIFI_REASON_GROUP_CIPHER_INVALID: c_int = 18;
-pub const WIFI_REASON_PAIRWISE_CIPHER_INVALID: c_int = 19;
-pub const WIFI_REASON_AKMP_INVALID: c_int = 20;
-pub const WIFI_REASON_UNSUPP_RSN_IE_VERSION: c_int = 21;
-pub const WIFI_REASON_INVALID_RSN_IE_CAP: c_int = 22;
-pub const WIFI_REASON_802_1X_AUTH_FAILED: c_int = 23;
-pub const WIFI_REASON_CIPHER_SUITE_REJECTED: c_int = 24;
-pub const WIFI_REASON_TDLS_PEER_UNREACHABLE: c_int = 25;
-pub const WIFI_REASON_TDLS_UNSPECIFIED: c_int = 26;
-pub const WIFI_REASON_SSP_REQUESTED_DISASSOC: c_int = 27;
-pub const WIFI_REASON_NO_SSP_ROAMING_AGREEMENT: c_int = 28;
-pub const WIFI_REASON_BAD_CIPHER_OR_AKM: c_int = 29;
-pub const WIFI_REASON_NOT_AUTHORIZED_THIS_LOCATION: c_int = 30;
-pub const WIFI_REASON_SERVICE_CHANGE_PERCLUDES_TS: c_int = 31;
-pub const WIFI_REASON_UNSPECIFIED_QOS: c_int = 32;
-pub const WIFI_REASON_NOT_ENOUGH_BANDWIDTH: c_int = 33;
-pub const WIFI_REASON_MISSING_ACKS: c_int = 34;
-pub const WIFI_REASON_EXCEEDED_TXOP: c_int = 35;
-pub const WIFI_REASON_STA_LEAVING: c_int = 36;
-pub const WIFI_REASON_END_BA: c_int = 37;
-pub const WIFI_REASON_UNKNOWN_BA: c_int = 38;
-pub const WIFI_REASON_TIMEOUT: c_int = 39;
-pub const WIFI_REASON_PEER_INITIATED: c_int = 46;
-pub const WIFI_REASON_AP_INITIATED: c_int = 47;
-pub const WIFI_REASON_INVALID_FT_ACTION_FRAME_COUNT: c_int = 48;
-pub const WIFI_REASON_INVALID_PMKID: c_int = 49;
-pub const WIFI_REASON_INVALID_MDE: c_int = 50;
-pub const WIFI_REASON_INVALID_FTE: c_int = 51;
-pub const WIFI_REASON_TRANSMISSION_LINK_ESTABLISH_FAILED: c_int = 67;
-pub const WIFI_REASON_ALTERATIVE_CHANNEL_OCCUPIED: c_int = 68;
-pub const WIFI_REASON_BEACON_TIMEOUT: c_int = 200;
-pub const WIFI_REASON_NO_AP_FOUND: c_int = 201;
-pub const WIFI_REASON_AUTH_FAIL: c_int = 202;
-pub const WIFI_REASON_ASSOC_FAIL: c_int = 203;
-pub const WIFI_REASON_HANDSHAKE_TIMEOUT: c_int = 204;
-pub const WIFI_REASON_CONNECTION_FAIL: c_int = 205;
-pub const WIFI_REASON_AP_TSF_RESET: c_int = 206;
-pub const WIFI_REASON_ROAMING: c_int = 207;
-pub const WIFI_REASON_ASSOC_COMEBACK_TIME_TOO_LONG: c_int = 208;
-pub const WIFI_REASON_SA_QUERY_TIMEOUT: c_int = 209;
-pub const WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY: c_int = 210;
-pub const WIFI_REASON_NO_AP_FOUND_IN_AUTHMODE_THRESHOLD: c_int = 211;
-pub const WIFI_REASON_NO_AP_FOUND_IN_RSSI_THRESHOLD: c_int = 212;
-pub const wifi_err_reason_t = c_uint;
-pub const WIFI_SECOND_CHAN_NONE: c_int = 0;
-pub const WIFI_SECOND_CHAN_ABOVE: c_int = 1;
-pub const WIFI_SECOND_CHAN_BELOW: c_int = 2;
-pub const wifi_second_chan_t = c_uint;
-pub const WIFI_SCAN_TYPE_ACTIVE: c_int = 0;
-pub const WIFI_SCAN_TYPE_PASSIVE: c_int = 1;
-pub const wifi_scan_type_t = c_uint;
+pub const wifi_auth_mode_t = enum(c_uint) {
+    WIFI_AUTH_OPEN = 0,
+    WIFI_AUTH_WEP = 1,
+    WIFI_AUTH_WPA_PSK = 2,
+    WIFI_AUTH_WPA2_PSK = 3,
+    WIFI_AUTH_WPA_WPA2_PSK = 4,
+    WIFI_AUTH_ENTERPRISE = 5,
+    WIFI_AUTH_WPA2_ENTERPRISE = 5,
+    WIFI_AUTH_WPA3_PSK = 6,
+    WIFI_AUTH_WPA2_WPA3_PSK = 7,
+    WIFI_AUTH_WAPI_PSK = 8,
+    WIFI_AUTH_OWE = 9,
+    WIFI_AUTH_WPA3_ENT_192 = 10,
+    WIFI_AUTH_WPA3_EXT_PSK = 11,
+    WIFI_AUTH_WPA3_EXT_PSK_MIXED_MODE = 12,
+    WIFI_AUTH_MAX = 13,
+};
+pub const wifi_err_reason_t = enum(c_uint) {
+    WIFI_REASON_UNSPECIFIED = 1,
+    WIFI_REASON_AUTH_EXPIRE = 2,
+    WIFI_REASON_AUTH_LEAVE = 3,
+    WIFI_REASON_ASSOC_EXPIRE = 4,
+    WIFI_REASON_ASSOC_TOOMANY = 5,
+    WIFI_REASON_NOT_AUTHED = 6,
+    WIFI_REASON_NOT_ASSOCED = 7,
+    WIFI_REASON_ASSOC_LEAVE = 8,
+    WIFI_REASON_ASSOC_NOT_AUTHED = 9,
+    WIFI_REASON_DISASSOC_PWRCAP_BAD = 10,
+    WIFI_REASON_DISASSOC_SUPCHAN_BAD = 11,
+    WIFI_REASON_BSS_TRANSITION_DISASSOC = 12,
+    WIFI_REASON_IE_INVALID = 13,
+    WIFI_REASON_MIC_FAILURE = 14,
+    WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT = 15,
+    WIFI_REASON_GROUP_KEY_UPDATE_TIMEOUT = 16,
+    WIFI_REASON_IE_IN_4WAY_DIFFERS = 17,
+    WIFI_REASON_GROUP_CIPHER_INVALID = 18,
+    WIFI_REASON_PAIRWISE_CIPHER_INVALID = 19,
+    WIFI_REASON_AKMP_INVALID = 20,
+    WIFI_REASON_UNSUPP_RSN_IE_VERSION = 21,
+    WIFI_REASON_INVALID_RSN_IE_CAP = 22,
+    WIFI_REASON_802_1X_AUTH_FAILED = 23,
+    WIFI_REASON_CIPHER_SUITE_REJECTED = 24,
+    WIFI_REASON_TDLS_PEER_UNREACHABLE = 25,
+    WIFI_REASON_TDLS_UNSPECIFIED = 26,
+    WIFI_REASON_SSP_REQUESTED_DISASSOC = 27,
+    WIFI_REASON_NO_SSP_ROAMING_AGREEMENT = 28,
+    WIFI_REASON_BAD_CIPHER_OR_AKM = 29,
+    WIFI_REASON_NOT_AUTHORIZED_THIS_LOCATION = 30,
+    WIFI_REASON_SERVICE_CHANGE_PERCLUDES_TS = 31,
+    WIFI_REASON_UNSPECIFIED_QOS = 32,
+    WIFI_REASON_NOT_ENOUGH_BANDWIDTH = 33,
+    WIFI_REASON_MISSING_ACKS = 34,
+    WIFI_REASON_EXCEEDED_TXOP = 35,
+    WIFI_REASON_STA_LEAVING = 36,
+    WIFI_REASON_END_BA = 37,
+    WIFI_REASON_UNKNOWN_BA = 38,
+    WIFI_REASON_TIMEOUT = 39,
+    WIFI_REASON_PEER_INITIATED = 46,
+    WIFI_REASON_AP_INITIATED = 47,
+    WIFI_REASON_INVALID_FT_ACTION_FRAME_COUNT = 48,
+    WIFI_REASON_INVALID_PMKID = 49,
+    WIFI_REASON_INVALID_MDE = 50,
+    WIFI_REASON_INVALID_FTE = 51,
+    WIFI_REASON_TRANSMISSION_LINK_ESTABLISH_FAILED = 67,
+    WIFI_REASON_ALTERATIVE_CHANNEL_OCCUPIED = 68,
+    WIFI_REASON_BEACON_TIMEOUT = 200,
+    WIFI_REASON_NO_AP_FOUND = 201,
+    WIFI_REASON_AUTH_FAIL = 202,
+    WIFI_REASON_ASSOC_FAIL = 203,
+    WIFI_REASON_HANDSHAKE_TIMEOUT = 204,
+    WIFI_REASON_CONNECTION_FAIL = 205,
+    WIFI_REASON_AP_TSF_RESET = 206,
+    WIFI_REASON_ROAMING = 207,
+    WIFI_REASON_ASSOC_COMEBACK_TIME_TOO_LONG = 208,
+    WIFI_REASON_SA_QUERY_TIMEOUT = 209,
+    WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY = 210,
+    WIFI_REASON_NO_AP_FOUND_IN_AUTHMODE_THRESHOLD = 211,
+    WIFI_REASON_NO_AP_FOUND_IN_RSSI_THRESHOLD = 212,
+};
+pub const wifi_second_chan_t = enum(c_uint) {
+    WIFI_SECOND_CHAN_NONE = 0,
+    WIFI_SECOND_CHAN_ABOVE = 1,
+    WIFI_SECOND_CHAN_BELOW = 2,
+};
+pub const wifi_scan_type_t = enum(c_uint) {
+    WIFI_SCAN_TYPE_ACTIVE = 0,
+    WIFI_SCAN_TYPE_PASSIVE = 1,
+};
 pub const wifi_active_scan_time_t = extern struct {
     min: u32 = std.mem.zeroes(u32),
     max: u32 = std.mem.zeroes(u32),
@@ -2822,56 +2842,67 @@ pub const wifi_scan_config_t = extern struct {
     scan_time: wifi_scan_time_t = std.mem.zeroes(wifi_scan_time_t),
     home_chan_dwell_time: u8 = std.mem.zeroes(u8),
 };
-pub const WIFI_CIPHER_TYPE_NONE: c_int = 0;
-pub const WIFI_CIPHER_TYPE_WEP40: c_int = 1;
-pub const WIFI_CIPHER_TYPE_WEP104: c_int = 2;
-pub const WIFI_CIPHER_TYPE_TKIP: c_int = 3;
-pub const WIFI_CIPHER_TYPE_CCMP: c_int = 4;
-pub const WIFI_CIPHER_TYPE_TKIP_CCMP: c_int = 5;
-pub const WIFI_CIPHER_TYPE_AES_CMAC128: c_int = 6;
-pub const WIFI_CIPHER_TYPE_SMS4: c_int = 7;
-pub const WIFI_CIPHER_TYPE_GCMP: c_int = 8;
-pub const WIFI_CIPHER_TYPE_GCMP256: c_int = 9;
-pub const WIFI_CIPHER_TYPE_AES_GMAC128: c_int = 10;
-pub const WIFI_CIPHER_TYPE_AES_GMAC256: c_int = 11;
-pub const WIFI_CIPHER_TYPE_UNKNOWN: c_int = 12;
-pub const wifi_cipher_type_t = c_uint;
-pub const WIFI_ANT_ANT0: c_int = 0;
-pub const WIFI_ANT_ANT1: c_int = 1;
-pub const WIFI_ANT_MAX: c_int = 2;
-pub const wifi_ant_t = c_uint; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:207:13: warning: struct demoted to opaque type - has bitfield
-pub const wifi_he_ap_info_t = opaque {}; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:224:14: warning: struct demoted to opaque type - has bitfield
+pub const wifi_cipher_type_t = enum(c_uint) {
+    WIFI_CIPHER_TYPE_NONE = 0,
+    WIFI_CIPHER_TYPE_WEP40 = 1,
+    WIFI_CIPHER_TYPE_WEP104 = 2,
+    WIFI_CIPHER_TYPE_TKIP = 3,
+    WIFI_CIPHER_TYPE_CCMP = 4,
+    WIFI_CIPHER_TYPE_TKIP_CCMP = 5,
+    WIFI_CIPHER_TYPE_AES_CMAC128 = 6,
+    WIFI_CIPHER_TYPE_SMS4 = 7,
+    WIFI_CIPHER_TYPE_GCMP = 8,
+    WIFI_CIPHER_TYPE_GCMP256 = 9,
+    WIFI_CIPHER_TYPE_AES_GMAC128 = 10,
+    WIFI_CIPHER_TYPE_AES_GMAC256 = 11,
+    WIFI_CIPHER_TYPE_UNKNOWN = 12,
+};
+pub const wifi_ant_t = enum(c_uint) {
+    WIFI_ANT_ANT0 = 0,
+    WIFI_ANT_ANT1 = 1,
+    WIFI_ANT_MAX = 2,
+};
+// esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:207:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_he_ap_info_t = opaque {};
+// esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:224:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ap_record_t = opaque {};
-pub const WIFI_FAST_SCAN: c_int = 0;
-pub const WIFI_ALL_CHANNEL_SCAN: c_int = 1;
-pub const wifi_scan_method_t = c_uint;
-pub const WIFI_CONNECT_AP_BY_SIGNAL: c_int = 0;
-pub const WIFI_CONNECT_AP_BY_SECURITY: c_int = 1;
-pub const wifi_sort_method_t = c_uint;
+pub const wifi_scan_method_t = enum(c_uint) {
+    WIFI_FAST_SCAN = 0,
+    WIFI_ALL_CHANNEL_SCAN = 1,
+};
+pub const wifi_sort_method_t = enum(c_uint) {
+    WIFI_CONNECT_AP_BY_SIGNAL = 0,
+    WIFI_CONNECT_AP_BY_SECURITY = 1,
+};
 pub const wifi_scan_threshold_t = extern struct {
     rssi: i8 = std.mem.zeroes(i8),
     authmode: wifi_auth_mode_t = std.mem.zeroes(wifi_auth_mode_t),
 };
-pub const WIFI_PS_NONE: c_int = 0;
-pub const WIFI_PS_MIN_MODEM: c_int = 1;
-pub const WIFI_PS_MAX_MODEM: c_int = 2;
-pub const wifi_ps_type_t = c_uint;
-pub const WIFI_BW_HT20: c_int = 1;
-pub const WIFI_BW_HT40: c_int = 2;
-pub const wifi_bandwidth_t = c_uint;
+
+pub const wifi_ps_type_t = enum(c_uint) {
+    WIFI_PS_NONE = 0,
+    WIFI_PS_MIN_MODEM = 1,
+    WIFI_PS_MAX_MODEM = 2,
+};
+pub const wifi_bandwidth_t = enum(c_uint) {
+    WIFI_BW_HT20 = 1,
+    WIFI_BW_HT40 = 2,
+};
 pub const wifi_pmf_config_t = extern struct {
     capable: bool = std.mem.zeroes(bool),
     required: bool = std.mem.zeroes(bool),
 };
-pub const WPA3_SAE_PWE_UNSPECIFIED: c_int = 0;
-pub const WPA3_SAE_PWE_HUNT_AND_PECK: c_int = 1;
-pub const WPA3_SAE_PWE_HASH_TO_ELEMENT: c_int = 2;
-pub const WPA3_SAE_PWE_BOTH: c_int = 3;
-pub const wifi_sae_pwe_method_t = c_uint;
-pub const WPA3_SAE_PK_MODE_AUTOMATIC: c_int = 0;
-pub const WPA3_SAE_PK_MODE_ONLY: c_int = 1;
-pub const WPA3_SAE_PK_MODE_DISABLED: c_int = 2;
-pub const wifi_sae_pk_mode_t = c_uint;
+pub const wifi_sae_pwe_method_t = enum(c_uint) {
+    WPA3_SAE_PWE_UNSPECIFIED = 0,
+    WPA3_SAE_PWE_HUNT_AND_PECK = 1,
+    WPA3_SAE_PWE_HASH_TO_ELEMENT = 2,
+    WPA3_SAE_PWE_BOTH = 3,
+};
+pub const wifi_sae_pk_mode_t = enum(c_uint) {
+    WPA3_SAE_PK_MODE_AUTOMATIC = 0,
+    WPA3_SAE_PK_MODE_ONLY = 1,
+    WPA3_SAE_PK_MODE_DISABLED = 2,
+};
 pub const wifi_ap_config_t = extern struct {
     ssid: [32]u8 = std.mem.zeroes([32]u8),
     password: [64]u8 = std.mem.zeroes([64]u8),
@@ -2899,25 +2930,29 @@ pub const wifi_config_t = extern union {
     nan: wifi_nan_config_t,
 }; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:371:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_sta_info_t = opaque {};
-pub const WIFI_STORAGE_FLASH: c_int = 0;
-pub const WIFI_STORAGE_RAM: c_int = 1;
-pub const wifi_storage_t = c_uint;
-pub const WIFI_VND_IE_TYPE_BEACON: c_int = 0;
-pub const WIFI_VND_IE_TYPE_PROBE_REQ: c_int = 1;
-pub const WIFI_VND_IE_TYPE_PROBE_RESP: c_int = 2;
-pub const WIFI_VND_IE_TYPE_ASSOC_REQ: c_int = 3;
-pub const WIFI_VND_IE_TYPE_ASSOC_RESP: c_int = 4;
-pub const wifi_vendor_ie_type_t = c_uint;
-pub const WIFI_VND_IE_ID_0: c_int = 0;
-pub const WIFI_VND_IE_ID_1: c_int = 1;
-pub const wifi_vendor_ie_id_t = c_uint;
-pub const WIFI_PHY_MODE_LR: c_int = 0;
-pub const WIFI_PHY_MODE_11B: c_int = 1;
-pub const WIFI_PHY_MODE_11G: c_int = 2;
-pub const WIFI_PHY_MODE_HT20: c_int = 3;
-pub const WIFI_PHY_MODE_HT40: c_int = 4;
-pub const WIFI_PHY_MODE_HE20: c_int = 5;
-pub const wifi_phy_mode_t = c_uint;
+pub const wifi_storage_t = enum(c_uint) {
+    WIFI_STORAGE_FLASH = 0,
+    WIFI_STORAGE_RAM = 1,
+};
+pub const wifi_vendor_ie_type_t = enum(c_uint) {
+    WIFI_VND_IE_TYPE_BEACON = 0,
+    WIFI_VND_IE_TYPE_PROBE_REQ = 1,
+    WIFI_VND_IE_TYPE_PROBE_RESP = 2,
+    WIFI_VND_IE_TYPE_ASSOC_REQ = 3,
+    WIFI_VND_IE_TYPE_ASSOC_RESP = 4,
+};
+pub const wifi_vendor_ie_id_t = enum(c_uint) {
+    WIFI_VND_IE_ID_0 = 0,
+    WIFI_VND_IE_ID_1 = 1,
+};
+pub const wifi_phy_mode_t = enum(c_uint) {
+    WIFI_PHY_MODE_LR = 0,
+    WIFI_PHY_MODE_11B = 1,
+    WIFI_PHY_MODE_11G = 2,
+    WIFI_PHY_MODE_HT20 = 3,
+    WIFI_PHY_MODE_HT40 = 4,
+    WIFI_PHY_MODE_HE20 = 5,
+};
 pub const vendor_ie_data_t = extern struct {
     element_id: u8 align(1) = std.mem.zeroes(u8),
     length: u8 = std.mem.zeroes(u8),
@@ -2929,11 +2964,12 @@ pub const vendor_ie_data_t = extern struct {
         return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 6)));
     }
 };
-pub const WIFI_PKT_MGMT: c_int = 0;
-pub const WIFI_PKT_CTRL: c_int = 1;
-pub const WIFI_PKT_DATA: c_int = 2;
-pub const WIFI_PKT_MISC: c_int = 3;
-pub const wifi_promiscuous_pkt_type_t = c_uint;
+pub const wifi_promiscuous_pkt_type_t = enum(c_uint) {
+    WIFI_PKT_MGMT = 0,
+    WIFI_PKT_CTRL = 1,
+    WIFI_PKT_DATA = 2,
+    WIFI_PKT_MISC = 3,
+};
 pub const wifi_promiscuous_filter_t = extern struct {
     filter_mask: u32 = std.mem.zeroes(u32),
 };
@@ -2953,11 +2989,13 @@ pub const wifi_ant_gpio_t = opaque {};
 pub const wifi_ant_gpio_config_t = extern struct {
     gpio_cfg: [4]wifi_ant_gpio_t = std.mem.zeroes([4]wifi_ant_gpio_t),
 };
-pub const WIFI_ANT_MODE_ANT0: c_int = 0;
-pub const WIFI_ANT_MODE_ANT1: c_int = 1;
-pub const WIFI_ANT_MODE_AUTO: c_int = 2;
-pub const WIFI_ANT_MODE_MAX: c_int = 3;
-pub const wifi_ant_mode_t = c_uint; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:521:21: warning: struct demoted to opaque type - has bitfield
+pub const wifi_ant_mode_t = enum(c_uint) {
+    WIFI_ANT_MODE_ANT0 = 0,
+    WIFI_ANT_MODE_ANT1 = 1,
+    WIFI_ANT_MODE_AUTO = 2,
+    WIFI_ANT_MODE_MAX = 3,
+};
+// esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:521:21: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ant_config_t = opaque {};
 pub const wifi_action_rx_cb_t = ?*const fn ([*c]u8, [*c]u8, usize, u8) callconv(.C) c_int;
 pub const wifi_action_tx_req_t = extern struct {
@@ -2978,12 +3016,16 @@ pub const wifi_ftm_initiator_cfg_t = extern struct {
     frm_count: u8 = std.mem.zeroes(u8),
     burst_period: u16 = std.mem.zeroes(u16),
 };
-pub const NAN_PUBLISH_SOLICITED: c_int = 0;
-pub const NAN_PUBLISH_UNSOLICITED: c_int = 1;
-pub const NAN_SUBSCRIBE_ACTIVE: c_int = 2;
-pub const NAN_SUBSCRIBE_PASSIVE: c_int = 3;
-pub const wifi_nan_service_type_t = c_uint; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:591:13: warning: struct demoted to opaque type - has bitfield
-pub const wifi_nan_publish_cfg_t = opaque {}; // esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:605:13: warning: struct demoted to opaque type - has bitfield
+
+pub const wifi_nan_service_type_t = enum(c_uint) {
+    NAN_PUBLISH_SOLICITED = 0,
+    NAN_PUBLISH_UNSOLICITED = 1,
+    NAN_SUBSCRIBE_ACTIVE = 2,
+    NAN_SUBSCRIBE_PASSIVE = 3,
+};
+// esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:591:13: warning: struct demoted to opaque type - has bitfield
+pub const wifi_nan_publish_cfg_t = opaque {};
+// esp-idf/components/esp_wifi/include/esp_wifi_types_generic.h:605:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_nan_subscribe_cfg_t = opaque {};
 pub const wifi_nan_followup_params_t = extern struct {
     inst_id: u8 = std.mem.zeroes(u8),
@@ -3005,88 +3047,90 @@ pub const wifi_nan_datapath_end_req_t = extern struct {
     ndp_id: u8 = std.mem.zeroes(u8),
     peer_mac: [6]u8 = std.mem.zeroes([6]u8),
 };
-pub const WIFI_PHY_RATE_1M_L: c_int = 0;
-pub const WIFI_PHY_RATE_2M_L: c_int = 1;
-pub const WIFI_PHY_RATE_5M_L: c_int = 2;
-pub const WIFI_PHY_RATE_11M_L: c_int = 3;
-pub const WIFI_PHY_RATE_2M_S: c_int = 5;
-pub const WIFI_PHY_RATE_5M_S: c_int = 6;
-pub const WIFI_PHY_RATE_11M_S: c_int = 7;
-pub const WIFI_PHY_RATE_48M: c_int = 8;
-pub const WIFI_PHY_RATE_24M: c_int = 9;
-pub const WIFI_PHY_RATE_12M: c_int = 10;
-pub const WIFI_PHY_RATE_6M: c_int = 11;
-pub const WIFI_PHY_RATE_54M: c_int = 12;
-pub const WIFI_PHY_RATE_36M: c_int = 13;
-pub const WIFI_PHY_RATE_18M: c_int = 14;
-pub const WIFI_PHY_RATE_9M: c_int = 15;
-pub const WIFI_PHY_RATE_MCS0_LGI: c_int = 16;
-pub const WIFI_PHY_RATE_MCS1_LGI: c_int = 17;
-pub const WIFI_PHY_RATE_MCS2_LGI: c_int = 18;
-pub const WIFI_PHY_RATE_MCS3_LGI: c_int = 19;
-pub const WIFI_PHY_RATE_MCS4_LGI: c_int = 20;
-pub const WIFI_PHY_RATE_MCS5_LGI: c_int = 21;
-pub const WIFI_PHY_RATE_MCS6_LGI: c_int = 22;
-pub const WIFI_PHY_RATE_MCS7_LGI: c_int = 23;
-pub const WIFI_PHY_RATE_MCS8_LGI: c_int = 24;
-pub const WIFI_PHY_RATE_MCS9_LGI: c_int = 25;
-pub const WIFI_PHY_RATE_MCS0_SGI: c_int = 26;
-pub const WIFI_PHY_RATE_MCS1_SGI: c_int = 27;
-pub const WIFI_PHY_RATE_MCS2_SGI: c_int = 28;
-pub const WIFI_PHY_RATE_MCS3_SGI: c_int = 29;
-pub const WIFI_PHY_RATE_MCS4_SGI: c_int = 30;
-pub const WIFI_PHY_RATE_MCS5_SGI: c_int = 31;
-pub const WIFI_PHY_RATE_MCS6_SGI: c_int = 32;
-pub const WIFI_PHY_RATE_MCS7_SGI: c_int = 33;
-pub const WIFI_PHY_RATE_MCS8_SGI: c_int = 34;
-pub const WIFI_PHY_RATE_MCS9_SGI: c_int = 35;
-pub const WIFI_PHY_RATE_LORA_250K: c_int = 41;
-pub const WIFI_PHY_RATE_LORA_500K: c_int = 42;
-pub const WIFI_PHY_RATE_MAX: c_int = 43;
-pub const wifi_phy_rate_t = c_uint;
-pub const WIFI_EVENT_WIFI_READY: c_int = 0;
-pub const WIFI_EVENT_SCAN_DONE: c_int = 1;
-pub const WIFI_EVENT_STA_START: c_int = 2;
-pub const WIFI_EVENT_STA_STOP: c_int = 3;
-pub const WIFI_EVENT_STA_CONNECTED: c_int = 4;
-pub const WIFI_EVENT_STA_DISCONNECTED: c_int = 5;
-pub const WIFI_EVENT_STA_AUTHMODE_CHANGE: c_int = 6;
-pub const WIFI_EVENT_STA_WPS_ER_SUCCESS: c_int = 7;
-pub const WIFI_EVENT_STA_WPS_ER_FAILED: c_int = 8;
-pub const WIFI_EVENT_STA_WPS_ER_TIMEOUT: c_int = 9;
-pub const WIFI_EVENT_STA_WPS_ER_PIN: c_int = 10;
-pub const WIFI_EVENT_STA_WPS_ER_PBC_OVERLAP: c_int = 11;
-pub const WIFI_EVENT_AP_START: c_int = 12;
-pub const WIFI_EVENT_AP_STOP: c_int = 13;
-pub const WIFI_EVENT_AP_STACONNECTED: c_int = 14;
-pub const WIFI_EVENT_AP_STADISCONNECTED: c_int = 15;
-pub const WIFI_EVENT_AP_PROBEREQRECVED: c_int = 16;
-pub const WIFI_EVENT_FTM_REPORT: c_int = 17;
-pub const WIFI_EVENT_STA_BSS_RSSI_LOW: c_int = 18;
-pub const WIFI_EVENT_ACTION_TX_STATUS: c_int = 19;
-pub const WIFI_EVENT_ROC_DONE: c_int = 20;
-pub const WIFI_EVENT_STA_BEACON_TIMEOUT: c_int = 21;
-pub const WIFI_EVENT_CONNECTIONLESS_MODULE_WAKE_INTERVAL_START: c_int = 22;
-pub const WIFI_EVENT_AP_WPS_RG_SUCCESS: c_int = 23;
-pub const WIFI_EVENT_AP_WPS_RG_FAILED: c_int = 24;
-pub const WIFI_EVENT_AP_WPS_RG_TIMEOUT: c_int = 25;
-pub const WIFI_EVENT_AP_WPS_RG_PIN: c_int = 26;
-pub const WIFI_EVENT_AP_WPS_RG_PBC_OVERLAP: c_int = 27;
-pub const WIFI_EVENT_ITWT_SETUP: c_int = 28;
-pub const WIFI_EVENT_ITWT_TEARDOWN: c_int = 29;
-pub const WIFI_EVENT_ITWT_PROBE: c_int = 30;
-pub const WIFI_EVENT_ITWT_SUSPEND: c_int = 31;
-pub const WIFI_EVENT_NAN_STARTED: c_int = 32;
-pub const WIFI_EVENT_NAN_STOPPED: c_int = 33;
-pub const WIFI_EVENT_NAN_SVC_MATCH: c_int = 34;
-pub const WIFI_EVENT_NAN_REPLIED: c_int = 35;
-pub const WIFI_EVENT_NAN_RECEIVE: c_int = 36;
-pub const WIFI_EVENT_NDP_INDICATION: c_int = 37;
-pub const WIFI_EVENT_NDP_CONFIRM: c_int = 38;
-pub const WIFI_EVENT_NDP_TERMINATED: c_int = 39;
-pub const WIFI_EVENT_HOME_CHANNEL_CHANGE: c_int = 40;
-pub const WIFI_EVENT_MAX: c_int = 41;
-pub const wifi_event_t = c_uint;
+pub const wifi_phy_rate_t = enum(c_uint) {
+    WIFI_PHY_RATE_1M_L = 0,
+    WIFI_PHY_RATE_2M_L = 1,
+    WIFI_PHY_RATE_5M_L = 2,
+    WIFI_PHY_RATE_11M_L = 3,
+    WIFI_PHY_RATE_2M_S = 5,
+    WIFI_PHY_RATE_5M_S = 6,
+    WIFI_PHY_RATE_11M_S = 7,
+    WIFI_PHY_RATE_48M = 8,
+    WIFI_PHY_RATE_24M = 9,
+    WIFI_PHY_RATE_12M = 10,
+    WIFI_PHY_RATE_6M = 11,
+    WIFI_PHY_RATE_54M = 12,
+    WIFI_PHY_RATE_36M = 13,
+    WIFI_PHY_RATE_18M = 14,
+    WIFI_PHY_RATE_9M = 15,
+    WIFI_PHY_RATE_MCS0_LGI = 16,
+    WIFI_PHY_RATE_MCS1_LGI = 17,
+    WIFI_PHY_RATE_MCS2_LGI = 18,
+    WIFI_PHY_RATE_MCS3_LGI = 19,
+    WIFI_PHY_RATE_MCS4_LGI = 20,
+    WIFI_PHY_RATE_MCS5_LGI = 21,
+    WIFI_PHY_RATE_MCS6_LGI = 22,
+    WIFI_PHY_RATE_MCS7_LGI = 23,
+    WIFI_PHY_RATE_MCS8_LGI = 24,
+    WIFI_PHY_RATE_MCS9_LGI = 25,
+    WIFI_PHY_RATE_MCS0_SGI = 26,
+    WIFI_PHY_RATE_MCS1_SGI = 27,
+    WIFI_PHY_RATE_MCS2_SGI = 28,
+    WIFI_PHY_RATE_MCS3_SGI = 29,
+    WIFI_PHY_RATE_MCS4_SGI = 30,
+    WIFI_PHY_RATE_MCS5_SGI = 31,
+    WIFI_PHY_RATE_MCS6_SGI = 32,
+    WIFI_PHY_RATE_MCS7_SGI = 33,
+    WIFI_PHY_RATE_MCS8_SGI = 34,
+    WIFI_PHY_RATE_MCS9_SGI = 35,
+    WIFI_PHY_RATE_LORA_250K = 41,
+    WIFI_PHY_RATE_LORA_500K = 42,
+    WIFI_PHY_RATE_MAX = 43,
+};
+pub const wifi_event_t = enum(c_uint) {
+    WIFI_EVENT_WIFI_READY = 0,
+    WIFI_EVENT_SCAN_DONE = 1,
+    WIFI_EVENT_STA_START = 2,
+    WIFI_EVENT_STA_STOP = 3,
+    WIFI_EVENT_STA_CONNECTED = 4,
+    WIFI_EVENT_STA_DISCONNECTED = 5,
+    WIFI_EVENT_STA_AUTHMODE_CHANGE = 6,
+    WIFI_EVENT_STA_WPS_ER_SUCCESS = 7,
+    WIFI_EVENT_STA_WPS_ER_FAILED = 8,
+    WIFI_EVENT_STA_WPS_ER_TIMEOUT = 9,
+    WIFI_EVENT_STA_WPS_ER_PIN = 10,
+    WIFI_EVENT_STA_WPS_ER_PBC_OVERLAP = 11,
+    WIFI_EVENT_AP_START = 12,
+    WIFI_EVENT_AP_STOP = 13,
+    WIFI_EVENT_AP_STACONNECTED = 14,
+    WIFI_EVENT_AP_STADISCONNECTED = 15,
+    WIFI_EVENT_AP_PROBEREQRECVED = 16,
+    WIFI_EVENT_FTM_REPORT = 17,
+    WIFI_EVENT_STA_BSS_RSSI_LOW = 18,
+    WIFI_EVENT_ACTION_TX_STATUS = 19,
+    WIFI_EVENT_ROC_DONE = 20,
+    WIFI_EVENT_STA_BEACON_TIMEOUT = 21,
+    WIFI_EVENT_CONNECTIONLESS_MODULE_WAKE_INTERVAL_START = 22,
+    WIFI_EVENT_AP_WPS_RG_SUCCESS = 23,
+    WIFI_EVENT_AP_WPS_RG_FAILED = 24,
+    WIFI_EVENT_AP_WPS_RG_TIMEOUT = 25,
+    WIFI_EVENT_AP_WPS_RG_PIN = 26,
+    WIFI_EVENT_AP_WPS_RG_PBC_OVERLAP = 27,
+    WIFI_EVENT_ITWT_SETUP = 28,
+    WIFI_EVENT_ITWT_TEARDOWN = 29,
+    WIFI_EVENT_ITWT_PROBE = 30,
+    WIFI_EVENT_ITWT_SUSPEND = 31,
+    WIFI_EVENT_NAN_STARTED = 32,
+    WIFI_EVENT_NAN_STOPPED = 33,
+    WIFI_EVENT_NAN_SVC_MATCH = 34,
+    WIFI_EVENT_NAN_REPLIED = 35,
+    WIFI_EVENT_NAN_RECEIVE = 36,
+    WIFI_EVENT_NDP_INDICATION = 37,
+    WIFI_EVENT_NDP_CONFIRM = 38,
+    WIFI_EVENT_NDP_TERMINATED = 39,
+    WIFI_EVENT_HOME_CHANNEL_CHANGE = 40,
+    WIFI_EVENT_MAX = 41,
+};
 pub extern const WIFI_EVENT: esp_event_base_t;
 pub const wifi_event_sta_scan_done_t = extern struct {
     status: u32 = std.mem.zeroes(u32),
@@ -3115,10 +3159,11 @@ pub const wifi_event_sta_authmode_change_t = extern struct {
 pub const wifi_event_sta_wps_er_pin_t = extern struct {
     pin_code: [8]u8 = std.mem.zeroes([8]u8),
 };
-pub const WPS_FAIL_REASON_NORMAL: c_int = 0;
-pub const WPS_FAIL_REASON_RECV_M2D: c_int = 1;
-pub const WPS_FAIL_REASON_MAX: c_int = 2;
-pub const wifi_event_sta_wps_fail_reason_t = c_uint;
+pub const wifi_event_sta_wps_fail_reason_t = enum(c_uint) {
+    WPS_FAIL_REASON_NORMAL = 0,
+    WPS_FAIL_REASON_RECV_M2D = 1,
+    WPS_FAIL_REASON_MAX = 2,
+};
 const unnamed_19 = extern struct {
     ssid: [32]u8 = std.mem.zeroes([32]u8),
     passphrase: [64]u8 = std.mem.zeroes([64]u8),
@@ -3151,12 +3196,13 @@ pub const wifi_event_home_channel_change_t = extern struct {
     new_chan: u8 = std.mem.zeroes(u8),
     new_snd: wifi_second_chan_t = std.mem.zeroes(wifi_second_chan_t),
 };
-pub const FTM_STATUS_SUCCESS: c_int = 0;
-pub const FTM_STATUS_UNSUPPORTED: c_int = 1;
-pub const FTM_STATUS_CONF_REJECTED: c_int = 2;
-pub const FTM_STATUS_NO_RESPONSE: c_int = 3;
-pub const FTM_STATUS_FAIL: c_int = 4;
-pub const wifi_ftm_status_t = c_uint;
+pub const wifi_ftm_status_t = enum(c_uint) {
+    FTM_STATUS_SUCCESS = 0,
+    FTM_STATUS_UNSUPPORTED = 1,
+    FTM_STATUS_CONF_REJECTED = 2,
+    FTM_STATUS_NO_RESPONSE = 3,
+    FTM_STATUS_FAIL = 4,
+};
 pub const wifi_ftm_report_entry_t = extern struct {
     dlog_token: u8 = std.mem.zeroes(u8),
     rssi: i8 = std.mem.zeroes(i8),
@@ -3187,11 +3233,12 @@ pub const wifi_event_roc_done_t = extern struct {
 pub const wifi_event_ap_wps_rg_pin_t = extern struct {
     pin_code: [8]u8 = std.mem.zeroes([8]u8),
 };
-pub const WPS_AP_FAIL_REASON_NORMAL: c_int = 0;
-pub const WPS_AP_FAIL_REASON_CONFIG: c_int = 1;
-pub const WPS_AP_FAIL_REASON_AUTH: c_int = 2;
-pub const WPS_AP_FAIL_REASON_MAX: c_int = 3;
-pub const wps_fail_reason_t = c_uint;
+pub const wps_fail_reason_t = enum(c_uint) {
+    WPS_AP_FAIL_REASON_NORMAL = 0,
+    WPS_AP_FAIL_REASON_CONFIG = 1,
+    WPS_AP_FAIL_REASON_AUTH = 2,
+    WPS_AP_FAIL_REASON_MAX = 3,
+};
 pub const wifi_event_ap_wps_rg_fail_reason_t = extern struct {
     reason: wps_fail_reason_t = std.mem.zeroes(wps_fail_reason_t),
     peer_macaddr: [6]u8 = std.mem.zeroes([6]u8),
@@ -3260,59 +3307,64 @@ pub const wifi_promiscuous_pkt_t = extern struct {
         return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 48)));
     }
 };
-pub const ESP_BLUFI_EVENT_INIT_FINISH: c_int = 0;
-pub const ESP_BLUFI_EVENT_DEINIT_FINISH: c_int = 1;
-pub const ESP_BLUFI_EVENT_SET_WIFI_OPMODE: c_int = 2;
-pub const ESP_BLUFI_EVENT_BLE_CONNECT: c_int = 3;
-pub const ESP_BLUFI_EVENT_BLE_DISCONNECT: c_int = 4;
-pub const ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP: c_int = 5;
-pub const ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP: c_int = 6;
-pub const ESP_BLUFI_EVENT_GET_WIFI_STATUS: c_int = 7;
-pub const ESP_BLUFI_EVENT_DEAUTHENTICATE_STA: c_int = 8;
-pub const ESP_BLUFI_EVENT_RECV_STA_BSSID: c_int = 9;
-pub const ESP_BLUFI_EVENT_RECV_STA_SSID: c_int = 10;
-pub const ESP_BLUFI_EVENT_RECV_STA_PASSWD: c_int = 11;
-pub const ESP_BLUFI_EVENT_RECV_SOFTAP_SSID: c_int = 12;
-pub const ESP_BLUFI_EVENT_RECV_SOFTAP_PASSWD: c_int = 13;
-pub const ESP_BLUFI_EVENT_RECV_SOFTAP_MAX_CONN_NUM: c_int = 14;
-pub const ESP_BLUFI_EVENT_RECV_SOFTAP_AUTH_MODE: c_int = 15;
-pub const ESP_BLUFI_EVENT_RECV_SOFTAP_CHANNEL: c_int = 16;
-pub const ESP_BLUFI_EVENT_RECV_USERNAME: c_int = 17;
-pub const ESP_BLUFI_EVENT_RECV_CA_CERT: c_int = 18;
-pub const ESP_BLUFI_EVENT_RECV_CLIENT_CERT: c_int = 19;
-pub const ESP_BLUFI_EVENT_RECV_SERVER_CERT: c_int = 20;
-pub const ESP_BLUFI_EVENT_RECV_CLIENT_PRIV_KEY: c_int = 21;
-pub const ESP_BLUFI_EVENT_RECV_SERVER_PRIV_KEY: c_int = 22;
-pub const ESP_BLUFI_EVENT_RECV_SLAVE_DISCONNECT_BLE: c_int = 23;
-pub const ESP_BLUFI_EVENT_GET_WIFI_LIST: c_int = 24;
-pub const ESP_BLUFI_EVENT_REPORT_ERROR: c_int = 25;
-pub const ESP_BLUFI_EVENT_RECV_CUSTOM_DATA: c_int = 26;
-pub const esp_blufi_cb_event_t = c_uint;
-pub const ESP_BLUFI_STA_CONN_SUCCESS: c_int = 0;
-pub const ESP_BLUFI_STA_CONN_FAIL: c_int = 1;
-pub const ESP_BLUFI_STA_CONNECTING: c_int = 2;
-pub const ESP_BLUFI_STA_NO_IP: c_int = 3;
-pub const esp_blufi_sta_conn_state_t = c_uint;
-pub const ESP_BLUFI_INIT_OK: c_int = 0;
-pub const ESP_BLUFI_INIT_FAILED: c_int = 1;
-pub const esp_blufi_init_state_t = c_uint;
-pub const ESP_BLUFI_DEINIT_OK: c_int = 0;
-pub const ESP_BLUFI_DEINIT_FAILED: c_int = 1;
-pub const esp_blufi_deinit_state_t = c_uint;
-pub const ESP_BLUFI_SEQUENCE_ERROR: c_int = 0;
-pub const ESP_BLUFI_CHECKSUM_ERROR: c_int = 1;
-pub const ESP_BLUFI_DECRYPT_ERROR: c_int = 2;
-pub const ESP_BLUFI_ENCRYPT_ERROR: c_int = 3;
-pub const ESP_BLUFI_INIT_SECURITY_ERROR: c_int = 4;
-pub const ESP_BLUFI_DH_MALLOC_ERROR: c_int = 5;
-pub const ESP_BLUFI_DH_PARAM_ERROR: c_int = 6;
-pub const ESP_BLUFI_READ_PARAM_ERROR: c_int = 7;
-pub const ESP_BLUFI_MAKE_PUBLIC_ERROR: c_int = 8;
-pub const ESP_BLUFI_DATA_FORMAT_ERROR: c_int = 9;
-pub const ESP_BLUFI_CALC_MD5_ERROR: c_int = 10;
-pub const ESP_BLUFI_WIFI_SCAN_FAIL: c_int = 11;
-pub const ESP_BLUFI_MSG_STATE_ERROR: c_int = 12;
-pub const esp_blufi_error_state_t = c_uint;
+pub const esp_blufi_cb_event_t = enum(c_uint) {
+    ESP_BLUFI_EVENT_INIT_FINISH = 0,
+    ESP_BLUFI_EVENT_DEINIT_FINISH = 1,
+    ESP_BLUFI_EVENT_SET_WIFI_OPMODE = 2,
+    ESP_BLUFI_EVENT_BLE_CONNECT = 3,
+    ESP_BLUFI_EVENT_BLE_DISCONNECT = 4,
+    ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP = 5,
+    ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP = 6,
+    ESP_BLUFI_EVENT_GET_WIFI_STATUS = 7,
+    ESP_BLUFI_EVENT_DEAUTHENTICATE_STA = 8,
+    ESP_BLUFI_EVENT_RECV_STA_BSSID = 9,
+    ESP_BLUFI_EVENT_RECV_STA_SSID = 10,
+    ESP_BLUFI_EVENT_RECV_STA_PASSWD = 11,
+    ESP_BLUFI_EVENT_RECV_SOFTAP_SSID = 12,
+    ESP_BLUFI_EVENT_RECV_SOFTAP_PASSWD = 13,
+    ESP_BLUFI_EVENT_RECV_SOFTAP_MAX_CONN_NUM = 14,
+    ESP_BLUFI_EVENT_RECV_SOFTAP_AUTH_MODE = 15,
+    ESP_BLUFI_EVENT_RECV_SOFTAP_CHANNEL = 16,
+    ESP_BLUFI_EVENT_RECV_USERNAME = 17,
+    ESP_BLUFI_EVENT_RECV_CA_CERT = 18,
+    ESP_BLUFI_EVENT_RECV_CLIENT_CERT = 19,
+    ESP_BLUFI_EVENT_RECV_SERVER_CERT = 20,
+    ESP_BLUFI_EVENT_RECV_CLIENT_PRIV_KEY = 21,
+    ESP_BLUFI_EVENT_RECV_SERVER_PRIV_KEY = 22,
+    ESP_BLUFI_EVENT_RECV_SLAVE_DISCONNECT_BLE = 23,
+    ESP_BLUFI_EVENT_GET_WIFI_LIST = 24,
+    ESP_BLUFI_EVENT_REPORT_ERROR = 25,
+    ESP_BLUFI_EVENT_RECV_CUSTOM_DATA = 26,
+};
+pub const esp_blufi_sta_conn_state_t = enum(c_uint) {
+    ESP_BLUFI_STA_CONN_SUCCESS = 0,
+    ESP_BLUFI_STA_CONN_FAIL = 1,
+    ESP_BLUFI_STA_CONNECTING = 2,
+    ESP_BLUFI_STA_NO_IP = 3,
+};
+pub const esp_blufi_init_state_t = enum(c_uint) {
+    ESP_BLUFI_INIT_OK = 0,
+    ESP_BLUFI_INIT_FAILED = 1,
+};
+pub const esp_blufi_deinit_state_t = enum(c_uint) {
+    ESP_BLUFI_DEINIT_OK = 0,
+    ESP_BLUFI_DEINIT_FAILED = 1,
+};
+pub const esp_blufi_error_state_t = enum(c_uint) {
+    ESP_BLUFI_SEQUENCE_ERROR = 0,
+    ESP_BLUFI_CHECKSUM_ERROR = 1,
+    ESP_BLUFI_DECRYPT_ERROR = 2,
+    ESP_BLUFI_ENCRYPT_ERROR = 3,
+    ESP_BLUFI_INIT_SECURITY_ERROR = 4,
+    ESP_BLUFI_DH_MALLOC_ERROR = 5,
+    ESP_BLUFI_DH_PARAM_ERROR = 6,
+    ESP_BLUFI_READ_PARAM_ERROR = 7,
+    ESP_BLUFI_MAKE_PUBLIC_ERROR = 8,
+    ESP_BLUFI_DATA_FORMAT_ERROR = 9,
+    ESP_BLUFI_CALC_MD5_ERROR = 10,
+    ESP_BLUFI_WIFI_SCAN_FAIL = 11,
+    ESP_BLUFI_MSG_STATE_ERROR = 12,
+};
 pub const esp_blufi_extra_info_t = extern struct {
     sta_bssid: [6]u8 = std.mem.zeroes([6]u8),
     sta_bssid_set: bool = std.mem.zeroes(bool),
@@ -3465,158 +3517,166 @@ pub const esp_ble_key_type_t = u8;
 pub const esp_ble_auth_req_t = u8;
 pub const esp_ble_io_cap_t = u8;
 pub const esp_ble_dtm_pkt_payload_t = u8;
-pub const ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT: c_int = 0;
-pub const ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT: c_int = 1;
-pub const ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: c_int = 2;
-pub const ESP_GAP_BLE_SCAN_RESULT_EVT: c_int = 3;
-pub const ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT: c_int = 4;
-pub const ESP_GAP_BLE_SCAN_RSP_DATA_RAW_SET_COMPLETE_EVT: c_int = 5;
-pub const ESP_GAP_BLE_ADV_START_COMPLETE_EVT: c_int = 6;
-pub const ESP_GAP_BLE_SCAN_START_COMPLETE_EVT: c_int = 7;
-pub const ESP_GAP_BLE_AUTH_CMPL_EVT: c_int = 8;
-pub const ESP_GAP_BLE_KEY_EVT: c_int = 9;
-pub const ESP_GAP_BLE_SEC_REQ_EVT: c_int = 10;
-pub const ESP_GAP_BLE_PASSKEY_NOTIF_EVT: c_int = 11;
-pub const ESP_GAP_BLE_PASSKEY_REQ_EVT: c_int = 12;
-pub const ESP_GAP_BLE_OOB_REQ_EVT: c_int = 13;
-pub const ESP_GAP_BLE_LOCAL_IR_EVT: c_int = 14;
-pub const ESP_GAP_BLE_LOCAL_ER_EVT: c_int = 15;
-pub const ESP_GAP_BLE_NC_REQ_EVT: c_int = 16;
-pub const ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT: c_int = 17;
-pub const ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT: c_int = 18;
-pub const ESP_GAP_BLE_SET_STATIC_RAND_ADDR_EVT: c_int = 19;
-pub const ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT: c_int = 20;
-pub const ESP_GAP_BLE_SET_PKT_LENGTH_COMPLETE_EVT: c_int = 21;
-pub const ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT: c_int = 22;
-pub const ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: c_int = 23;
-pub const ESP_GAP_BLE_CLEAR_BOND_DEV_COMPLETE_EVT: c_int = 24;
-pub const ESP_GAP_BLE_GET_BOND_DEV_COMPLETE_EVT: c_int = 25;
-pub const ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT: c_int = 26;
-pub const ESP_GAP_BLE_UPDATE_WHITELIST_COMPLETE_EVT: c_int = 27;
-pub const ESP_GAP_BLE_UPDATE_DUPLICATE_EXCEPTIONAL_LIST_COMPLETE_EVT: c_int = 28;
-pub const ESP_GAP_BLE_SET_CHANNELS_EVT: c_int = 29;
-pub const ESP_GAP_BLE_READ_PHY_COMPLETE_EVT: c_int = 30;
-pub const ESP_GAP_BLE_SET_PREFERRED_DEFAULT_PHY_COMPLETE_EVT: c_int = 31;
-pub const ESP_GAP_BLE_SET_PREFERRED_PHY_COMPLETE_EVT: c_int = 32;
-pub const ESP_GAP_BLE_EXT_ADV_SET_RAND_ADDR_COMPLETE_EVT: c_int = 33;
-pub const ESP_GAP_BLE_EXT_ADV_SET_PARAMS_COMPLETE_EVT: c_int = 34;
-pub const ESP_GAP_BLE_EXT_ADV_DATA_SET_COMPLETE_EVT: c_int = 35;
-pub const ESP_GAP_BLE_EXT_SCAN_RSP_DATA_SET_COMPLETE_EVT: c_int = 36;
-pub const ESP_GAP_BLE_EXT_ADV_START_COMPLETE_EVT: c_int = 37;
-pub const ESP_GAP_BLE_EXT_ADV_STOP_COMPLETE_EVT: c_int = 38;
-pub const ESP_GAP_BLE_EXT_ADV_SET_REMOVE_COMPLETE_EVT: c_int = 39;
-pub const ESP_GAP_BLE_EXT_ADV_SET_CLEAR_COMPLETE_EVT: c_int = 40;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SET_PARAMS_COMPLETE_EVT: c_int = 41;
-pub const ESP_GAP_BLE_PERIODIC_ADV_DATA_SET_COMPLETE_EVT: c_int = 42;
-pub const ESP_GAP_BLE_PERIODIC_ADV_START_COMPLETE_EVT: c_int = 43;
-pub const ESP_GAP_BLE_PERIODIC_ADV_STOP_COMPLETE_EVT: c_int = 44;
-pub const ESP_GAP_BLE_PERIODIC_ADV_CREATE_SYNC_COMPLETE_EVT: c_int = 45;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_CANCEL_COMPLETE_EVT: c_int = 46;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_TERMINATE_COMPLETE_EVT: c_int = 47;
-pub const ESP_GAP_BLE_PERIODIC_ADV_ADD_DEV_COMPLETE_EVT: c_int = 48;
-pub const ESP_GAP_BLE_PERIODIC_ADV_REMOVE_DEV_COMPLETE_EVT: c_int = 49;
-pub const ESP_GAP_BLE_PERIODIC_ADV_CLEAR_DEV_COMPLETE_EVT: c_int = 50;
-pub const ESP_GAP_BLE_SET_EXT_SCAN_PARAMS_COMPLETE_EVT: c_int = 51;
-pub const ESP_GAP_BLE_EXT_SCAN_START_COMPLETE_EVT: c_int = 52;
-pub const ESP_GAP_BLE_EXT_SCAN_STOP_COMPLETE_EVT: c_int = 53;
-pub const ESP_GAP_BLE_PREFER_EXT_CONN_PARAMS_SET_COMPLETE_EVT: c_int = 54;
-pub const ESP_GAP_BLE_PHY_UPDATE_COMPLETE_EVT: c_int = 55;
-pub const ESP_GAP_BLE_EXT_ADV_REPORT_EVT: c_int = 56;
-pub const ESP_GAP_BLE_SCAN_TIMEOUT_EVT: c_int = 57;
-pub const ESP_GAP_BLE_ADV_TERMINATED_EVT: c_int = 58;
-pub const ESP_GAP_BLE_SCAN_REQ_RECEIVED_EVT: c_int = 59;
-pub const ESP_GAP_BLE_CHANNEL_SELECT_ALGORITHM_EVT: c_int = 60;
-pub const ESP_GAP_BLE_PERIODIC_ADV_REPORT_EVT: c_int = 61;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_LOST_EVT: c_int = 62;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_ESTAB_EVT: c_int = 63;
-pub const ESP_GAP_BLE_SC_OOB_REQ_EVT: c_int = 64;
-pub const ESP_GAP_BLE_SC_CR_LOC_OOB_EVT: c_int = 65;
-pub const ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT: c_int = 66;
-pub const ESP_GAP_BLE_PERIODIC_ADV_RECV_ENABLE_COMPLETE_EVT: c_int = 67;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_TRANS_COMPLETE_EVT: c_int = 68;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SET_INFO_TRANS_COMPLETE_EVT: c_int = 69;
-pub const ESP_GAP_BLE_SET_PAST_PARAMS_COMPLETE_EVT: c_int = 70;
-pub const ESP_GAP_BLE_PERIODIC_ADV_SYNC_TRANS_RECV_EVT: c_int = 71;
-pub const ESP_GAP_BLE_DTM_TEST_UPDATE_EVT: c_int = 72;
-pub const ESP_GAP_BLE_ADV_CLEAR_COMPLETE_EVT: c_int = 73;
-pub const ESP_GAP_BLE_EVT_MAX: c_int = 74;
-pub const esp_gap_ble_cb_event_t = c_uint;
+pub const esp_gap_ble_cb_event_t = enum(c_uint) {
+    ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT = 0,
+    ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT = 1,
+    ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT = 2,
+    ESP_GAP_BLE_SCAN_RESULT_EVT = 3,
+    ESP_GAP_BLE_ADV_DATA_RAW_SET_COMPLETE_EVT = 4,
+    ESP_GAP_BLE_SCAN_RSP_DATA_RAW_SET_COMPLETE_EVT = 5,
+    ESP_GAP_BLE_ADV_START_COMPLETE_EVT = 6,
+    ESP_GAP_BLE_SCAN_START_COMPLETE_EVT = 7,
+    ESP_GAP_BLE_AUTH_CMPL_EVT = 8,
+    ESP_GAP_BLE_KEY_EVT = 9,
+    ESP_GAP_BLE_SEC_REQ_EVT = 10,
+    ESP_GAP_BLE_PASSKEY_NOTIF_EVT = 11,
+    ESP_GAP_BLE_PASSKEY_REQ_EVT = 12,
+    ESP_GAP_BLE_OOB_REQ_EVT = 13,
+    ESP_GAP_BLE_LOCAL_IR_EVT = 14,
+    ESP_GAP_BLE_LOCAL_ER_EVT = 15,
+    ESP_GAP_BLE_NC_REQ_EVT = 16,
+    ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT = 17,
+    ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT = 18,
+    ESP_GAP_BLE_SET_STATIC_RAND_ADDR_EVT = 19,
+    ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT = 20,
+    ESP_GAP_BLE_SET_PKT_LENGTH_COMPLETE_EVT = 21,
+    ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT = 22,
+    ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT = 23,
+    ESP_GAP_BLE_CLEAR_BOND_DEV_COMPLETE_EVT = 24,
+    ESP_GAP_BLE_GET_BOND_DEV_COMPLETE_EVT = 25,
+    ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT = 26,
+    ESP_GAP_BLE_UPDATE_WHITELIST_COMPLETE_EVT = 27,
+    ESP_GAP_BLE_UPDATE_DUPLICATE_EXCEPTIONAL_LIST_COMPLETE_EVT = 28,
+    ESP_GAP_BLE_SET_CHANNELS_EVT = 29,
+    ESP_GAP_BLE_READ_PHY_COMPLETE_EVT = 30,
+    ESP_GAP_BLE_SET_PREFERRED_DEFAULT_PHY_COMPLETE_EVT = 31,
+    ESP_GAP_BLE_SET_PREFERRED_PHY_COMPLETE_EVT = 32,
+    ESP_GAP_BLE_EXT_ADV_SET_RAND_ADDR_COMPLETE_EVT = 33,
+    ESP_GAP_BLE_EXT_ADV_SET_PARAMS_COMPLETE_EVT = 34,
+    ESP_GAP_BLE_EXT_ADV_DATA_SET_COMPLETE_EVT = 35,
+    ESP_GAP_BLE_EXT_SCAN_RSP_DATA_SET_COMPLETE_EVT = 36,
+    ESP_GAP_BLE_EXT_ADV_START_COMPLETE_EVT = 37,
+    ESP_GAP_BLE_EXT_ADV_STOP_COMPLETE_EVT = 38,
+    ESP_GAP_BLE_EXT_ADV_SET_REMOVE_COMPLETE_EVT = 39,
+    ESP_GAP_BLE_EXT_ADV_SET_CLEAR_COMPLETE_EVT = 40,
+    ESP_GAP_BLE_PERIODIC_ADV_SET_PARAMS_COMPLETE_EVT = 41,
+    ESP_GAP_BLE_PERIODIC_ADV_DATA_SET_COMPLETE_EVT = 42,
+    ESP_GAP_BLE_PERIODIC_ADV_START_COMPLETE_EVT = 43,
+    ESP_GAP_BLE_PERIODIC_ADV_STOP_COMPLETE_EVT = 44,
+    ESP_GAP_BLE_PERIODIC_ADV_CREATE_SYNC_COMPLETE_EVT = 45,
+    ESP_GAP_BLE_PERIODIC_ADV_SYNC_CANCEL_COMPLETE_EVT = 46,
+    ESP_GAP_BLE_PERIODIC_ADV_SYNC_TERMINATE_COMPLETE_EVT = 47,
+    ESP_GAP_BLE_PERIODIC_ADV_ADD_DEV_COMPLETE_EVT = 48,
+    ESP_GAP_BLE_PERIODIC_ADV_REMOVE_DEV_COMPLETE_EVT = 49,
+    ESP_GAP_BLE_PERIODIC_ADV_CLEAR_DEV_COMPLETE_EVT = 50,
+    ESP_GAP_BLE_SET_EXT_SCAN_PARAMS_COMPLETE_EVT = 51,
+    ESP_GAP_BLE_EXT_SCAN_START_COMPLETE_EVT = 52,
+    ESP_GAP_BLE_EXT_SCAN_STOP_COMPLETE_EVT = 53,
+    ESP_GAP_BLE_PREFER_EXT_CONN_PARAMS_SET_COMPLETE_EVT = 54,
+    ESP_GAP_BLE_PHY_UPDATE_COMPLETE_EVT = 55,
+    ESP_GAP_BLE_EXT_ADV_REPORT_EVT = 56,
+    ESP_GAP_BLE_SCAN_TIMEOUT_EVT = 57,
+    ESP_GAP_BLE_ADV_TERMINATED_EVT = 58,
+    ESP_GAP_BLE_SCAN_REQ_RECEIVED_EVT = 59,
+    ESP_GAP_BLE_CHANNEL_SELECT_ALGORITHM_EVT = 60,
+    ESP_GAP_BLE_PERIODIC_ADV_REPORT_EVT = 61,
+    ESP_GAP_BLE_PERIODIC_ADV_SYNC_LOST_EVT = 62,
+    ESP_GAP_BLE_PERIODIC_ADV_SYNC_ESTAB_EVT = 63,
+    ESP_GAP_BLE_SC_OOB_REQ_EVT = 64,
+    ESP_GAP_BLE_SC_CR_LOC_OOB_EVT = 65,
+    ESP_GAP_BLE_GET_DEV_NAME_COMPLETE_EVT = 66,
+    ESP_GAP_BLE_PERIODIC_ADV_RECV_ENABLE_COMPLETE_EVT = 67,
+    ESP_GAP_BLE_PERIODIC_ADV_SYNC_TRANS_COMPLETE_EVT = 68,
+    ESP_GAP_BLE_PERIODIC_ADV_SET_INFO_TRANS_COMPLETE_EVT = 69,
+    ESP_GAP_BLE_SET_PAST_PARAMS_COMPLETE_EVT = 70,
+    ESP_GAP_BLE_PERIODIC_ADV_SYNC_TRANS_RECV_EVT = 71,
+    ESP_GAP_BLE_DTM_TEST_UPDATE_EVT = 72,
+    ESP_GAP_BLE_ADV_CLEAR_COMPLETE_EVT = 73,
+    ESP_GAP_BLE_EVT_MAX = 74,
+};
 pub const esp_gap_ble_channels = [5]u8;
-pub const ESP_BLE_AD_TYPE_FLAG: c_int = 1;
-pub const ESP_BLE_AD_TYPE_16SRV_PART: c_int = 2;
-pub const ESP_BLE_AD_TYPE_16SRV_CMPL: c_int = 3;
-pub const ESP_BLE_AD_TYPE_32SRV_PART: c_int = 4;
-pub const ESP_BLE_AD_TYPE_32SRV_CMPL: c_int = 5;
-pub const ESP_BLE_AD_TYPE_128SRV_PART: c_int = 6;
-pub const ESP_BLE_AD_TYPE_128SRV_CMPL: c_int = 7;
-pub const ESP_BLE_AD_TYPE_NAME_SHORT: c_int = 8;
-pub const ESP_BLE_AD_TYPE_NAME_CMPL: c_int = 9;
-pub const ESP_BLE_AD_TYPE_TX_PWR: c_int = 10;
-pub const ESP_BLE_AD_TYPE_DEV_CLASS: c_int = 13;
-pub const ESP_BLE_AD_TYPE_SM_TK: c_int = 16;
-pub const ESP_BLE_AD_TYPE_SM_OOB_FLAG: c_int = 17;
-pub const ESP_BLE_AD_TYPE_INT_RANGE: c_int = 18;
-pub const ESP_BLE_AD_TYPE_SOL_SRV_UUID: c_int = 20;
-pub const ESP_BLE_AD_TYPE_128SOL_SRV_UUID: c_int = 21;
-pub const ESP_BLE_AD_TYPE_SERVICE_DATA: c_int = 22;
-pub const ESP_BLE_AD_TYPE_PUBLIC_TARGET: c_int = 23;
-pub const ESP_BLE_AD_TYPE_RANDOM_TARGET: c_int = 24;
-pub const ESP_BLE_AD_TYPE_APPEARANCE: c_int = 25;
-pub const ESP_BLE_AD_TYPE_ADV_INT: c_int = 26;
-pub const ESP_BLE_AD_TYPE_LE_DEV_ADDR: c_int = 27;
-pub const ESP_BLE_AD_TYPE_LE_ROLE: c_int = 28;
-pub const ESP_BLE_AD_TYPE_SPAIR_C256: c_int = 29;
-pub const ESP_BLE_AD_TYPE_SPAIR_R256: c_int = 30;
-pub const ESP_BLE_AD_TYPE_32SOL_SRV_UUID: c_int = 31;
-pub const ESP_BLE_AD_TYPE_32SERVICE_DATA: c_int = 32;
-pub const ESP_BLE_AD_TYPE_128SERVICE_DATA: c_int = 33;
-pub const ESP_BLE_AD_TYPE_LE_SECURE_CONFIRM: c_int = 34;
-pub const ESP_BLE_AD_TYPE_LE_SECURE_RANDOM: c_int = 35;
-pub const ESP_BLE_AD_TYPE_URI: c_int = 36;
-pub const ESP_BLE_AD_TYPE_INDOOR_POSITION: c_int = 37;
-pub const ESP_BLE_AD_TYPE_TRANS_DISC_DATA: c_int = 38;
-pub const ESP_BLE_AD_TYPE_LE_SUPPORT_FEATURE: c_int = 39;
-pub const ESP_BLE_AD_TYPE_CHAN_MAP_UPDATE: c_int = 40;
-pub const ESP_BLE_AD_MANUFACTURER_SPECIFIC_TYPE: c_int = 255;
-pub const esp_ble_adv_data_type = c_uint;
-pub const ADV_TYPE_IND: c_int = 0;
-pub const ADV_TYPE_DIRECT_IND_HIGH: c_int = 1;
-pub const ADV_TYPE_SCAN_IND: c_int = 2;
-pub const ADV_TYPE_NONCONN_IND: c_int = 3;
-pub const ADV_TYPE_DIRECT_IND_LOW: c_int = 4;
-pub const esp_ble_adv_type_t = c_uint;
-pub const ADV_CHNL_37: c_int = 1;
-pub const ADV_CHNL_38: c_int = 2;
-pub const ADV_CHNL_39: c_int = 4;
-pub const ADV_CHNL_ALL: c_int = 7;
-pub const esp_ble_adv_channel_t = c_uint;
-pub const ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY: c_int = 0;
-pub const ADV_FILTER_ALLOW_SCAN_WLST_CON_ANY: c_int = 1;
-pub const ADV_FILTER_ALLOW_SCAN_ANY_CON_WLST: c_int = 2;
-pub const ADV_FILTER_ALLOW_SCAN_WLST_CON_WLST: c_int = 3;
-pub const esp_ble_adv_filter_t = c_uint;
-pub const ESP_BLE_SEC_ENCRYPT: c_int = 1;
-pub const ESP_BLE_SEC_ENCRYPT_NO_MITM: c_int = 2;
-pub const ESP_BLE_SEC_ENCRYPT_MITM: c_int = 3;
-pub const esp_ble_sec_act_t = c_uint;
-pub const ESP_BLE_SM_PASSKEY: c_int = 0;
-pub const ESP_BLE_SM_AUTHEN_REQ_MODE: c_int = 1;
-pub const ESP_BLE_SM_IOCAP_MODE: c_int = 2;
-pub const ESP_BLE_SM_SET_INIT_KEY: c_int = 3;
-pub const ESP_BLE_SM_SET_RSP_KEY: c_int = 4;
-pub const ESP_BLE_SM_MAX_KEY_SIZE: c_int = 5;
-pub const ESP_BLE_SM_MIN_KEY_SIZE: c_int = 6;
-pub const ESP_BLE_SM_SET_STATIC_PASSKEY: c_int = 7;
-pub const ESP_BLE_SM_CLEAR_STATIC_PASSKEY: c_int = 8;
-pub const ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH: c_int = 9;
-pub const ESP_BLE_SM_OOB_SUPPORT: c_int = 10;
-pub const ESP_BLE_APP_ENC_KEY_SIZE: c_int = 11;
-pub const ESP_BLE_SM_MAX_PARAM: c_int = 12;
-pub const esp_ble_sm_param_t = c_uint;
-pub const DTM_TX_START_EVT: c_int = 0;
-pub const DTM_RX_START_EVT: c_int = 1;
-pub const DTM_TEST_STOP_EVT: c_int = 2;
-pub const esp_ble_dtm_update_evt_t = c_uint;
+pub const esp_ble_adv_data_type = enum(c_uint) {
+    ESP_BLE_AD_TYPE_FLAG = 1,
+    ESP_BLE_AD_TYPE_16SRV_PART = 2,
+    ESP_BLE_AD_TYPE_16SRV_CMPL = 3,
+    ESP_BLE_AD_TYPE_32SRV_PART = 4,
+    ESP_BLE_AD_TYPE_32SRV_CMPL = 5,
+    ESP_BLE_AD_TYPE_128SRV_PART = 6,
+    ESP_BLE_AD_TYPE_128SRV_CMPL = 7,
+    ESP_BLE_AD_TYPE_NAME_SHORT = 8,
+    ESP_BLE_AD_TYPE_NAME_CMPL = 9,
+    ESP_BLE_AD_TYPE_TX_PWR = 10,
+    ESP_BLE_AD_TYPE_DEV_CLASS = 13,
+    ESP_BLE_AD_TYPE_SM_TK = 16,
+    ESP_BLE_AD_TYPE_SM_OOB_FLAG = 17,
+    ESP_BLE_AD_TYPE_INT_RANGE = 18,
+    ESP_BLE_AD_TYPE_SOL_SRV_UUID = 20,
+    ESP_BLE_AD_TYPE_128SOL_SRV_UUID = 21,
+    ESP_BLE_AD_TYPE_SERVICE_DATA = 22,
+    ESP_BLE_AD_TYPE_PUBLIC_TARGET = 23,
+    ESP_BLE_AD_TYPE_RANDOM_TARGET = 24,
+    ESP_BLE_AD_TYPE_APPEARANCE = 25,
+    ESP_BLE_AD_TYPE_ADV_INT = 26,
+    ESP_BLE_AD_TYPE_LE_DEV_ADDR = 27,
+    ESP_BLE_AD_TYPE_LE_ROLE = 28,
+    ESP_BLE_AD_TYPE_SPAIR_C256 = 29,
+    ESP_BLE_AD_TYPE_SPAIR_R256 = 30,
+    ESP_BLE_AD_TYPE_32SOL_SRV_UUID = 31,
+    ESP_BLE_AD_TYPE_32SERVICE_DATA = 32,
+    ESP_BLE_AD_TYPE_128SERVICE_DATA = 33,
+    ESP_BLE_AD_TYPE_LE_SECURE_CONFIRM = 34,
+    ESP_BLE_AD_TYPE_LE_SECURE_RANDOM = 35,
+    ESP_BLE_AD_TYPE_URI = 36,
+    ESP_BLE_AD_TYPE_INDOOR_POSITION = 37,
+    ESP_BLE_AD_TYPE_TRANS_DISC_DATA = 38,
+    ESP_BLE_AD_TYPE_LE_SUPPORT_FEATURE = 39,
+    ESP_BLE_AD_TYPE_CHAN_MAP_UPDATE = 40,
+    ESP_BLE_AD_MANUFACTURER_SPECIFIC_TYPE = 255,
+};
+pub const esp_ble_adv_type_t = enum(c_uint) {
+    ADV_TYPE_IND = 0,
+    ADV_TYPE_DIRECT_IND_HIGH = 1,
+    ADV_TYPE_SCAN_IND = 2,
+    ADV_TYPE_NONCONN_IND = 3,
+    ADV_TYPE_DIRECT_IND_LOW = 4,
+};
+pub const esp_ble_adv_channel_t = enum(c_uint) {
+    ADV_CHNL_37 = 1,
+    ADV_CHNL_38 = 2,
+    ADV_CHNL_39 = 4,
+    ADV_CHNL_ALL = 7,
+};
+pub const esp_ble_adv_filter_t = enum(c_uint) {
+    ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY = 0,
+    ADV_FILTER_ALLOW_SCAN_WLST_CON_ANY = 1,
+    ADV_FILTER_ALLOW_SCAN_ANY_CON_WLST = 2,
+    ADV_FILTER_ALLOW_SCAN_WLST_CON_WLST = 3,
+};
+pub const esp_ble_sec_act_t = enum(c_uint) {
+    ESP_BLE_SEC_ENCRYPT = 1,
+    ESP_BLE_SEC_ENCRYPT_NO_MITM = 2,
+    ESP_BLE_SEC_ENCRYPT_MITM = 3,
+};
+pub const esp_ble_sm_param_t = enum(c_uint) {
+    ESP_BLE_SM_PASSKEY = 0,
+    ESP_BLE_SM_AUTHEN_REQ_MODE = 1,
+    ESP_BLE_SM_IOCAP_MODE = 2,
+    ESP_BLE_SM_SET_INIT_KEY = 3,
+    ESP_BLE_SM_SET_RSP_KEY = 4,
+    ESP_BLE_SM_MAX_KEY_SIZE = 5,
+    ESP_BLE_SM_MIN_KEY_SIZE = 6,
+    ESP_BLE_SM_SET_STATIC_PASSKEY = 7,
+    ESP_BLE_SM_CLEAR_STATIC_PASSKEY = 8,
+    ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH = 9,
+    ESP_BLE_SM_OOB_SUPPORT = 10,
+    ESP_BLE_APP_ENC_KEY_SIZE = 11,
+    ESP_BLE_SM_MAX_PARAM = 12,
+};
+pub const esp_ble_dtm_update_evt_t = enum(c_uint) {
+    DTM_TX_START_EVT = 0,
+    DTM_RX_START_EVT = 1,
+    DTM_TEST_STOP_EVT = 2,
+};
 pub const esp_ble_dtm_tx_t = extern struct {
     tx_channel: u8 = std.mem.zeroes(u8),
     len_of_data: u8 = std.mem.zeroes(u8),
@@ -3650,19 +3710,22 @@ pub const esp_ble_adv_data_t = extern struct {
     p_service_uuid: [*c]u8 = std.mem.zeroes([*c]u8),
     flag: u8 = std.mem.zeroes(u8),
 };
-pub const BLE_SCAN_TYPE_PASSIVE: c_int = 0;
-pub const BLE_SCAN_TYPE_ACTIVE: c_int = 1;
-pub const esp_ble_scan_type_t = c_uint;
-pub const BLE_SCAN_FILTER_ALLOW_ALL: c_int = 0;
-pub const BLE_SCAN_FILTER_ALLOW_ONLY_WLST: c_int = 1;
-pub const BLE_SCAN_FILTER_ALLOW_UND_RPA_DIR: c_int = 2;
-pub const BLE_SCAN_FILTER_ALLOW_WLIST_RPA_DIR: c_int = 3;
-pub const esp_ble_scan_filter_t = c_uint;
-pub const BLE_SCAN_DUPLICATE_DISABLE: c_int = 0;
-pub const BLE_SCAN_DUPLICATE_ENABLE: c_int = 1;
-pub const BLE_SCAN_DUPLICATE_ENABLE_RESET: c_int = 2;
-pub const BLE_SCAN_DUPLICATE_MAX: c_int = 3;
-pub const esp_ble_scan_duplicate_t = c_uint;
+pub const esp_ble_scan_type_t = enum(c_uint) {
+    BLE_SCAN_TYPE_PASSIVE = 0,
+    BLE_SCAN_TYPE_ACTIVE = 1,
+};
+pub const esp_ble_scan_filter_t = enum(c_uint) {
+    BLE_SCAN_FILTER_ALLOW_ALL = 0,
+    BLE_SCAN_FILTER_ALLOW_ONLY_WLST = 1,
+    BLE_SCAN_FILTER_ALLOW_UND_RPA_DIR = 2,
+    BLE_SCAN_FILTER_ALLOW_WLIST_RPA_DIR = 3,
+};
+pub const esp_ble_scan_duplicate_t = enum(c_uint) {
+    BLE_SCAN_DUPLICATE_DISABLE = 0,
+    BLE_SCAN_DUPLICATE_ENABLE = 1,
+    BLE_SCAN_DUPLICATE_ENABLE_RESET = 2,
+    BLE_SCAN_DUPLICATE_MAX = 3,
+};
 pub const esp_ble_scan_params_t = extern struct {
     scan_type: esp_ble_scan_type_t = std.mem.zeroes(esp_ble_scan_type_t),
     own_addr_type: esp_ble_addr_type_t = std.mem.zeroes(esp_ble_addr_type_t),
@@ -3773,46 +3836,52 @@ pub const esp_ble_sec_t = extern union {
     oob_data: esp_ble_local_oob_data_t,
     auth_cmpl: esp_ble_auth_cmpl_t,
 };
-pub const ESP_GAP_SEARCH_INQ_RES_EVT: c_int = 0;
-pub const ESP_GAP_SEARCH_INQ_CMPL_EVT: c_int = 1;
-pub const ESP_GAP_SEARCH_DISC_RES_EVT: c_int = 2;
-pub const ESP_GAP_SEARCH_DISC_BLE_RES_EVT: c_int = 3;
-pub const ESP_GAP_SEARCH_DISC_CMPL_EVT: c_int = 4;
-pub const ESP_GAP_SEARCH_DI_DISC_CMPL_EVT: c_int = 5;
-pub const ESP_GAP_SEARCH_SEARCH_CANCEL_CMPL_EVT: c_int = 6;
-pub const ESP_GAP_SEARCH_INQ_DISCARD_NUM_EVT: c_int = 7;
-pub const esp_gap_search_evt_t = c_uint;
-pub const ESP_BLE_EVT_CONN_ADV: c_int = 0;
-pub const ESP_BLE_EVT_CONN_DIR_ADV: c_int = 1;
-pub const ESP_BLE_EVT_DISC_ADV: c_int = 2;
-pub const ESP_BLE_EVT_NON_CONN_ADV: c_int = 3;
-pub const ESP_BLE_EVT_SCAN_RSP: c_int = 4;
-pub const esp_ble_evt_type_t = c_uint;
-pub const ESP_BLE_WHITELIST_REMOVE: c_int = 0;
-pub const ESP_BLE_WHITELIST_ADD: c_int = 1;
-pub const ESP_BLE_WHITELIST_CLEAR: c_int = 2;
-pub const esp_ble_wl_operation_t = c_uint;
-pub const ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_ADD: c_int = 0;
-pub const ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_REMOVE: c_int = 1;
-pub const ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_CLEAN: c_int = 2;
-pub const esp_bt_duplicate_exceptional_subcode_type_t = c_uint;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_ADV_ADDR: c_int = 0;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_LINK_ID: c_int = 1;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_BEACON_TYPE: c_int = 2;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROV_SRV_ADV: c_int = 3;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROXY_SRV_ADV: c_int = 4;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROXY_SOLIC_ADV: c_int = 5;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_URI_ADV: c_int = 6;
-pub const esp_ble_duplicate_exceptional_info_type_t = c_uint;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_ADDR_LIST: c_int = 1;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_LINK_ID_LIST: c_int = 2;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_BEACON_TYPE_LIST: c_int = 4;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROV_SRV_ADV_LIST: c_int = 8;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROXY_SRV_ADV_LIST: c_int = 16;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROXY_SOLIC_ADV_LIST: c_int = 32;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_URI_ADV_LIST: c_int = 64;
-pub const ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_ALL_LIST: c_int = 65535;
-pub const esp_duplicate_scan_exceptional_list_type_t = c_uint;
+pub const esp_gap_search_evt_t = enum(c_uint) {
+    ESP_GAP_SEARCH_INQ_RES_EVT = 0,
+    ESP_GAP_SEARCH_INQ_CMPL_EVT = 1,
+    ESP_GAP_SEARCH_DISC_RES_EVT = 2,
+    ESP_GAP_SEARCH_DISC_BLE_RES_EVT = 3,
+    ESP_GAP_SEARCH_DISC_CMPL_EVT = 4,
+    ESP_GAP_SEARCH_DI_DISC_CMPL_EVT = 5,
+    ESP_GAP_SEARCH_SEARCH_CANCEL_CMPL_EVT = 6,
+    ESP_GAP_SEARCH_INQ_DISCARD_NUM_EVT = 7,
+};
+pub const esp_ble_evt_type_t = enum(c_uint) {
+    ESP_BLE_EVT_CONN_ADV = 0,
+    ESP_BLE_EVT_CONN_DIR_ADV = 1,
+    ESP_BLE_EVT_DISC_ADV = 2,
+    ESP_BLE_EVT_NON_CONN_ADV = 3,
+    ESP_BLE_EVT_SCAN_RSP = 4,
+};
+pub const esp_ble_wl_operation_t = enum(c_uint) {
+    ESP_BLE_WHITELIST_REMOVE = 0,
+    ESP_BLE_WHITELIST_ADD = 1,
+    ESP_BLE_WHITELIST_CLEAR = 2,
+};
+pub const esp_bt_duplicate_exceptional_subcode_type_t = enum(c_uint) {
+    ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_ADD = 0,
+    ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_REMOVE = 1,
+    ESP_BLE_DUPLICATE_EXCEPTIONAL_LIST_CLEAN = 2,
+};
+pub const esp_ble_duplicate_exceptional_info_type_t = enum(c_uint) {
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_ADV_ADDR = 0,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_LINK_ID = 1,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_BEACON_TYPE = 2,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROV_SRV_ADV = 3,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROXY_SRV_ADV = 4,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_PROXY_SOLIC_ADV = 5,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_INFO_MESH_URI_ADV = 6,
+};
+pub const esp_duplicate_scan_exceptional_list_type_t = enum(c_uint) {
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_ADDR_LIST = 1,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_LINK_ID_LIST = 2,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_BEACON_TYPE_LIST = 4,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROV_SRV_ADV_LIST = 8,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROXY_SRV_ADV_LIST = 16,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_PROXY_SOLIC_ADV_LIST = 32,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_MESH_URI_ADV_LIST = 64,
+    ESP_BLE_DUPLICATE_SCAN_EXCEPTIONAL_ALL_LIST = 65535,
+};
 pub const esp_duplicate_info_t = [6]u8;
 pub const esp_ble_ext_adv_type_mask_t = u16;
 pub const esp_ble_gap_phy_t = u8;
@@ -4335,6 +4404,11 @@ pub extern fn esp_blufi_adv_stop() void;
 pub extern fn esp_blufi_adv_start() void;
 pub extern fn esp_blufi_send_encap(arg: ?*anyopaque) void;
 
+pub const va_list = extern struct {
+    __va_stk: [*c]c_int = std.mem.zeroes([*c]c_int),
+    __va_reg: [*c]c_int = std.mem.zeroes([*c]c_int),
+    __va_ndx: c_int = std.mem.zeroes(c_int),
+};
 pub const sched_param = extern struct {
     sched_priority: c_int = std.mem.zeroes(c_int),
 };
@@ -4444,3 +4518,14 @@ pub const itimerspec = extern struct {
     it_value: timespec = std.mem.zeroes(timespec),
 };
 // TODO: port zig (std.Thread) to FreeRTOS
+
+// panic handler for esp-idf
+pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, _: ?usize) noreturn {
+    esp_log_write(default_level, "panic_handler", "PANIC: caused by %s\n", msg.ptr, esp_log_timestamp());
+    if (error_return_trace) |trace| {
+        for (trace.instruction_addresses) |address| {
+            esp_log_write(default_level, "panic_handler", "Addr: %d\n", address, esp_log_timestamp());
+        }
+    }
+    esp_system_abort("aborting...");
+}
