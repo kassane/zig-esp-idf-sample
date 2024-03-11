@@ -13,9 +13,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    lib.root_module.addAnonymousImport("esp_idf", .{
-        .root_source_file = .{ .path = "idf-sys.zig" },
-    });
+    lib.root_module.addImport("esp_idf", modules(b));
 
     const include_dirs = try std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS");
     var it_inc = std.mem.tokenize(u8, include_dirs, ";");
@@ -84,6 +82,26 @@ pub fn build(b: *std.Build) !void {
     });
     lib.linkLibC();
     b.installArtifact(lib);
+}
+
+fn modules(b: *std.Build) *std.Build.Module {
+    const led = b.addModule("led", .{
+        .root_source_file = .{
+            .path = "led-strip.zig",
+        },
+    });
+    const idf = b.addModule("esp_idf", .{
+        .root_source_file = .{
+            .path = "idf-sys.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "led",
+                .module = led,
+            },
+        },
+    });
+    return idf;
 }
 
 // Targets config
