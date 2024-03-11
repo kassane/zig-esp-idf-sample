@@ -1,4 +1,4 @@
-//! esp-idf headers 'zig translate-c' v0.12.0 for xtensa target (re-edited by @kassane)
+// esp-idf headers 'zig translate-c' v0.12.0 for xtensa target (re-edited by @kassane)
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -4521,6 +4521,7 @@ pub const itimerspec = extern struct {
 
 // panic handler for esp-idf
 pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, _: ?usize) noreturn {
+    @setCold(true);
     esp_log_write(default_level, "panic_handler", "PANIC: caused by %s\n", msg.ptr, esp_log_timestamp());
     if (error_return_trace) |trace| {
         for (trace.instruction_addresses) |address| {
@@ -4528,4 +4529,28 @@ pub fn panic(msg: []const u8, error_return_trace: ?*std.builtin.StackTrace, _: ?
         }
     }
     esp_system_abort("aborting...");
+}
+
+pub fn espLogFn(
+    comptime level: std.log.Level,
+    comptime scope: @TypeOf(.EnumLiteral),
+    comptime format: []const u8,
+    args: anytype,
+) void {
+    var heap = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
+    defer heap.deinit();
+    const allocator = heap.allocator();
+
+    // Ignore all non-error logging from sources other than
+    // .my_project, .nice_library and the default
+    const scope_prefix = "(" ++ switch (scope) {
+        .my_project, .nice_library, std.log.default_log_scope => @tagName(scope),
+        else => if (@intFromEnum(level) <= @intFromEnum(std.log.Level.err))
+            @tagName(scope)
+        else
+            @tagName(scope),
+    } ++ "): ";
+
+    const prefix = "[" ++ comptime level.asText() ++ "] " ++ scope_prefix;
+    ESP_LOGI(allocator, "logging", prefix ++ format ++ "\n", args);
 }

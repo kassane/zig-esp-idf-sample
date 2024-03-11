@@ -16,8 +16,8 @@ export fn app_main() callconv(.C) void {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    esp_idf.ESP_LOGI(allocator, tag, "Hello, world from Zig!\n", .{});
-    esp_idf.ESP_LOGI(allocator, tag,
+    log.info("Hello, world from Zig!\n", .{});
+    log.info(
         \\
         \\[Zig Info]
         \\* Version: {s}
@@ -82,21 +82,31 @@ export fn app_main() callconv(.C) void {
 }
 export fn foo(_: ?*anyopaque) callconv(.C) void {
     while (true) {
-        _ = std.c.printf("Demo_Task foo printing..\n");
+        log.info("Demo_Task foo printing..", .{});
         esp_idf.vTaskDelay(2000 / esp_idf.portTICK_PERIOD_MS);
     }
 }
 export fn bar(_: ?*anyopaque) callconv(.C) void {
     while (true) {
-        _ = std.c.printf("Demo_Task bar printing..\n");
+        log.info("Demo_Task bar printing..", .{});
         esp_idf.vTaskDelay(1000 / esp_idf.portTICK_PERIOD_MS);
     }
 }
 
-// zig panic handler overritten by esp_idf.panic
+// zig panic handler override by esp_idf.panic
 pub usingnamespace if (!@hasDecl(@This(), "panic"))
     struct {
         pub const panic = esp_idf.panic;
     }
 else
     struct {};
+
+const log = std.log.scoped(.esp_idf);
+pub const std_options = .{
+    .log_level = switch (builtin.mode) {
+        .Debug => .debug,
+        else => .info,
+    },
+    // Define logFn to override the std implementation
+    .logFn = esp_idf.espLogFn,
+};
