@@ -15,50 +15,30 @@ pub fn build(b: *std.Build) !void {
     });
     lib.root_module.addImport("esp_idf", modules(b));
 
-    const include_dirs = try std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS");
-    var it_inc = std.mem.tokenize(u8, include_dirs, ";");
-    while (it_inc.next()) |dir| {
-        lib.addSystemIncludePath(.{ .path = dir });
+    const include_dirs = std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS") catch "";
+    if (!std.mem.eql(u8, include_dirs, "")) {
+        var it_inc = std.mem.tokenize(u8, include_dirs, ";");
+        while (it_inc.next()) |dir| {
+            lib.addSystemIncludePath(.{ .path = dir });
+        }
     }
 
-    const home_dir = try std.process.getEnvVarOwned(b.allocator, "HOME");
-    const archtools = b.fmt("{s}-esp-elf", .{
-        @tagName(lib.rootModuleTarget().cpu.arch),
-    });
+    const home_dir = std.process.getEnvVarOwned(b.allocator, "HOME") catch "";
+    if (!std.mem.eql(u8, home_dir, "")) {
+        const archtools = b.fmt("{s}-esp-elf", .{
+            @tagName(lib.rootModuleTarget().cpu.arch),
+        });
 
-    lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{
-        home_dir,
-        ".espressif",
-        "tools",
-        archtools,
-        "esp-13.2.0_20230928",
-        archtools,
-        "include",
-    }) });
-    lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{
-        home_dir,
-        ".espressif",
-        "tools",
-        archtools,
-        "esp-13.2.0_20230928",
-        archtools,
-        archtools,
-        "sys-include",
-    }) });
-    lib.addSystemIncludePath(.{
-        .path = b.pathJoin(&.{
+        lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{
             home_dir,
             ".espressif",
             "tools",
             archtools,
             "esp-13.2.0_20230928",
-            archtools,
             archtools,
             "include",
-        }),
-    });
-    lib.addLibraryPath(.{
-        .path = b.pathJoin(&.{
+        }) });
+        lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{
             home_dir,
             ".espressif",
             "tools",
@@ -66,20 +46,44 @@ pub fn build(b: *std.Build) !void {
             "esp-13.2.0_20230928",
             archtools,
             archtools,
-            "lib",
-        }),
-    });
-    lib.addLibraryPath(.{
-        .path = b.pathJoin(&.{
-            home_dir,
-            ".espressif",
-            "tools",
-            archtools,
-            "esp-13.2.0_20230928",
-            archtools,
-            "lib",
-        }),
-    });
+            "sys-include",
+        }) });
+        lib.addSystemIncludePath(.{
+            .path = b.pathJoin(&.{
+                home_dir,
+                ".espressif",
+                "tools",
+                archtools,
+                "esp-13.2.0_20230928",
+                archtools,
+                archtools,
+                "include",
+            }),
+        });
+        lib.addLibraryPath(.{
+            .path = b.pathJoin(&.{
+                home_dir,
+                ".espressif",
+                "tools",
+                archtools,
+                "esp-13.2.0_20230928",
+                archtools,
+                archtools,
+                "lib",
+            }),
+        });
+        lib.addLibraryPath(.{
+            .path = b.pathJoin(&.{
+                home_dir,
+                ".espressif",
+                "tools",
+                archtools,
+                "esp-13.2.0_20230928",
+                archtools,
+                "lib",
+            }),
+        });
+    }
     lib.linkLibC();
     b.installArtifact(lib);
 }
