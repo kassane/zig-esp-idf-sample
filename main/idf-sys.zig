@@ -72,7 +72,7 @@ fn rawHeapCapsFree(
 // Alocator for use with raw_multi_heap_allocator
 pub const raw_multi_heap_allocator: std.mem.Allocator = .{
     .ptr = undefined,
-    .vtable = &raw_heap_caps_allocator_vtable,
+    .vtable = &raw_multi_heap_allocator_vtable,
 };
 const raw_multi_heap_allocator_vtable = std.mem.Allocator.VTable{
     .alloc = rawMultiHeapAlloc,

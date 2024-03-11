@@ -9,8 +9,8 @@ export fn app_main() callconv(.C) void {
     // std.heap.raw_c_allocator
 
     // custom allocators (based on raw_c_allocator)
-    // esp_idf.esp_idf.raw_heap_caps_allocator
-    // esp_idf.esp_idf.raw_multi_heap_allocator
+    // esp_idf.raw_heap_caps_allocator
+    // esp_idf.raw_multi_heap_allocator
 
     var arena = std.heap.ArenaAllocator.init(esp_idf.raw_heap_caps_allocator);
     defer arena.deinit();

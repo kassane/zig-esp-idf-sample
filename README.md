@@ -1,6 +1,22 @@
 # zig-esp-idf-sample
 
-Running zig std allocator (static-lib) on esp-idf freertos
+Running zig std allocator (as  static-lib) on [esp-idf FreeRTOS](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos.html).
+
+> :information_source::
+>
+> Asserts allocations are within `@alignOf(std.c.max_align_t)` and directly calls
+> `malloc`/`free`. Does not attempt to utilize `malloc_usable_size`.
+>
+> `std.heap.raw_c_allocator` allocator is safe to use as the backing allocator with
+> `std.heap.ArenaAllocator` for example and is more optimal in such a case
+> than `std.heap.c_allocator`. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#A;std:heap.raw_c_allocator)
+>
+> Custom Allocators (based on `std.heap.raw_c_allocator`)
+>
+> `esp_idf.raw_heap_caps_allocator`
+> `esp_idf.raw_multi_heap_allocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/v5.2.1/esp32c3/api-reference/system/mem_alloc.html)
+>
+> `std.heap.ArenaAllocator` takes an existing allocator, wraps it, and provides an interface where you can allocate without freeing, and then free it all together. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#A;std:heap.ArenaAllocator)
 
 ## Required
 
@@ -8,4 +24,4 @@ Running zig std allocator (static-lib) on esp-idf freertos
 - [ESP-IDF](https://github.com/espressif/esp-idf) - v4.4 or v5.2
 
 
-> :warning:: Zig upstream (LLVM-Codegen) not have xtensa support. Similar to [esp-rs](https://github.com/esp-rs) need to use [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) - toolchain forked.
+> :warning:: Zig upstream (LLVM-Codegen) does not have xtensa support. Similar to [esp-rs](https://github.com/esp-rs), it is necessary to use the [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) - toolchain forked.
