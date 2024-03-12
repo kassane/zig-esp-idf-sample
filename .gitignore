@@ -2,3 +2,5 @@ build/
 zig-*/
 .vscode/
 .cache/
+sdkconfig
+*.lock

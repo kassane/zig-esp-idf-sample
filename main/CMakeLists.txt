@@ -1,5 +1,5 @@
 set(DEPS "pthread" "driver" "vfs")
-idf_component_register(SRCS "placeholder.c"
+idf_component_register(SRCS "lib.cc" "placeholder.c"
     INCLUDE_DIRS "."
     PRIV_REQUIRES "${DEPS}"
 )
@@ -39,7 +39,7 @@ add_custom_target(zig_build
     "INCLUDE_DIRS=${include_dirs}"
     "LIBRARIES=${link_libs}"
     zig build
-    --build-file ${CMAKE_CURRENT_SOURCE_DIR}/build.zig
+    --build-file ${CMAKE_CURRENT_SOURCE_DIR}/../build.zig
     -Doptimize=${ZIG_BUILD_TYPE}
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
