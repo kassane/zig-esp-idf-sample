@@ -9,14 +9,14 @@ Running zig std allocator (as  static-lib) on [esp-idf FreeRTOS](https://docs.es
 >
 > `std.heap.raw_c_allocator` allocator is safe to use as the backing allocator with
 > `std.heap.ArenaAllocator` for example and is more optimal in such a case
-> than `std.heap.c_allocator`. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#A;std:heap.raw_c_allocator)
+> than `std.heap.c_allocator`. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#std.heap.raw_c_allocator)
 >
 > Custom Allocators (based on `std.heap.raw_c_allocator`)
 >
 > `esp_idf.raw_heap_caps_allocator`
 > `esp_idf.raw_multi_heap_allocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/v5.2.1/esp32c3/api-reference/system/mem_alloc.html)
 >
-> `std.heap.ArenaAllocator` takes an existing allocator, wraps it, and provides an interface where you can allocate without freeing, and then free it all together. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#A;std:heap.ArenaAllocator)
+> `std.heap.ArenaAllocator` takes an existing allocator, wraps it, and provides an interface where you can allocate without freeing, and then free it all together. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#std.heap.ArenaAllocator)
 
 ## Required
 
