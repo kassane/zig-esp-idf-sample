@@ -1,5 +1,5 @@
 //! Need: idf.py add-dependency espressif/led_strip
-const idf = @import("esp_idf");
+const idf = @import("sys");
 const std = @import("std");
 
 // Functions & types

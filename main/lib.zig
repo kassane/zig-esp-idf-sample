@@ -1,8 +1,18 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const esp_idf = @import("esp_idf");
-
 const tag = "zig-example";
+
+fn blinkLED(delay_ms: u32) void {
+    _ = esp_idf.gpio_set_direction(.GPIO_NUM_18, .GPIO_MODE_OUTPUT);
+    while (true) {
+        log.info("LED: ON", .{});
+        _ = esp_idf.gpio_set_level(.GPIO_NUM_18, 1);
+        esp_idf.vTaskDelay(delay_ms / esp_idf.portTICK_PERIOD_MS);
+        log.info("LED: OFF", .{});
+        _ = esp_idf.gpio_set_level(.GPIO_NUM_18, 0);
+    }
+}
 
 export fn app_main() callconv(.C) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
@@ -79,6 +89,12 @@ export fn app_main() callconv(.C) void {
     if (esp_idf.xTaskCreate(bar, "bar", 1024 * 3, null, 2, null) == 0) {
         @panic("Error: Task bar not created!\n");
     }
+    if (esp_idf.xTaskCreate(blinkclock, "blink", 1024 * 2, null, 5, null) == 0) {
+        @panic("Error: Task blinkclock not created!\n");
+    }
+}
+export fn blinkclock(_: ?*anyopaque) void {
+    blinkLED(1000);
 }
 export fn foo(_: ?*anyopaque) callconv(.C) void {
     while (true) {

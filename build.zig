@@ -119,19 +119,34 @@ pub fn build(b: *std.Build) !void {
 }
 
 fn modules(b: *std.Build) *std.Build.Module {
+    const sys = b.addModule("sys", .{
+        .root_source_file = .{
+            .path = "imports/idf-sys.zig",
+        },
+    });
     const led = b.addModule("led", .{
         .root_source_file = .{
             .path = "imports/led-strip.zig",
         },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
     });
     const idf = b.addModule("esp_idf", .{
         .root_source_file = .{
-            .path = "imports/idf-sys.zig",
+            .path = "imports/idf.zig",
         },
         .imports = &.{
             .{
                 .name = "led",
                 .module = led,
+            },
+            .{
+                .name = "sys",
+                .module = sys,
             },
         },
     });
