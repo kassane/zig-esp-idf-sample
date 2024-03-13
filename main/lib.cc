@@ -1,55 +1,42 @@
+#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "soc/gpio_num.h"
 #include <cstdio>
 #include <expected>
-#include <format>
 #include <string>
-#include <vector>
 
-consteval double
-add(const double a, const double b)
-{
-  return a + b;
+// GPIO Pin configuration
+#ifndef CONFIG_BLINK_GPIO
+constexpr auto BLINK_GPIO = GPIO_NUM_2;
+#else
+constexpr auto BLINK_GPIO = CONFIG_BLINK_GPIO;
+#endif
+
+// Function to blink LED
+std::expected<void, std::string> blinkLED(int delay_ms) {
+  gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+
+  while (true) {
+    gpio_set_level(BLINK_GPIO, 1); // LED ON
+    vTaskDelay(delay_ms / portTICK_PERIOD_MS);
+    gpio_set_level(BLINK_GPIO, 0); // LED OFF
+    vTaskDelay(delay_ms / portTICK_PERIOD_MS);
+  }
+
+  return {};
 }
 
-std::expected<int, std::string>
-divide(int numerator, int denominator)
-{
-  if (denominator == 0) {
-    return std::unexpected("Division by zero");
-  }
-  return numerator / denominator;
-}
+extern "C" void app_main() {
+  // Create a task for blinking LED
+  xTaskCreate(
+      [](void *pvParameter) {
+        std::expected<void, std::string> result =
+            blinkLED(1000); // Blink every 1 second
 
-std::expected<std::vector<int>, std::string>
-generateVector(int size)
-{
-  if (size < 0) {
-    return std::unexpected("Size cannot be negative.");
-  }
-
-  std::vector<int> vec(size);
-  for (int i = 0; i < size; ++i) {
-    vec[i] = i;
-  }
-
-  return vec;
-}
-
-extern "C"
-{
-  void app_main(void)
-  {
-    const auto hello = std::format("Add 6 + 7.5 = {}\n", add(6, 7.5));
-    std::printf(hello.c_str());
-    auto result = generateVector(5);
-
-    if (result) {
-      std::printf("Vector generated successfully:\n");
-      for (int num : *result) {
-        std::printf("%d ", num);
-      }
-      std::printf("\n");
-    } else {
-      std::printf("Failed to generate vector: %s\n", result.error().c_str());
-    }
-  }
+        if (!result) {
+          std::printf("Error: %s\n", result.error().c_str());
+        }
+      },
+      "blink_task", 2048, nullptr, 5, nullptr);
 }

@@ -1,4 +1,7 @@
-# zig-esp-idf-sample
+# Using Zig language & toolchain with ESP-IDF
+
+| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-P4 | ESP32-S2 | ESP32-S3 |
+| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- | -------- |
 
 Running zig std allocator (as  static-lib) on [esp-idf FreeRTOS](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos.html).
 

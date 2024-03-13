@@ -1,5 +1,5 @@
 set(DEPS "pthread" "driver" "vfs")
-idf_component_register(SRCS "lib.cc" "placeholder.c"
+idf_component_register(SRCS "placeholder.c"
     INCLUDE_DIRS "."
     PRIV_REQUIRES "${DEPS}"
 )

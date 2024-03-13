@@ -9,42 +9,42 @@ pub fn build(b: *std.Build) !void {
 
     const lib = b.addStaticLibrary(.{
         .name = "zig",
-        // comment .root_source_file, make null value for module detection
+        // comment or remove .root_source_file, make null value for module detection
         .root_source_file = .{ .path = "main/lib.zig" },
         .target = target,
         .optimize = optimize,
     });
-    // For C and/or C++ files (using clang/++)
-    // lib.addCSourceFiles(.{
-    //     .files = &.{
-    //         "main/lib.cc",
-    //     },
-    //     .flags = &.{
-    //         "-Wall",
-    //         "-Wextra",
-    //         "-fno-exceptions",
-    //         "-fno-rtti",
-    //         // "-Wpedantic",
-    //         "-fno-threadsafe-statics",
-    //         "-std=c++23",
-    //         "-ffreestanding",
-    //         "-fexperimental-library",
-    //     },
-    // });
-    // lib.defineCMacro("_LIBCPP_HAS_NO_THREADS", null);
-    // lib.defineCMacro("_LIBCPP_HAS_NO_LOCALIZATION", null);
-    // lib.defineCMacro("_LIBCPP_FREESTANDING", null);
-    // lib.defineCMacro("_LIBCPP_HAS_NO_WIDE_CHARACTERS", null);
-    // lib.defineCMacro("_LIBCPP_HAS_NO_FILESYSTEM", null);
-    // lib.defineCMacro("_LIBCPP_HAS_NO_RANDOM_DEVICE", null);
-
-    lib.linkLibC(); // libc only (stub)
-    // or
-    // lib.linkLibCpp(); // static linking (libc++ + libunwind + libc++abi) + libc
 
     // if detect zig root_source_file, enable zig modules (or use c/c++ files)
-    if (lib.root_module.root_source_file != null)
+    if (lib.root_module.root_source_file != null) {
         lib.root_module.addImport("esp_idf", modules(b));
+        lib.linkLibC();
+    } else {
+        // For C and/or C++ files (using clang/++)
+        lib.addCSourceFiles(.{
+            .files = &.{
+                "main/lib.cc",
+            },
+            .flags = &.{
+                "-Wall",
+                "-Wextra",
+                "-fno-exceptions",
+                "-fno-rtti",
+                "-Wpedantic",
+                "-fno-threadsafe-statics",
+                "-std=c++23",
+                "-ffreestanding",
+                "-fexperimental-library",
+            },
+        });
+        lib.defineCMacro("_LIBCPP_HAS_NO_THREADS", null);
+        lib.defineCMacro("_LIBCPP_HAS_NO_LOCALIZATION", null);
+        // lib.defineCMacro("_LIBCPP_HAS_NO_WIDE_CHARACTERS", null);
+        // lib.defineCMacro("_LIBCPP_HAS_NO_FILESYSTEM", null);
+        // lib.defineCMacro("_LIBCPP_HAS_NO_RANDOM_DEVICE", null);
+        lib.defineCMacro("_LIBCPP_FREESTANDING", null);
+        lib.linkLibCpp(); // static linking (libc++ + libunwind + libc++abi) + libc
+    }
 
     const include_dirs = std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS") catch "";
     if (!std.mem.eql(u8, include_dirs, "")) {
