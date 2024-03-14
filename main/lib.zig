@@ -1,16 +1,18 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const esp_idf = @import("esp_idf");
-const tag = "zig-example";
 
 fn blinkLED(delay_ms: u32) void {
-    _ = esp_idf.gpio_set_direction(.GPIO_NUM_18, .GPIO_MODE_OUTPUT);
+    esp_idf.espCheckError(esp_idf.gpio_set_direction(.GPIO_NUM_18, .GPIO_MODE_OUTPUT)) catch |err|
+        @panic(@errorName(err));
     while (true) {
         log.info("LED: ON", .{});
-        _ = esp_idf.gpio_set_level(.GPIO_NUM_18, 1);
+        esp_idf.espCheckError(esp_idf.gpio_set_level(.GPIO_NUM_18, 1)) catch |err|
+            @panic(@errorName(err));
         esp_idf.vTaskDelay(delay_ms / esp_idf.portTICK_PERIOD_MS);
         log.info("LED: OFF", .{});
-        _ = esp_idf.gpio_set_level(.GPIO_NUM_18, 0);
+        esp_idf.espCheckError(esp_idf.gpio_set_level(.GPIO_NUM_18, 0)) catch |err|
+            @panic(@errorName(err));
     }
 }
 
@@ -19,10 +21,11 @@ export fn app_main() callconv(.C) void {
     // std.heap.raw_c_allocator
 
     // custom allocators (based on raw_c_allocator)
-    // esp_idf.raw_heap_caps_allocator
-    // esp_idf.raw_multi_heap_allocator
+    // esp_idf.HeapCapsAllocator
+    // esp_idf.MultiHeapAllocator
 
-    var arena = std.heap.ArenaAllocator.init(esp_idf.raw_heap_caps_allocator);
+    var heap = esp_idf.HeapCapsAllocator.init(@intFromEnum(caps.MALLOC_CAP_DEFAULT) | @intFromEnum(caps.MALLOC_CAP_INTERNAL));
+    var arena = std.heap.ArenaAllocator.init(heap.allocator());
     defer arena.deinit();
     const allocator = arena.allocator();
 
@@ -51,9 +54,9 @@ export fn app_main() callconv(.C) void {
         \\
     ,
         .{
-            esp_idf.heap_caps_get_total_size(@intFromEnum(esp_idf.Caps.MALLOC_CAP_DEFAULT) | @intFromEnum(esp_idf.Caps.MALLOC_CAP_INTERNAL)),
-            esp_idf.heap_caps_get_free_size(@intFromEnum(esp_idf.Caps.MALLOC_CAP_DEFAULT) | @intFromEnum(esp_idf.Caps.MALLOC_CAP_INTERNAL)),
-            esp_idf.heap_caps_get_minimum_free_size(@intFromEnum(esp_idf.Caps.MALLOC_CAP_DEFAULT) | @intFromEnum(esp_idf.Caps.MALLOC_CAP_INTERNAL)),
+            esp_idf.heap_caps_get_total_size(@intFromEnum(caps.MALLOC_CAP_DEFAULT) | @intFromEnum(caps.MALLOC_CAP_INTERNAL)),
+            esp_idf.heap_caps_get_free_size(@intFromEnum(caps.MALLOC_CAP_DEFAULT) | @intFromEnum(caps.MALLOC_CAP_INTERNAL)),
+            esp_idf.heap_caps_get_minimum_free_size(@intFromEnum(caps.MALLOC_CAP_DEFAULT) | @intFromEnum(caps.MALLOC_CAP_INTERNAL)),
         },
     );
     esp_idf.ESP_LOGI(
@@ -126,3 +129,6 @@ pub const std_options = .{
     // Define logFn to override the std implementation
     .logFn = esp_idf.espLogFn,
 };
+
+const caps = esp_idf.Caps;
+const tag = "zig-example";

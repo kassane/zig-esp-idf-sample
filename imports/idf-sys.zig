@@ -4,125 +4,147 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 // Alocator for use with raw_heap_caps_allocator
-pub const raw_heap_caps_allocator: std.mem.Allocator = .{
-    .ptr = undefined,
-    .vtable = &raw_heap_caps_allocator_vtable,
-};
-const raw_heap_caps_allocator_vtable = std.mem.Allocator.VTable{
-    .alloc = rawHeapCapsAlloc,
-    .resize = rawHeapCapsResize,
-    .free = rawHeapCapsFree,
-};
+pub const HeapCapsAllocator = struct {
+    caps: Caps = .MALLOC_CAP_DEFAULT,
 
-fn rawHeapCapsAlloc(
-    _: *anyopaque,
-    len: usize,
-    log2_ptr_align: u8,
-    ret_addr: usize,
-) ?[*]u8 {
-    _ = ret_addr;
-    std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(
-        usize,
-        @alignOf(std.c.max_align_t),
-    ));
-    return @as(?[*]u8, @ptrCast(
-        heap_caps_malloc(
-            len,
-            @intFromEnum(Caps.MALLOC_CAP_DEFAULT) | @intFromEnum(Caps.MALLOC_CAP_INTERNAL),
-        ),
-    ));
-}
+    const Self = @This();
+    pub fn init(cap: u32) Self {
+        return .{
+            .caps = @enumFromInt(cap),
+        };
+    }
+    pub fn allocator(self: *Self) std.mem.Allocator {
+        return .{
+            .ptr = self,
+            .vtable = &.{
+                .alloc = rawHeapCapsAlloc,
+                .resize = rawHeapCapsResize,
+                .free = rawHeapCapsFree,
+            },
+        };
+    }
+    fn rawHeapCapsAlloc(
+        ctx: *anyopaque,
+        len: usize,
+        log2_ptr_align: u8,
+        ret_addr: usize,
+    ) ?[*]u8 {
+        _ = ret_addr;
+        const self: *Self = @ptrCast(@alignCast(ctx));
+        std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(
+            usize,
+            @alignOf(std.c.max_align_t),
+        ));
+        return @as(?[*]u8, @ptrCast(
+            heap_caps_malloc(
+                len,
+                @intFromEnum(self.caps),
+            ),
+        ));
+    }
 
-fn rawHeapCapsResize(
-    _: *anyopaque,
-    buf: []u8,
-    log2_old_align: u8,
-    new_len: usize,
-    ret_addr: usize,
-) bool {
-    _ = log2_old_align;
-    _ = ret_addr;
+    fn rawHeapCapsResize(
+        _: *anyopaque,
+        buf: []u8,
+        log2_old_align: u8,
+        new_len: usize,
+        ret_addr: usize,
+    ) bool {
+        _ = log2_old_align;
+        _ = ret_addr;
 
-    if (new_len <= buf.len)
-        return true;
-
-    const full_len = if (@TypeOf(heap_caps_get_allocated_size) != void)
-        heap_caps_get_allocated_size(buf.ptr);
-    if (new_len <= full_len) return true;
-
-    return false;
-}
-
-fn rawHeapCapsFree(
-    _: *anyopaque,
-    buf: []u8,
-    log2_old_align: u8,
-    ret_addr: usize,
-) void {
-    _ = log2_old_align;
-    _ = ret_addr;
-    std.debug.assert(heap_caps_check_integrity_all(true));
-    heap_caps_free(buf.ptr);
-}
-// Alocator for use with raw_multi_heap_allocator
-pub const raw_multi_heap_allocator: std.mem.Allocator = .{
-    .ptr = undefined,
-    .vtable = &raw_multi_heap_allocator_vtable,
-};
-const raw_multi_heap_allocator_vtable = std.mem.Allocator.VTable{
-    .alloc = rawMultiHeapAlloc,
-    .resize = rawMultiHeapResize,
-    .free = rawMultiHeapFree,
-};
-
-var multi_heap_alloc: multi_heap_handle_t = null;
-fn rawMultiHeapAlloc(
-    _: *anyopaque,
-    len: usize,
-    log2_ptr_align: u8,
-    ret_addr: usize,
-) ?[*]u8 {
-    _ = ret_addr;
-    std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(
-        usize,
-        @alignOf(std.c.max_align_t),
-    ));
-    return @as(?[*]u8, @ptrCast(
-        multi_heap_malloc(multi_heap_alloc, len),
-    ));
-}
-
-fn rawMultiHeapResize(
-    _: *anyopaque,
-    buf: []u8,
-    log2_old_align: u8,
-    new_len: usize,
-    ret_addr: usize,
-) bool {
-    _ = log2_old_align;
-    _ = ret_addr;
-
-    if (new_len <= buf.len)
-        return true;
-
-    if (@TypeOf(multi_heap_get_allocated_size) != void)
-        if (new_len <= multi_heap_get_allocated_size(multi_heap_alloc, buf.ptr))
+        if (new_len <= buf.len)
             return true;
 
-    return false;
-}
+        const full_len = if (@TypeOf(heap_caps_get_allocated_size) != void)
+            heap_caps_get_allocated_size(buf.ptr);
+        if (new_len <= full_len) return true;
 
-fn rawMultiHeapFree(
-    _: *anyopaque,
-    buf: []u8,
-    log2_old_align: u8,
-    ret_addr: usize,
-) void {
-    _ = log2_old_align;
-    _ = ret_addr;
-    defer std.debug.assert(multi_heap_check(multi_heap_alloc, true));
-    multi_heap_free(multi_heap_alloc, buf.ptr);
-}
+        return false;
+    }
+
+    fn rawHeapCapsFree(
+        _: *anyopaque,
+        buf: []u8,
+        log2_old_align: u8,
+        ret_addr: usize,
+    ) void {
+        _ = log2_old_align;
+        _ = ret_addr;
+        std.debug.assert(heap_caps_check_integrity_all(true));
+        heap_caps_free(buf.ptr);
+    }
+};
+
+// Alocator for use with raw_multi_heap_allocator
+pub const MultiHeapAllocator = struct {
+    multi_heap_alloc: multi_heap_handle_t = null,
+
+    const Self = @This();
+    pub fn init() Self {
+        return .{};
+    }
+    pub fn allocator(self: *Self) std.mem.Allocator {
+        return .{
+            .ptr = self,
+            .vtable = &.{
+                .alloc = rawMultiHeapAlloc,
+                .resize = rawMultiHeapResize,
+                .free = rawMultiHeapFree,
+            },
+        };
+    }
+    fn rawMultiHeapAlloc(
+        ctx: *anyopaque,
+        len: usize,
+        log2_ptr_align: u8,
+        ret_addr: usize,
+    ) ?[*]u8 {
+        _ = ret_addr;
+        const self: *Self = @ptrCast(@alignCast(ctx));
+        std.debug.assert(log2_ptr_align <= comptime std.math.log2_int(
+            usize,
+            @alignOf(std.c.max_align_t),
+        ));
+        return @as(?[*]u8, @ptrCast(
+            multi_heap_malloc(self.multi_heap_alloc, multi_heap_free_size(self.multi_heap_alloc) * len),
+        ));
+    }
+
+    fn rawMultiHeapResize(
+        _: *anyopaque,
+        buf: []u8,
+        log2_old_align: u8,
+        new_len: usize,
+        ret_addr: usize,
+    ) bool {
+        _ = log2_old_align;
+        _ = ret_addr;
+        const self: Self = .{};
+
+        if (new_len <= buf.len)
+            return true;
+
+        if (@TypeOf(multi_heap_get_allocated_size) != void)
+            if (new_len <= multi_heap_get_allocated_size(self.multi_heap_alloc, buf.ptr))
+                return true;
+
+        return false;
+    }
+
+    fn rawMultiHeapFree(
+        _: *anyopaque,
+        buf: []u8,
+        log2_old_align: u8,
+        ret_addr: usize,
+    ) void {
+        _ = log2_old_align;
+        _ = ret_addr;
+        const self: Self = .{};
+        defer std.debug.assert(multi_heap_check(self.multi_heap_alloc, true));
+        multi_heap_free(self.multi_heap_alloc, buf.ptr);
+    }
+};
 
 // C error
 pub const esp_err_t = enum(c_int) {
@@ -1443,7 +1465,13 @@ pub extern fn esp_setup_syscall_table() void;
 pub extern fn esp_set_time_from_rtc() void;
 pub extern fn esp_sync_timekeeping_timers() void;
 pub extern fn esp_newlib_locks_init() void;
-pub const multi_heap_info = opaque {};
+pub const multi_heap_info = extern struct {
+    lock: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    free_bytes: usize = std.mem.zeroes(usize),
+    minimum_free_bytes: usize = std.mem.zeroes(usize),
+    pool_size: usize = std.mem.zeroes(usize),
+    heap_data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+};
 pub const multi_heap_handle_t = ?*multi_heap_info;
 pub extern fn multi_heap_aligned_alloc(heap: multi_heap_handle_t, size: usize, alignment: usize) ?*anyopaque;
 pub extern fn multi_heap_malloc(heap: multi_heap_handle_t, size: usize) ?*anyopaque;
