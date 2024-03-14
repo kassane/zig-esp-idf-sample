@@ -4431,6 +4431,8 @@ pub extern fn esp_blufi_disconnect() void;
 pub extern fn esp_blufi_adv_stop() void;
 pub extern fn esp_blufi_adv_start() void;
 pub extern fn esp_blufi_send_encap(arg: ?*anyopaque) void;
+pub extern fn esp_random() u32;
+pub extern fn esp_fill_random(buf: ?*anyopaque, len: usize) void;
 
 pub const va_list = extern struct {
     __va_stk: [*c]c_int = std.mem.zeroes([*c]c_int),

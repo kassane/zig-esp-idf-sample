@@ -135,6 +135,17 @@ fn modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const bootloader = b.addModule("bootloader", .{
+        .root_source_file = .{
+            .path = "imports/bootloader.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     const idf = b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = "imports/idf.zig",
@@ -143,6 +154,10 @@ fn modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "led",
                 .module = led,
+            },
+            .{
+                .name = "bootloader",
+                .module = bootloader,
             },
             .{
                 .name = "sys",
