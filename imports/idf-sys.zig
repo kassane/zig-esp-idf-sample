@@ -1457,7 +1457,8 @@ pub inline fn esp_stack_ptr_is_sane(sp: u32) bool {
     return esp_stack_ptr_in_dram(sp);
 }
 pub extern fn esp_newlib_time_init() void;
-// pub extern fn esp_reent_init(r: [*c]_reent) void;
+pub const _reent = opaque {};
+pub extern fn esp_reent_init(r: ?*_reent) void;
 pub extern fn esp_newlib_init_global_stdio(stdio_dev: [*:0]const u8) void;
 pub extern fn esp_reent_cleanup() void;
 pub extern fn esp_newlib_init() void;
@@ -1796,12 +1797,12 @@ pub const eSleepModeStatus = enum(c_uint) {
     eStandardSleep = 1,
     eNoTasksWaitingTimeout = 2,
 };
-pub extern fn xTaskCreatePinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pvCreatedTask: [*c]TaskHandle_t, xCoreID: BaseType_t) BaseType_t;
-pub inline fn xTaskCreate(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxCreatedTask: [*c]TaskHandle_t) BaseType_t {
+pub extern fn xTaskCreatePinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*:0]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pvCreatedTask: [*c]TaskHandle_t, xCoreID: BaseType_t) BaseType_t;
+pub inline fn xTaskCreate(pxTaskCode: TaskFunction_t, pcName: [*:0]const u8, usStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxCreatedTask: [*c]TaskHandle_t) BaseType_t {
     return xTaskCreatePinnedToCore(pxTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pxCreatedTask, @as(BaseType_t, @bitCast(@as(c_int, 2147483647))));
 }
-pub extern fn xTaskCreateStaticPinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t, xCoreID: BaseType_t) TaskHandle_t;
-pub inline fn xTaskCreateStatic(pxTaskCode: TaskFunction_t, pcName: [*c]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, puxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t) TaskHandle_t {
+pub extern fn xTaskCreateStaticPinnedToCore(pxTaskCode: TaskFunction_t, pcName: [*:0]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, pxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t, xCoreID: BaseType_t) TaskHandle_t;
+pub inline fn xTaskCreateStatic(pxTaskCode: TaskFunction_t, pcName: [*:0]const u8, ulStackDepth: u32, pvParameters: ?*anyopaque, uxPriority: UBaseType_t, puxStackBuffer: [*c]StackType_t, pxTaskBuffer: [*c]StaticTask_t) TaskHandle_t {
     return xTaskCreateStaticPinnedToCore(pxTaskCode, pcName, ulStackDepth, pvParameters, uxPriority, puxStackBuffer, pxTaskBuffer, @as(BaseType_t, @bitCast(@as(c_int, 2147483647))));
 }
 pub extern fn vTaskAllocateMPURegions(xTask: TaskHandle_t, pxRegions: [*c]const MemoryRegion_t) void;
@@ -2241,7 +2242,7 @@ pub const esp_event_handler_t = ?*const fn (?*anyopaque, esp_event_base_t, i32, 
 pub const esp_event_handler_instance_t = ?*anyopaque;
 pub const esp_event_loop_args_t = extern struct {
     queue_size: i32 = std.mem.zeroes(i32),
-    task_name: [*c]const u8 = std.mem.zeroes([*c]const u8),
+    task_name: [*:0]const u8 = std.mem.zeroes([*c]const u8),
     task_priority: UBaseType_t = std.mem.zeroes(UBaseType_t),
     task_stack_size: u32 = std.mem.zeroes(u32),
     task_core_id: BaseType_t = std.mem.zeroes(BaseType_t),
@@ -2291,30 +2292,30 @@ pub const nvs_entry_info_t = extern struct {
 };
 pub const nvs_opaque_iterator_t = opaque {};
 pub const nvs_iterator_t = ?*nvs_opaque_iterator_t;
-pub extern fn nvs_open(namespace_name: [*c]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
-pub extern fn nvs_open_from_partition(part_name: [*c]const u8, namespace_name: [*c]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
-pub extern fn nvs_set_i8(handle: nvs_handle_t, key: [*c]const u8, value: i8) esp_err_t;
-pub extern fn nvs_set_u8(handle: nvs_handle_t, key: [*c]const u8, value: u8) esp_err_t;
-pub extern fn nvs_set_i16(handle: nvs_handle_t, key: [*c]const u8, value: i16) esp_err_t;
-pub extern fn nvs_set_u16(handle: nvs_handle_t, key: [*c]const u8, value: u16) esp_err_t;
-pub extern fn nvs_set_i32(handle: nvs_handle_t, key: [*c]const u8, value: i32) esp_err_t;
-pub extern fn nvs_set_u32(handle: nvs_handle_t, key: [*c]const u8, value: u32) esp_err_t;
-pub extern fn nvs_set_i64(handle: nvs_handle_t, key: [*c]const u8, value: i64) esp_err_t;
-pub extern fn nvs_set_u64(handle: nvs_handle_t, key: [*c]const u8, value: u64) esp_err_t;
-pub extern fn nvs_set_str(handle: nvs_handle_t, key: [*c]const u8, value: [*c]const u8) esp_err_t;
-pub extern fn nvs_set_blob(handle: nvs_handle_t, key: [*c]const u8, value: ?*const anyopaque, length: usize) esp_err_t;
-pub extern fn nvs_get_i8(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i8) esp_err_t;
-pub extern fn nvs_get_u8(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u8) esp_err_t;
-pub extern fn nvs_get_i16(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i16) esp_err_t;
-pub extern fn nvs_get_u16(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u16) esp_err_t;
-pub extern fn nvs_get_i32(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i32) esp_err_t;
-pub extern fn nvs_get_u32(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u32) esp_err_t;
-pub extern fn nvs_get_i64(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]i64) esp_err_t;
-pub extern fn nvs_get_u64(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u64) esp_err_t;
-pub extern fn nvs_get_str(handle: nvs_handle_t, key: [*c]const u8, out_value: [*c]u8, length: [*c]usize) esp_err_t;
-pub extern fn nvs_get_blob(handle: nvs_handle_t, key: [*c]const u8, out_value: ?*anyopaque, length: [*c]usize) esp_err_t;
-pub extern fn nvs_find_key(handle: nvs_handle_t, key: [*c]const u8, out_type: [*c]nvs_type_t) esp_err_t;
-pub extern fn nvs_erase_key(handle: nvs_handle_t, key: [*c]const u8) esp_err_t;
+pub extern fn nvs_open(namespace_name: [*:0]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
+pub extern fn nvs_open_from_partition(part_name: [*:0]const u8, namespace_name: [*:0]const u8, open_mode: nvs_open_mode_t, out_handle: [*c]nvs_handle_t) esp_err_t;
+pub extern fn nvs_set_i8(handle: nvs_handle_t, key: [*:0]const u8, value: i8) esp_err_t;
+pub extern fn nvs_set_u8(handle: nvs_handle_t, key: [*:0]const u8, value: u8) esp_err_t;
+pub extern fn nvs_set_i16(handle: nvs_handle_t, key: [*:0]const u8, value: i16) esp_err_t;
+pub extern fn nvs_set_u16(handle: nvs_handle_t, key: [*:0]const u8, value: u16) esp_err_t;
+pub extern fn nvs_set_i32(handle: nvs_handle_t, key: [*:0]const u8, value: i32) esp_err_t;
+pub extern fn nvs_set_u32(handle: nvs_handle_t, key: [*:0]const u8, value: u32) esp_err_t;
+pub extern fn nvs_set_i64(handle: nvs_handle_t, key: [*:0]const u8, value: i64) esp_err_t;
+pub extern fn nvs_set_u64(handle: nvs_handle_t, key: [*:0]const u8, value: u64) esp_err_t;
+pub extern fn nvs_set_str(handle: nvs_handle_t, key: [*:0]const u8, value: [*:0]const u8) esp_err_t;
+pub extern fn nvs_set_blob(handle: nvs_handle_t, key: [*:0]const u8, value: ?*const anyopaque, length: usize) esp_err_t;
+pub extern fn nvs_get_i8(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]i8) esp_err_t;
+pub extern fn nvs_get_u8(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]u8) esp_err_t;
+pub extern fn nvs_get_i16(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]i16) esp_err_t;
+pub extern fn nvs_get_u16(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]u16) esp_err_t;
+pub extern fn nvs_get_i32(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]i32) esp_err_t;
+pub extern fn nvs_get_u32(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]u32) esp_err_t;
+pub extern fn nvs_get_i64(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]i64) esp_err_t;
+pub extern fn nvs_get_u64(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]u64) esp_err_t;
+pub extern fn nvs_get_str(handle: nvs_handle_t, key: [*:0]const u8, out_value: [*c]u8, length: [*c]usize) esp_err_t;
+pub extern fn nvs_get_blob(handle: nvs_handle_t, key: [*:0]const u8, out_value: ?*anyopaque, length: [*c]usize) esp_err_t;
+pub extern fn nvs_find_key(handle: nvs_handle_t, key: [*:0]const u8, out_type: [*c]nvs_type_t) esp_err_t;
+pub extern fn nvs_erase_key(handle: nvs_handle_t, key: [*:0]const u8) esp_err_t;
 pub extern fn nvs_erase_all(handle: nvs_handle_t) esp_err_t;
 pub extern fn nvs_commit(handle: nvs_handle_t) esp_err_t;
 pub extern fn nvs_close(handle: nvs_handle_t) void;
@@ -2325,9 +2326,9 @@ pub const nvs_stats_t = extern struct {
     total_entries: usize = std.mem.zeroes(usize),
     namespace_count: usize = std.mem.zeroes(usize),
 };
-pub extern fn nvs_get_stats(part_name: [*c]const u8, nvs_stats: [*c]nvs_stats_t) esp_err_t;
+pub extern fn nvs_get_stats(part_name: [*:0]const u8, nvs_stats: [*c]nvs_stats_t) esp_err_t;
 pub extern fn nvs_get_used_entry_count(handle: nvs_handle_t, used_entries: [*c]usize) esp_err_t;
-pub extern fn nvs_entry_find(part_name: [*c]const u8, namespace_name: [*c]const u8, @"type": nvs_type_t, output_iterator: [*c]nvs_iterator_t) esp_err_t;
+pub extern fn nvs_entry_find(part_name: [*:0]const u8, namespace_name: [*:0]const u8, @"type": nvs_type_t, output_iterator: [*c]nvs_iterator_t) esp_err_t;
 pub extern fn nvs_entry_find_in_handle(handle: nvs_handle_t, @"type": nvs_type_t, output_iterator: [*c]nvs_iterator_t) esp_err_t;
 pub extern fn nvs_entry_next(iterator: [*c]nvs_iterator_t) esp_err_t;
 pub extern fn nvs_entry_info(iterator: nvs_iterator_t, out_info: [*c]nvs_entry_info_t) esp_err_t;
@@ -2390,8 +2391,8 @@ pub const esp_partition_t = extern struct {
     encrypted: bool = std.mem.zeroes(bool),
     readonly: bool = std.mem.zeroes(bool),
 };
-pub extern fn esp_partition_find(@"type": esp_partition_type_t, subtype: esp_partition_subtype_t, label: [*c]const u8) esp_partition_iterator_t;
-pub extern fn esp_partition_find_first(@"type": esp_partition_type_t, subtype: esp_partition_subtype_t, label: [*c]const u8) [*c]const esp_partition_t;
+pub extern fn esp_partition_find(@"type": esp_partition_type_t, subtype: esp_partition_subtype_t, label: [*:0]const u8) esp_partition_iterator_t;
+pub extern fn esp_partition_find_first(@"type": esp_partition_type_t, subtype: esp_partition_subtype_t, label: [*:0]const u8) [*c]const esp_partition_t;
 pub extern fn esp_partition_get(iterator: esp_partition_iterator_t) [*c]const esp_partition_t;
 pub extern fn esp_partition_next(iterator: esp_partition_iterator_t) esp_partition_iterator_t;
 pub extern fn esp_partition_iterator_release(iterator: esp_partition_iterator_t) void;
@@ -2405,7 +2406,7 @@ pub extern fn esp_partition_mmap(partition: [*c]const esp_partition_t, offset: u
 pub extern fn esp_partition_munmap(handle: esp_partition_mmap_handle_t) void;
 pub extern fn esp_partition_get_sha256(partition: [*c]const esp_partition_t, sha_256: [*c]u8) esp_err_t;
 pub extern fn esp_partition_check_identity(partition_1: [*c]const esp_partition_t, partition_2: [*c]const esp_partition_t) bool;
-pub extern fn esp_partition_register_external(flash_chip: ?*esp_flash_t, offset: usize, size: usize, label: [*c]const u8, @"type": esp_partition_type_t, subtype: esp_partition_subtype_t, out_partition: [*c][*c]const esp_partition_t) esp_err_t;
+pub extern fn esp_partition_register_external(flash_chip: ?*esp_flash_t, offset: usize, size: usize, label: [*:0]const u8, @"type": esp_partition_type_t, subtype: esp_partition_subtype_t, out_partition: [*c][*c]const esp_partition_t) esp_err_t;
 pub extern fn esp_partition_deregister_external(partition: [*c]const esp_partition_t) esp_err_t;
 pub extern fn esp_partition_unload_all() void;
 pub const nvs_sec_cfg_t = extern struct {
@@ -2421,15 +2422,15 @@ pub const nvs_sec_scheme_t = extern struct {
     nvs_flash_read_cfg: nvs_flash_read_cfg_t = std.mem.zeroes(nvs_flash_read_cfg_t),
 };
 pub extern fn nvs_flash_init() esp_err_t;
-pub extern fn nvs_flash_init_partition(partition_label: [*c]const u8) esp_err_t;
+pub extern fn nvs_flash_init_partition(partition_label: [*:0]const u8) esp_err_t;
 pub extern fn nvs_flash_init_partition_ptr(partition: [*c]const esp_partition_t) esp_err_t;
 pub extern fn nvs_flash_deinit() esp_err_t;
-pub extern fn nvs_flash_deinit_partition(partition_label: [*c]const u8) esp_err_t;
+pub extern fn nvs_flash_deinit_partition(partition_label: [*:0]const u8) esp_err_t;
 pub extern fn nvs_flash_erase() esp_err_t;
-pub extern fn nvs_flash_erase_partition(part_name: [*c]const u8) esp_err_t;
+pub extern fn nvs_flash_erase_partition(part_name: [*:0]const u8) esp_err_t;
 pub extern fn nvs_flash_erase_partition_ptr(partition: [*c]const esp_partition_t) esp_err_t;
 pub extern fn nvs_flash_secure_init(cfg: [*c]nvs_sec_cfg_t) esp_err_t;
-pub extern fn nvs_flash_secure_init_partition(partition_label: [*c]const u8, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
+pub extern fn nvs_flash_secure_init_partition(partition_label: [*:0]const u8, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
 pub extern fn nvs_flash_generate_keys(partition: [*c]const esp_partition_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
 pub extern fn nvs_flash_read_security_cfg(partition: [*c]const esp_partition_t, cfg: [*c]nvs_sec_cfg_t) esp_err_t;
 pub extern fn nvs_flash_register_security_scheme(scheme_cfg: [*c]nvs_sec_scheme_t) esp_err_t;
@@ -2736,10 +2737,10 @@ pub const esp_bt_dev_cb_param_t = extern union {
 pub const esp_bt_dev_cb_t = ?*const fn (esp_bt_dev_cb_event_t, [*c]esp_bt_dev_cb_param_t) callconv(.C) void;
 pub extern fn esp_bt_dev_register_callback(callback: esp_bt_dev_cb_t) esp_err_t;
 pub extern fn esp_bt_dev_get_address() [*c]const u8;
-pub extern fn esp_bt_dev_set_device_name(name: [*c]const u8) esp_err_t;
+pub extern fn esp_bt_dev_set_device_name(name: [*:0]const u8) esp_err_t;
 pub extern fn esp_bt_dev_get_device_name() esp_err_t;
 pub extern fn esp_bt_dev_coex_status_config(@"type": esp_bt_dev_coex_type_t, op: esp_bt_dev_coex_op_t, status: u8) esp_err_t;
-pub extern fn esp_bt_config_file_path_update(file_path: [*c]const u8) esp_err_t;
+pub extern fn esp_bt_config_file_path_update(file_path: [*:0]const u8) esp_err_t;
 pub const wifi_mode_t = enum(c_uint) {
     WIFI_MODE_NULL = 0,
     WIFI_MODE_STA = 1,
@@ -4361,7 +4362,7 @@ pub extern fn esp_ble_gap_update_whitelist(add_remove: bool, remote_bda: [*c]u8,
 pub extern fn esp_ble_gap_clear_whitelist() esp_err_t;
 pub extern fn esp_ble_gap_get_whitelist_size(length: [*c]u16) esp_err_t;
 pub extern fn esp_ble_gap_set_prefer_conn_params(bd_addr: [*c]u8, min_conn_int: u16, max_conn_int: u16, slave_latency: u16, supervision_tout: u16) esp_err_t;
-pub extern fn esp_ble_gap_set_device_name(name: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_set_device_name(name: [*:0]const u8) esp_err_t;
 pub extern fn esp_ble_gap_get_device_name() esp_err_t;
 pub extern fn esp_ble_gap_get_local_used_addr(local_used_addr: [*c]u8, addr_type: [*c]u8) esp_err_t;
 pub extern fn esp_ble_resolve_adv_data(adv_data: [*c]u8, @"type": u8, length: [*c]u8) [*c]u8;
@@ -4391,14 +4392,14 @@ pub extern fn esp_ble_gap_set_preferred_default_phy(tx_phy_mask: esp_ble_gap_phy
 pub extern fn esp_ble_gap_set_preferred_phy(bd_addr: [*c]u8, all_phys_mask: esp_ble_gap_all_phys_t, tx_phy_mask: esp_ble_gap_phy_mask_t, rx_phy_mask: esp_ble_gap_phy_mask_t, phy_options: esp_ble_gap_prefer_phy_options_t) esp_err_t;
 pub extern fn esp_ble_gap_ext_adv_set_rand_addr(instance: u8, rand_addr: [*c]u8) esp_err_t;
 pub extern fn esp_ble_gap_ext_adv_set_params(instance: u8, params: [*c]const esp_ble_gap_ext_adv_params_t) esp_err_t;
-pub extern fn esp_ble_gap_config_ext_adv_data_raw(instance: u8, length: u16, data: [*c]const u8) esp_err_t;
-pub extern fn esp_ble_gap_config_ext_scan_rsp_data_raw(instance: u8, length: u16, scan_rsp_data: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_config_ext_adv_data_raw(instance: u8, length: u16, data: [*:0]const u8) esp_err_t;
+pub extern fn esp_ble_gap_config_ext_scan_rsp_data_raw(instance: u8, length: u16, scan_rsp_data: [*:0]const u8) esp_err_t;
 pub extern fn esp_ble_gap_ext_adv_start(num_adv: u8, ext_adv: [*c]const esp_ble_gap_ext_adv_t) esp_err_t;
-pub extern fn esp_ble_gap_ext_adv_stop(num_adv: u8, ext_adv_inst: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_ext_adv_stop(num_adv: u8, ext_adv_inst: [*:0]const u8) esp_err_t;
 pub extern fn esp_ble_gap_ext_adv_set_remove(instance: u8) esp_err_t;
 pub extern fn esp_ble_gap_ext_adv_set_clear() esp_err_t;
 pub extern fn esp_ble_gap_periodic_adv_set_params(instance: u8, params: [*c]const esp_ble_gap_periodic_adv_params_t) esp_err_t;
-pub extern fn esp_ble_gap_config_periodic_adv_data_raw(instance: u8, length: u16, data: [*c]const u8) esp_err_t;
+pub extern fn esp_ble_gap_config_periodic_adv_data_raw(instance: u8, length: u16, data: [*:0]const u8) esp_err_t;
 pub extern fn esp_ble_gap_periodic_adv_start(instance: u8) esp_err_t;
 pub extern fn esp_ble_gap_periodic_adv_stop(instance: u8) esp_err_t;
 pub extern fn esp_ble_gap_set_ext_scan_params(params: [*c]const esp_ble_ext_scan_params_t) esp_err_t;
@@ -4433,6 +4434,666 @@ pub extern fn esp_blufi_adv_start() void;
 pub extern fn esp_blufi_send_encap(arg: ?*anyopaque) void;
 pub extern fn esp_random() u32;
 pub extern fn esp_fill_random(buf: ?*anyopaque, len: usize) void;
+
+pub const heap_trace_mode_t = enum(c_uint) {
+    HEAP_TRACE_ALL = 0,
+    HEAP_TRACE_LEAKS = 1,
+};
+pub const heap_trace_record_t = extern struct {
+    ccount: u32 align(4) = std.mem.zeroes(u32),
+    address: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    size: usize = std.mem.zeroes(usize),
+    alloced_by: [0]?*anyopaque = std.mem.zeroes([0]?*anyopaque),
+    pub fn freed_by(self: anytype) std.zig.c_translation.FlexibleArrayType(@TypeOf(self), ?*anyopaque) {
+        const Intermediate = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), u8);
+        const ReturnType = std.zig.c_translation.FlexibleArrayType(@TypeOf(self), ?*anyopaque);
+        return @as(ReturnType, @ptrCast(@alignCast(@as(Intermediate, @ptrCast(self)) + 12)));
+    }
+};
+pub const heap_trace_summary_t = extern struct {
+    mode: heap_trace_mode_t = std.mem.zeroes(heap_trace_mode_t),
+    total_allocations: usize = std.mem.zeroes(usize),
+    total_frees: usize = std.mem.zeroes(usize),
+    count: usize = std.mem.zeroes(usize),
+    capacity: usize = std.mem.zeroes(usize),
+    high_water_mark: usize = std.mem.zeroes(usize),
+    has_overflowed: usize = std.mem.zeroes(usize),
+};
+pub extern fn heap_trace_init_standalone(record_buffer: [*c]heap_trace_record_t, num_records: usize) esp_err_t;
+pub extern fn heap_trace_init_tohost() esp_err_t;
+pub extern fn heap_trace_start(mode: heap_trace_mode_t) esp_err_t;
+pub extern fn heap_trace_stop() esp_err_t;
+pub extern fn heap_trace_resume() esp_err_t;
+pub extern fn heap_trace_get_count() usize;
+pub extern fn heap_trace_get(index: usize, record: [*c]heap_trace_record_t) esp_err_t;
+pub extern fn heap_trace_dump() void;
+pub extern fn heap_trace_dump_caps(caps: u32) void;
+pub extern fn heap_trace_summary(summary: [*c]heap_trace_summary_t) esp_err_t;
+pub const SEGGER_RTT_BUFFER_UP = extern struct {
+    sName: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    pBuffer: [*c]u8 = std.mem.zeroes([*c]u8),
+    SizeOfBuffer: c_uint = std.mem.zeroes(c_uint),
+    WrOff: c_uint = std.mem.zeroes(c_uint),
+    RdOff: c_uint = std.mem.zeroes(c_uint),
+    Flags: c_uint = std.mem.zeroes(c_uint),
+};
+pub const SEGGER_RTT_BUFFER_DOWN = extern struct {
+    sName: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    pBuffer: [*c]u8 = std.mem.zeroes([*c]u8),
+    SizeOfBuffer: c_uint = std.mem.zeroes(c_uint),
+    WrOff: c_uint = std.mem.zeroes(c_uint),
+    RdOff: c_uint = std.mem.zeroes(c_uint),
+    Flags: c_uint = std.mem.zeroes(c_uint),
+};
+pub const SEGGER_RTT_CB = extern struct {
+    acID: [16]u8 = std.mem.zeroes([16]u8),
+    MaxNumUpBuffers: c_int = std.mem.zeroes(c_int),
+    MaxNumDownBuffers: c_int = std.mem.zeroes(c_int),
+    aUp: [3]SEGGER_RTT_BUFFER_UP = std.mem.zeroes([3]SEGGER_RTT_BUFFER_UP),
+    aDown: [3]SEGGER_RTT_BUFFER_DOWN = std.mem.zeroes([3]SEGGER_RTT_BUFFER_DOWN),
+};
+pub extern var _SEGGER_RTT: SEGGER_RTT_CB;
+pub extern fn SEGGER_RTT_AllocDownBuffer(sName: [*:0]const u8, pBuffer: ?*anyopaque, BufferSize: c_uint, Flags: c_uint) c_int;
+pub extern fn SEGGER_RTT_AllocUpBuffer(sName: [*:0]const u8, pBuffer: ?*anyopaque, BufferSize: c_uint, Flags: c_uint) c_int;
+pub extern fn SEGGER_RTT_ConfigUpBuffer(BufferIndex: c_uint, sName: [*:0]const u8, pBuffer: ?*anyopaque, BufferSize: c_uint, Flags: c_uint) c_int;
+pub extern fn SEGGER_RTT_ConfigDownBuffer(BufferIndex: c_uint, sName: [*:0]const u8, pBuffer: ?*anyopaque, BufferSize: c_uint, Flags: c_uint) c_int;
+pub extern fn SEGGER_RTT_GetKey() c_int;
+pub extern fn SEGGER_RTT_HasData(BufferIndex: c_uint) c_uint;
+pub extern fn SEGGER_RTT_HasKey() c_int;
+pub extern fn SEGGER_RTT_HasDataUp(BufferIndex: c_uint) c_uint;
+pub extern fn SEGGER_RTT_Init() void;
+pub extern fn SEGGER_RTT_Read(BufferIndex: c_uint, pBuffer: ?*anyopaque, BufferSize: c_uint) c_uint;
+pub extern fn SEGGER_RTT_ReadNoLock(BufferIndex: c_uint, pData: ?*anyopaque, BufferSize: c_uint) c_uint;
+pub extern fn SEGGER_RTT_SetNameDownBuffer(BufferIndex: c_uint, sName: [*:0]const u8) c_int;
+pub extern fn SEGGER_RTT_SetNameUpBuffer(BufferIndex: c_uint, sName: [*:0]const u8) c_int;
+pub extern fn SEGGER_RTT_SetFlagsDownBuffer(BufferIndex: c_uint, Flags: c_uint) c_int;
+pub extern fn SEGGER_RTT_SetFlagsUpBuffer(BufferIndex: c_uint, Flags: c_uint) c_int;
+pub extern fn SEGGER_RTT_WaitKey() c_int;
+pub extern fn SEGGER_RTT_Write(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) c_uint;
+pub extern fn SEGGER_RTT_WriteNoLock(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) c_uint;
+pub extern fn SEGGER_RTT_WriteSkipNoLock(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) c_uint;
+pub extern fn SEGGER_RTT_ASM_WriteSkipNoLock(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) c_uint;
+pub extern fn SEGGER_RTT_WriteString(BufferIndex: c_uint, s: [*:0]const u8) c_uint;
+pub extern fn SEGGER_RTT_WriteWithOverwriteNoLock(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) void;
+pub extern fn SEGGER_RTT_PutChar(BufferIndex: c_uint, c: u8) c_uint;
+pub extern fn SEGGER_RTT_PutCharSkip(BufferIndex: c_uint, c: u8) c_uint;
+pub extern fn SEGGER_RTT_PutCharSkipNoLock(BufferIndex: c_uint, c: u8) c_uint;
+pub extern fn SEGGER_RTT_GetAvailWriteSpace(BufferIndex: c_uint) c_uint;
+pub extern fn SEGGER_RTT_GetBytesInBuffer(BufferIndex: c_uint) c_uint;
+pub extern fn SEGGER_RTT_ESP_FlushNoLock(min_sz: c_ulong, tmo: c_ulong) void;
+pub extern fn SEGGER_RTT_ESP_Flush(min_sz: c_ulong, tmo: c_ulong) void;
+pub extern fn SEGGER_RTT_ReadUpBuffer(BufferIndex: c_uint, pBuffer: ?*anyopaque, BufferSize: c_uint) c_uint;
+pub extern fn SEGGER_RTT_ReadUpBufferNoLock(BufferIndex: c_uint, pData: ?*anyopaque, BufferSize: c_uint) c_uint;
+pub extern fn SEGGER_RTT_WriteDownBuffer(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) c_uint;
+pub extern fn SEGGER_RTT_WriteDownBufferNoLock(BufferIndex: c_uint, pBuffer: ?*const anyopaque, NumBytes: c_uint) c_uint;
+pub extern fn SEGGER_RTT_SetTerminal(TerminalId: u8) c_int;
+pub extern fn SEGGER_RTT_TerminalOut(TerminalId: u8, s: [*:0]const u8) c_int;
+pub extern fn SEGGER_RTT_printf(BufferIndex: c_uint, sFormat: [*:0]const u8, ...) c_int;
+pub extern fn SEGGER_RTT_vprintf(BufferIndex: c_uint, sFormat: [*:0]const u8, pParamList: [*c]va_list) c_int;
+pub const enum_intr_type = enum(c_uint) {
+    INTR_TYPE_LEVEL = 0,
+    INTR_TYPE_EDGE = 1,
+};
+pub const esp_timer = opaque {};
+pub const esp_timer_handle_t = ?*esp_timer;
+pub const esp_timer_cb_t = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const esp_timer_dispatch_t = enum(c_uint) {
+    ESP_TIMER_TASK = 0,
+    ESP_TIMER_MAX = 1,
+};
+pub const esp_timer_create_args_t = extern struct {
+    callback: esp_timer_cb_t = std.mem.zeroes(esp_timer_cb_t),
+    arg: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    dispatch_method: esp_timer_dispatch_t = std.mem.zeroes(esp_timer_dispatch_t),
+    name: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    skip_unhandled_events: bool = std.mem.zeroes(bool),
+};
+pub extern fn esp_timer_early_init() esp_err_t;
+pub extern fn esp_timer_init() esp_err_t;
+pub extern fn esp_timer_deinit() esp_err_t;
+pub extern fn esp_timer_create(create_args: [*c]const esp_timer_create_args_t, out_handle: [*c]esp_timer_handle_t) esp_err_t;
+pub extern fn esp_timer_start_once(timer: esp_timer_handle_t, timeout_us: u64) esp_err_t;
+pub extern fn esp_timer_start_periodic(timer: esp_timer_handle_t, period: u64) esp_err_t;
+pub extern fn esp_timer_restart(timer: esp_timer_handle_t, timeout_us: u64) esp_err_t;
+pub extern fn esp_timer_stop(timer: esp_timer_handle_t) esp_err_t;
+pub extern fn esp_timer_delete(timer: esp_timer_handle_t) esp_err_t;
+pub extern fn esp_timer_get_time() i64;
+pub extern fn esp_timer_get_next_alarm() i64;
+pub extern fn esp_timer_get_next_alarm_for_wake_up() i64;
+pub extern fn esp_timer_get_period(timer: esp_timer_handle_t, period: [*c]u64) esp_err_t;
+pub extern fn esp_timer_get_expiry_time(timer: esp_timer_handle_t, expiry: [*c]u64) esp_err_t;
+pub extern fn esp_timer_dump(stream: std.c.FILE) esp_err_t;
+pub extern fn esp_timer_is_active(timer: esp_timer_handle_t) bool;
+pub const esp_apptrace_tmo_t = extern struct {
+    start: i64 = std.mem.zeroes(i64),
+    tmo: i64 = std.mem.zeroes(i64),
+    elapsed: i64 = std.mem.zeroes(i64),
+};
+pub fn esp_apptrace_tmo_init(arg_tmo: [*c]esp_apptrace_tmo_t, arg_user_tmo: u32) callconv(.C) void {
+    var tmo = arg_tmo;
+    _ = &tmo;
+    var user_tmo = arg_user_tmo;
+    _ = &user_tmo;
+    tmo.*.start = esp_timer_get_time();
+    tmo.*.tmo = if (user_tmo == @as(u32, @bitCast(-@as(c_int, 1)))) @as(i64, @bitCast(@as(c_longlong, -@as(c_int, 1)))) else @as(i64, @bitCast(@as(c_ulonglong, user_tmo)));
+    tmo.*.elapsed = 0;
+}
+pub extern fn esp_apptrace_tmo_check(tmo: [*c]esp_apptrace_tmo_t) esp_err_t;
+pub fn esp_apptrace_tmo_remaining_us(arg_tmo: [*c]esp_apptrace_tmo_t) callconv(.C) u32 {
+    var tmo = arg_tmo;
+    _ = &tmo;
+    return @as(u32, @bitCast(@as(c_int, @truncate(if (tmo.*.tmo != @as(i64, @bitCast(@as(c_longlong, -@as(c_int, 1))))) tmo.*.elapsed - tmo.*.tmo else @as(i64, @bitCast(@as(c_ulonglong, @as(u32, @bitCast(-@as(c_int, 1))))))))));
+}
+pub const esp_apptrace_lock_t = extern struct {
+    mux: spinlock_t = std.mem.zeroes(spinlock_t),
+    int_state: c_uint = std.mem.zeroes(c_uint),
+};
+pub fn esp_apptrace_lock_init(arg_lock: [*c]esp_apptrace_lock_t) callconv(.C) void {
+    var lock = arg_lock;
+    _ = &lock;
+    spinlock_initialize(&lock.*.mux);
+    lock.*.int_state = 0;
+}
+pub extern fn esp_apptrace_lock_take(lock: [*c]esp_apptrace_lock_t, tmo: [*c]esp_apptrace_tmo_t) esp_err_t;
+pub extern fn esp_apptrace_lock_give(lock: [*c]esp_apptrace_lock_t) esp_err_t;
+pub const esp_apptrace_rb_t = extern struct {
+    data: [*c]u8 = std.mem.zeroes([*c]u8),
+    size: u32 = std.mem.zeroes(u32),
+    cur_size: u32 = std.mem.zeroes(u32),
+    rd: u32 = std.mem.zeroes(u32),
+    wr: u32 = std.mem.zeroes(u32),
+};
+pub fn esp_apptrace_rb_init(arg_rb: [*c]esp_apptrace_rb_t, arg_data: [*c]u8, arg_size: u32) callconv(.C) void {
+    var rb = arg_rb;
+    _ = &rb;
+    var data = arg_data;
+    _ = &data;
+    var size = arg_size;
+    _ = &size;
+    rb.*.data = data;
+    rb.*.size = blk: {
+        const tmp = size;
+        rb.*.cur_size = tmp;
+        break :blk tmp;
+    };
+    rb.*.rd = 0;
+    rb.*.wr = 0;
+}
+pub extern fn esp_apptrace_rb_produce(rb: [*c]esp_apptrace_rb_t, size: u32) [*c]u8;
+pub extern fn esp_apptrace_rb_consume(rb: [*c]esp_apptrace_rb_t, size: u32) [*c]u8;
+pub extern fn esp_apptrace_rb_read_size_get(rb: [*c]esp_apptrace_rb_t) u32;
+pub extern fn esp_apptrace_rb_write_size_get(rb: [*c]esp_apptrace_rb_t) u32;
+pub extern fn esp_apptrace_log_lock() c_int;
+pub extern fn esp_apptrace_log_unlock() void;
+pub fn esp_sysview_flush(tmo: u32) callconv(.C) esp_err_t {
+    SEGGER_RTT_ESP_Flush(@as(c_ulong, @bitCast(@as(c_long, @as(c_int, 0)))), @as(c_ulong, @bitCast(@as(c_ulong, tmo))));
+    return 0;
+}
+pub extern fn esp_sysview_vprintf(format: [*:0]const u8, args: va_list) c_int;
+pub extern fn esp_sysview_heap_trace_start(tmo: u32) esp_err_t;
+pub extern fn esp_sysview_heap_trace_stop() esp_err_t;
+pub extern fn esp_sysview_heap_trace_alloc(addr: ?*anyopaque, size: u32, callers: ?*const anyopaque) void;
+pub extern fn esp_sysview_heap_trace_free(addr: ?*anyopaque, callers: ?*const anyopaque) void;
+
+pub const esp_crypto_hash_alg_t = enum(c_uint) {
+    ESP_CRYPTO_HASH_ALG_MD5 = 0,
+    ESP_CRYPTO_HASH_ALG_SHA1 = 1,
+    ESP_CRYPTO_HASH_ALG_HMAC_MD5 = 2,
+    ESP_CRYPTO_HASH_ALG_HMAC_SHA1 = 3,
+    ESP_CRYPTO_HASH_ALG_SHA256 = 4,
+    ESP_CRYPTO_HASH_ALG_HMAC_SHA256 = 5,
+};
+pub const esp_crypto_cipher_alg_t = enum(c_uint) {
+    ESP_CRYPTO_CIPHER_NULL = 0,
+    ESP_CRYPTO_CIPHER_ALG_AES = 1,
+    ESP_CRYPTO_CIPHER_ALG_3DES = 2,
+    ESP_CRYPTO_CIPHER_ALG_DES = 3,
+    ESP_CRYPTO_CIPHER_ALG_RC2 = 4,
+    ESP_CRYPTO_CIPHER_ALG_RC4 = 5,
+};
+pub const crypto_hash = opaque {};
+pub const esp_crypto_hash_t = crypto_hash;
+pub const crypto_cipher = opaque {};
+pub const esp_crypto_cipher_t = crypto_cipher;
+pub const esp_aes_128_encrypt_t = ?*const fn ([*c]const u8, [*c]const u8, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_aes_128_decrypt_t = ?*const fn ([*c]const u8, [*c]const u8, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_aes_wrap_t = ?*const fn ([*c]const u8, c_int, [*c]const u8, [*c]u8) callconv(.C) c_int;
+pub const esp_aes_unwrap_t = ?*const fn ([*c]const u8, c_int, [*c]const u8, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_sha256_vector_t = ?*const fn ([*c]const u8, c_int, c_int, [*c][*c]const u8, [*c]const c_int, [*c]u8) callconv(.C) c_int;
+pub const esp_sha256_prf_t = ?*const fn ([*c]const u8, c_int, [*c]const u8, [*c]const u8, c_int, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_hmac_md5_t = ?*const fn ([*c]const u8, c_uint, [*c]const u8, c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_md5_vector_t = ?*const fn ([*c]const u8, c_uint, c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_sha1_t = ?*const fn ([*c]const u8, c_uint, [*c]const u8, c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_sha1_vector_t = ?*const fn ([*c]const u8, c_uint, c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_sha1_prf_t = ?*const fn ([*c]const u8, c_uint, [*c]const u8, [*c]const u8, c_uint, [*c]u8, c_uint) callconv(.C) c_int;
+pub const esp_sha1_vector_t = ?*const fn (c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_pbkdf2_sha1_t = ?*const fn ([*c]const u8, [*c]const u8, c_uint, c_int, [*c]u8, c_uint) callconv(.C) c_int;
+pub const esp_rc4_skip_t = ?*const fn ([*c]const u8, c_uint, c_uint, [*c]u8, c_uint) callconv(.C) c_int;
+pub const esp_md5_vector_t = ?*const fn (c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_aes_encrypt_t = ?*const fn (?*anyopaque, [*c]const u8, [*c]u8) callconv(.C) void;
+pub const esp_aes_encrypt_init_t = ?*const fn ([*c]const u8, c_uint) callconv(.C) ?*anyopaque;
+pub const esp_aes_encrypt_deinit_t = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const esp_aes_decrypt_t = ?*const fn (?*anyopaque, [*c]const u8, [*c]u8) callconv(.C) void;
+pub const esp_aes_decrypt_init_t = ?*const fn ([*c]const u8, c_uint) callconv(.C) ?*anyopaque;
+pub const esp_aes_decrypt_deinit_t = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const esp_omac1_aes_128_t = ?*const fn ([*c]const u8, [*c]const u8, usize, [*c]u8) callconv(.C) c_int;
+pub const esp_ccmp_decrypt_t = ?*const fn ([*c]const u8, [*c]const u8, [*c]const u8, usize, [*c]usize, bool) callconv(.C) [*c]u8;
+pub const esp_ccmp_encrypt_t = ?*const fn ([*c]const u8, [*c]u8, usize, usize, [*c]u8, c_int, [*c]usize) callconv(.C) [*c]u8;
+pub const esp_aes_gmac_t = ?*const fn ([*c]const u8, usize, [*c]const u8, usize, [*c]const u8, usize, [*c]u8) callconv(.C) c_int;
+pub const esp_sha256_vector_t = ?*const fn (usize, [*c][*c]const u8, [*c]const usize, [*c]u8) callconv(.C) c_int;
+pub const esp_crc32_le_t = ?*const fn (u32, [*c]const u8, u32) callconv(.C) u32;
+pub const wpa_crypto_funcs_t = extern struct {
+    size: u32 = std.mem.zeroes(u32),
+    version: u32 = std.mem.zeroes(u32),
+    aes_wrap: esp_aes_wrap_t = std.mem.zeroes(esp_aes_wrap_t),
+    aes_unwrap: esp_aes_unwrap_t = std.mem.zeroes(esp_aes_unwrap_t),
+    hmac_sha256_vector: esp_hmac_sha256_vector_t = std.mem.zeroes(esp_hmac_sha256_vector_t),
+    sha256_prf: esp_sha256_prf_t = std.mem.zeroes(esp_sha256_prf_t),
+    hmac_md5: esp_hmac_md5_t = std.mem.zeroes(esp_hmac_md5_t),
+    hamc_md5_vector: esp_hmac_md5_vector_t = std.mem.zeroes(esp_hmac_md5_vector_t),
+    hmac_sha1: esp_hmac_sha1_t = std.mem.zeroes(esp_hmac_sha1_t),
+    hmac_sha1_vector: esp_hmac_sha1_vector_t = std.mem.zeroes(esp_hmac_sha1_vector_t),
+    sha1_prf: esp_sha1_prf_t = std.mem.zeroes(esp_sha1_prf_t),
+    sha1_vector: esp_sha1_vector_t = std.mem.zeroes(esp_sha1_vector_t),
+    pbkdf2_sha1: esp_pbkdf2_sha1_t = std.mem.zeroes(esp_pbkdf2_sha1_t),
+    rc4_skip: esp_rc4_skip_t = std.mem.zeroes(esp_rc4_skip_t),
+    md5_vector: esp_md5_vector_t = std.mem.zeroes(esp_md5_vector_t),
+    aes_encrypt: esp_aes_encrypt_t = std.mem.zeroes(esp_aes_encrypt_t),
+    aes_encrypt_init: esp_aes_encrypt_init_t = std.mem.zeroes(esp_aes_encrypt_init_t),
+    aes_encrypt_deinit: esp_aes_encrypt_deinit_t = std.mem.zeroes(esp_aes_encrypt_deinit_t),
+    aes_decrypt: esp_aes_decrypt_t = std.mem.zeroes(esp_aes_decrypt_t),
+    aes_decrypt_init: esp_aes_decrypt_init_t = std.mem.zeroes(esp_aes_decrypt_init_t),
+    aes_decrypt_deinit: esp_aes_decrypt_deinit_t = std.mem.zeroes(esp_aes_decrypt_deinit_t),
+    aes_128_encrypt: esp_aes_128_encrypt_t = std.mem.zeroes(esp_aes_128_encrypt_t),
+    aes_128_decrypt: esp_aes_128_decrypt_t = std.mem.zeroes(esp_aes_128_decrypt_t),
+    omac1_aes_128: esp_omac1_aes_128_t = std.mem.zeroes(esp_omac1_aes_128_t),
+    ccmp_decrypt: esp_ccmp_decrypt_t = std.mem.zeroes(esp_ccmp_decrypt_t),
+    ccmp_encrypt: esp_ccmp_encrypt_t = std.mem.zeroes(esp_ccmp_encrypt_t),
+    aes_gmac: esp_aes_gmac_t = std.mem.zeroes(esp_aes_gmac_t),
+    sha256_vector: esp_sha256_vector_t = std.mem.zeroes(esp_sha256_vector_t),
+    crc32: esp_crc32_le_t = std.mem.zeroes(esp_crc32_le_t),
+};
+pub const mesh_crypto_funcs_t = extern struct {
+    aes_128_encrypt: esp_aes_128_encrypt_t = std.mem.zeroes(esp_aes_128_encrypt_t),
+    aes_128_decrypt: esp_aes_128_decrypt_t = std.mem.zeroes(esp_aes_128_decrypt_t),
+};
+pub const esp_ip6_addr = extern struct {
+    addr: [4]u32 = std.mem.zeroes([4]u32),
+    zone: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ip4_addr = extern struct {
+    addr: u32 = std.mem.zeroes(u32),
+};
+pub const esp_ip4_addr_t = esp_ip4_addr;
+pub const esp_ip6_addr_t = esp_ip6_addr;
+const union_unnamed_5 = extern union {
+    ip6: esp_ip6_addr_t,
+    ip4: esp_ip4_addr_t,
+};
+pub const _ip_addr = extern struct {
+    u_addr: union_unnamed_5 = std.mem.zeroes(union_unnamed_5),
+    type: u8 = std.mem.zeroes(u8),
+};
+pub const esp_ip_addr_t = _ip_addr;
+pub const esp_ip6_addr_type_t = enum(c_uint) {
+    ESP_IP6_ADDR_IS_UNKNOWN = 0,
+    ESP_IP6_ADDR_IS_GLOBAL = 1,
+    ESP_IP6_ADDR_IS_LINK_LOCAL = 2,
+    ESP_IP6_ADDR_IS_SITE_LOCAL = 3,
+    ESP_IP6_ADDR_IS_UNIQUE_LOCAL = 4,
+    ESP_IP6_ADDR_IS_IPV4_MAPPED_IPV6 = 5,
+};
+pub extern fn esp_netif_ip6_get_addr_type(ip6_addr: [*c]esp_ip6_addr_t) esp_ip6_addr_type_t;
+pub fn esp_netif_ip_addr_copy(arg_dest: [*c]esp_ip_addr_t, arg_src: [*c]const esp_ip_addr_t) callconv(.C) void {
+    var dest = arg_dest;
+    _ = &dest;
+    var src = arg_src;
+    _ = &src;
+    dest.*.type = src.*.type;
+    if (@as(c_uint, @bitCast(@as(c_uint, src.*.type))) == @as(c_uint, 6)) {
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 0)))] = src.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 0)))];
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 1)))] = src.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 1)))];
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 2)))] = src.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 2)))];
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 3)))] = src.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 3)))];
+        dest.*.u_addr.ip6.zone = src.*.u_addr.ip6.zone;
+    } else {
+        dest.*.u_addr.ip4.addr = src.*.u_addr.ip4.addr;
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 1)))] = 0;
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 2)))] = 0;
+        dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 3)))] = 0;
+        dest.*.u_addr.ip6.zone = 0;
+    }
+}
+pub const esp_netif_obj = opaque {};
+pub const esp_netif_t = esp_netif_obj;
+pub const esp_netif_dns_type_t = enum(c_uint) {
+    ESP_NETIF_DNS_MAIN = 0,
+    ESP_NETIF_DNS_BACKUP = 1,
+    ESP_NETIF_DNS_FALLBACK = 2,
+    ESP_NETIF_DNS_MAX = 3,
+};
+pub const esp_netif_dns_info_t = extern struct {
+    ip: esp_ip_addr_t = std.mem.zeroes(esp_ip_addr_t),
+};
+pub const esp_netif_dhcp_status_t = enum(c_uint) {
+    ESP_NETIF_DHCP_INIT = 0,
+    ESP_NETIF_DHCP_STARTED = 1,
+    ESP_NETIF_DHCP_STOPPED = 2,
+    ESP_NETIF_DHCP_STATUS_MAX = 3,
+};
+pub const esp_netif_dhcp_option_mode_t = enum(c_uint) {
+    ESP_NETIF_OP_START = 0,
+    ESP_NETIF_OP_SET = 1,
+    ESP_NETIF_OP_GET = 2,
+    ESP_NETIF_OP_MAX = 3,
+};
+pub const esp_netif_dhcp_option_id_t = enum(c_uint) {
+    ESP_NETIF_SUBNET_MASK = 1,
+    ESP_NETIF_DOMAIN_NAME_SERVER = 6,
+    ESP_NETIF_ROUTER_SOLICITATION_ADDRESS = 32,
+    ESP_NETIF_REQUESTED_IP_ADDRESS = 50,
+    ESP_NETIF_IP_ADDRESS_LEASE_TIME = 51,
+    ESP_NETIF_IP_REQUEST_RETRY_TIME = 52,
+    ESP_NETIF_VENDOR_CLASS_IDENTIFIER = 60,
+    ESP_NETIF_VENDOR_SPECIFIC_INFO = 43,
+};
+pub const ip_event_t = enum(c_uint) {
+    IP_EVENT_STA_GOT_IP = 0,
+    IP_EVENT_STA_LOST_IP = 1,
+    IP_EVENT_AP_STAIPASSIGNED = 2,
+    IP_EVENT_GOT_IP6 = 3,
+    IP_EVENT_ETH_GOT_IP = 4,
+    IP_EVENT_ETH_LOST_IP = 5,
+    IP_EVENT_PPP_GOT_IP = 6,
+    IP_EVENT_PPP_LOST_IP = 7,
+};
+pub extern const IP_EVENT: esp_event_base_t;
+pub const esp_netif_ip_info_t = extern struct {
+    ip: esp_ip4_addr_t = std.mem.zeroes(esp_ip4_addr_t),
+    netmask: esp_ip4_addr_t = std.mem.zeroes(esp_ip4_addr_t),
+    gw: esp_ip4_addr_t = std.mem.zeroes(esp_ip4_addr_t),
+};
+pub const esp_netif_ip6_info_t = extern struct {
+    ip: esp_ip6_addr_t = std.mem.zeroes(esp_ip6_addr_t),
+};
+pub const ip_event_got_ip_t = extern struct {
+    esp_netif: ?*esp_netif_t = std.mem.zeroes(?*esp_netif_t),
+    ip_info: esp_netif_ip_info_t = std.mem.zeroes(esp_netif_ip_info_t),
+    ip_changed: bool = std.mem.zeroes(bool),
+};
+pub const ip_event_got_ip6_t = extern struct {
+    esp_netif: ?*esp_netif_t = std.mem.zeroes(?*esp_netif_t),
+    ip6_info: esp_netif_ip6_info_t = std.mem.zeroes(esp_netif_ip6_info_t),
+    ip_index: c_int = std.mem.zeroes(c_int),
+};
+pub const ip_event_add_ip6_t = extern struct {
+    addr: esp_ip6_addr_t = std.mem.zeroes(esp_ip6_addr_t),
+    preferred: bool = std.mem.zeroes(bool),
+};
+pub const ip_event_ap_staipassigned_t = extern struct {
+    esp_netif: ?*esp_netif_t = std.mem.zeroes(?*esp_netif_t),
+    ip: esp_ip4_addr_t = std.mem.zeroes(esp_ip4_addr_t),
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const enum_esp_netif_flags = enum(c_uint) {
+    ESP_NETIF_DHCP_CLIENT = 1,
+    ESP_NETIF_DHCP_SERVER = 2,
+    ESP_NETIF_FLAG_AUTOUP = 4,
+    ESP_NETIF_FLAG_GARP = 8,
+    ESP_NETIF_FLAG_EVENT_IP_MODIFIED = 16,
+    ESP_NETIF_FLAG_IS_PPP = 32,
+    ESP_NETIF_FLAG_IS_BRIDGE = 64,
+    ESP_NETIF_FLAG_MLDV6_REPORT = 128,
+};
+pub const esp_netif_flags_t = enum_esp_netif_flags;
+pub const enum_esp_netif_ip_event_type = enum(c_uint) {
+    ESP_NETIF_IP_EVENT_GOT_IP = 1,
+    ESP_NETIF_IP_EVENT_LOST_IP = 2,
+};
+pub const esp_netif_ip_event_type_t = enum_esp_netif_ip_event_type;
+pub const bridgeif_config = extern struct {
+    max_fdb_dyn_entries: u16 = std.mem.zeroes(u16),
+    max_fdb_sta_entries: u16 = std.mem.zeroes(u16),
+    max_ports: u8 = std.mem.zeroes(u8),
+};
+pub const bridgeif_config_t = bridgeif_config;
+pub const esp_netif_inherent_config = extern struct {
+    flags: esp_netif_flags_t = std.mem.zeroes(esp_netif_flags_t),
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+    ip_info: [*c]const esp_netif_ip_info_t = std.mem.zeroes([*c]const esp_netif_ip_info_t),
+    get_ip_event: u32 = std.mem.zeroes(u32),
+    lost_ip_event: u32 = std.mem.zeroes(u32),
+    if_key: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    if_desc: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    route_prio: c_int = std.mem.zeroes(c_int),
+    bridge_info: [*c]bridgeif_config_t = std.mem.zeroes([*c]bridgeif_config_t),
+};
+pub const esp_netif_inherent_config_t = esp_netif_inherent_config;
+pub const esp_netif_iodriver_handle = ?*anyopaque;
+pub const esp_netif_driver_ifconfig = extern struct {
+    handle: esp_netif_iodriver_handle = std.mem.zeroes(esp_netif_iodriver_handle),
+    transmit: ?*const fn (?*anyopaque, ?*anyopaque, usize) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (?*anyopaque, ?*anyopaque, usize) callconv(.C) esp_err_t),
+    transmit_wrap: ?*const fn (?*anyopaque, ?*anyopaque, usize, ?*anyopaque) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (?*anyopaque, ?*anyopaque, usize, ?*anyopaque) callconv(.C) esp_err_t),
+    driver_free_rx_buffer: ?*const fn (?*anyopaque, ?*anyopaque) callconv(.C) void = std.mem.zeroes(?*const fn (?*anyopaque, ?*anyopaque) callconv(.C) void),
+};
+pub const esp_netif_driver_ifconfig_t = esp_netif_driver_ifconfig;
+pub const esp_netif_netstack_config = opaque {};
+pub const esp_netif_netstack_config_t = esp_netif_netstack_config;
+pub const esp_netif_config = extern struct {
+    base: [*c]const esp_netif_inherent_config_t = std.mem.zeroes([*c]const esp_netif_inherent_config_t),
+    driver: [*c]const esp_netif_driver_ifconfig_t = std.mem.zeroes([*c]const esp_netif_driver_ifconfig_t),
+    stack: ?*const esp_netif_netstack_config_t = std.mem.zeroes(?*const esp_netif_netstack_config_t),
+};
+pub const esp_netif_config_t = esp_netif_config;
+pub const esp_netif_driver_base_s = extern struct {
+    post_attach: ?*const fn (?*esp_netif_t, esp_netif_iodriver_handle) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (?*esp_netif_t, esp_netif_iodriver_handle) callconv(.C) esp_err_t),
+    netif: ?*esp_netif_t = std.mem.zeroes(?*esp_netif_t),
+};
+pub const esp_netif_driver_base_t = esp_netif_driver_base_s;
+pub const esp_netif_pair_mac_ip_t = extern struct {
+    mac: [6]u8 = std.mem.zeroes([6]u8),
+    ip: esp_ip4_addr_t = std.mem.zeroes(esp_ip4_addr_t),
+};
+pub const esp_netif_receive_t = ?*const fn (?*esp_netif_t, ?*anyopaque, usize, ?*anyopaque) callconv(.C) esp_err_t;
+pub extern var _g_esp_netif_netstack_default_eth: ?*const esp_netif_netstack_config_t;
+pub extern var _g_esp_netif_netstack_default_br: ?*const esp_netif_netstack_config_t;
+pub extern var _g_esp_netif_netstack_default_wifi_sta: ?*const esp_netif_netstack_config_t;
+pub extern var _g_esp_netif_netstack_default_wifi_ap: ?*const esp_netif_netstack_config_t;
+pub extern const _g_esp_netif_inherent_sta_config: esp_netif_inherent_config_t;
+pub extern const _g_esp_netif_inherent_ap_config: esp_netif_inherent_config_t;
+pub extern const _g_esp_netif_inherent_eth_config: esp_netif_inherent_config_t;
+pub extern const _g_esp_netif_soft_ap_ip: esp_netif_ip_info_t;
+pub extern fn esp_netif_init() esp_err_t;
+pub extern fn esp_netif_deinit() esp_err_t;
+pub extern fn esp_netif_new(esp_netif_config: [*c]const esp_netif_config_t) ?*esp_netif_t;
+pub extern fn esp_netif_destroy(esp_netif: ?*esp_netif_t) void;
+pub extern fn esp_netif_set_driver_config(esp_netif: ?*esp_netif_t, driver_config: [*c]const esp_netif_driver_ifconfig_t) esp_err_t;
+pub extern fn esp_netif_attach(esp_netif: ?*esp_netif_t, driver_handle: esp_netif_iodriver_handle) esp_err_t;
+pub extern fn esp_netif_receive(esp_netif: ?*esp_netif_t, buffer: ?*anyopaque, len: usize, eb: ?*anyopaque) esp_err_t;
+pub extern fn esp_netif_action_start(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_stop(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_connected(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_disconnected(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_got_ip(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_join_ip6_multicast_group(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_leave_ip6_multicast_group(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_add_ip6_address(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_action_remove_ip6_address(esp_netif: ?*anyopaque, base: esp_event_base_t, event_id: i32, data: ?*anyopaque) void;
+pub extern fn esp_netif_set_default_netif(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_get_default_netif() ?*esp_netif_t;
+pub extern fn esp_netif_join_ip6_multicast_group(esp_netif: ?*esp_netif_t, addr: [*c]const esp_ip6_addr_t) esp_err_t;
+pub extern fn esp_netif_leave_ip6_multicast_group(esp_netif: ?*esp_netif_t, addr: [*c]const esp_ip6_addr_t) esp_err_t;
+pub extern fn esp_netif_set_mac(esp_netif: ?*esp_netif_t, mac: [*c]u8) esp_err_t;
+pub extern fn esp_netif_get_mac(esp_netif: ?*esp_netif_t, mac: [*c]u8) esp_err_t;
+pub extern fn esp_netif_set_hostname(esp_netif: ?*esp_netif_t, hostname: [*:0]const u8) esp_err_t;
+pub extern fn esp_netif_get_hostname(esp_netif: ?*esp_netif_t, hostname: [*c][*c]const u8) esp_err_t;
+pub extern fn esp_netif_is_netif_up(esp_netif: ?*esp_netif_t) bool;
+pub extern fn esp_netif_get_ip_info(esp_netif: ?*esp_netif_t, ip_info: [*c]esp_netif_ip_info_t) esp_err_t;
+pub extern fn esp_netif_get_old_ip_info(esp_netif: ?*esp_netif_t, ip_info: [*c]esp_netif_ip_info_t) esp_err_t;
+pub extern fn esp_netif_set_ip_info(esp_netif: ?*esp_netif_t, ip_info: [*c]const esp_netif_ip_info_t) esp_err_t;
+pub extern fn esp_netif_set_old_ip_info(esp_netif: ?*esp_netif_t, ip_info: [*c]const esp_netif_ip_info_t) esp_err_t;
+pub extern fn esp_netif_get_netif_impl_index(esp_netif: ?*esp_netif_t) c_int;
+pub extern fn esp_netif_get_netif_impl_name(esp_netif: ?*esp_netif_t, name: [*c]u8) esp_err_t;
+pub extern fn esp_netif_napt_enable(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_napt_disable(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_dhcps_option(esp_netif: ?*esp_netif_t, opt_op: esp_netif_dhcp_option_mode_t, opt_id: esp_netif_dhcp_option_id_t, opt_val: ?*anyopaque, opt_len: u32) esp_err_t;
+pub extern fn esp_netif_dhcpc_option(esp_netif: ?*esp_netif_t, opt_op: esp_netif_dhcp_option_mode_t, opt_id: esp_netif_dhcp_option_id_t, opt_val: ?*anyopaque, opt_len: u32) esp_err_t;
+pub extern fn esp_netif_dhcpc_start(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_dhcpc_stop(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_dhcpc_get_status(esp_netif: ?*esp_netif_t, status: [*c]esp_netif_dhcp_status_t) esp_err_t;
+pub extern fn esp_netif_dhcps_get_status(esp_netif: ?*esp_netif_t, status: [*c]esp_netif_dhcp_status_t) esp_err_t;
+pub extern fn esp_netif_dhcps_start(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_dhcps_stop(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_dhcps_get_clients_by_mac(esp_netif: ?*esp_netif_t, num: c_int, mac_ip_pair: [*c]esp_netif_pair_mac_ip_t) esp_err_t;
+pub extern fn esp_netif_set_dns_info(esp_netif: ?*esp_netif_t, @"type": esp_netif_dns_type_t, dns: [*c]esp_netif_dns_info_t) esp_err_t;
+pub extern fn esp_netif_get_dns_info(esp_netif: ?*esp_netif_t, @"type": esp_netif_dns_type_t, dns: [*c]esp_netif_dns_info_t) esp_err_t;
+pub extern fn esp_netif_create_ip6_linklocal(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_get_ip6_linklocal(esp_netif: ?*esp_netif_t, if_ip6: [*c]esp_ip6_addr_t) esp_err_t;
+pub extern fn esp_netif_get_ip6_global(esp_netif: ?*esp_netif_t, if_ip6: [*c]esp_ip6_addr_t) esp_err_t;
+pub extern fn esp_netif_get_all_ip6(esp_netif: ?*esp_netif_t, if_ip6: [*c]esp_ip6_addr_t) c_int;
+pub extern fn esp_netif_add_ip6_address(esp_netif: ?*esp_netif_t, addr: esp_ip6_addr_t, preferred: bool) esp_err_t;
+pub extern fn esp_netif_remove_ip6_address(esp_netif: ?*esp_netif_t, addr: [*c]const esp_ip6_addr_t) esp_err_t;
+pub extern fn esp_netif_set_ip4_addr(addr: [*c]esp_ip4_addr_t, a: u8, b: u8, c: u8, d: u8) void;
+pub extern fn esp_ip4addr_ntoa(addr: [*c]const esp_ip4_addr_t, buf: [*c]u8, buflen: c_int) [*c]u8;
+pub extern fn esp_ip4addr_aton(addr: [*:0]const u8) u32;
+pub extern fn esp_netif_str_to_ip4(src: [*:0]const u8, dst: [*c]esp_ip4_addr_t) esp_err_t;
+pub extern fn esp_netif_str_to_ip6(src: [*:0]const u8, dst: [*c]esp_ip6_addr_t) esp_err_t;
+pub extern fn esp_netif_get_io_driver(esp_netif: ?*esp_netif_t) esp_netif_iodriver_handle;
+pub extern fn esp_netif_get_handle_from_ifkey(if_key: [*:0]const u8) ?*esp_netif_t;
+pub extern fn esp_netif_get_flags(esp_netif: ?*esp_netif_t) esp_netif_flags_t;
+pub extern fn esp_netif_get_ifkey(esp_netif: ?*esp_netif_t) [*c]const u8;
+pub extern fn esp_netif_get_desc(esp_netif: ?*esp_netif_t) [*c]const u8;
+pub extern fn esp_netif_get_route_prio(esp_netif: ?*esp_netif_t) c_int;
+pub extern fn esp_netif_get_event_id(esp_netif: ?*esp_netif_t, event_type: esp_netif_ip_event_type_t) i32;
+pub extern fn esp_netif_next(esp_netif: ?*esp_netif_t) ?*esp_netif_t;
+pub extern fn esp_netif_next_unsafe(esp_netif: ?*esp_netif_t) ?*esp_netif_t;
+pub const esp_netif_find_predicate_t = ?*const fn (?*esp_netif_t, ?*anyopaque) callconv(.C) bool;
+pub extern fn esp_netif_find_if(@"fn": esp_netif_find_predicate_t, ctx: ?*anyopaque) ?*esp_netif_t;
+pub extern fn esp_netif_get_nr_of_ifs() usize;
+pub extern fn esp_netif_netstack_buf_ref(netstack_buf: ?*anyopaque) void;
+pub extern fn esp_netif_netstack_buf_free(netstack_buf: ?*anyopaque) void;
+pub const esp_netif_callback_fn = ?*const fn (?*anyopaque) callconv(.C) esp_err_t;
+pub extern fn esp_netif_tcpip_exec(@"fn": esp_netif_callback_fn, ctx: ?*anyopaque) esp_err_t;
+pub extern fn esp_netif_attach_wifi_station(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_netif_attach_wifi_ap(esp_netif: ?*esp_netif_t) esp_err_t;
+pub extern fn esp_wifi_set_default_wifi_sta_handlers() esp_err_t;
+pub extern fn esp_wifi_set_default_wifi_ap_handlers() esp_err_t;
+pub extern fn esp_wifi_set_default_wifi_nan_handlers() esp_err_t;
+pub extern fn esp_wifi_clear_default_wifi_driver_and_handlers(esp_netif: ?*anyopaque) esp_err_t;
+pub extern fn esp_netif_create_default_wifi_ap() ?*esp_netif_t;
+pub extern fn esp_netif_create_default_wifi_sta() ?*esp_netif_t;
+pub extern fn esp_netif_create_default_wifi_nan() ?*esp_netif_t;
+pub extern fn esp_netif_destroy_default_wifi(esp_netif: ?*anyopaque) void;
+pub extern fn esp_netif_create_wifi(wifi_if: wifi_interface_t, esp_netif_config: [*c]const esp_netif_inherent_config_t) ?*esp_netif_t;
+pub extern fn esp_netif_create_default_wifi_mesh_netifs(p_netif_sta: [*c]?*esp_netif_t, p_netif_ap: [*c]?*esp_netif_t) esp_err_t;
+pub const wifi_osi_funcs_t = opaque {};
+pub const wifi_init_config_t = extern struct {
+    osi_funcs: ?*wifi_osi_funcs_t = std.mem.zeroes(?*wifi_osi_funcs_t),
+    wpa_crypto_funcs: wpa_crypto_funcs_t = std.mem.zeroes(wpa_crypto_funcs_t),
+    static_rx_buf_num: c_int = std.mem.zeroes(c_int),
+    dynamic_rx_buf_num: c_int = std.mem.zeroes(c_int),
+    tx_buf_type: c_int = std.mem.zeroes(c_int),
+    static_tx_buf_num: c_int = std.mem.zeroes(c_int),
+    dynamic_tx_buf_num: c_int = std.mem.zeroes(c_int),
+    rx_mgmt_buf_type: c_int = std.mem.zeroes(c_int),
+    rx_mgmt_buf_num: c_int = std.mem.zeroes(c_int),
+    cache_tx_buf_num: c_int = std.mem.zeroes(c_int),
+    csi_enable: c_int = std.mem.zeroes(c_int),
+    ampdu_rx_enable: c_int = std.mem.zeroes(c_int),
+    ampdu_tx_enable: c_int = std.mem.zeroes(c_int),
+    amsdu_tx_enable: c_int = std.mem.zeroes(c_int),
+    nvs_enable: c_int = std.mem.zeroes(c_int),
+    nano_enable: c_int = std.mem.zeroes(c_int),
+    rx_ba_win: c_int = std.mem.zeroes(c_int),
+    wifi_task_core_id: c_int = std.mem.zeroes(c_int),
+    beacon_max_len: c_int = std.mem.zeroes(c_int),
+    mgmt_sbuf_num: c_int = std.mem.zeroes(c_int),
+    feature_caps: u64 = std.mem.zeroes(u64),
+    sta_disconnected_pm: bool = std.mem.zeroes(bool),
+    espnow_max_encrypt_num: c_int = std.mem.zeroes(c_int),
+    magic: c_int = std.mem.zeroes(c_int),
+};
+pub extern const g_wifi_default_wpa_crypto_funcs: wpa_crypto_funcs_t;
+pub extern var g_wifi_osi_funcs: wifi_osi_funcs_t;
+pub extern fn esp_wifi_init(config: [*c]const wifi_init_config_t) esp_err_t;
+pub extern fn esp_wifi_deinit() esp_err_t;
+pub extern fn esp_wifi_set_mode(mode: wifi_mode_t) esp_err_t;
+pub extern fn esp_wifi_get_mode(mode: [*c]wifi_mode_t) esp_err_t;
+pub extern fn esp_wifi_start() esp_err_t;
+pub extern fn esp_wifi_stop() esp_err_t;
+pub extern fn esp_wifi_restore() esp_err_t;
+pub extern fn esp_wifi_connect() esp_err_t;
+pub extern fn esp_wifi_disconnect() esp_err_t;
+pub extern fn esp_wifi_clear_fast_connect() esp_err_t;
+pub extern fn esp_wifi_deauth_sta(aid: u16) esp_err_t;
+pub extern fn esp_wifi_scan_start(config: [*c]const wifi_scan_config_t, block: bool) esp_err_t;
+pub extern fn esp_wifi_scan_stop() esp_err_t;
+pub extern fn esp_wifi_scan_get_ap_num(number: [*c]u16) esp_err_t;
+pub extern fn esp_wifi_scan_get_ap_records(number: [*c]u16, ap_records: ?*wifi_ap_record_t) esp_err_t;
+pub extern fn esp_wifi_scan_get_ap_record(ap_record: ?*wifi_ap_record_t) esp_err_t;
+pub extern fn esp_wifi_clear_ap_list() esp_err_t;
+pub extern fn esp_wifi_sta_get_ap_info(ap_info: ?*wifi_ap_record_t) esp_err_t;
+pub extern fn esp_wifi_set_ps(@"type": wifi_ps_type_t) esp_err_t;
+pub extern fn esp_wifi_get_ps(@"type": [*c]wifi_ps_type_t) esp_err_t;
+pub extern fn esp_wifi_set_protocol(ifx: wifi_interface_t, protocol_bitmap: u8) esp_err_t;
+pub extern fn esp_wifi_get_protocol(ifx: wifi_interface_t, protocol_bitmap: [*c]u8) esp_err_t;
+pub extern fn esp_wifi_set_bandwidth(ifx: wifi_interface_t, bw: wifi_bandwidth_t) esp_err_t;
+pub extern fn esp_wifi_get_bandwidth(ifx: wifi_interface_t, bw: [*c]wifi_bandwidth_t) esp_err_t;
+pub extern fn esp_wifi_set_channel(primary: u8, second: wifi_second_chan_t) esp_err_t;
+pub extern fn esp_wifi_get_channel(primary: [*c]u8, second: [*c]wifi_second_chan_t) esp_err_t;
+pub extern fn esp_wifi_set_country(country: [*c]const wifi_country_t) esp_err_t;
+pub extern fn esp_wifi_get_country(country: [*c]wifi_country_t) esp_err_t;
+pub extern fn esp_wifi_set_mac(ifx: wifi_interface_t, mac: [*:0]const u8) esp_err_t;
+pub extern fn esp_wifi_get_mac(ifx: wifi_interface_t, mac: [*c]u8) esp_err_t;
+pub const wifi_promiscuous_cb_t = ?*const fn (?*anyopaque, wifi_promiscuous_pkt_type_t) callconv(.C) void;
+pub extern fn esp_wifi_set_promiscuous_rx_cb(cb: wifi_promiscuous_cb_t) esp_err_t;
+pub extern fn esp_wifi_set_promiscuous(en: bool) esp_err_t;
+pub extern fn esp_wifi_get_promiscuous(en: [*c]bool) esp_err_t;
+pub extern fn esp_wifi_set_promiscuous_filter(filter: [*c]const wifi_promiscuous_filter_t) esp_err_t;
+pub extern fn esp_wifi_get_promiscuous_filter(filter: [*c]wifi_promiscuous_filter_t) esp_err_t;
+pub extern fn esp_wifi_set_promiscuous_ctrl_filter(filter: [*c]const wifi_promiscuous_filter_t) esp_err_t;
+pub extern fn esp_wifi_get_promiscuous_ctrl_filter(filter: [*c]wifi_promiscuous_filter_t) esp_err_t;
+pub extern fn esp_wifi_set_config(interface: wifi_interface_t, conf: ?*wifi_config_t) esp_err_t;
+pub extern fn esp_wifi_get_config(interface: wifi_interface_t, conf: ?*wifi_config_t) esp_err_t;
+pub extern fn esp_wifi_ap_get_sta_list(sta: ?*wifi_sta_list_t) esp_err_t;
+pub extern fn esp_wifi_ap_get_sta_aid(mac: [*:0]const u8, aid: [*c]u16) esp_err_t;
+pub extern fn esp_wifi_set_storage(storage: wifi_storage_t) esp_err_t;
+pub const esp_vendor_ie_cb_t = ?*const fn (?*anyopaque, wifi_vendor_ie_type_t, [*c]const u8, [*c]const vendor_ie_data_t, c_int) callconv(.C) void;
+pub extern fn esp_wifi_set_vendor_ie(enable: bool, @"type": wifi_vendor_ie_type_t, idx: wifi_vendor_ie_id_t, vnd_ie: ?*const anyopaque) esp_err_t;
+pub extern fn esp_wifi_set_vendor_ie_cb(cb: esp_vendor_ie_cb_t, ctx: ?*anyopaque) esp_err_t;
+pub extern fn esp_wifi_set_max_tx_power(power: i8) esp_err_t;
+pub extern fn esp_wifi_get_max_tx_power(power: [*c]i8) esp_err_t;
+pub extern fn esp_wifi_set_event_mask(mask: u32) esp_err_t;
+pub extern fn esp_wifi_get_event_mask(mask: [*c]u32) esp_err_t;
+pub extern fn esp_wifi_80211_tx(ifx: wifi_interface_t, buffer: ?*const anyopaque, len: c_int, en_sys_seq: bool) esp_err_t;
+pub const wifi_csi_cb_t = ?*const fn (?*anyopaque, ?*wifi_csi_info_t) callconv(.C) void;
+pub extern fn esp_wifi_set_csi_rx_cb(cb: wifi_csi_cb_t, ctx: ?*anyopaque) esp_err_t;
+pub extern fn esp_wifi_set_csi_config(config: ?*const wifi_csi_config_t) esp_err_t;
+pub extern fn esp_wifi_set_csi(en: bool) esp_err_t;
+pub extern fn esp_wifi_set_ant_gpio(config: [*c]const wifi_ant_gpio_config_t) esp_err_t;
+pub extern fn esp_wifi_get_ant_gpio(config: [*c]wifi_ant_gpio_config_t) esp_err_t;
+pub extern fn esp_wifi_set_ant(config: ?*const wifi_ant_config_t) esp_err_t;
+pub extern fn esp_wifi_get_ant(config: ?*wifi_ant_config_t) esp_err_t;
+pub extern fn esp_wifi_get_tsf_time(interface: wifi_interface_t) i64;
+pub extern fn esp_wifi_set_inactive_time(ifx: wifi_interface_t, sec: u16) esp_err_t;
+pub extern fn esp_wifi_get_inactive_time(ifx: wifi_interface_t, sec: [*c]u16) esp_err_t;
+pub extern fn esp_wifi_statis_dump(modules: u32) esp_err_t;
+pub extern fn esp_wifi_set_rssi_threshold(rssi: i32) esp_err_t;
+pub extern fn esp_wifi_ftm_initiate_session(cfg: [*c]wifi_ftm_initiator_cfg_t) esp_err_t;
+pub extern fn esp_wifi_ftm_end_session() esp_err_t;
+pub extern fn esp_wifi_ftm_resp_set_offset(offset_cm: i16) esp_err_t;
+pub extern fn esp_wifi_config_11b_rate(ifx: wifi_interface_t, disable: bool) esp_err_t;
+pub extern fn esp_wifi_connectionless_module_set_wake_interval(wake_interval: u16) esp_err_t;
+pub extern fn esp_wifi_force_wakeup_acquire() esp_err_t;
+pub extern fn esp_wifi_force_wakeup_release() esp_err_t;
+pub extern fn esp_wifi_set_country_code(country: [*:0]const u8, ieee80211d_enabled: bool) esp_err_t;
+pub extern fn esp_wifi_get_country_code(country: [*c]u8) esp_err_t;
+pub extern fn esp_wifi_config_80211_tx_rate(ifx: wifi_interface_t, rate: wifi_phy_rate_t) esp_err_t;
+pub extern fn esp_wifi_disable_pmf_config(ifx: wifi_interface_t) esp_err_t;
+pub extern fn esp_wifi_sta_get_aid(aid: [*c]u16) esp_err_t;
+pub extern fn esp_wifi_sta_get_negotiated_phymode(phymode: [*c]wifi_phy_mode_t) esp_err_t;
+pub extern fn esp_wifi_set_dynamic_cs(enabled: bool) esp_err_t;
+pub extern fn esp_wifi_sta_get_rssi(rssi: [*c]c_int) esp_err_t;
 
 pub const va_list = extern struct {
     __va_stk: [*c]c_int = std.mem.zeroes([*c]c_int),

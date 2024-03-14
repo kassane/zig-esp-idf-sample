@@ -13,15 +13,15 @@ pub const led_model_t = enum(c_uint) {
     LED_MODEL_SK6812 = 1,
     LED_MODEL_INVALID = 2,
 };
-pub const struct_led_strip_t = opaque {};
-pub const led_strip_handle_t = ?*struct_led_strip_t; // /home/kassane/espressif/zig-esp-idf-sample/managed_components/espressif__led_strip/include/led_strip_types.h:48:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_3 = opaque {};
+pub const led_strip_t = opaque {};
+pub const led_strip_handle_t = ?*led_strip_t; // /home/kassane/espressif/zig-esp-idf-sample/managed_components/espressif__led_strip/include/led_strip_types.h:48:18: warning: struct demoted to opaque type - has bitfield
+const unnamed_3 = opaque {};
 pub const led_strip_config_t = extern struct {
     strip_gpio_num: c_int = std.mem.zeroes(c_int),
     max_leds: u32 = std.mem.zeroes(u32),
     led_pixel_format: led_pixel_format_t = std.mem.zeroes(led_pixel_format_t),
     led_model: led_model_t = std.mem.zeroes(led_model_t),
-    flags: struct_unnamed_3 = std.mem.zeroes(struct_unnamed_3),
+    flags: unnamed_3 = std.mem.zeroes(unnamed_3),
 };
 pub const SOC_ROOT_CLK_INT_RC_FAST: c_int = 0;
 pub const SOC_ROOT_CLK_INT_RC_SLOW: c_int = 1;
@@ -130,34 +130,34 @@ pub const CLKOUT_SIG_RC_FAST: c_int = 14;
 pub const CLKOUT_SIG_INVALID: c_int = 255;
 pub const soc_clkout_sig_id_t = c_uint;
 pub const rmt_clock_source_t = soc_periph_rmt_clk_src_t; // /home/kassane/espressif/esp-idf/components/hal/include/hal/rmt_types.h:32:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_4 = opaque {};
+const unnamed_4 = opaque {};
 pub const rmt_symbol_word_t = extern union {
-    unnamed_0: struct_unnamed_4,
+    unnamed_0: unnamed_4,
     val: u32,
 };
-pub const struct_rmt_channel_t = opaque {};
-pub const rmt_channel_handle_t = ?*struct_rmt_channel_t;
-pub const struct_rmt_sync_manager_t = opaque {};
-pub const rmt_sync_manager_handle_t = ?*struct_rmt_sync_manager_t;
-pub const struct_rmt_encoder_t = opaque {};
-pub const rmt_encoder_handle_t = ?*struct_rmt_encoder_t;
+pub const rmt_channel_t = opaque {};
+pub const rmt_channel_handle_t = ?*rmt_channel_t;
+pub const rmt_sync_manager_t = opaque {};
+pub const rmt_sync_manager_handle_t = ?*rmt_sync_manager_t;
+pub const rmt_encoder_t = opaque {};
+pub const rmt_encoder_handle_t = ?*rmt_encoder_t;
 pub const rmt_tx_done_event_data_t = extern struct {
     num_symbols: usize = std.mem.zeroes(usize),
 };
 pub const rmt_tx_done_callback_t = ?*const fn (rmt_channel_handle_t, [*c]const rmt_tx_done_event_data_t, ?*anyopaque) callconv(.C) bool; // /home/kassane/espressif/esp-idf/components/esp_driver_rmt/include/driver/rmt_types.h:60:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_5 = opaque {};
+const unnamed_5 = opaque {};
 pub const rmt_rx_done_event_data_t = extern struct {
     received_symbols: ?*rmt_symbol_word_t = std.mem.zeroes(?*rmt_symbol_word_t),
     num_symbols: usize = std.mem.zeroes(usize),
-    flags: struct_unnamed_5 = std.mem.zeroes(struct_unnamed_5),
+    flags: unnamed_5 = std.mem.zeroes(unnamed_5),
 };
 pub const rmt_rx_done_callback_t = ?*const fn (rmt_channel_handle_t, ?*const rmt_rx_done_event_data_t, ?*anyopaque) callconv(.C) bool; // /home/kassane/espressif/zig-esp-idf-sample/managed_components/espressif__led_strip/include/led_strip_rmt.h:33:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_6 = opaque {};
+const unnamed_6 = opaque {};
 pub const led_strip_rmt_config_t = extern struct {
     clk_src: rmt_clock_source_t = std.mem.zeroes(rmt_clock_source_t),
     resolution_hz: u32 = std.mem.zeroes(u32),
     mem_block_symbols: usize = std.mem.zeroes(usize),
-    flags: struct_unnamed_6 = std.mem.zeroes(struct_unnamed_6),
+    flags: unnamed_6 = std.mem.zeroes(unnamed_6),
 };
 pub extern fn led_strip_new_rmt_device(led_config: ?*const led_strip_config_t, rmt_config: ?*const led_strip_rmt_config_t, ret_strip: [*c]led_strip_handle_t) idf.esp_err_t;
 pub const SPI1_HOST: c_int = 0;
@@ -238,7 +238,7 @@ const union_unnamed_12 = extern union {
     rx_buffer: ?*anyopaque,
     rx_data: [4]u8,
 };
-pub const struct_spi_transaction_t = extern struct {
+pub const spi_transaction_t = extern struct {
     flags: u32 = std.mem.zeroes(u32),
     cmd: u16 = std.mem.zeroes(u16),
     addr: u64 = std.mem.zeroes(u64),
@@ -248,7 +248,6 @@ pub const struct_spi_transaction_t = extern struct {
     unnamed_0: union_unnamed_11 = std.mem.zeroes(union_unnamed_11),
     unnamed_1: union_unnamed_12 = std.mem.zeroes(union_unnamed_12),
 };
-pub const spi_transaction_t = struct_spi_transaction_t;
 pub const transaction_cb_t = ?*const fn ([*c]spi_transaction_t) callconv(.C) void;
 pub const spi_device_interface_config_t = extern struct {
     command_bits: u8 = std.mem.zeroes(u8),
@@ -268,13 +267,13 @@ pub const spi_device_interface_config_t = extern struct {
     post_cb: transaction_cb_t = std.mem.zeroes(transaction_cb_t),
 };
 pub const spi_transaction_ext_t = extern struct {
-    base: struct_spi_transaction_t = std.mem.zeroes(struct_spi_transaction_t),
+    base: spi_transaction_t = std.mem.zeroes(spi_transaction_t),
     command_bits: u8 = std.mem.zeroes(u8),
     address_bits: u8 = std.mem.zeroes(u8),
     dummy_bits: u8 = std.mem.zeroes(u8),
 };
-pub const struct_spi_device_t = opaque {};
-pub const spi_device_handle_t = ?*struct_spi_device_t;
+pub const spi_device_t = opaque {};
+pub const spi_device_handle_t = ?*spi_device_t;
 pub extern fn spi_bus_add_device(host_id: spi_host_device_t, dev_config: [*c]const spi_device_interface_config_t, handle: [*c]spi_device_handle_t) idf.esp_err_t;
 pub extern fn spi_bus_remove_device(handle: spi_device_handle_t) idf.esp_err_t;
 pub extern fn spi_device_queue_trans(handle: spi_device_handle_t, trans_desc: [*c]spi_transaction_t, ticks_to_wait: idf.TickType_t) idf.esp_err_t;
@@ -290,11 +289,11 @@ pub extern fn spi_get_actual_clock(fapb: c_int, hz: c_int, duty_cycle: c_int) c_
 pub extern fn spi_get_timing(gpio_is_used: bool, input_delay_ns: c_int, eff_clk: c_int, dummy_o: [*c]c_int, cycles_remain_o: [*c]c_int) void;
 pub extern fn spi_get_freq_limit(gpio_is_used: bool, input_delay_ns: c_int) c_int;
 pub extern fn spi_bus_get_max_transaction_len(host_id: spi_host_device_t, max_bytes: [*c]usize) idf.esp_err_t; // /home/kassane/espressif/zig-esp-idf-sample/managed_components/espressif__led_strip/include/led_strip_spi.h:24:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_13 = opaque {};
+const unnamed_13 = opaque {};
 pub const led_strip_spi_config_t = extern struct {
     clk_src: spi_clock_source_t = std.mem.zeroes(spi_clock_source_t),
     spi_bus: spi_host_device_t = std.mem.zeroes(spi_host_device_t),
-    flags: struct_unnamed_13 = std.mem.zeroes(struct_unnamed_13),
+    flags: unnamed_13 = std.mem.zeroes(unnamed_13),
 };
 pub extern fn led_strip_new_spi_device(led_config: ?*const led_strip_config_t, spi_config: ?*const led_strip_spi_config_t, ret_strip: [*c]led_strip_handle_t) idf.esp_err_t;
 pub extern fn led_strip_set_pixel(strip: led_strip_handle_t, index: u32, red: u32, green: u32, blue: u32) idf.esp_err_t;
@@ -309,12 +308,12 @@ pub extern fn esp_rom_gpio_pad_unhold(gpio_num: u32) void;
 pub extern fn esp_rom_gpio_pad_set_drv(iopad_num: u32, drv: u32) void;
 pub extern fn esp_rom_gpio_connect_in_signal(gpio_num: u32, signal_idx: u32, inv: bool) void;
 pub extern fn esp_rom_gpio_connect_out_signal(gpio_num: u32, signal_idx: u32, out_inv: bool, oen_inv: bool) void;
-pub const struct_esp_etm_channel_t = opaque {};
-pub const esp_etm_channel_handle_t = ?*struct_esp_etm_channel_t;
-pub const struct_esp_etm_event_t = opaque {};
-pub const esp_etm_event_handle_t = ?*struct_esp_etm_event_t;
-pub const struct_esp_etm_task_t = opaque {};
-pub const esp_etm_task_handle_t = ?*struct_esp_etm_task_t;
+pub const esp_etm_channel_t = opaque {};
+pub const esp_etm_channel_handle_t = ?*esp_etm_channel_t;
+pub const esp_etm_event_t = opaque {};
+pub const esp_etm_event_handle_t = ?*esp_etm_event_t;
+pub const esp_etm_task_t = opaque {};
+pub const esp_etm_task_handle_t = ?*esp_etm_task_t;
 pub const esp_etm_channel_config_t = extern struct {};
 pub extern fn esp_etm_new_channel(config: [*c]const esp_etm_channel_config_t, ret_chan: [*c]esp_etm_channel_handle_t) idf.esp_err_t;
 pub extern fn esp_etm_del_channel(chan: esp_etm_channel_handle_t) idf.esp_err_t;
@@ -324,6 +323,7 @@ pub extern fn esp_etm_channel_connect(chan: esp_etm_channel_handle_t, event: esp
 pub extern fn esp_etm_del_event(event: esp_etm_event_handle_t) idf.esp_err_t;
 pub extern fn esp_etm_del_task(task: esp_etm_task_handle_t) idf.esp_err_t;
 pub extern fn esp_etm_dump(out_stream: std.c.FILE) idf.esp_err_t;
+pub extern fn esp_timer_new_etm_alarm_event(out_event: [*c]esp_etm_event_handle_t) idf.esp_err_t;
 pub const gpio_etm_event_edge_t = enum(c_uint) {
     GPIO_ETM_EVENT_EDGE_POS = 0,
     GPIO_ETM_EVENT_EDGE_NEG = 1,

@@ -210,9 +210,9 @@ pub const esp_image_load_mode_t = enum(c_uint) {
     ESP_IMAGE_VERIFY_SILENT = 1,
 };
 // /esp-idf/components/bootloader_support/include/esp_image_format.h:53:21: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_3 = opaque {};
+const unnamed_3 = opaque {};
 const union_unnamed_2 = extern union {
-    unnamed_0: struct_unnamed_3,
+    unnamed_0: unnamed_3,
     val: u8,
 };
 pub const rtc_retain_mem_t = extern struct {
@@ -272,12 +272,6 @@ pub extern fn esp_rom_efuse_mac_address_crc8(data: [*:0]const u8, len: u32) u8;
 pub extern fn esp_rom_efuse_get_flash_gpio_info() u32;
 pub extern fn esp_rom_efuse_get_flash_wp_gpio() u32;
 pub extern fn esp_rom_efuse_is_secure_boot_enabled() bool;
-pub extern fn esp_rom_crc32_le(crc: u32, buf: [*:0]const u8, len: u32) u32;
-pub extern fn esp_rom_crc32_be(crc: u32, buf: [*:0]const u8, len: u32) u32;
-pub extern fn esp_rom_crc16_le(crc: u16, buf: [*:0]const u8, len: u32) u16;
-pub extern fn esp_rom_crc16_be(crc: u16, buf: [*:0]const u8, len: u32) u16;
-pub extern fn esp_rom_crc8_le(crc: u8, buf: [*:0]const u8, len: u32) u8;
-pub extern fn esp_rom_crc8_be(crc: u8, buf: [*:0]const u8, len: u32) u8;
 pub const ets_efuse_purpose_t = enum(c_uint) {
     ETS_EFUSE_KEY_PURPOSE_USER = 0,
     ETS_EFUSE_KEY_PURPOSE_RESERVED = 1,
@@ -441,11 +435,11 @@ pub const ETS_STATUS = enum(c_uint) {
 pub const ets_status_t = ETS_STATUS;
 pub const ETSSignal = u32;
 pub const ETSParam = u32;
-pub const struct_ETSEventTag = extern struct {
+pub const ETSEventTag = extern struct {
     sig: ETSSignal = std.mem.zeroes(ETSSignal),
     par: ETSParam = std.mem.zeroes(ETSParam),
 };
-pub const ETSEvent = struct_ETSEventTag;
+pub const ETSEvent = ETSEventTag;
 pub const ETSTask = ?*const fn ([*c]ETSEvent) callconv(.C) void;
 pub const ets_idle_cb_t = ?*const fn (?*anyopaque) callconv(.C) void;
 pub extern const exc_cause_table: [40][*c]const u8;
@@ -456,14 +450,14 @@ pub extern fn ets_install_putc1(p: ?*const fn (u8) callconv(.C) void) void;
 pub extern fn ets_install_putc2(p: ?*const fn (u8) callconv(.C) void) void;
 pub extern fn ets_install_uart_printf() void;
 pub const ETSTimerFunc = fn (?*anyopaque) callconv(.C) void;
-pub const struct__ETSTIMER_ = extern struct {
-    timer_next: [*c]struct__ETSTIMER_ = std.mem.zeroes([*c]struct__ETSTIMER_),
+pub const _ETSTIMER_ = extern struct {
+    timer_next: [*c]_ETSTIMER_ = std.mem.zeroes([*c]_ETSTIMER_),
     timer_expire: u32 = std.mem.zeroes(u32),
     timer_period: u32 = std.mem.zeroes(u32),
     timer_func: ?*const ETSTimerFunc = std.mem.zeroes(?*const ETSTimerFunc),
     timer_arg: ?*anyopaque = std.mem.zeroes(?*anyopaque),
 };
-pub const ETSTimer = struct__ETSTIMER_;
+pub const ETSTimer = _ETSTIMER_;
 pub extern fn ets_timer_init() void;
 pub extern fn ets_timer_deinit() void;
 pub extern fn ets_timer_arm(timer: [*c]ETSTimer, tmout: u32, repeat: bool) void;
@@ -493,7 +487,7 @@ pub const ets_rsa_pubkey_t = extern struct {
 pub extern fn ets_rsa_pss_verify(key: [*c]const ets_rsa_pubkey_t, sig: [*:0]const u8, digest: [*:0]const u8, verified_digest: [*c]u8) bool;
 pub extern fn ets_mgf1_sha256(mgfSeed: [*:0]const u8, seedLen: usize, maskLen: usize, mask: [*c]u8) void;
 pub extern fn ets_emsa_pss_verify(encoded_message: [*:0]const u8, mhash: [*:0]const u8) bool;
-pub const struct_ets_secure_boot_sig_block = extern struct {
+pub const ets_secure_boot_sig_block = extern struct {
     magic_byte: u8 = std.mem.zeroes(u8),
     version: u8 = std.mem.zeroes(u8),
     _reserved1: u8 = std.mem.zeroes(u8),
@@ -504,20 +498,21 @@ pub const struct_ets_secure_boot_sig_block = extern struct {
     block_crc: u32 = std.mem.zeroes(u32),
     _padding: [16]u8 = std.mem.zeroes([16]u8),
 };
-pub const ets_secure_boot_sig_block_t = struct_ets_secure_boot_sig_block;
-pub const struct_ets_secure_boot_signature = extern struct {
+pub const ets_secure_boot_sig_block_t = ets_secure_boot_sig_block;
+pub const ets_secure_boot_signature = extern struct {
     block: [3]ets_secure_boot_sig_block_t = std.mem.zeroes([3]ets_secure_boot_sig_block_t),
     _padding: [448]u8 = std.mem.zeroes([448]u8),
 };
-pub const ets_secure_boot_signature_t = struct_ets_secure_boot_signature;
-pub const struct_ets_secure_boot_key_digests = extern struct {
+pub const ets_secure_boot_signature_t = ets_secure_boot_signature;
+pub const ets_secure_boot_key_digests = extern struct {
     key_digests: [3]?*const anyopaque = std.mem.zeroes([3]?*const anyopaque),
     allow_key_revoke: bool = std.mem.zeroes(bool),
 };
-pub const ets_secure_boot_key_digests_t = struct_ets_secure_boot_key_digests;
-pub const SB_SUCCESS: c_int = 978999973;
-pub const SB_FAILED: c_int = 1966311518;
-pub const ets_secure_boot_status_t = c_uint;
+pub const ets_secure_boot_key_digests_t = ets_secure_boot_key_digests;
+pub const ets_secure_boot_status_t = enum(c_uint) {
+    SB_SUCCESS = 978999973,
+    SB_FAILED = 1966311518,
+};
 pub extern fn ets_secure_boot_verify_bootloader_with_keys(verified_hash: [*c]u8, trusted_keys: [*c]const ets_secure_boot_key_digests_t, stage_load: bool) ets_secure_boot_status_t;
 pub extern fn ets_secure_boot_read_key_digests(trusted_keys: [*c]ets_secure_boot_key_digests_t) ETS_STATUS;
 pub extern fn ets_secure_boot_verify_signature(sig: [*c]const ets_secure_boot_signature_t, image_digest: [*:0]const u8, trusted_keys: [*c]const ets_secure_boot_key_digests_t, verified_digest: [*c]u8) ets_secure_boot_status_t;
@@ -566,692 +561,692 @@ pub extern fn bootloader_enable_random() void;
 pub extern fn bootloader_print_banner() void;
 pub extern fn bootloader_init() idf.esp_err_t;
 
-const struct_unnamed_4 = opaque {};
+const unnamed_4 = opaque {};
 pub const efuse_pgm_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_4,
+    unnamed_0: unnamed_4,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:35:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_5 = opaque {};
+const unnamed_5 = opaque {};
 pub const efuse_pgm_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_5,
+    unnamed_0: unnamed_5,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:48:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_6 = opaque {};
+const unnamed_6 = opaque {};
 pub const efuse_pgm_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_6,
+    unnamed_0: unnamed_6,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:61:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_7 = opaque {};
+const unnamed_7 = opaque {};
 pub const efuse_pgm_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_7,
+    unnamed_0: unnamed_7,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:74:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_8 = opaque {};
+const unnamed_8 = opaque {};
 pub const efuse_pgm_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_8,
+    unnamed_0: unnamed_8,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:87:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_9 = opaque {};
+const unnamed_9 = opaque {};
 pub const efuse_pgm_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_9,
+    unnamed_0: unnamed_9,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:100:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_10 = opaque {};
+const unnamed_10 = opaque {};
 pub const efuse_pgm_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_10,
+    unnamed_0: unnamed_10,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:113:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_11 = opaque {};
+const unnamed_11 = opaque {};
 pub const efuse_pgm_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_11,
+    unnamed_0: unnamed_11,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:126:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_12 = opaque {};
+const unnamed_12 = opaque {};
 pub const efuse_pgm_check_value0_reg_t = extern union {
-    unnamed_0: struct_unnamed_12,
+    unnamed_0: unnamed_12,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:139:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_13 = opaque {};
+const unnamed_13 = opaque {};
 pub const efuse_pgm_check_value1_reg_t = extern union {
-    unnamed_0: struct_unnamed_13,
+    unnamed_0: unnamed_13,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:152:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_14 = opaque {};
+const unnamed_14 = opaque {};
 pub const efuse_pgm_check_value2_reg_t = extern union {
-    unnamed_0: struct_unnamed_14,
+    unnamed_0: unnamed_14,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:167:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_15 = opaque {};
+const unnamed_15 = opaque {};
 pub const efuse_rd_wr_dis_reg_t = extern union {
-    unnamed_0: struct_unnamed_15,
+    unnamed_0: unnamed_15,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:180:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_16 = opaque {};
+const unnamed_16 = opaque {};
 pub const efuse_rd_repeat_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_16,
+    unnamed_0: unnamed_16,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:274:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_17 = opaque {};
+const unnamed_17 = opaque {};
 pub const efuse_rd_repeat_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_17,
+    unnamed_0: unnamed_17,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:317:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_18 = opaque {};
+const unnamed_18 = opaque {};
 pub const efuse_rd_repeat_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_18,
+    unnamed_0: unnamed_18,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:364:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_19 = opaque {};
+const unnamed_19 = opaque {};
 pub const efuse_rd_repeat_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_19,
+    unnamed_0: unnamed_19,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:435:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_20 = opaque {};
+const unnamed_20 = opaque {};
 pub const efuse_rd_repeat_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_20,
+    unnamed_0: unnamed_20,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:457:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_21 = opaque {};
+const unnamed_21 = opaque {};
 pub const efuse_rd_mac_spi_sys_0_reg_t = extern union {
-    unnamed_0: struct_unnamed_21,
+    unnamed_0: unnamed_21,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:470:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_22 = opaque {};
+const unnamed_22 = opaque {};
 pub const efuse_rd_mac_spi_sys_1_reg_t = extern union {
-    unnamed_0: struct_unnamed_22,
+    unnamed_0: unnamed_22,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:495:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_23 = opaque {};
+const unnamed_23 = opaque {};
 pub const efuse_rd_mac_spi_sys_2_reg_t = extern union {
-    unnamed_0: struct_unnamed_23,
+    unnamed_0: unnamed_23,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:528:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_24 = opaque {};
+const unnamed_24 = opaque {};
 pub const efuse_rd_mac_spi_sys_3_reg_t = extern union {
-    unnamed_0: struct_unnamed_24,
+    unnamed_0: unnamed_24,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:569:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_25 = opaque {};
+const unnamed_25 = opaque {};
 pub const efuse_rd_mac_spi_sys_4_reg_t = extern union {
-    unnamed_0: struct_unnamed_25,
+    unnamed_0: unnamed_25,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:602:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_26 = opaque {};
+const unnamed_26 = opaque {};
 pub const efuse_rd_mac_spi_sys_5_reg_t = extern union {
-    unnamed_0: struct_unnamed_26,
+    unnamed_0: unnamed_26,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:639:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_27 = opaque {};
+const unnamed_27 = opaque {};
 pub const efuse_rd_sys_part1_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_27,
+    unnamed_0: unnamed_27,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:652:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_28 = opaque {};
+const unnamed_28 = opaque {};
 pub const efuse_rd_sys_part1_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_28,
+    unnamed_0: unnamed_28,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:665:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_29 = opaque {};
+const unnamed_29 = opaque {};
 pub const efuse_rd_sys_part1_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_29,
+    unnamed_0: unnamed_29,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:678:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_30 = opaque {};
+const unnamed_30 = opaque {};
 pub const efuse_rd_sys_part1_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_30,
+    unnamed_0: unnamed_30,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:691:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_31 = opaque {};
+const unnamed_31 = opaque {};
 pub const efuse_rd_sys_part1_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_31,
+    unnamed_0: unnamed_31,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:724:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_32 = opaque {};
+const unnamed_32 = opaque {};
 pub const efuse_rd_sys_part1_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_32,
+    unnamed_0: unnamed_32,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:749:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_33 = opaque {};
+const unnamed_33 = opaque {};
 pub const efuse_rd_sys_part1_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_33,
+    unnamed_0: unnamed_33,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:774:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_34 = opaque {};
+const unnamed_34 = opaque {};
 pub const efuse_rd_sys_part1_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_34,
+    unnamed_0: unnamed_34,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:791:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_35 = opaque {};
+const unnamed_35 = opaque {};
 pub const efuse_rd_usr_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_35,
+    unnamed_0: unnamed_35,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:804:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_36 = opaque {};
+const unnamed_36 = opaque {};
 pub const efuse_rd_usr_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_36,
+    unnamed_0: unnamed_36,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:817:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_37 = opaque {};
+const unnamed_37 = opaque {};
 pub const efuse_rd_usr_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_37,
+    unnamed_0: unnamed_37,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:830:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_38 = opaque {};
+const unnamed_38 = opaque {};
 pub const efuse_rd_usr_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_38,
+    unnamed_0: unnamed_38,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:843:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_39 = opaque {};
+const unnamed_39 = opaque {};
 pub const efuse_rd_usr_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_39,
+    unnamed_0: unnamed_39,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:856:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_40 = opaque {};
+const unnamed_40 = opaque {};
 pub const efuse_rd_usr_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_40,
+    unnamed_0: unnamed_40,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:869:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_41 = opaque {};
+const unnamed_41 = opaque {};
 pub const efuse_rd_usr_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_41,
+    unnamed_0: unnamed_41,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:886:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_42 = opaque {};
+const unnamed_42 = opaque {};
 pub const efuse_rd_usr_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_42,
+    unnamed_0: unnamed_42,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:903:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_43 = opaque {};
+const unnamed_43 = opaque {};
 pub const efuse_rd_key0_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_43,
+    unnamed_0: unnamed_43,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:916:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_44 = opaque {};
+const unnamed_44 = opaque {};
 pub const efuse_rd_key0_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_44,
+    unnamed_0: unnamed_44,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:929:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_45 = opaque {};
+const unnamed_45 = opaque {};
 pub const efuse_rd_key0_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_45,
+    unnamed_0: unnamed_45,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:942:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_46 = opaque {};
+const unnamed_46 = opaque {};
 pub const efuse_rd_key0_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_46,
+    unnamed_0: unnamed_46,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:955:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_47 = opaque {};
+const unnamed_47 = opaque {};
 pub const efuse_rd_key0_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_47,
+    unnamed_0: unnamed_47,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:968:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_48 = opaque {};
+const unnamed_48 = opaque {};
 pub const efuse_rd_key0_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_48,
+    unnamed_0: unnamed_48,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:981:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_49 = opaque {};
+const unnamed_49 = opaque {};
 pub const efuse_rd_key0_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_49,
+    unnamed_0: unnamed_49,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:994:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_50 = opaque {};
+const unnamed_50 = opaque {};
 pub const efuse_rd_key0_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_50,
+    unnamed_0: unnamed_50,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1007:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_51 = opaque {};
+const unnamed_51 = opaque {};
 pub const efuse_rd_key1_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_51,
+    unnamed_0: unnamed_51,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1020:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_52 = opaque {};
+const unnamed_52 = opaque {};
 pub const efuse_rd_key1_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_52,
+    unnamed_0: unnamed_52,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1033:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_53 = opaque {};
+const unnamed_53 = opaque {};
 pub const efuse_rd_key1_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_53,
+    unnamed_0: unnamed_53,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1046:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_54 = opaque {};
+const unnamed_54 = opaque {};
 pub const efuse_rd_key1_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_54,
+    unnamed_0: unnamed_54,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1059:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_55 = opaque {};
+const unnamed_55 = opaque {};
 pub const efuse_rd_key1_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_55,
+    unnamed_0: unnamed_55,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1072:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_56 = opaque {};
+const unnamed_56 = opaque {};
 pub const efuse_rd_key1_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_56,
+    unnamed_0: unnamed_56,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1085:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_57 = opaque {};
+const unnamed_57 = opaque {};
 pub const efuse_rd_key1_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_57,
+    unnamed_0: unnamed_57,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1098:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_58 = opaque {};
+const unnamed_58 = opaque {};
 pub const efuse_rd_key1_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_58,
+    unnamed_0: unnamed_58,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1111:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_59 = opaque {};
+const unnamed_59 = opaque {};
 pub const efuse_rd_key2_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_59,
+    unnamed_0: unnamed_59,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1124:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_60 = opaque {};
+const unnamed_60 = opaque {};
 pub const efuse_rd_key2_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_60,
+    unnamed_0: unnamed_60,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1137:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_61 = opaque {};
+const unnamed_61 = opaque {};
 pub const efuse_rd_key2_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_61,
+    unnamed_0: unnamed_61,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1150:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_62 = opaque {};
+const unnamed_62 = opaque {};
 pub const efuse_rd_key2_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_62,
+    unnamed_0: unnamed_62,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1163:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_63 = opaque {};
+const unnamed_63 = opaque {};
 pub const efuse_rd_key2_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_63,
+    unnamed_0: unnamed_63,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1176:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_64 = opaque {};
+const unnamed_64 = opaque {};
 pub const efuse_rd_key2_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_64,
+    unnamed_0: unnamed_64,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1189:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_65 = opaque {};
+const unnamed_65 = opaque {};
 pub const efuse_rd_key2_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_65,
+    unnamed_0: unnamed_65,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1202:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_66 = opaque {};
+const unnamed_66 = opaque {};
 pub const efuse_rd_key2_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_66,
+    unnamed_0: unnamed_66,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1215:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_67 = opaque {};
+const unnamed_67 = opaque {};
 pub const efuse_rd_key3_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_67,
+    unnamed_0: unnamed_67,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1228:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_68 = opaque {};
+const unnamed_68 = opaque {};
 pub const efuse_rd_key3_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_68,
+    unnamed_0: unnamed_68,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1241:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_69 = opaque {};
+const unnamed_69 = opaque {};
 pub const efuse_rd_key3_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_69,
+    unnamed_0: unnamed_69,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1254:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_70 = opaque {};
+const unnamed_70 = opaque {};
 pub const efuse_rd_key3_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_70,
+    unnamed_0: unnamed_70,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1267:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_71 = opaque {};
+const unnamed_71 = opaque {};
 pub const efuse_rd_key3_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_71,
+    unnamed_0: unnamed_71,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1280:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_72 = opaque {};
+const unnamed_72 = opaque {};
 pub const efuse_rd_key3_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_72,
+    unnamed_0: unnamed_72,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1293:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_73 = opaque {};
+const unnamed_73 = opaque {};
 pub const efuse_rd_key3_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_73,
+    unnamed_0: unnamed_73,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1306:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_74 = opaque {};
+const unnamed_74 = opaque {};
 pub const efuse_rd_key3_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_74,
+    unnamed_0: unnamed_74,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1319:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_75 = opaque {};
+const unnamed_75 = opaque {};
 pub const efuse_rd_key4_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_75,
+    unnamed_0: unnamed_75,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1332:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_76 = opaque {};
+const unnamed_76 = opaque {};
 pub const efuse_rd_key4_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_76,
+    unnamed_0: unnamed_76,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1345:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_77 = opaque {};
+const unnamed_77 = opaque {};
 pub const efuse_rd_key4_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_77,
+    unnamed_0: unnamed_77,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1358:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_78 = opaque {};
+const unnamed_78 = opaque {};
 pub const efuse_rd_key4_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_78,
+    unnamed_0: unnamed_78,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1371:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_79 = opaque {};
+const unnamed_79 = opaque {};
 pub const efuse_rd_key4_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_79,
+    unnamed_0: unnamed_79,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1384:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_80 = opaque {};
+const unnamed_80 = opaque {};
 pub const efuse_rd_key4_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_80,
+    unnamed_0: unnamed_80,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1397:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_81 = opaque {};
+const unnamed_81 = opaque {};
 pub const efuse_rd_key4_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_81,
+    unnamed_0: unnamed_81,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1410:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_82 = opaque {};
+const unnamed_82 = opaque {};
 pub const efuse_rd_key4_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_82,
+    unnamed_0: unnamed_82,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1423:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_83 = opaque {};
+const unnamed_83 = opaque {};
 pub const efuse_rd_key5_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_83,
+    unnamed_0: unnamed_83,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1436:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_84 = opaque {};
+const unnamed_84 = opaque {};
 pub const efuse_rd_key5_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_84,
+    unnamed_0: unnamed_84,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1449:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_85 = opaque {};
+const unnamed_85 = opaque {};
 pub const efuse_rd_key5_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_85,
+    unnamed_0: unnamed_85,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1462:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_86 = opaque {};
+const unnamed_86 = opaque {};
 pub const efuse_rd_key5_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_86,
+    unnamed_0: unnamed_86,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1475:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_87 = opaque {};
+const unnamed_87 = opaque {};
 pub const efuse_rd_key5_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_87,
+    unnamed_0: unnamed_87,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1488:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_88 = opaque {};
+const unnamed_88 = opaque {};
 pub const efuse_rd_key5_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_88,
+    unnamed_0: unnamed_88,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1501:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_89 = opaque {};
+const unnamed_89 = opaque {};
 pub const efuse_rd_key5_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_89,
+    unnamed_0: unnamed_89,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1514:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_90 = opaque {};
+const unnamed_90 = opaque {};
 pub const efuse_rd_key5_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_90,
+    unnamed_0: unnamed_90,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1527:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_91 = opaque {};
+const unnamed_91 = opaque {};
 pub const efuse_rd_sys_part2_data0_reg_t = extern union {
-    unnamed_0: struct_unnamed_91,
+    unnamed_0: unnamed_91,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1540:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_92 = opaque {};
+const unnamed_92 = opaque {};
 pub const efuse_rd_sys_part2_data1_reg_t = extern union {
-    unnamed_0: struct_unnamed_92,
+    unnamed_0: unnamed_92,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1553:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_93 = opaque {};
+const unnamed_93 = opaque {};
 pub const efuse_rd_sys_part2_data2_reg_t = extern union {
-    unnamed_0: struct_unnamed_93,
+    unnamed_0: unnamed_93,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1566:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_94 = opaque {};
+const unnamed_94 = opaque {};
 pub const efuse_rd_sys_part2_data3_reg_t = extern union {
-    unnamed_0: struct_unnamed_94,
+    unnamed_0: unnamed_94,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1579:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_95 = opaque {};
+const unnamed_95 = opaque {};
 pub const efuse_rd_sys_part2_data4_reg_t = extern union {
-    unnamed_0: struct_unnamed_95,
+    unnamed_0: unnamed_95,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1592:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_96 = opaque {};
+const unnamed_96 = opaque {};
 pub const efuse_rd_sys_part2_data5_reg_t = extern union {
-    unnamed_0: struct_unnamed_96,
+    unnamed_0: unnamed_96,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1605:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_97 = opaque {};
+const unnamed_97 = opaque {};
 pub const efuse_rd_sys_part2_data6_reg_t = extern union {
-    unnamed_0: struct_unnamed_97,
+    unnamed_0: unnamed_97,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1618:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_98 = opaque {};
+const unnamed_98 = opaque {};
 pub const efuse_rd_sys_part2_data7_reg_t = extern union {
-    unnamed_0: struct_unnamed_98,
+    unnamed_0: unnamed_98,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1633:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_99 = opaque {};
+const unnamed_99 = opaque {};
 pub const efuse_rd_repeat_err0_reg_t = extern union {
-    unnamed_0: struct_unnamed_99,
+    unnamed_0: unnamed_99,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1722:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_100 = opaque {};
+const unnamed_100 = opaque {};
 pub const efuse_rd_repeat_err1_reg_t = extern union {
-    unnamed_0: struct_unnamed_100,
+    unnamed_0: unnamed_100,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1763:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_101 = opaque {};
+const unnamed_101 = opaque {};
 pub const efuse_rd_repeat_err2_reg_t = extern union {
-    unnamed_0: struct_unnamed_101,
+    unnamed_0: unnamed_101,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1808:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_102 = opaque {};
+const unnamed_102 = opaque {};
 pub const efuse_rd_repeat_err3_reg_t = extern union {
-    unnamed_0: struct_unnamed_102,
+    unnamed_0: unnamed_102,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1873:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_103 = opaque {};
+const unnamed_103 = opaque {};
 pub const efuse_rd_repeat_err4_reg_t = extern union {
-    unnamed_0: struct_unnamed_103,
+    unnamed_0: unnamed_103,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1887:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_104 = opaque {};
+const unnamed_104 = opaque {};
 pub const efuse_rd_rs_err0_reg_t = extern union {
-    unnamed_0: struct_unnamed_104,
+    unnamed_0: unnamed_104,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1968:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_105 = opaque {};
+const unnamed_105 = opaque {};
 pub const efuse_rd_rs_err1_reg_t = extern union {
-    unnamed_0: struct_unnamed_105,
+    unnamed_0: unnamed_105,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:1998:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_106 = opaque {};
+const unnamed_106 = opaque {};
 pub const efuse_clk_reg_t = extern union {
-    unnamed_0: struct_unnamed_106,
+    unnamed_0: unnamed_106,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2025:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_107 = opaque {};
+const unnamed_107 = opaque {};
 pub const efuse_conf_reg_t = extern union {
-    unnamed_0: struct_unnamed_107,
+    unnamed_0: unnamed_107,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2039:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_108 = opaque {};
+const unnamed_108 = opaque {};
 pub const efuse_cmd_reg_t = extern union {
-    unnamed_0: struct_unnamed_108,
+    unnamed_0: unnamed_108,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2062:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_109 = opaque {};
+const unnamed_109 = opaque {};
 pub const efuse_dac_conf_reg_t = extern union {
-    unnamed_0: struct_unnamed_109,
+    unnamed_0: unnamed_109,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2085:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_110 = opaque {};
+const unnamed_110 = opaque {};
 pub const efuse_rd_tim_conf_reg_t = extern union {
-    unnamed_0: struct_unnamed_110,
+    unnamed_0: unnamed_110,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2099:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_111 = opaque {};
+const unnamed_111 = opaque {};
 pub const efuse_wr_tim_conf1_reg_t = extern union {
-    unnamed_0: struct_unnamed_111,
+    unnamed_0: unnamed_111,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2117:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_112 = opaque {};
+const unnamed_112 = opaque {};
 pub const efuse_wr_tim_conf2_reg_t = extern union {
-    unnamed_0: struct_unnamed_112,
+    unnamed_0: unnamed_112,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2133:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_113 = opaque {};
+const unnamed_113 = opaque {};
 pub const efuse_status_reg_t = extern union {
-    unnamed_0: struct_unnamed_113,
+    unnamed_0: unnamed_113,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2177:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_114 = opaque {};
+const unnamed_114 = opaque {};
 pub const efuse_int_raw_reg_t = extern union {
-    unnamed_0: struct_unnamed_114,
+    unnamed_0: unnamed_114,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2195:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_115 = opaque {};
+const unnamed_115 = opaque {};
 pub const efuse_int_st_reg_t = extern union {
-    unnamed_0: struct_unnamed_115,
+    unnamed_0: unnamed_115,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2213:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_116 = opaque {};
+const unnamed_116 = opaque {};
 pub const efuse_int_ena_reg_t = extern union {
-    unnamed_0: struct_unnamed_116,
+    unnamed_0: unnamed_116,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2231:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_117 = opaque {};
+const unnamed_117 = opaque {};
 pub const efuse_int_clr_reg_t = extern union {
-    unnamed_0: struct_unnamed_117,
+    unnamed_0: unnamed_117,
     val: u32,
 };
 // /esp-idf/components/soc/esp32c3/include/soc/efuse_struct.h:2251:18: warning: struct demoted to opaque type - has bitfield
-const struct_unnamed_118 = opaque {};
+const unnamed_118 = opaque {};
 pub const efuse_date_reg_t = extern union {
-    unnamed_0: struct_unnamed_118,
+    unnamed_0: unnamed_118,
     val: u32,
 };

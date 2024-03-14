@@ -146,6 +146,17 @@ fn modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const lwip = b.addModule("lwip", .{
+        .root_source_file = .{
+            .path = "imports/lwip.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     const idf = b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = "imports/idf.zig",
@@ -162,6 +173,10 @@ fn modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "sys",
                 .module = sys,
+            },
+            .{
+                .name = "lwip",
+                .module = lwip,
             },
         },
     });
