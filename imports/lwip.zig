@@ -19,7 +19,7 @@ pub const sys_mutex_t = idf.SemaphoreHandle_t;
 pub const sys_thread_t = idf.TaskHandle_t;
 pub const sys_mbox_s = extern struct {
     os_mbox: idf.QueueHandle_t = std.mem.zeroes(idf.QueueHandle_t),
-    owner: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    owner: ?*anyopaque = null,
 };
 pub const sys_mbox_t = [*c]sys_mbox_s;
 pub extern fn sys_delay_ms(ms: u32) void;
@@ -66,9 +66,9 @@ pub extern fn err_to_errno(err: err_t) c_int;
 pub extern fn lwip_htons(x: u16) u16;
 pub extern fn lwip_htonl(x: u32) u32;
 pub extern fn lwip_itoa(result: [*c]u8, bufsize: usize, number: c_int) void;
-pub extern fn lwip_strnicmp(str1: [*c]const u8, str2: [*c]const u8, len: usize) c_int;
-pub extern fn lwip_stricmp(str1: [*c]const u8, str2: [*c]const u8) c_int;
-pub extern fn lwip_strnstr(buffer: [*c]const u8, token: [*c]const u8, n: usize) [*c]u8;
+pub extern fn lwip_strnicmp(str1: [*:0]const u8, str2: [*:0]const u8, len: usize) c_int;
+pub extern fn lwip_stricmp(str1: [*:0]const u8, str2: [*:0]const u8) c_int;
+pub extern fn lwip_strnstr(buffer: [*:0]const u8, token: [*:0]const u8, n: usize) [*c]u8;
 pub const ip4_addr = extern struct {
     addr: u32 = std.mem.zeroes(u32),
 };
@@ -89,7 +89,7 @@ pub const ip_addr = extern struct {
 pub const ip_addr_t = ip_addr;
 pub const pbuf = extern struct {
     next: [*c]pbuf = std.mem.zeroes([*c]pbuf),
-    payload: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    payload: ?*anyopaque = null,
     tot_len: u16 = std.mem.zeroes(u16),
     len: u16 = std.mem.zeroes(u16),
     type_internal: u8 = std.mem.zeroes(u8),
@@ -120,9 +120,9 @@ pub const netif = extern struct {
     output: netif_output_fn = std.mem.zeroes(netif_output_fn),
     linkoutput: netif_linkoutput_fn = std.mem.zeroes(netif_linkoutput_fn),
     output_ip6: netif_output_ip6_fn = std.mem.zeroes(netif_output_ip6_fn),
-    state: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    state: ?*anyopaque = null,
     client_data: [3]?*anyopaque = std.mem.zeroes([3]?*anyopaque),
-    hostname: [*c]const u8 = std.mem.zeroes([*c]const u8),
+    hostname: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     mtu: u16 = std.mem.zeroes(u16),
     mtu6: u16 = std.mem.zeroes(u16),
     hwaddr: [6]u8 = std.mem.zeroes([6]u8),
@@ -141,8 +141,8 @@ pub const netif = extern struct {
 };
 pub extern fn ip4_addr_isbroadcast_u32(addr: u32, netif: [*c]const netif) u8;
 pub extern fn ip4_addr_netmask_valid(netmask: u32) u8;
-pub extern fn ipaddr_addr(cp: [*c]const u8) u32;
-pub extern fn ip4addr_aton(cp: [*c]const u8, addr: [*c]ip4_addr_t) c_int;
+pub extern fn ipaddr_addr(cp: [*:0]const u8) u32;
+pub extern fn ip4addr_aton(cp: [*:0]const u8, addr: [*c]ip4_addr_t) c_int;
 pub extern fn ip4addr_ntoa(addr: [*c]const ip4_addr_t) [*c]u8;
 pub extern fn ip4addr_ntoa_r(addr: [*c]const ip4_addr_t, buf: [*c]u8, buflen: c_int) [*c]u8;
 pub const enum_lwip_ipv6_scope_type = enum(c_uint) {
@@ -150,7 +150,7 @@ pub const enum_lwip_ipv6_scope_type = enum(c_uint) {
     IP6_UNICAST = 1,
     IP6_MULTICAST = 2,
 };
-pub extern fn ip6addr_aton(cp: [*c]const u8, addr: [*c]ip6_addr_t) c_int;
+pub extern fn ip6addr_aton(cp: [*:0]const u8, addr: [*c]ip6_addr_t) c_int;
 pub extern fn ip6addr_ntoa(addr: [*c]const ip6_addr_t) [*c]u8;
 pub extern fn ip6addr_ntoa_r(addr: [*c]const ip6_addr_t, buf: [*c]u8, buflen: c_int) [*c]u8;
 pub const enum_lwip_ip_addr_type = enum(c_uint) {
@@ -161,7 +161,7 @@ pub const enum_lwip_ip_addr_type = enum(c_uint) {
 pub extern const ip_addr_any_type: ip_addr_t;
 pub extern fn ipaddr_ntoa(addr: [*c]const ip_addr_t) [*c]u8;
 pub extern fn ipaddr_ntoa_r(addr: [*c]const ip_addr_t, buf: [*c]u8, buflen: c_int) [*c]u8;
-pub extern fn ipaddr_aton(cp: [*c]const u8, addr: [*c]ip_addr_t) c_int;
+pub extern fn ipaddr_aton(cp: [*:0]const u8, addr: [*c]ip_addr_t) c_int;
 pub extern const ip_addr_any: ip_addr_t;
 pub extern const ip_addr_broadcast: ip_addr_t;
 pub extern const ip6_addr_any: ip_addr_t;
@@ -217,7 +217,7 @@ pub extern fn pbuf_try_get_at(p: [*c]const pbuf, offset: u16) c_int;
 pub extern fn pbuf_put_at(p: [*c]pbuf, offset: u16, data: u8) void;
 pub extern fn pbuf_memcmp(p: [*c]const pbuf, offset: u16, s2: ?*const anyopaque, n: u16) u16;
 pub extern fn pbuf_memfind(p: [*c]const pbuf, mem: ?*const anyopaque, mem_len: u16, start_offset: u16) u16;
-pub extern fn pbuf_strstr(p: [*c]const pbuf, substr: [*c]const u8) u16;
+pub extern fn pbuf_strstr(p: [*c]const pbuf, substr: [*:0]const u8) u16;
 pub const mem_size_t = usize;
 pub extern fn mem_init() void;
 pub extern fn mem_trim(mem: ?*anyopaque, size: mem_size_t) ?*anyopaque;
@@ -271,7 +271,7 @@ pub extern fn netif_add_noaddr(netif: [*c]netif, state: ?*anyopaque, init: netif
 pub extern fn netif_add(netif: [*c]netif, ipaddr: [*c]const ip4_addr_t, netmask: [*c]const ip4_addr_t, gw: [*c]const ip4_addr_t, state: ?*anyopaque, init: netif_init_fn, input: netif_input_fn) [*c]netif;
 pub extern fn netif_set_addr(netif: [*c]netif, ipaddr: [*c]const ip4_addr_t, netmask: [*c]const ip4_addr_t, gw: [*c]const ip4_addr_t) void;
 pub extern fn netif_remove(netif: [*c]netif) void;
-pub extern fn netif_find(name: [*c]const u8) [*c]netif;
+pub extern fn netif_find(name: [*:0]const u8) [*c]netif;
 pub extern fn netif_set_default(netif: [*c]netif) void;
 pub extern fn netif_set_ipaddr(netif: [*c]netif, ipaddr: [*c]const ip4_addr_t) void;
 pub extern fn netif_set_netmask(netif: [*c]netif, netmask: [*c]const ip4_addr_t) void;
@@ -289,7 +289,7 @@ pub extern fn netif_ip6_addr_set_state(netif: [*c]netif, addr_idx: i8, state: u8
 pub extern fn netif_get_ip6_addr_match(netif: [*c]netif, ip6addr: [*c]const ip6_addr_t) i8;
 pub extern fn netif_create_ip6_linklocal_address(netif: [*c]netif, from_mac_48bit: u8) void;
 pub extern fn netif_add_ip6_address(netif: [*c]netif, ip6addr: [*c]const ip6_addr_t, chosen_idx: [*c]i8) err_t;
-pub extern fn netif_name_to_index(name: [*c]const u8) u8;
+pub extern fn netif_name_to_index(name: [*:0]const u8) u8;
 pub extern fn netif_index_to_name(idx: u8, name: [*c]u8) [*c]u8;
 pub extern fn netif_get_by_index(idx: u8) [*c]netif;
 pub const netif_nsc_reason_t = u16;
@@ -370,15 +370,15 @@ pub const sockaddr_storage = extern struct {
 };
 pub const socklen_t = u32;
 pub const iovec = extern struct {
-    iov_base: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    iov_base: ?*anyopaque = null,
     iov_len: usize = std.mem.zeroes(usize),
 };
 pub const msghdr = extern struct {
-    msg_name: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    msg_name: ?*anyopaque = null,
     msg_namelen: socklen_t = std.mem.zeroes(socklen_t),
     msg_iov: [*c]iovec = std.mem.zeroes([*c]iovec),
     msg_iovlen: c_int = std.mem.zeroes(c_int),
-    msg_control: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    msg_control: ?*anyopaque = null,
     msg_controllen: socklen_t = std.mem.zeroes(socklen_t),
     msg_flags: c_int = std.mem.zeroes(c_int),
 };
@@ -433,8 +433,8 @@ pub extern fn lwip_select(maxfdp1: c_int, readset: [*c]fd_set, writeset: [*c]fd_
 pub extern fn lwip_poll(fds: [*c]pollfd, nfds: nfds_t, timeout: c_int) c_int;
 pub extern fn lwip_ioctl(s: c_int, cmd: c_long, argp: ?*anyopaque) c_int;
 pub extern fn lwip_fcntl(s: c_int, cmd: c_int, val: c_int) c_int;
-pub extern fn lwip_inet_ntop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, size: socklen_t) [*c]const u8;
-pub extern fn lwip_inet_pton(af: c_int, src: [*c]const u8, dst: ?*anyopaque) c_int;
+pub extern fn lwip_inet_ntop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, size: socklen_t) [*:0]const u8;
+pub extern fn lwip_inet_pton(af: c_int, src: [*:0]const u8, dst: ?*anyopaque) c_int;
 pub fn accept(s: c_int, addr: [*c]sockaddr, addrlen: [*c]socklen_t) callconv(.C) c_int {
     return lwip_accept(s, addr, addrlen);
 }
@@ -486,10 +486,10 @@ pub fn sendto(s: c_int, dataptr: ?*const anyopaque, size: usize, flags: c_int, t
 pub fn socket(domain: c_int, @"type": c_int, protocol: c_int) callconv(.C) c_int {
     return lwip_socket(domain, @"type", protocol);
 }
-pub fn inet_ntop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, size: socklen_t) callconv(.C) [*c]const u8 {
+pub fn inet_ntop(af: c_int, src: ?*const anyopaque, dst: [*c]u8, size: socklen_t) callconv(.C) [*:0]const u8 {
     return lwip_inet_ntop(af, src, dst, size);
 }
-pub fn inet_pton(af: c_int, src: [*c]const u8, dst: ?*anyopaque) callconv(.C) c_int {
+pub fn inet_pton(af: c_int, src: [*:0]const u8, dst: ?*anyopaque) callconv(.C) c_int {
     return lwip_inet_pton(af, src, dst);
 }
 pub const lwip_thread_fn = ?*const fn (?*anyopaque) callconv(.C) void;
@@ -508,7 +508,7 @@ pub extern fn sys_mbox_trypost_fromisr(mbox: [*c]sys_mbox_t, msg: ?*anyopaque) e
 pub extern fn sys_arch_mbox_fetch(mbox: [*c]sys_mbox_t, msg: [*c]?*anyopaque, timeout: u32) u32;
 pub extern fn sys_arch_mbox_tryfetch(mbox: [*c]sys_mbox_t, msg: [*c]?*anyopaque) u32;
 pub extern fn sys_mbox_free(mbox: [*c]sys_mbox_t) void;
-pub extern fn sys_thread_new(name: [*c]const u8, thread: lwip_thread_fn, arg: ?*anyopaque, stacksize: c_int, prio: c_int) sys_thread_t;
+pub extern fn sys_thread_new(name: [*:0]const u8, thread: lwip_thread_fn, arg: ?*anyopaque, stacksize: c_int, prio: c_int) sys_thread_t;
 pub extern fn sys_init() void;
 pub extern fn sys_jiffies() u32;
 pub extern fn sys_now() u32;
@@ -532,31 +532,31 @@ pub const addrinfo = extern struct {
     ai_next: [*c]addrinfo = std.mem.zeroes([*c]addrinfo),
 };
 pub extern var h_errno: c_int;
-pub extern fn lwip_gethostbyname(name: [*c]const u8) [*c]hostent;
-pub extern fn lwip_gethostbyname_r(name: [*c]const u8, ret: [*c]hostent, buf: [*c]u8, buflen: usize, result: [*c][*c]hostent, h_errnop: [*c]c_int) c_int;
+pub extern fn lwip_gethostbyname(name: [*:0]const u8) [*c]hostent;
+pub extern fn lwip_gethostbyname_r(name: [*:0]const u8, ret: [*c]hostent, buf: [*c]u8, buflen: usize, result: [*c][*c]hostent, h_errnop: [*c]c_int) c_int;
 pub extern fn lwip_freeaddrinfo(ai: [*c]addrinfo) void;
-pub extern fn lwip_getaddrinfo(nodename: [*c]const u8, servname: [*c]const u8, hints: [*c]const addrinfo, res: [*c][*c]addrinfo) c_int;
-pub fn gethostbyname_r(name: [*c]const u8, ret: [*c]hostent, buf: [*c]u8, buflen: usize, result: [*c][*c]hostent, h_errnop: [*c]c_int) callconv(.C) c_int {
+pub extern fn lwip_getaddrinfo(nodename: [*:0]const u8, servname: [*:0]const u8, hints: [*c]const addrinfo, res: [*c][*c]addrinfo) c_int;
+pub fn gethostbyname_r(name: [*:0]const u8, ret: [*c]hostent, buf: [*c]u8, buflen: usize, result: [*c][*c]hostent, h_errnop: [*c]c_int) callconv(.C) c_int {
     return lwip_gethostbyname_r(name, ret, buf, buflen, result, h_errnop);
 }
-pub fn gethostbyname(name: [*c]const u8) callconv(.C) [*c]hostent {
+pub fn gethostbyname(name: [*:0]const u8) callconv(.C) [*c]hostent {
     return lwip_gethostbyname(name);
 }
 pub fn freeaddrinfo(ai: [*c]addrinfo) callconv(.C) void {
     lwip_freeaddrinfo(ai);
 }
-pub fn getaddrinfo(nodename: [*c]const u8, servname: [*c]const u8, hints: [*c]const addrinfo, res: [*c][*c]addrinfo) callconv(.C) c_int {
+pub fn getaddrinfo(nodename: [*:0]const u8, servname: [*:0]const u8, hints: [*c]const addrinfo, res: [*c][*c]addrinfo) callconv(.C) c_int {
     return lwip_getaddrinfo(nodename, servname, hints, res);
 }
 pub extern const dns_mquery_v4group: ip_addr_t;
 pub extern const dns_mquery_v6group: ip_addr_t;
-pub const dns_found_callback = ?*const fn ([*c]const u8, [*c]const ip_addr_t, ?*anyopaque) callconv(.C) void;
+pub const dns_found_callback = ?*const fn ([*:0]const u8, [*c]const ip_addr_t, ?*anyopaque) callconv(.C) void;
 pub extern fn dns_init() void;
 pub extern fn dns_tmr() void;
 pub extern fn dns_setserver(numdns: u8, dnsserver: [*c]const ip_addr_t) void;
 pub extern fn dns_getserver(numdns: u8) [*c]const ip_addr_t;
-pub extern fn dns_gethostbyname(hostname: [*c]const u8, addr: [*c]ip_addr_t, found: dns_found_callback, callback_arg: ?*anyopaque) err_t;
-pub extern fn dns_gethostbyname_addrtype(hostname: [*c]const u8, addr: [*c]ip_addr_t, found: dns_found_callback, callback_arg: ?*anyopaque, dns_addrtype: u8) err_t;
+pub extern fn dns_gethostbyname(hostname: [*:0]const u8, addr: [*c]ip_addr_t, found: dns_found_callback, callback_arg: ?*anyopaque) err_t;
+pub extern fn dns_gethostbyname_addrtype(hostname: [*:0]const u8, addr: [*c]ip_addr_t, found: dns_found_callback, callback_arg: ?*anyopaque, dns_addrtype: u8) err_t;
 pub extern fn dns_clear_cache() void;
 pub const fd_set = extern struct {
     __fds_bits: [2]__fd_mask = std.mem.zeroes([2]__fd_mask),

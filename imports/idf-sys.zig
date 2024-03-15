@@ -1467,11 +1467,11 @@ pub extern fn esp_set_time_from_rtc() void;
 pub extern fn esp_sync_timekeeping_timers() void;
 pub extern fn esp_newlib_locks_init() void;
 pub const multi_heap_info = extern struct {
-    lock: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    lock: ?*anyopaque = null,
     free_bytes: usize = std.mem.zeroes(usize),
     minimum_free_bytes: usize = std.mem.zeroes(usize),
     pool_size: usize = std.mem.zeroes(usize),
-    heap_data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    heap_data: ?*anyopaque = null,
 };
 pub const multi_heap_handle_t = ?*multi_heap_info;
 pub extern fn multi_heap_aligned_alloc(heap: multi_heap_handle_t, size: usize, alignment: usize) ?*anyopaque;
@@ -1658,18 +1658,18 @@ pub const xSTATIC_MINI_LIST_ITEM = extern struct {
 pub const StaticMiniListItem_t = xSTATIC_MINI_LIST_ITEM;
 pub const xSTATIC_LIST = extern struct {
     uxDummy2: UBaseType_t = std.mem.zeroes(UBaseType_t),
-    pvDummy3: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvDummy3: ?*anyopaque = null,
     xDummy4: StaticMiniListItem_t = std.mem.zeroes(StaticMiniListItem_t),
 };
 pub const StaticList_t = xSTATIC_LIST;
 pub const xSTATIC_TCB = extern struct {
-    pxDummy1: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pxDummy1: ?*anyopaque = null,
     xDummy3: [2]StaticListItem_t = std.mem.zeroes([2]StaticListItem_t),
     uxDummy5: UBaseType_t = std.mem.zeroes(UBaseType_t),
-    pxDummy6: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pxDummy6: ?*anyopaque = null,
     xDummy23: [2]BaseType_t = std.mem.zeroes([2]BaseType_t),
     ucDummy7: [16]u8 = std.mem.zeroes([16]u8),
-    pxDummy8: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pxDummy8: ?*anyopaque = null,
     uxDummy12: [2]UBaseType_t = std.mem.zeroes([2]UBaseType_t),
     pvDummy15: [2]?*anyopaque = std.mem.zeroes([2]?*anyopaque),
     xDummy17: opaque {},
@@ -1690,7 +1690,7 @@ pub const xSTATIC_QUEUE = extern struct {
     uxDummy4: [3]UBaseType_t = std.mem.zeroes([3]UBaseType_t),
     ucDummy5: [2]u8 = std.mem.zeroes([2]u8),
     ucDummy6: u8 = std.mem.zeroes(u8),
-    pvDummy7: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvDummy7: ?*anyopaque = null,
 };
 pub const StaticQueue_t = xSTATIC_QUEUE;
 pub const StaticSemaphore_t = StaticQueue_t;
@@ -1701,10 +1701,10 @@ pub const xSTATIC_EVENT_GROUP = extern struct {
 };
 pub const StaticEventGroup_t = xSTATIC_EVENT_GROUP;
 pub const xSTATIC_TIMER = extern struct {
-    pvDummy1: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvDummy1: ?*anyopaque = null,
     xDummy2: StaticListItem_t = std.mem.zeroes(StaticListItem_t),
     xDummy3: TickType_t = std.mem.zeroes(TickType_t),
-    pvDummy5: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvDummy5: ?*anyopaque = null,
     pvDummy6: TaskFunction_t = std.mem.zeroes(TaskFunction_t),
     ucDummy8: u8 = std.mem.zeroes(u8),
 };
@@ -1720,7 +1720,7 @@ pub const xLIST_ITEM = extern struct {
     xItemValue: TickType_t = std.mem.zeroes(TickType_t),
     pxNext: [*c]xLIST_ITEM = std.mem.zeroes([*c]xLIST_ITEM),
     pxPrevious: [*c]xLIST_ITEM = std.mem.zeroes([*c]xLIST_ITEM),
-    pvOwner: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvOwner: ?*anyopaque = null,
     pxContainer: [*c]xLIST = std.mem.zeroes([*c]xLIST),
 };
 pub const ListItem_t = xLIST_ITEM;
@@ -1765,7 +1765,7 @@ pub const xTIME_OUT = extern struct {
 };
 pub const TimeOut_t = xTIME_OUT;
 pub const xMEMORY_REGION = extern struct {
-    pvBaseAddress: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvBaseAddress: ?*anyopaque = null,
     ulLengthInBytes: u32 = std.mem.zeroes(u32),
     ulParameters: u32 = std.mem.zeroes(u32),
 };
@@ -1774,7 +1774,7 @@ pub const xTASK_PARAMETERS = extern struct {
     pvTaskCode: TaskFunction_t = std.mem.zeroes(TaskFunction_t),
     pcName: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     usStackDepth: u32 = std.mem.zeroes(u32),
-    pvParameters: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pvParameters: ?*anyopaque = null,
     uxPriority: UBaseType_t = std.mem.zeroes(UBaseType_t),
     puxStackBuffer: [*c]StackType_t = std.mem.zeroes([*c]StackType_t),
     xRegions: [1]MemoryRegion_t = std.mem.zeroes([1]MemoryRegion_t),
@@ -2216,7 +2216,7 @@ pub extern fn uxQueueGetQueueNumber(xQueue: QueueHandle_t) UBaseType_t;
 pub extern fn ucQueueGetQueueType(xQueue: QueueHandle_t) u8;
 pub const SemaphoreHandle_t = QueueHandle_t;
 pub const xTASK_SNAPSHOT = extern struct {
-    pxTCB: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    pxTCB: ?*anyopaque = null,
     pxTopOfStack: [*c]StackType_t = std.mem.zeroes([*c]StackType_t),
     pxEndOfStack: [*c]StackType_t = std.mem.zeroes([*c]StackType_t),
 };
@@ -2242,7 +2242,7 @@ pub const esp_event_handler_t = ?*const fn (?*anyopaque, esp_event_base_t, i32, 
 pub const esp_event_handler_instance_t = ?*anyopaque;
 pub const esp_event_loop_args_t = extern struct {
     queue_size: i32 = std.mem.zeroes(i32),
-    task_name: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    task_name: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     task_priority: UBaseType_t = std.mem.zeroes(UBaseType_t),
     task_stack_size: u32 = std.mem.zeroes(u32),
     task_core_id: BaseType_t = std.mem.zeroes(BaseType_t),
@@ -2417,7 +2417,7 @@ pub const nvs_flash_generate_keys_t = ?*const fn (?*const anyopaque, [*c]nvs_sec
 pub const nvs_flash_read_cfg_t = ?*const fn (?*const anyopaque, [*c]nvs_sec_cfg_t) callconv(.C) esp_err_t;
 pub const nvs_sec_scheme_t = extern struct {
     scheme_id: c_int = std.mem.zeroes(c_int),
-    scheme_data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    scheme_data: ?*anyopaque = null,
     nvs_flash_key_gen: nvs_flash_generate_keys_t = std.mem.zeroes(nvs_flash_generate_keys_t),
     nvs_flash_read_cfg: nvs_flash_read_cfg_t = std.mem.zeroes(nvs_flash_read_cfg_t),
 };
@@ -2736,7 +2736,7 @@ pub const esp_bt_dev_cb_param_t = extern union {
 };
 pub const esp_bt_dev_cb_t = ?*const fn (esp_bt_dev_cb_event_t, [*c]esp_bt_dev_cb_param_t) callconv(.C) void;
 pub extern fn esp_bt_dev_register_callback(callback: esp_bt_dev_cb_t) esp_err_t;
-pub extern fn esp_bt_dev_get_address() [*c]const u8;
+pub extern fn esp_bt_dev_get_address() [*:0]const u8;
 pub extern fn esp_bt_dev_set_device_name(name: [*:0]const u8) esp_err_t;
 pub extern fn esp_bt_dev_get_device_name() esp_err_t;
 pub extern fn esp_bt_dev_coex_status_config(@"type": esp_bt_dev_coex_type_t, op: esp_bt_dev_coex_op_t, status: u8) esp_err_t;
@@ -4441,7 +4441,7 @@ pub const heap_trace_mode_t = enum(c_uint) {
 };
 pub const heap_trace_record_t = extern struct {
     ccount: u32 align(4) = std.mem.zeroes(u32),
-    address: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    address: ?*anyopaque = null,
     size: usize = std.mem.zeroes(usize),
     alloced_by: [0]?*anyopaque = std.mem.zeroes([0]?*anyopaque),
     pub fn freed_by(self: anytype) std.zig.c_translation.FlexibleArrayType(@TypeOf(self), ?*anyopaque) {
@@ -4470,7 +4470,7 @@ pub extern fn heap_trace_dump() void;
 pub extern fn heap_trace_dump_caps(caps: u32) void;
 pub extern fn heap_trace_summary(summary: [*c]heap_trace_summary_t) esp_err_t;
 pub const SEGGER_RTT_BUFFER_UP = extern struct {
-    sName: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    sName: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     pBuffer: [*c]u8 = std.mem.zeroes([*c]u8),
     SizeOfBuffer: c_uint = std.mem.zeroes(c_uint),
     WrOff: c_uint = std.mem.zeroes(c_uint),
@@ -4478,7 +4478,7 @@ pub const SEGGER_RTT_BUFFER_UP = extern struct {
     Flags: c_uint = std.mem.zeroes(c_uint),
 };
 pub const SEGGER_RTT_BUFFER_DOWN = extern struct {
-    sName: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    sName: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     pBuffer: [*c]u8 = std.mem.zeroes([*c]u8),
     SizeOfBuffer: c_uint = std.mem.zeroes(c_uint),
     WrOff: c_uint = std.mem.zeroes(c_uint),
@@ -4543,9 +4543,9 @@ pub const esp_timer_dispatch_t = enum(c_uint) {
 };
 pub const esp_timer_create_args_t = extern struct {
     callback: esp_timer_cb_t = std.mem.zeroes(esp_timer_cb_t),
-    arg: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    arg: ?*anyopaque = null,
     dispatch_method: esp_timer_dispatch_t = std.mem.zeroes(esp_timer_dispatch_t),
-    name: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    name: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     skip_unhandled_events: bool = std.mem.zeroes(bool),
 };
 pub extern fn esp_timer_early_init() esp_err_t;
@@ -4655,33 +4655,33 @@ pub const crypto_hash = opaque {};
 pub const esp_crypto_hash_t = crypto_hash;
 pub const crypto_cipher = opaque {};
 pub const esp_crypto_cipher_t = crypto_cipher;
-pub const esp_aes_128_encrypt_t = ?*const fn ([*c]const u8, [*c]const u8, [*c]u8, c_int) callconv(.C) c_int;
-pub const esp_aes_128_decrypt_t = ?*const fn ([*c]const u8, [*c]const u8, [*c]u8, c_int) callconv(.C) c_int;
-pub const esp_aes_wrap_t = ?*const fn ([*c]const u8, c_int, [*c]const u8, [*c]u8) callconv(.C) c_int;
-pub const esp_aes_unwrap_t = ?*const fn ([*c]const u8, c_int, [*c]const u8, [*c]u8) callconv(.C) c_int;
-pub const esp_hmac_sha256_vector_t = ?*const fn ([*c]const u8, c_int, c_int, [*c][*c]const u8, [*c]const c_int, [*c]u8) callconv(.C) c_int;
-pub const esp_sha256_prf_t = ?*const fn ([*c]const u8, c_int, [*c]const u8, [*c]const u8, c_int, [*c]u8, c_int) callconv(.C) c_int;
-pub const esp_hmac_md5_t = ?*const fn ([*c]const u8, c_uint, [*c]const u8, c_uint, [*c]u8) callconv(.C) c_int;
-pub const esp_hmac_md5_vector_t = ?*const fn ([*c]const u8, c_uint, c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
-pub const esp_hmac_sha1_t = ?*const fn ([*c]const u8, c_uint, [*c]const u8, c_uint, [*c]u8) callconv(.C) c_int;
-pub const esp_hmac_sha1_vector_t = ?*const fn ([*c]const u8, c_uint, c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
-pub const esp_sha1_prf_t = ?*const fn ([*c]const u8, c_uint, [*c]const u8, [*c]const u8, c_uint, [*c]u8, c_uint) callconv(.C) c_int;
+pub const esp_aes_128_encrypt_t = ?*const fn ([*:0]const u8, [*:0]const u8, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_aes_128_decrypt_t = ?*const fn ([*:0]const u8, [*:0]const u8, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_aes_wrap_t = ?*const fn ([*:0]const u8, c_int, [*:0]const u8, [*c]u8) callconv(.C) c_int;
+pub const esp_aes_unwrap_t = ?*const fn ([*:0]const u8, c_int, [*:0]const u8, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_sha256_vector_t = ?*const fn ([*:0]const u8, c_int, c_int, [*c][*c]const u8, [*c]const c_int, [*c]u8) callconv(.C) c_int;
+pub const esp_sha256_prf_t = ?*const fn ([*:0]const u8, c_int, [*:0]const u8, [*:0]const u8, c_int, [*c]u8, c_int) callconv(.C) c_int;
+pub const esp_hmac_md5_t = ?*const fn ([*:0]const u8, c_uint, [*:0]const u8, c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_md5_vector_t = ?*const fn ([*:0]const u8, c_uint, c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_sha1_t = ?*const fn ([*:0]const u8, c_uint, [*:0]const u8, c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_hmac_sha1_vector_t = ?*const fn ([*:0]const u8, c_uint, c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
+pub const esp_sha1_prf_t = ?*const fn ([*:0]const u8, c_uint, [*:0]const u8, [*:0]const u8, c_uint, [*c]u8, c_uint) callconv(.C) c_int;
 pub const esp_sha1_vector_t = ?*const fn (c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
-pub const esp_pbkdf2_sha1_t = ?*const fn ([*c]const u8, [*c]const u8, c_uint, c_int, [*c]u8, c_uint) callconv(.C) c_int;
-pub const esp_rc4_skip_t = ?*const fn ([*c]const u8, c_uint, c_uint, [*c]u8, c_uint) callconv(.C) c_int;
+pub const esp_pbkdf2_sha1_t = ?*const fn ([*:0]const u8, [*:0]const u8, c_uint, c_int, [*c]u8, c_uint) callconv(.C) c_int;
+pub const esp_rc4_skip_t = ?*const fn ([*:0]const u8, c_uint, c_uint, [*c]u8, c_uint) callconv(.C) c_int;
 pub const esp_md5_vector_t = ?*const fn (c_uint, [*c][*c]const u8, [*c]const c_uint, [*c]u8) callconv(.C) c_int;
-pub const esp_aes_encrypt_t = ?*const fn (?*anyopaque, [*c]const u8, [*c]u8) callconv(.C) void;
-pub const esp_aes_encrypt_init_t = ?*const fn ([*c]const u8, c_uint) callconv(.C) ?*anyopaque;
+pub const esp_aes_encrypt_t = ?*const fn (?*anyopaque, [*:0]const u8, [*c]u8) callconv(.C) void;
+pub const esp_aes_encrypt_init_t = ?*const fn ([*:0]const u8, c_uint) callconv(.C) ?*anyopaque;
 pub const esp_aes_encrypt_deinit_t = ?*const fn (?*anyopaque) callconv(.C) void;
-pub const esp_aes_decrypt_t = ?*const fn (?*anyopaque, [*c]const u8, [*c]u8) callconv(.C) void;
-pub const esp_aes_decrypt_init_t = ?*const fn ([*c]const u8, c_uint) callconv(.C) ?*anyopaque;
+pub const esp_aes_decrypt_t = ?*const fn (?*anyopaque, [*:0]const u8, [*c]u8) callconv(.C) void;
+pub const esp_aes_decrypt_init_t = ?*const fn ([*:0]const u8, c_uint) callconv(.C) ?*anyopaque;
 pub const esp_aes_decrypt_deinit_t = ?*const fn (?*anyopaque) callconv(.C) void;
-pub const esp_omac1_aes_128_t = ?*const fn ([*c]const u8, [*c]const u8, usize, [*c]u8) callconv(.C) c_int;
-pub const esp_ccmp_decrypt_t = ?*const fn ([*c]const u8, [*c]const u8, [*c]const u8, usize, [*c]usize, bool) callconv(.C) [*c]u8;
-pub const esp_ccmp_encrypt_t = ?*const fn ([*c]const u8, [*c]u8, usize, usize, [*c]u8, c_int, [*c]usize) callconv(.C) [*c]u8;
-pub const esp_aes_gmac_t = ?*const fn ([*c]const u8, usize, [*c]const u8, usize, [*c]const u8, usize, [*c]u8) callconv(.C) c_int;
+pub const esp_omac1_aes_128_t = ?*const fn ([*:0]const u8, [*:0]const u8, usize, [*c]u8) callconv(.C) c_int;
+pub const esp_ccmp_decrypt_t = ?*const fn ([*:0]const u8, [*:0]const u8, [*:0]const u8, usize, [*c]usize, bool) callconv(.C) [*c]u8;
+pub const esp_ccmp_encrypt_t = ?*const fn ([*:0]const u8, [*c]u8, usize, usize, [*c]u8, c_int, [*c]usize) callconv(.C) [*c]u8;
+pub const esp_aes_gmac_t = ?*const fn ([*:0]const u8, usize, [*:0]const u8, usize, [*:0]const u8, usize, [*c]u8) callconv(.C) c_int;
 pub const esp_sha256_vector_t = ?*const fn (usize, [*c][*c]const u8, [*c]const usize, [*c]u8) callconv(.C) c_int;
-pub const esp_crc32_le_t = ?*const fn (u32, [*c]const u8, u32) callconv(.C) u32;
+pub const esp_crc32_le_t = ?*const fn (u32, [*:0]const u8, u32) callconv(.C) u32;
 pub const wpa_crypto_funcs_t = extern struct {
     size: u32 = std.mem.zeroes(u32),
     version: u32 = std.mem.zeroes(u32),
@@ -4863,8 +4863,8 @@ pub const esp_netif_inherent_config = extern struct {
     ip_info: [*c]const esp_netif_ip_info_t = std.mem.zeroes([*c]const esp_netif_ip_info_t),
     get_ip_event: u32 = std.mem.zeroes(u32),
     lost_ip_event: u32 = std.mem.zeroes(u32),
-    if_key: [*:0]const u8 = std.mem.zeroes([*c]const u8),
-    if_desc: [*:0]const u8 = std.mem.zeroes([*c]const u8),
+    if_key: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    if_desc: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     route_prio: c_int = std.mem.zeroes(c_int),
     bridge_info: [*c]bridgeif_config_t = std.mem.zeroes([*c]bridgeif_config_t),
 };
@@ -4961,8 +4961,8 @@ pub extern fn esp_netif_str_to_ip6(src: [*:0]const u8, dst: [*c]esp_ip6_addr_t) 
 pub extern fn esp_netif_get_io_driver(esp_netif: ?*esp_netif_t) esp_netif_iodriver_handle;
 pub extern fn esp_netif_get_handle_from_ifkey(if_key: [*:0]const u8) ?*esp_netif_t;
 pub extern fn esp_netif_get_flags(esp_netif: ?*esp_netif_t) esp_netif_flags_t;
-pub extern fn esp_netif_get_ifkey(esp_netif: ?*esp_netif_t) [*c]const u8;
-pub extern fn esp_netif_get_desc(esp_netif: ?*esp_netif_t) [*c]const u8;
+pub extern fn esp_netif_get_ifkey(esp_netif: ?*esp_netif_t) [*:0]const u8;
+pub extern fn esp_netif_get_desc(esp_netif: ?*esp_netif_t) [*:0]const u8;
 pub extern fn esp_netif_get_route_prio(esp_netif: ?*esp_netif_t) c_int;
 pub extern fn esp_netif_get_event_id(esp_netif: ?*esp_netif_t, event_type: esp_netif_ip_event_type_t) i32;
 pub extern fn esp_netif_next(esp_netif: ?*esp_netif_t) ?*esp_netif_t;
@@ -5058,7 +5058,7 @@ pub extern fn esp_wifi_get_config(interface: wifi_interface_t, conf: ?*wifi_conf
 pub extern fn esp_wifi_ap_get_sta_list(sta: ?*wifi_sta_list_t) esp_err_t;
 pub extern fn esp_wifi_ap_get_sta_aid(mac: [*:0]const u8, aid: [*c]u16) esp_err_t;
 pub extern fn esp_wifi_set_storage(storage: wifi_storage_t) esp_err_t;
-pub const esp_vendor_ie_cb_t = ?*const fn (?*anyopaque, wifi_vendor_ie_type_t, [*c]const u8, [*c]const vendor_ie_data_t, c_int) callconv(.C) void;
+pub const esp_vendor_ie_cb_t = ?*const fn (?*anyopaque, wifi_vendor_ie_type_t, [*:0]const u8, [*c]const vendor_ie_data_t, c_int) callconv(.C) void;
 pub extern fn esp_wifi_set_vendor_ie(enable: bool, @"type": wifi_vendor_ie_type_t, idx: wifi_vendor_ie_id_t, vnd_ie: ?*const anyopaque) esp_err_t;
 pub extern fn esp_wifi_set_vendor_ie_cb(cb: esp_vendor_ie_cb_t, ctx: ?*anyopaque) esp_err_t;
 pub extern fn esp_wifi_set_max_tx_power(power: i8) esp_err_t;
@@ -5107,7 +5107,7 @@ pub extern fn sched_yield() c_int;
 pub const pthread_t = c_uint;
 pub const pthread_attr_t = extern struct {
     is_initialized: c_int = std.mem.zeroes(c_int),
-    stackaddr: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    stackaddr: ?*anyopaque = null,
     stacksize: c_int = std.mem.zeroes(c_int),
     contentionscope: c_int = std.mem.zeroes(c_int),
     inheritsched: c_int = std.mem.zeroes(c_int),
@@ -5137,7 +5137,7 @@ pub const bintime = extern struct {
 };
 pub const pthread_cleanup_context = extern struct {
     _routine: ?*const fn (?*anyopaque) callconv(.C) void = std.mem.zeroes(?*const fn (?*anyopaque) callconv(.C) void),
-    _arg: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    _arg: ?*anyopaque = null,
     _canceltype: c_int = std.mem.zeroes(c_int),
     _previous: [*c]pthread_cleanup_context = std.mem.zeroes([*c]pthread_cleanup_context),
 };

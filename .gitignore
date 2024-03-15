@@ -3,4 +3,5 @@ zig-*/
 .vscode/
 .cache/
 sdkconfig
+*.old
 *.lock

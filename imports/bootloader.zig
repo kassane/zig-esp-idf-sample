@@ -455,7 +455,7 @@ pub const _ETSTIMER_ = extern struct {
     timer_expire: u32 = std.mem.zeroes(u32),
     timer_period: u32 = std.mem.zeroes(u32),
     timer_func: ?*const ETSTimerFunc = std.mem.zeroes(?*const ETSTimerFunc),
-    timer_arg: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    timer_arg: ?*anyopaque = null,
 };
 pub const ETSTimer = _ETSTIMER_;
 pub extern fn ets_timer_init() void;

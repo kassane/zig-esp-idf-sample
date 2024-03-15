@@ -244,7 +244,7 @@ pub const spi_transaction_t = extern struct {
     addr: u64 = std.mem.zeroes(u64),
     length: usize = std.mem.zeroes(usize),
     rxlength: usize = std.mem.zeroes(usize),
-    user: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    user: ?*anyopaque = null,
     unnamed_0: union_unnamed_11 = std.mem.zeroes(union_unnamed_11),
     unnamed_1: union_unnamed_12 = std.mem.zeroes(union_unnamed_12),
 };
