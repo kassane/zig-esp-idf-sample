@@ -2236,7 +2236,7 @@ pub extern fn esp_int_wdt_cpu_init() void;
 pub const portTICK_PERIOD_MS: TickType_t = @as(TickType_t, @divExact(@as(c_int, 1000), configTICK_RATE_HZ));
 pub const configTICK_RATE_HZ: c_int = 100;
 
-pub const esp_event_base_t = [*c]const u8;
+pub const esp_event_base_t = [*:0]const u8;
 pub const esp_event_loop_handle_t = ?*anyopaque;
 pub const esp_event_handler_t = ?*const fn (?*anyopaque, esp_event_base_t, i32, ?*anyopaque) callconv(.C) void;
 pub const esp_event_handler_instance_t = ?*anyopaque;

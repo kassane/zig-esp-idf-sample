@@ -18,7 +18,7 @@ pub fn build(b: *std.Build) !void {
     // if detect zig root_source_file, enable zig modules (or use c/c++ files)
     if (lib.root_module.root_source_file != null) {
         lib.root_module.addImport("esp_idf", modules(b));
-        lib.linkLibC();
+        lib.linkLibC(); // stubs for libc
     } else {
         // For C and/or C++ files (using clang/++)
         lib.addCSourceFiles(.{
@@ -157,7 +157,18 @@ fn modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
-    const idf = b.addModule("esp_idf", .{
+    const mqtt = b.addModule("mqtt", .{
+        .root_source_file = .{
+            .path = "imports/mqtt.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    return b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = "imports/idf.zig",
         },
@@ -178,9 +189,12 @@ fn modules(b: *std.Build) *std.Build.Module {
                 .name = "lwip",
                 .module = lwip,
             },
+            .{
+                .name = "mqtt",
+                .module = mqtt,
+            },
         },
     });
-    return idf;
 }
 
 // Targets config
