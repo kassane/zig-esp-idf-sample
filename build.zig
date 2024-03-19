@@ -17,7 +17,7 @@ pub fn build(b: *std.Build) !void {
 
     // if detect zig root_source_file, enable zig modules (or use c/c++ files)
     if (lib.root_module.root_source_file != null) {
-        lib.root_module.addImport("esp_idf", modules(b));
+        lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
         lib.linkLibC(); // stubs for libc
     } else {
         // For C and/or C++ files (using clang/++)
@@ -43,7 +43,9 @@ pub fn build(b: *std.Build) !void {
         // lib.defineCMacro("_LIBCPP_HAS_NO_FILESYSTEM", null);
         // lib.defineCMacro("_LIBCPP_HAS_NO_RANDOM_DEVICE", null);
         lib.defineCMacro("_LIBCPP_FREESTANDING", null);
-        lib.linkLibCpp(); // static linking (libc++ + libunwind + libc++abi) + libc
+
+        // static linking (libc++ + libunwind + libc++abi) + libc
+        lib.linkLibCpp();
     }
 
     includeDeps(b, lib);
@@ -120,13 +122,10 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
             }),
         });
     }
-    if (b.sysroot) |sysroot| {
-        lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{ sysroot, "esp_common", "include" }) });
-        // std.debug.print("path: {s}\n", .{b.pathJoin(&.{ sysroot, "esp_common", "include" })});
-    }
     lib.addIncludePath(.{ .path = "include" });
 }
-fn modules(b: *std.Build) *std.Build.Module {
+
+pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     const sys = b.addModule("sys", .{
         .root_source_file = .{
             .path = "imports/idf-sys.zig",
