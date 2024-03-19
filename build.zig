@@ -46,6 +46,11 @@ pub fn build(b: *std.Build) !void {
         lib.linkLibCpp(); // static linking (libc++ + libunwind + libc++abi) + libc
     }
 
+    includeDeps(b, lib);
+    b.installArtifact(lib);
+}
+
+fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
     const include_dirs = std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS") catch "";
     if (!std.mem.eql(u8, include_dirs, "")) {
         var it_inc = std.mem.tokenize(u8, include_dirs, ";");
@@ -115,13 +120,42 @@ pub fn build(b: *std.Build) !void {
             }),
         });
     }
-    b.installArtifact(lib);
+    if (b.sysroot) |sysroot| {
+        lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{ sysroot, "esp_common", "include" }) });
+        // std.debug.print("path: {s}\n", .{b.pathJoin(&.{ sysroot, "esp_common", "include" })});
+    }
+    lib.addIncludePath(.{ .path = "include" });
 }
-
 fn modules(b: *std.Build) *std.Build.Module {
     const sys = b.addModule("sys", .{
         .root_source_file = .{
             .path = "imports/idf-sys.zig",
+        },
+    });
+    const log = b.addModule("log", .{
+        .root_source_file = .{
+            .path = "imports/logger.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const panic = b.addModule("panic", .{
+        .root_source_file = .{
+            .path = "imports/panic.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "log",
+                .module = log,
+            },
         },
     });
     const led = b.addModule("led", .{
@@ -192,6 +226,14 @@ fn modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "mqtt",
                 .module = mqtt,
+            },
+            .{
+                .name = "panic",
+                .module = panic,
+            },
+            .{
+                .name = "log",
+                .module = log,
             },
         },
     });

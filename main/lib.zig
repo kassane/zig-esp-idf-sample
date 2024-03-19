@@ -2,20 +2,6 @@ const std = @import("std");
 const builtin = @import("builtin");
 const esp_idf = @import("esp_idf");
 
-fn blinkLED(delay_ms: u32) void {
-    esp_idf.espCheckError(esp_idf.gpio_set_direction(.GPIO_NUM_18, .GPIO_MODE_OUTPUT)) catch |err|
-        @panic(@errorName(err));
-    while (true) {
-        log.info("LED: ON", .{});
-        esp_idf.espCheckError(esp_idf.gpio_set_level(.GPIO_NUM_18, 1)) catch |err|
-            @panic(@errorName(err));
-        esp_idf.vTaskDelay(delay_ms / esp_idf.portTICK_PERIOD_MS);
-        log.info("LED: OFF", .{});
-        esp_idf.espCheckError(esp_idf.gpio_set_level(.GPIO_NUM_18, 0)) catch |err|
-            @panic(@errorName(err));
-    }
-}
-
 export fn app_main() callconv(.C) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
     // std.heap.raw_c_allocator
@@ -37,13 +23,13 @@ export fn app_main() callconv(.C) void {
         \\* Stage: {s}
         \\
     , .{ builtin.zig_version_string, @tagName(builtin.zig_backend) });
-    esp_idf.ESP_LOGI(allocator, tag,
+    esp_idf.ESP_LOG(allocator, tag,
         \\
         \\[ESP-IDF Info]
         \\* Version: {s}
         \\
     , .{esp_idf.esp_get_idf_version()});
-    esp_idf.ESP_LOGI(
+    esp_idf.ESP_LOG(
         allocator,
         tag,
         \\
@@ -59,7 +45,7 @@ export fn app_main() callconv(.C) void {
             esp_idf.heap_caps_get_minimum_free_size(@intFromEnum(caps.MALLOC_CAP_DEFAULT) | @intFromEnum(caps.MALLOC_CAP_INTERNAL)),
         },
     );
-    esp_idf.ESP_LOGI(
+    esp_idf.ESP_LOG(
         allocator,
         tag,
         "\nLet's have a look at your shiny {s} - {s} system! :)\n\n",
@@ -80,7 +66,7 @@ export fn app_main() callconv(.C) void {
         @panic(@errorName(err));
 
     for (arr.items) |index| {
-        esp_idf.ESP_LOGI(allocator, tag, "Arr value: {}\n", .{index});
+        esp_idf.ESP_LOG(allocator, tag, "Arr value: {}\n", .{index});
     }
     if (builtin.mode == .Debug)
         esp_idf.heap_caps_dump_all();
@@ -96,9 +82,27 @@ export fn app_main() callconv(.C) void {
         @panic("Error: Task blinkclock not created!\n");
     }
 }
+
+// comptime function
+fn blinkLED(delay_ms: u32) void {
+    esp_idf.espCheckError(esp_idf.gpio_set_direction(.GPIO_NUM_18, .GPIO_MODE_OUTPUT)) catch |err|
+        @panic(@errorName(err));
+    while (true) {
+        log.info("LED: ON", .{});
+        esp_idf.espCheckError(esp_idf.gpio_set_level(.GPIO_NUM_18, 1)) catch |err|
+            @panic(@errorName(err));
+        esp_idf.vTaskDelay(delay_ms / esp_idf.portTICK_PERIOD_MS);
+        log.info("LED: OFF", .{});
+        esp_idf.espCheckError(esp_idf.gpio_set_level(.GPIO_NUM_18, 0)) catch |err|
+            @panic(@errorName(err));
+    }
+}
+
+// Task functions (must be exported to C ABI) - runtime functions
 export fn blinkclock(_: ?*anyopaque) void {
     blinkLED(1000);
 }
+
 export fn foo(_: ?*anyopaque) callconv(.C) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
@@ -112,7 +116,7 @@ export fn bar(_: ?*anyopaque) callconv(.C) void {
     }
 }
 
-// zig panic handler override by esp_idf.panic
+// override the std panic function with esp_idf.panic
 pub usingnamespace if (!@hasDecl(@This(), "panic"))
     struct {
         pub const panic = esp_idf.panic;
