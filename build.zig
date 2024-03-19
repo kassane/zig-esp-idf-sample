@@ -20,7 +20,7 @@ pub fn build(b: *std.Build) !void {
         lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
         lib.linkLibC(); // stubs for libc
     } else {
-        // For C and/or C++ files (using clang/++)
+        // For C and/or C++ files (using clang/clang++)
         lib.addCSourceFiles(.{
             .files = &.{
                 "main/lib.cc",
@@ -28,8 +28,6 @@ pub fn build(b: *std.Build) !void {
             .flags = &.{
                 "-Wall",
                 "-Wextra",
-                "-fno-exceptions",
-                "-fno-rtti",
                 "-Wpedantic",
                 "-fno-threadsafe-statics",
                 "-std=c++23",
