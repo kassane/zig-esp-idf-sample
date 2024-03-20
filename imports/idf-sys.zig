@@ -3,17 +3,47 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-// const c = @cImport({
-//     @cInclude("esp_idf_version.h");
-// });
-
 pub const Version = struct {
-    major: u32 = 5,
-    minor: u32 = 3,
+    major: u32 = 0,
+    minor: u32 = 0,
     patch: u32 = 0,
-    pub fn toString(self: Version) []const u8 {
-        _ = self; // autofix
-        return std.mem.span(esp_get_idf_version());
+    pub fn init() Version {
+        var final_version: Version = undefined;
+        const idf_version = std.mem.span(esp_get_idf_version());
+
+        if (!std.mem.startsWith(u8, idf_version, "v"))
+            return .{};
+
+        // skip [0] == 'v' and remove [idf_version.len - 4] == "-dev"
+        var it = if (std.mem.endsWith(u8, idf_version, "-dev"))
+            std.mem.split(u8, idf_version[1 .. idf_version.len - 4], ".")
+        else
+            std.mem.split(u8, idf_version, ".");
+
+        final_version.major = std.fmt.parseUnsigned(u32, it.first(), 10) catch |err|
+            @panic(@errorName(err));
+
+        while (it.next()) |token| {
+            if (!std.ascii.isDigit(token[0]))
+                continue;
+            const digit = std.fmt.parseUnsigned(u32, token, 10) catch |err|
+                @panic(@errorName(err));
+            final_version.minor = digit;
+            if (digit != final_version.minor)
+                final_version.patch = digit;
+        }
+
+        return final_version;
+    }
+    pub fn toString(self: Version, allocator: std.mem.Allocator) []const u8 {
+        const idf_version = std.mem.span(esp_get_idf_version());
+
+        // e.g.: v4.0.0 or commit-hash: g5d5f5c3
+        if (!std.mem.startsWith(u8, idf_version, "v"))
+            return idf_version
+        else
+            return std.fmt.allocPrint(allocator, "{d}.{d}.{d}", .{ self.major, self.minor, self.patch }) catch |err|
+                @panic(@errorName(err));
     }
 };
 
@@ -241,7 +271,7 @@ pub extern fn esp_err_to_name(code: esp_err_t) [*:0]const u8;
 pub extern fn esp_err_to_name_r(code: esp_err_t, buf: [*:0]u8, buflen: usize) [*:0]const u8;
 pub extern fn _esp_error_check_failed(rc: esp_err_t, file: [*:0]const u8, line: c_int, function: [*:0]const u8, expression: [*:0]const u8) noreturn;
 pub extern fn _esp_error_check_failed_without_abort(rc: esp_err_t, file: [*:0]const u8, line: c_int, function: [*:0]const u8, expression: [*:0]const u8) void;
-pub extern fn esp_get_idf_version() [*:0]const u8;
+extern fn esp_get_idf_version() [*:0]const u8;
 pub const esp_reset_reason_t = enum(c_uint) {
     ESP_RST_UNKNOWN = 0,
     ESP_RST_POWERON = 1,

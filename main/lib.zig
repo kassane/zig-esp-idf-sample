@@ -15,7 +15,8 @@ export fn app_main() callconv(.C) void {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    log.info("Hello, world from Zig!\n", .{});
+    log.info("Hello, world from Zig!", .{});
+
     log.info(
         \\
         \\[Zig Info]
@@ -28,7 +29,8 @@ export fn app_main() callconv(.C) void {
         \\[ESP-IDF Info]
         \\* Version: {s}
         \\
-    , .{esp_idf.esp_get_idf_version()});
+    , .{esp_idf.Version.init().toString(allocator)});
+
     esp_idf.ESP_LOG(
         allocator,
         tag,
