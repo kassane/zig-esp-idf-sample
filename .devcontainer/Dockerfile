@@ -19,14 +19,15 @@ RUN apt-get update \
 RUN update-alternatives --install /usr/local/bin/usbip usbip `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
 
 # QEMU
-ENV QEMU_REL=esp-develop-20220919
-ENV QEMU_SHA256=f6565d3f0d1e463a63a7f81aec94cce62df662bd42fc7606de4b4418ed55f870
-ENV QEMU_DIST=qemu-${QEMU_REL}.tar.bz2
-ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/${QEMU_REL}/${QEMU_DIST}
+ENV QEMU_REL=xtensa-softmmu-esp_develop_8.2.0_20240122-x86_64-linux-gnu
+ENV QEMU_SHA256=e7c72ef5705ad1444d391711088c8717fc89f42e9bf6d1487f9c2a326b8cfa83
+ENV QEMU_DIST=qemu-${QEMU_REL}.tar.xz
+ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-8.2.0-20240122/${QEMU_DIST}
 
 # Zig v0.12.0 - xtensa
+ENV ZIG_REL=zig-x86_64-relsafe-espressif-linux-musl-baseline
 ENV ZIG_SHA256=d0a3d816160421c6ca9e4e533e15a392850dce9e421817c42f6d2e686c54463f
-ENV ZIG_DIST=zig-x86_64-relsafe-espressif-linux-musl-baseline.tar.xz
+ENV ZIG_DIST=${ZIG_REL}.tar.xz
 ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.12.0-dev/${ZIG_DIST}
 
 ENV LC_ALL=C.UTF-8
@@ -42,8 +43,7 @@ RUN wget --no-verbose ${ZIG_URL} \
   && tar -xf $ZIG_DIST -C /opt \
   && rm ${ZIG_DIST}
 
-RUN export ZIG_DIST=${ZIG_DIST%%.*}
-ENV PATH=/opt/qemu/bin:/opt/${ZIG_DIST}:${PATH}
+ENV PATH=/opt/qemu/bin:/opt/${ZIG_REL}:${PATH}
 
 RUN groupadd --gid $USER_GID $CONTAINER_USER \
   && adduser --uid $USER_UID --gid $USER_GID --disabled-password --gecos "" ${CONTAINER_USER} \
