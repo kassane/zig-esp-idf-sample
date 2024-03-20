@@ -7,7 +7,7 @@ pub const Version = struct {
     major: u32 = 0,
     minor: u32 = 0,
     patch: u32 = 0,
-    pub fn init() Version {
+    pub fn get() Version {
         var final_version: Version = undefined;
         const idf_version = std.mem.span(esp_get_idf_version());
 
@@ -18,7 +18,7 @@ pub const Version = struct {
         var it = if (std.mem.endsWith(u8, idf_version, "-dev"))
             std.mem.split(u8, idf_version[1 .. idf_version.len - 4], ".")
         else
-            std.mem.split(u8, idf_version, ".");
+            std.mem.split(u8, idf_version[1..], ".");
 
         final_version.major = std.fmt.parseUnsigned(u32, it.first(), 10) catch |err|
             @panic(@errorName(err));

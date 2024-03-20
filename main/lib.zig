@@ -29,7 +29,7 @@ export fn app_main() callconv(.C) void {
         \\[ESP-IDF Info]
         \\* Version: {s}
         \\
-    , .{esp_idf.Version.init().toString(allocator)});
+    , .{esp_idf.Version.get().toString(allocator)});
 
     esp_idf.ESP_LOG(
         allocator,
