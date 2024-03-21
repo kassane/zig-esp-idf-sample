@@ -9,6 +9,7 @@ export fn app_main() callconv(.C) void {
     // custom allocators (based on raw_c_allocator)
     // idf.HeapCapsAllocator
     // idf.MultiHeapAllocator
+    // idf.vPortAllocator
 
     var heap = idf.HeapCapsAllocator.init(.MALLOC_CAP_8BIT);
     var arena = std.heap.ArenaAllocator.init(heap.allocator());

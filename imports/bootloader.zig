@@ -394,9 +394,7 @@ pub inline fn efuse_ll_get_pgm_cmd() bool {
 pub inline fn efuse_ll_set_read_cmd() void {
     EFUSE.cmd.unnamed_0.read_cmd = 1;
 }
-pub inline fn efuse_ll_set_pgm_cmd(arg_block: u32) void {
-    var block = arg_block;
-    _ = &block;
+pub inline fn efuse_ll_set_pgm_cmd(block: u32) void {
     EFUSE.cmd.val = @as(u32, @bitCast(@as(c_uint, @truncate(@as(c_ulong, @bitCast(@as(c_ulong, (block << @intCast(2)) & (@as(c_uint, 15) << @intCast(2))))) | (@as(c_ulong, 1) << @intCast(@as(c_int, 1)))))));
 }
 pub inline fn efuse_ll_set_conf_read_op_code() void {
@@ -405,24 +403,16 @@ pub inline fn efuse_ll_set_conf_read_op_code() void {
 pub inline fn efuse_ll_set_conf_write_op_code() void {
     EFUSE.conf.unnamed_0.op_code = @as(u32, @bitCast(@as(c_int, 23130)));
 }
-pub inline fn efuse_ll_set_dac_num(arg_val: u8) void {
-    var val = arg_val;
-    _ = &val;
+pub inline fn efuse_ll_set_dac_num(val: u8) void {
     EFUSE.dac_conf.unnamed_0.dac_num = @as(u32, @bitCast(@as(c_uint, val)));
 }
-pub inline fn efuse_ll_set_dac_clk_div(arg_val: u8) void {
-    var val = arg_val;
-    _ = &val;
+pub inline fn efuse_ll_set_dac_clk_div(val: u8) void {
     EFUSE.dac_conf.unnamed_0.dac_clk_div = @as(u32, @bitCast(@as(c_uint, val)));
 }
-pub inline fn efuse_ll_set_pwr_on_num(arg_val: u16) void {
-    var val = arg_val;
-    _ = &val;
+pub inline fn efuse_ll_set_pwr_on_num(val: u16) void {
     EFUSE.wr_tim_conf1.unnamed_0.pwr_on_num = @as(u32, @bitCast(@as(c_uint, val)));
 }
-pub inline fn efuse_ll_set_pwr_off_num(arg_value: u16) void {
-    var value = arg_value;
-    _ = &value;
+pub inline fn efuse_ll_set_pwr_off_num(value: u16) void {
     EFUSE.wr_tim_conf2.unnamed_0.pwr_off_num = @as(u32, @bitCast(@as(c_uint, value)));
 }
 pub const ETS_STATUS = enum(c_uint) {
@@ -442,7 +432,7 @@ pub const ETSEventTag = extern struct {
 pub const ETSEvent = ETSEventTag;
 pub const ETSTask = ?*const fn ([*c]ETSEvent) callconv(.C) void;
 pub const ets_idle_cb_t = ?*const fn (?*anyopaque) callconv(.C) void;
-pub extern const exc_cause_table: [40][*c]const u8;
+pub extern const exc_cause_table: [40][*:0]const u8;
 pub extern fn ets_set_user_start(start: u32) void;
 pub extern fn ets_printf(fmt: [*:0]const u8, ...) c_int;
 pub extern fn ets_get_printf_channel() u8;

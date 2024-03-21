@@ -96,6 +96,7 @@ pub const soc_periph_temperature_sensor_clk_src_t = enum(c_uint) {
     TEMPERATURE_SENSOR_CLK_SRC_RC_FAST = 8,
     TEMPERATURE_SENSOR_CLK_SRC_DEFAULT = 10,
 };
+pub const temperature_sensor_clk_src_t = soc_periph_temperature_sensor_clk_src_t;
 pub const soc_periph_uart_clk_src_legacy_t = enum(c_uint) {
     UART_SCLK_APB = 4,
     UART_SCLK_RTC = 8,
@@ -330,3 +331,15 @@ pub extern fn led_strip_set_pixel_hsv(strip: led_strip_handle_t, index: u32, hue
 pub extern fn led_strip_refresh(strip: led_strip_handle_t) idf.esp_err_t;
 pub extern fn led_strip_clear(strip: led_strip_handle_t) idf.esp_err_t;
 pub extern fn led_strip_del(strip: led_strip_handle_t) idf.esp_err_t;
+pub const temperature_sensor_obj_t = opaque {};
+pub const temperature_sensor_handle_t = ?*temperature_sensor_obj_t;
+pub const temperature_sensor_config_t = extern struct {
+    range_min: c_int = std.mem.zeroes(c_int),
+    range_max: c_int = std.mem.zeroes(c_int),
+    clk_src: temperature_sensor_clk_src_t = std.mem.zeroes(temperature_sensor_clk_src_t),
+};
+pub extern fn temperature_sensor_install(tsens_config: [*c]const temperature_sensor_config_t, ret_tsens: [*c]temperature_sensor_handle_t) idf.esp_err_t;
+pub extern fn temperature_sensor_uninstall(tsens: temperature_sensor_handle_t) idf.esp_err_t;
+pub extern fn temperature_sensor_enable(tsens: temperature_sensor_handle_t) idf.esp_err_t;
+pub extern fn temperature_sensor_disable(tsens: temperature_sensor_handle_t) idf.esp_err_t;
+pub extern fn temperature_sensor_get_celsius(tsens: temperature_sensor_handle_t, out_celsius: [*c]f32) idf.esp_err_t;

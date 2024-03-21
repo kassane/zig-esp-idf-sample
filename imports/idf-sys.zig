@@ -639,14 +639,10 @@ pub extern fn xt_set_exception_handler(n: c_int, f: xt_exc_handler) xt_exc_handl
 pub extern fn xt_set_interrupt_handler(n: c_int, f: xt_handler, arg: ?*anyopaque) xt_handler;
 pub extern fn xt_ints_on(mask: c_uint) void;
 pub extern fn xt_ints_off(mask: c_uint) void;
-pub fn xt_set_intset(arg_arg: c_uint) callconv(.C) void {
-    var arg = arg_arg;
-    _ = &arg;
+pub fn xt_set_intset(arg: c_uint) callconv(.C) void {
     xthal_set_intset(arg);
 }
-pub fn xt_set_intclear(arg_arg: c_uint) callconv(.C) void {
-    var arg = arg_arg;
-    _ = &arg;
+pub fn xt_set_intclear(arg: c_uint) callconv(.C) void {
     xthal_set_intclear(arg);
 }
 pub extern fn xt_get_interrupt_handler_arg(n: c_int) ?*anyopaque;
@@ -695,14 +691,10 @@ pub const _xtos_handler_func = fn () callconv(.C) void;
 pub const _xtos_handler = ?*const _xtos_handler_func;
 pub extern fn _xtos_ints_off(mask: c_uint) c_uint;
 pub extern fn _xtos_ints_on(mask: c_uint) c_uint;
-pub fn _xtos_interrupt_enable(arg_intnum: c_uint) callconv(.C) void {
-    var intnum = arg_intnum;
-    _ = &intnum;
+pub fn _xtos_interrupt_enable(intnum: c_uint) callconv(.C) void {
     _ = _xtos_ints_on(@as(c_uint, 1) << @intCast(intnum));
 }
-pub fn _xtos_interrupt_disable(arg_intnum: c_uint) callconv(.C) void {
-    var intnum = arg_intnum;
-    _ = &intnum;
+pub fn _xtos_interrupt_disable(intnum: c_uint) callconv(.C) void {
     _ = _xtos_ints_off(@as(c_uint, 1) << @intCast(intnum));
 }
 pub extern fn _xtos_set_intlevel(intlevel: c_int) c_uint;
@@ -737,27 +729,27 @@ pub extern fn xt_utils_get_sp() ?*anyopaque; // esp-idf/components/xtensa/includ
 // esp-idf/components/xtensa/include/xt_utils.h:68:28: warning: unable to translate function, demoted to extern
 pub extern fn xt_utils_get_cycle_count() u32; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:75:20: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_cycle_count(arg_ccount: u32) callconv(.C) void; // esp-idf/components/xtensa/include/xt_utils.h:82:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+pub extern fn xt_utils_set_cycle_count(ccount: u32) callconv(.C) void; // esp-idf/components/xtensa/include/xt_utils.h:82:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:80:24: warning: unable to translate function, demoted to extern
 pub extern fn xt_utils_wait_for_intr() void; // esp-idf/components/xtensa/include/xt_utils.h:95:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:93:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_vecbase(arg_vecbase: u32) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+pub extern fn xt_utils_set_vecbase(vecbase: u32) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:100:28: warning: unable to translate function, demoted to extern
 pub extern fn xt_utils_intr_get_enabled_mask() u32; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:117:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_breakpoint(arg_bp_num: c_int, arg_bp_addr: u32) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+pub extern fn xt_utils_set_breakpoint(bp_num: c_int, bp_addr: u32) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:132:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_clear_breakpoint(arg_bp_num: c_int) void; // esp-idf/components/xtensa/include/xt_utils.h:156:35: warning: TODO implement function '__builtin_ffsll' in std.zig.c_builtins
+pub extern fn xt_utils_clear_breakpoint(bp_num: c_int) void; // esp-idf/components/xtensa/include/xt_utils.h:156:35: warning: TODO implement function '__builtin_ffsll' in std.zig.c_builtins
 // esp-idf/components/xtensa/include/xt_utils.h:148:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_watchpoint(arg_wp_num: c_int, arg_wp_addr: u32, arg_size: usize, arg_on_read: bool, arg_on_write: bool) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+pub extern fn xt_utils_set_watchpoint(wp_num: c_int, wp_addr: u32, size: usize, on_read: bool, on_write: bool) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:174:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_clear_watchpoint(arg_wp_num: c_int) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:15:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
+pub extern fn xt_utils_clear_watchpoint(wp_num: c_int) void; // esp-idf/components/xtensa/include/xt_instr_macros.h:15:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:188:24: warning: unable to translate function, demoted to extern
 pub extern fn xt_utils_dbgr_is_attached() bool; // esp-idf/components/xtensa/include/xt_utils.h:198:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:196:24: warning: unable to translate function, demoted to extern
 pub extern fn xt_utils_dbgr_break() void; // esp-idf/components/xtensa/include/xt_utils.h:216:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
 // esp-idf/components/xtensa/include/xt_utils.h:205:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_compare_and_set(arg_addr: [*c]volatile u32, arg_compare_value: u32, arg_new_value: u32) bool;
+pub extern fn xt_utils_compare_and_set(addr: [*c]volatile u32, compare_value: u32, new_value: u32) bool;
 pub const intr_handler_t = ?*const fn (?*anyopaque) callconv(.C) void;
 pub const intr_handle_data_t = opaque {};
 pub const intr_handle_t = ?*intr_handle_data_t;
@@ -782,7 +774,7 @@ pub extern fn esp_intr_enable_source(inum: c_int) void;
 pub extern fn esp_intr_disable_source(inum: c_int) void;
 // esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:300:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_intr_alloc.h:298:19: warning: unable to translate function, demoted to extern
-pub extern fn esp_intr_flags_to_level(arg_flags: c_int) callconv(.C) c_int;
+pub extern fn esp_intr_flags_to_level(flags: c_int) callconv(.C) c_int;
 pub fn esp_intr_level_to_flags(level: c_int) callconv(.C) c_int {
     return if (level > @as(c_int, 0)) (@as(c_int, 1) << @intCast(level)) & (((((((@as(c_int, 1) << @intCast(1)) | (@as(c_int, 1) << @intCast(2))) | (@as(c_int, 1) << @intCast(3))) | (@as(c_int, 1) << @intCast(4))) | (@as(c_int, 1) << @intCast(5))) | (@as(c_int, 1) << @intCast(6))) | (@as(c_int, 1) << @intCast(7))) else @as(c_int, 0);
 }
@@ -817,30 +809,24 @@ pub inline fn esp_cpu_get_sp() ?*anyopaque {
 pub inline fn esp_cpu_get_cycle_count() esp_cpu_cycle_count_t {
     return @as(esp_cpu_cycle_count_t, @bitCast(xt_utils_get_cycle_count()));
 }
-pub inline fn esp_cpu_set_cycle_count(arg_cycle_count: esp_cpu_cycle_count_t) void {
-    var cycle_count = arg_cycle_count;
-    _ = &cycle_count;
+pub inline fn esp_cpu_set_cycle_count(cycle_count: esp_cpu_cycle_count_t) void {
     xt_utils_set_cycle_count(@as(u32, @bitCast(cycle_count)));
 }
-pub inline fn esp_cpu_pc_to_addr(arg_pc: u32) ?*anyopaque {
-    var pc = arg_pc;
-    _ = &pc;
+pub inline fn esp_cpu_pc_to_addr(pc: u32) ?*anyopaque {
     return @as(?*anyopaque, @ptrFromInt((pc & @as(c_uint, 1073741823)) | @as(c_uint, 1073741824)));
 }
 pub extern fn esp_cpu_intr_get_desc(core_id: c_int, intr_num: c_int, intr_desc_ret: [*c]esp_cpu_intr_desc_t) void;
-pub inline fn esp_cpu_intr_set_ivt_addr(arg_ivt_addr: ?*const anyopaque) void {
-    var ivt_addr = arg_ivt_addr;
-    _ = &ivt_addr;
+pub inline fn esp_cpu_intr_set_ivt_addr(ivt_addr: ?*const anyopaque) void {
     xt_utils_set_vecbase(@as(u32, @intCast(@intFromPtr(ivt_addr))));
 }
 // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:324:24: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_has_handler(arg_intr_num: c_int) bool;
+pub extern fn esp_cpu_intr_has_handler(intr_num: c_int) bool;
 // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:348:24: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_set_handler(arg_intr_num: c_int, arg_handler: esp_cpu_intr_handler_t, arg_handler_arg: ?*anyopaque) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+pub extern fn esp_cpu_intr_set_handler(intr_num: c_int, handler: esp_cpu_intr_handler_t, handler_arg: ?*anyopaque) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:366:25: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_get_handler_arg(arg_intr_num: c_int) ?*anyopaque;
+pub extern fn esp_cpu_intr_get_handler_arg(intr_num: c_int) ?*anyopaque;
 pub inline fn esp_cpu_intr_enable(intr_mask: u32) void {
     xt_ints_on(intr_mask);
 }
@@ -851,7 +837,7 @@ pub inline fn esp_cpu_intr_get_enabled_mask() u32 {
     return xt_utils_intr_get_enabled_mask();
 } // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/esp_cpu.h:427:24: warning: unable to translate function, demoted to extern
-pub extern fn esp_cpu_intr_edge_ack(arg_intr_num: c_int) void;
+pub extern fn esp_cpu_intr_edge_ack(intr_num: c_int) void;
 pub extern fn esp_cpu_configure_region_protection() void;
 pub extern fn esp_cpu_set_breakpoint(bp_num: c_int, bp_addr: ?*const anyopaque) esp_err_t;
 pub extern fn esp_cpu_clear_breakpoint(bp_num: c_int) esp_err_t;
@@ -879,20 +865,10 @@ pub extern fn esp_backtrace_get_next_frame(frame: [*c]esp_backtrace_frame_t) boo
 pub extern fn esp_backtrace_print_from_frame(depth: c_int, frame: [*c]const esp_backtrace_frame_t, panic: bool) esp_err_t;
 pub extern fn esp_backtrace_print(depth: c_int) esp_err_t;
 pub extern fn esp_backtrace_print_all_tasks(depth: c_int) esp_err_t;
-pub fn esp_set_watchpoint(arg_no: c_int, arg_adr: ?*anyopaque, arg_size: c_int, arg_flags: c_int) callconv(.C) esp_err_t {
-    var no = arg_no;
-    _ = &no;
-    var adr = arg_adr;
-    _ = &adr;
-    var size = arg_size;
-    _ = &size;
-    var flags = arg_flags;
-    _ = &flags;
+pub fn esp_set_watchpoint(no: c_int, adr: ?*anyopaque, size: c_int, flags: c_int) callconv(.C) esp_err_t {
     return esp_cpu_set_watchpoint(no, adr, @as(usize, @bitCast(size)), @as(c_uint, @bitCast(flags)));
 }
-pub fn esp_clear_watchpoint(arg_no: c_int) callconv(.C) void {
-    var no = arg_no;
-    _ = &no;
+pub fn esp_clear_watchpoint(no: c_int) callconv(.C) void {
     _ = esp_cpu_clear_watchpoint(no);
 }
 
@@ -964,6 +940,88 @@ pub const touch_trigger_src_t = enum(c_uint) {
     TOUCH_TRIGGER_SOURCE_BOTH = 0,
     TOUCH_TRIGGER_SOURCE_SET1 = 1,
     TOUCH_TRIGGER_SOURCE_MAX = 2,
+};
+pub const touch_pad_intr_mask_t = enum(c_uint) {
+    TOUCH_PAD_INTR_MASK_DONE = 1,
+    TOUCH_PAD_INTR_MASK_ACTIVE = 2,
+    TOUCH_PAD_INTR_MASK_INACTIVE = 4,
+    TOUCH_PAD_INTR_MASK_SCAN_DONE = 8,
+    TOUCH_PAD_INTR_MASK_TIMEOUT = 16,
+    TOUCH_PAD_INTR_MASK_MAX = 17,
+};
+pub const touch_pad_denoise_grade_t = enum(c_uint) {
+    TOUCH_PAD_DENOISE_BIT12 = 0,
+    TOUCH_PAD_DENOISE_BIT10 = 1,
+    TOUCH_PAD_DENOISE_BIT8 = 2,
+    TOUCH_PAD_DENOISE_BIT4 = 3,
+    TOUCH_PAD_DENOISE_MAX = 4,
+};
+pub const touch_pad_denoise_cap_t = enum(c_uint) {
+    TOUCH_PAD_DENOISE_CAP_L0 = 0,
+    TOUCH_PAD_DENOISE_CAP_L1 = 1,
+    TOUCH_PAD_DENOISE_CAP_L2 = 2,
+    TOUCH_PAD_DENOISE_CAP_L3 = 3,
+    TOUCH_PAD_DENOISE_CAP_L4 = 4,
+    TOUCH_PAD_DENOISE_CAP_L5 = 5,
+    TOUCH_PAD_DENOISE_CAP_L6 = 6,
+    TOUCH_PAD_DENOISE_CAP_L7 = 7,
+    TOUCH_PAD_DENOISE_CAP_MAX = 8,
+};
+pub const touch_pad_denoise = extern struct {
+    grade: touch_pad_denoise_grade_t = std.mem.zeroes(touch_pad_denoise_grade_t),
+    cap_level: touch_pad_denoise_cap_t = std.mem.zeroes(touch_pad_denoise_cap_t),
+};
+pub const touch_pad_denoise_t = touch_pad_denoise;
+pub const touch_pad_shield_driver_t = enum(c_uint) {
+    TOUCH_PAD_SHIELD_DRV_L0 = 0,
+    TOUCH_PAD_SHIELD_DRV_L1 = 1,
+    TOUCH_PAD_SHIELD_DRV_L2 = 2,
+    TOUCH_PAD_SHIELD_DRV_L3 = 3,
+    TOUCH_PAD_SHIELD_DRV_L4 = 4,
+    TOUCH_PAD_SHIELD_DRV_L5 = 5,
+    TOUCH_PAD_SHIELD_DRV_L6 = 6,
+    TOUCH_PAD_SHIELD_DRV_L7 = 7,
+    TOUCH_PAD_SHIELD_DRV_MAX = 8,
+};
+pub const touch_pad_waterproof = extern struct {
+    guard_ring_pad: touch_pad_t = std.mem.zeroes(touch_pad_t),
+    shield_driver: touch_pad_shield_driver_t = std.mem.zeroes(touch_pad_shield_driver_t),
+};
+pub const touch_pad_waterproof_t = touch_pad_waterproof;
+pub const touch_pad_conn_type_t = enum(c_uint) {
+    TOUCH_PAD_CONN_HIGHZ = 0,
+    TOUCH_PAD_CONN_GND = 1,
+    TOUCH_PAD_CONN_MAX = 2,
+};
+pub const touch_filter_mode_t = enum(c_uint) {
+    TOUCH_PAD_FILTER_IIR_4 = 0,
+    TOUCH_PAD_FILTER_IIR_8 = 1,
+    TOUCH_PAD_FILTER_IIR_16 = 2,
+    TOUCH_PAD_FILTER_IIR_32 = 3,
+    TOUCH_PAD_FILTER_IIR_64 = 4,
+    TOUCH_PAD_FILTER_IIR_128 = 5,
+    TOUCH_PAD_FILTER_IIR_256 = 6,
+    TOUCH_PAD_FILTER_JITTER = 7,
+    TOUCH_PAD_FILTER_MAX = 8,
+};
+pub const touch_smooth_mode_t = enum(c_uint) {
+    TOUCH_PAD_SMOOTH_OFF = 0,
+    TOUCH_PAD_SMOOTH_IIR_2 = 1,
+    TOUCH_PAD_SMOOTH_IIR_4 = 2,
+    TOUCH_PAD_SMOOTH_IIR_8 = 3,
+    TOUCH_PAD_SMOOTH_MAX = 4,
+};
+pub const touch_filter_config = extern struct {
+    mode: touch_filter_mode_t = std.mem.zeroes(touch_filter_mode_t),
+    debounce_cnt: u32 = std.mem.zeroes(u32),
+    noise_thr: u32 = std.mem.zeroes(u32),
+    jitter_step: u32 = std.mem.zeroes(u32),
+    smh_lvl: touch_smooth_mode_t = std.mem.zeroes(touch_smooth_mode_t),
+};
+pub const touch_filter_config_t = touch_filter_config;
+pub const touch_pad_sleep_channel_t = extern struct {
+    touch_num: touch_pad_t = std.mem.zeroes(touch_pad_t),
+    en_proximity: bool = std.mem.zeroes(bool),
 };
 pub const gpio_num_t = enum(c_int) {
     GPIO_NUM_NC = -1,
@@ -1138,11 +1196,11 @@ pub const spinlock_t = extern struct {
     count: u32 = std.mem.zeroes(u32),
 }; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/spinlock.h:51:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_initialize(arg_lock: [*c]spinlock_t) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+pub extern fn spinlock_initialize(lock: [*c]spinlock_t) void; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/spinlock.h:74:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_acquire(arg_lock: [*c]spinlock_t, arg_timeout: i32) bool; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+pub extern fn spinlock_acquire(lock: [*c]spinlock_t, timeout: i32) bool; // esp-idf/components/newlib/platform_include/assert.h:30:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 // esp-idf/components/esp_hw_support/include/spinlock.h:172:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_release(arg_lock: [*c]spinlock_t) void;
+pub extern fn spinlock_release(lock: [*c]spinlock_t) void;
 pub extern fn esp_crosscore_int_init() void;
 pub extern fn esp_crosscore_int_send_yield(core_id: c_int) void;
 pub extern fn esp_crosscore_int_send_freq_switch(core_id: c_int) void;
@@ -1153,73 +1211,47 @@ pub extern fn esp_crosscore_int_send_twdt_abort(core_id: c_int) void; // /.espre
 pub inline fn esp_dram_match_iram() bool {
     return (@as(c_int, 1073405952) == @as(c_int, 1074266112)) and (@as(c_int, 1073741824) == @as(c_int, 1074438144));
 }
-pub inline fn esp_ptr_in_iram(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_iram(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1074266112)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1074438144));
 }
-pub inline fn esp_ptr_in_dram(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_dram(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1073405952)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1073741824));
 }
-pub inline fn esp_ptr_in_diram_dram(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_diram_dram(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1073610752)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1073741824));
 }
-pub inline fn esp_ptr_in_diram_iram(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_diram_iram(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1074397184)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1074528256));
 }
-pub inline fn esp_ptr_in_rtc_iram_fast(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_rtc_iram_fast(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1074528256)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1074536448));
 }
-pub inline fn esp_ptr_in_rtc_dram_fast(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_rtc_dram_fast(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1073217536)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1073225728));
 }
-pub inline fn esp_ptr_in_rtc_slow(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_rtc_slow(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1342177280)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1342185472));
 }
-pub inline fn esp_ptr_diram_dram_to_iram(arg_p: ?*const anyopaque) ?*anyopaque {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_diram_dram_to_iram(p: ?*const anyopaque) ?*anyopaque {
     return @as(?*anyopaque, @ptrFromInt((@as(c_int, 1074397184) + (@as(c_int, 1073741824) - @as(isize, @intCast(@intFromPtr(p))))) - @as(c_int, 4)));
 }
-pub inline fn esp_ptr_diram_iram_to_dram(arg_p: ?*const anyopaque) ?*anyopaque {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_diram_iram_to_dram(p: ?*const anyopaque) ?*anyopaque {
     return @as(?*anyopaque, @ptrFromInt((@as(c_int, 1073610752) + (@as(c_int, 1074528256) - @as(isize, @intCast(@intFromPtr(p))))) - @as(c_int, 4)));
 }
-pub inline fn esp_ptr_dma_capable(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_dma_capable(p: ?*const anyopaque) bool {
     return (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1073405952)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1073741824));
 }
 pub extern fn esp_ptr_dma_ext_capable(p: ?*const anyopaque) bool;
-pub inline fn esp_ptr_word_aligned(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_word_aligned(p: ?*const anyopaque) bool {
     return std.zig.c_translation.signedRemainder(@as(isize, @intCast(@intFromPtr(p))), @as(c_int, 4)) == @as(c_int, 0);
 }
-pub inline fn esp_ptr_executable(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_executable(p: ?*const anyopaque) bool {
     var ip: isize = @as(isize, @intCast(@intFromPtr(p)));
     _ = &ip;
     return ((((ip >= @as(c_int, 1074593792)) and (ip < @as(c_int, 1077936128))) or ((ip >= @as(c_int, 1074266112)) and (ip < @as(c_int, 1074438144)))) or ((ip >= @as(c_int, 1073741824)) and (ip < @as(c_int, 1074200576)))) or ((ip >= @as(c_int, 1074528256)) and (ip < @as(c_int, 1074536448)));
 }
 pub extern fn esp_ptr_byte_accessible(p: ?*const anyopaque) bool;
-pub inline fn esp_ptr_internal(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_internal(p: ?*const anyopaque) bool {
     var r: bool = undefined;
     _ = &r;
     r = (@as(isize, @intCast(@intFromPtr(p))) >= @as(c_int, 1073283072)) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1074536448));
@@ -1227,9 +1259,7 @@ pub inline fn esp_ptr_internal(arg_p: ?*const anyopaque) bool {
     return r;
 }
 pub extern fn esp_ptr_external_ram(p: ?*const anyopaque) bool;
-pub inline fn esp_ptr_in_drom(arg_p: ?*const anyopaque) bool {
-    var p = arg_p;
-    _ = &p;
+pub inline fn esp_ptr_in_drom(p: ?*const anyopaque) bool {
     var drom_start_addr: i32 = 1061158912;
     _ = &drom_start_addr;
     return (@as(isize, @intCast(@intFromPtr(p))) >= drom_start_addr) and (@as(isize, @intCast(@intFromPtr(p))) < @as(c_int, 1065353216));
@@ -1346,26 +1376,17 @@ pub inline fn vPortClearInterruptMaskFromISR(prev_level: UBaseType_t) void {
 }
 pub const portMUX_TYPE = spinlock_t;
 pub extern fn xPortEnterCriticalTimeout(mux: [*c]portMUX_TYPE, timeout: BaseType_t) BaseType_t;
-pub inline fn vPortEnterCritical(arg_mux: [*c]portMUX_TYPE) void {
-    var mux = arg_mux;
-    _ = &mux;
+pub inline fn vPortEnterCritical(mux: [*c]portMUX_TYPE) void {
     _ = xPortEnterCriticalTimeout(mux, -@as(c_int, 1));
 }
 pub extern fn vPortExitCritical(mux: [*c]portMUX_TYPE) void;
 pub extern fn xPortEnterCriticalTimeoutCompliance(mux: [*c]portMUX_TYPE, timeout: BaseType_t) BaseType_t;
-pub inline fn vPortEnterCriticalCompliance(arg_mux: [*c]portMUX_TYPE) void {
-    var mux = arg_mux;
-    _ = &mux;
+pub inline fn vPortEnterCriticalCompliance(mux: [*c]portMUX_TYPE) void {
     _ = xPortEnterCriticalTimeoutCompliance(mux, -@as(c_int, 1));
 }
 pub extern fn vPortExitCriticalCompliance(mux: [*c]portMUX_TYPE) void;
-pub inline fn xPortEnterCriticalTimeoutSafe(arg_mux: [*c]portMUX_TYPE, arg_timeout: BaseType_t) BaseType_t {
-    var mux = arg_mux;
-    _ = &mux;
-    var timeout = arg_timeout;
-    _ = &timeout;
+pub inline fn xPortEnterCriticalTimeoutSafe(mux: [*c]portMUX_TYPE, timeout: BaseType_t) BaseType_t {
     var ret: BaseType_t = undefined;
-    _ = &ret;
     if (xPortInIsrContext() != 0) {
         ret = xPortEnterCriticalTimeout(mux, timeout);
     } else {
@@ -1373,14 +1394,10 @@ pub inline fn xPortEnterCriticalTimeoutSafe(arg_mux: [*c]portMUX_TYPE, arg_timeo
     }
     return ret;
 }
-pub inline fn vPortEnterCriticalSafe(arg_mux: [*c]portMUX_TYPE) void {
-    var mux = arg_mux;
-    _ = &mux;
+pub inline fn vPortEnterCriticalSafe(mux: [*c]portMUX_TYPE) void {
     _ = xPortEnterCriticalTimeoutSafe(mux, -@as(c_int, 1));
 }
-pub inline fn vPortExitCriticalSafe(arg_mux: [*c]portMUX_TYPE) void {
-    var mux = arg_mux;
-    _ = &mux;
+pub inline fn vPortExitCriticalSafe(mux: [*c]portMUX_TYPE) void {
     if (xPortInIsrContext() != 0) {
         vPortExitCritical(mux);
     } else {
@@ -1717,13 +1734,7 @@ pub extern fn esp_deregister_freertos_idle_hook_for_cpu(old_idle_cb: esp_freerto
 pub extern fn esp_deregister_freertos_idle_hook(old_idle_cb: esp_freertos_idle_cb_t) void;
 pub extern fn esp_deregister_freertos_tick_hook_for_cpu(old_tick_cb: esp_freertos_tick_cb_t, cpuid: UBaseType_t) void;
 pub extern fn esp_deregister_freertos_tick_hook(old_tick_cb: esp_freertos_tick_cb_t) void;
-pub fn Atomic_CompareAndSwap_u32(arg_pulDestination: [*c]volatile u32, arg_ulExchange: u32, arg_ulComparand: u32) callconv(.C) u32 {
-    var pulDestination = arg_pulDestination;
-    _ = &pulDestination;
-    var ulExchange = arg_ulExchange;
-    _ = &ulExchange;
-    var ulComparand = arg_ulComparand;
-    _ = &ulComparand;
+pub fn Atomic_CompareAndSwap_u32(pulDestination: [*c]volatile u32, ulExchange: u32, ulComparand: u32) callconv(.C) u32 {
     var ulReturnValue: u32 = undefined;
     _ = &ulReturnValue;
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
@@ -1739,11 +1750,7 @@ pub fn Atomic_CompareAndSwap_u32(arg_pulDestination: [*c]volatile u32, arg_ulExc
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulReturnValue;
 }
-pub fn Atomic_SwapPointers_p32(arg_ppvDestination: [*c]volatile ?*anyopaque, arg_pvExchange: ?*anyopaque) callconv(.C) ?*anyopaque {
-    var ppvDestination = arg_ppvDestination;
-    _ = &ppvDestination;
-    var pvExchange = arg_pvExchange;
-    _ = &pvExchange;
+pub fn Atomic_SwapPointers_p32(ppvDestination: [*c]volatile ?*anyopaque, pvExchange: ?*anyopaque) callconv(.C) ?*anyopaque {
     var pReturnValue: ?*anyopaque = undefined;
     _ = &pReturnValue;
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
@@ -1755,13 +1762,7 @@ pub fn Atomic_SwapPointers_p32(arg_ppvDestination: [*c]volatile ?*anyopaque, arg
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return pReturnValue;
 }
-pub fn Atomic_CompareAndSwapPointers_p32(arg_ppvDestination: [*c]volatile ?*anyopaque, arg_pvExchange: ?*anyopaque, arg_pvComparand: ?*anyopaque) callconv(.C) u32 {
-    var ppvDestination = arg_ppvDestination;
-    _ = &ppvDestination;
-    var pvExchange = arg_pvExchange;
-    _ = &pvExchange;
-    var pvComparand = arg_pvComparand;
-    _ = &pvComparand;
+pub fn Atomic_CompareAndSwapPointers_p32(ppvDestination: [*c]volatile ?*anyopaque, pvExchange: ?*anyopaque, pvComparand: ?*anyopaque) callconv(.C) u32 {
     var ulReturnValue: u32 = 0;
     _ = &ulReturnValue;
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
@@ -1775,13 +1776,9 @@ pub fn Atomic_CompareAndSwapPointers_p32(arg_ppvDestination: [*c]volatile ?*anyo
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulReturnValue;
 }
-pub fn Atomic_Add_u32(arg_pulAddend: [*c]volatile u32, arg_ulCount: u32) callconv(.C) u32 {
-    var pulAddend = arg_pulAddend;
-    _ = &pulAddend;
-    var ulCount = arg_ulCount;
-    _ = &ulCount;
+pub fn Atomic_Add_u32(pulAddend: [*c]volatile u32, ulCount: u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
+
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1791,13 +1788,8 @@ pub fn Atomic_Add_u32(arg_pulAddend: [*c]volatile u32, arg_ulCount: u32) callcon
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_Subtract_u32(arg_pulAddend: [*c]volatile u32, arg_ulCount: u32) callconv(.C) u32 {
-    var pulAddend = arg_pulAddend;
-    _ = &pulAddend;
-    var ulCount = arg_ulCount;
-    _ = &ulCount;
+pub fn Atomic_Subtract_u32(pulAddend: [*c]volatile u32, ulCount: u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1807,11 +1799,8 @@ pub fn Atomic_Subtract_u32(arg_pulAddend: [*c]volatile u32, arg_ulCount: u32) ca
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_Increment_u32(arg_pulAddend: [*c]volatile u32) callconv(.C) u32 {
-    var pulAddend = arg_pulAddend;
-    _ = &pulAddend;
+pub fn Atomic_Increment_u32(pulAddend: [*c]volatile u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1821,11 +1810,9 @@ pub fn Atomic_Increment_u32(arg_pulAddend: [*c]volatile u32) callconv(.C) u32 {
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_Decrement_u32(arg_pulAddend: [*c]volatile u32) callconv(.C) u32 {
-    var pulAddend = arg_pulAddend;
-    _ = &pulAddend;
+pub fn Atomic_Decrement_u32(pulAddend: [*c]volatile u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
+
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1835,13 +1822,9 @@ pub fn Atomic_Decrement_u32(arg_pulAddend: [*c]volatile u32) callconv(.C) u32 {
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_OR_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) callconv(.C) u32 {
-    var pulDestination = arg_pulDestination;
-    _ = &pulDestination;
-    var ulValue = arg_ulValue;
-    _ = &ulValue;
+pub fn Atomic_OR_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
+
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1851,13 +1834,9 @@ pub fn Atomic_OR_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) cal
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_AND_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) callconv(.C) u32 {
-    var pulDestination = arg_pulDestination;
-    _ = &pulDestination;
-    var ulValue = arg_ulValue;
-    _ = &ulValue;
+pub fn Atomic_AND_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
+
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1867,13 +1846,9 @@ pub fn Atomic_AND_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) ca
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_NAND_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) callconv(.C) u32 {
-    var pulDestination = arg_pulDestination;
-    _ = &pulDestination;
-    var ulValue = arg_ulValue;
-    _ = &ulValue;
+pub fn Atomic_NAND_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
+
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -1883,13 +1858,9 @@ pub fn Atomic_NAND_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) c
     vPortClearInterruptMaskFromISR(uxCriticalSectionType);
     return ulCurrent;
 }
-pub fn Atomic_XOR_u32(arg_pulDestination: [*c]volatile u32, arg_ulValue: u32) callconv(.C) u32 {
-    var pulDestination = arg_pulDestination;
-    _ = &pulDestination;
-    var ulValue = arg_ulValue;
-    _ = &ulValue;
+pub fn Atomic_XOR_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
     var ulCurrent: u32 = undefined;
-    _ = &ulCurrent;
+
     var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     _ = &uxCriticalSectionType;
     {
@@ -4353,28 +4324,20 @@ pub const esp_apptrace_tmo_t = extern struct {
     tmo: i64 = std.mem.zeroes(i64),
     elapsed: i64 = std.mem.zeroes(i64),
 };
-pub fn esp_apptrace_tmo_init(arg_tmo: [*c]esp_apptrace_tmo_t, arg_user_tmo: u32) callconv(.C) void {
-    var tmo = arg_tmo;
-    _ = &tmo;
-    var user_tmo = arg_user_tmo;
-    _ = &user_tmo;
+pub fn esp_apptrace_tmo_init(tmo: [*c]esp_apptrace_tmo_t, user_tmo: u32) callconv(.C) void {
     tmo.*.start = esp_timer_get_time();
     tmo.*.tmo = if (user_tmo == @as(u32, @bitCast(-@as(c_int, 1)))) @as(i64, @bitCast(@as(c_longlong, -@as(c_int, 1)))) else @as(i64, @bitCast(@as(c_ulonglong, user_tmo)));
     tmo.*.elapsed = 0;
 }
 pub extern fn esp_apptrace_tmo_check(tmo: [*c]esp_apptrace_tmo_t) esp_err_t;
-pub fn esp_apptrace_tmo_remaining_us(arg_tmo: [*c]esp_apptrace_tmo_t) callconv(.C) u32 {
-    var tmo = arg_tmo;
-    _ = &tmo;
+pub fn esp_apptrace_tmo_remaining_us(tmo: [*c]esp_apptrace_tmo_t) callconv(.C) u32 {
     return @as(u32, @bitCast(@as(c_int, @truncate(if (tmo.*.tmo != @as(i64, @bitCast(@as(c_longlong, -@as(c_int, 1))))) tmo.*.elapsed - tmo.*.tmo else @as(i64, @bitCast(@as(c_ulonglong, @as(u32, @bitCast(-@as(c_int, 1))))))))));
 }
 pub const esp_apptrace_lock_t = extern struct {
     mux: spinlock_t = std.mem.zeroes(spinlock_t),
     int_state: c_uint = std.mem.zeroes(c_uint),
 };
-pub fn esp_apptrace_lock_init(arg_lock: [*c]esp_apptrace_lock_t) callconv(.C) void {
-    var lock = arg_lock;
-    _ = &lock;
+pub fn esp_apptrace_lock_init(lock: [*c]esp_apptrace_lock_t) callconv(.C) void {
     spinlock_initialize(&lock.*.mux);
     lock.*.int_state = 0;
 }
@@ -4387,13 +4350,7 @@ pub const esp_apptrace_rb_t = extern struct {
     rd: u32 = std.mem.zeroes(u32),
     wr: u32 = std.mem.zeroes(u32),
 };
-pub fn esp_apptrace_rb_init(arg_rb: [*c]esp_apptrace_rb_t, arg_data: [*c]u8, arg_size: u32) callconv(.C) void {
-    var rb = arg_rb;
-    _ = &rb;
-    var data = arg_data;
-    _ = &data;
-    var size = arg_size;
-    _ = &size;
+pub fn esp_apptrace_rb_init(rb: [*c]esp_apptrace_rb_t, data: [*c]u8, size: u32) callconv(.C) void {
     rb.*.data = data;
     rb.*.size = blk: {
         const tmp = size;
@@ -4528,11 +4485,7 @@ pub const esp_ip6_addr_type_t = enum(c_uint) {
     ESP_IP6_ADDR_IS_IPV4_MAPPED_IPV6 = 5,
 };
 pub extern fn esp_netif_ip6_get_addr_type(ip6_addr: [*c]esp_ip6_addr_t) esp_ip6_addr_type_t;
-pub fn esp_netif_ip_addr_copy(arg_dest: [*c]esp_ip_addr_t, arg_src: [*c]const esp_ip_addr_t) callconv(.C) void {
-    var dest = arg_dest;
-    _ = &dest;
-    var src = arg_src;
-    _ = &src;
+pub fn esp_netif_ip_addr_copy(dest: [*c]esp_ip_addr_t, src: [*c]const esp_ip_addr_t) callconv(.C) void {
     dest.*.type = src.*.type;
     if (@as(c_uint, @bitCast(@as(c_uint, src.*.type))) == @as(c_uint, 6)) {
         dest.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 0)))] = src.*.u_addr.ip6.addr[@as(c_uint, @intCast(@as(c_int, 0)))];
