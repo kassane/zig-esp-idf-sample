@@ -10,7 +10,7 @@ export fn app_main() callconv(.C) void {
     // idf.HeapCapsAllocator
     // idf.MultiHeapAllocator
 
-    var heap = idf.HeapCapsAllocator.init(@intFromEnum(caps.MALLOC_CAP_8BIT));
+    var heap = idf.HeapCapsAllocator.init(.MALLOC_CAP_8BIT);
     var arena = std.heap.ArenaAllocator.init(heap.allocator());
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -42,9 +42,9 @@ export fn app_main() callconv(.C) void {
         \\
     ,
         .{
-            idf.heap_caps_get_total_size(@intFromEnum(caps.MALLOC_CAP_8BIT)),
-            idf.heap_caps_get_free_size(@intFromEnum(caps.MALLOC_CAP_8BIT)),
-            idf.heap_caps_get_minimum_free_size(@intFromEnum(caps.MALLOC_CAP_8BIT)),
+            heap.total_size(),
+            heap.free_size(),
+            heap.minimum_free_size(),
         },
     );
     idf.ESP_LOG(
@@ -136,5 +136,4 @@ pub const std_options = .{
     .logFn = idf.espLogFn,
 };
 
-const caps = idf.Caps;
 const tag = "zig-example";

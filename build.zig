@@ -199,6 +199,61 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const gpio = b.addModule("gpio", .{
+        .root_source_file = .{
+            .path = "imports/gpio.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const heap = b.addModule("heap", .{
+        .root_source_file = .{
+            .path = "imports/heap.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const bt = b.addModule("bluetooth", .{
+        .root_source_file = .{
+            .path = "imports/bluetooth.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const wifi = b.addModule("wifi", .{
+        .root_source_file = .{
+            .path = "imports/wifi.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const errors = b.addModule("error", .{
+        .root_source_file = .{
+            .path = "imports/error.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     return b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = "imports/idf.zig",
@@ -231,6 +286,26 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "log",
                 .module = log,
+            },
+            .{
+                .name = "heap",
+                .module = heap,
+            },
+            .{
+                .name = "gpio",
+                .module = gpio,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+            .{
+                .name = "wifi",
+                .module = wifi,
+            },
+            .{
+                .name = "bluetooth",
+                .module = bt,
             },
         },
     });

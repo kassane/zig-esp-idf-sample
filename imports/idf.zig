@@ -1,7 +1,12 @@
-pub usingnamespace @import("sys");
+pub usingnamespace @import("bootloader");
+pub usingnamespace @import("bluetooth");
+pub usingnamespace @import("error");
+pub usingnamespace @import("gpio");
+pub usingnamespace @import("heap");
 pub usingnamespace @import("led");
+pub usingnamespace @import("log");
 pub usingnamespace @import("lwip");
 pub usingnamespace @import("mqtt");
-pub usingnamespace @import("log");
 pub usingnamespace @import("panic");
-pub usingnamespace @import("bootloader");
+pub usingnamespace @import("sys");
+pub usingnamespace @import("wifi");
