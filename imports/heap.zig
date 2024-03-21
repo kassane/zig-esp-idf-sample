@@ -21,7 +21,15 @@ pub const HeapCapsAllocator = struct {
             },
         };
     }
-
+    pub fn dump(self: Self) void {
+        idf.heap_caps_dump(self.caps);
+    }
+    pub fn allocated_size(_: Self, ptr: ?*anyopaque) usize {
+        return idf.heap_caps_get_allocated_size(ptr);
+    }
+    pub fn largest_free_block(self: Self) usize {
+        return idf.heap_caps_get_largest_free_block(self.caps);
+    }
     pub fn total_size(self: Self) usize {
         return idf.heap_caps_get_total_size(@intFromEnum(self.caps));
     }
@@ -144,10 +152,10 @@ pub const vPortAllocator = struct {
     }
 
     pub fn free_size(_: Self) usize {
-        return idf.esp_get_free_heap_size();
+        return idf.xPortGetFreeHeapSize();
     }
     pub fn minimum_free_size(_: Self) usize {
-        return idf.esp_get_minimum_free_heap_size();
+        return idf.xPortGetMinimumEverFreeHeapSize();
     }
 
     fn alloc(_: *anyopaque, len: usize, log2_ptr_align: u8, _: usize) ?[*]u8 {

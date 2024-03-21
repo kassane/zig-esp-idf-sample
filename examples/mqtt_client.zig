@@ -1,19 +1,19 @@
 const std = @import("std");
-const esp_idf = @import("esp_idf");
+const idf = @import("esp_idf");
 
-export fn esp_mqtt_event_handle_cb(event: esp_idf.esp_mqtt_event_handle_t) void {
+export fn esp_mqtt_event_handle_cb(event: idf.esp_mqtt_event_handle_t) void {
     const client = event.*.client;
     var msg_id: c_int = 0;
     switch (event.*.event_id) {
         .MQTT_EVENT_CONNECTED => {
             log.info("MQTT_EVENT_CONNECTED", .{});
-            msg_id = esp_idf.esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
+            msg_id = idf.esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
             log.info("sent publish successful, msg_id={d}", .{msg_id});
-            msg_id = esp_idf.esp_mqtt_client_subscribe_single(client, "/topic/qos0", 0);
+            msg_id = idf.esp_mqtt_client_subscribe_single(client, "/topic/qos0", 0);
             log.info("sent subscribe successful, msg_id={d}", .{msg_id});
-            msg_id = esp_idf.esp_mqtt_client_subscribe_single(client, "/topic/qos1", 1);
+            msg_id = idf.esp_mqtt_client_subscribe_single(client, "/topic/qos1", 1);
             log.info("sent subscribe successful, msg_id={d}", .{msg_id});
-            msg_id = esp_idf.esp_mqtt_client_unsubscribe(client, "/topic/qos0");
+            msg_id = idf.esp_mqtt_client_unsubscribe(client, "/topic/qos0");
             log.info("sent subscribe successful, msg_id={d}", .{msg_id});
         },
         .MQTT_EVENT_DISCONNECTED => {
@@ -21,7 +21,7 @@ export fn esp_mqtt_event_handle_cb(event: esp_idf.esp_mqtt_event_handle_t) void 
         },
         .MQTT_EVENT_SUBSCRIBED => {
             log.info("MQTT_EVENT_SUBSCRIBED, msg_id={d}", .{event.*.msg_id});
-            msg_id = esp_idf.esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
+            msg_id = idf.esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
             log.info("sent publish successful, msg_id={d}", .{msg_id});
         },
         .MQTT_EVENT_UNSUBSCRIBED => {
@@ -47,36 +47,35 @@ export fn esp_mqtt_event_handle_cb(event: esp_idf.esp_mqtt_event_handle_t) void 
         else => log.info("Other event id:{}", .{event.*.event_id}),
     }
 }
-export fn mqtt_event_handler(handler_args: ?*anyopaque, base: esp_idf.esp_event_base_t, event_id: i32, event_data: ?*anyopaque) void {
-    _ = handler_args; // autofix
+export fn mqtt_event_handler(_: ?*anyopaque, base: idf.esp_event_base_t, event_id: i32, event_data: ?*anyopaque) void {
     log.info("MQTT base: {s} event: {d}", .{ base, event_id });
     esp_mqtt_event_handle_cb(@ptrCast(@alignCast(event_data)));
 }
 
 export fn app_main() callconv(.C) void {
-    var mqtt_init: esp_idf.esp_mqtt_client_config_t = .{
+    var mqtt_init: idf.esp_mqtt_client_config_t = .{
         .broker = .{
             .address = .{
                 .uri = "mqtt://mqtt.eclipse.org",
             },
         },
     };
-    const client = esp_idf.esp_mqtt_client_init(&mqtt_init);
-    esp_idf.espCheckError(esp_idf.esp_mqtt_client_register_event(
+    const client = idf.esp_mqtt_client_init(&mqtt_init);
+    idf.espCheckError(idf.esp_mqtt_client_register_event(
         client,
         .MQTT_EVENT_ANY,
         &mqtt_event_handler,
         null,
     )) catch |err|
         @panic(@errorName(err));
-    esp_idf.espCheckError(esp_idf.esp_mqtt_client_start(client)) catch |err|
+    idf.espCheckError(idf.esp_mqtt_client_start(client)) catch |err|
         @panic(@errorName(err));
 }
 
-// override the std panic function with esp_idf.panic
+// override the std panic function with idf.panic
 pub usingnamespace if (!@hasDecl(@This(), "panic"))
     struct {
-        pub const panic = esp_idf.panic;
+        pub const panic = idf.panic;
     }
 else
     struct {};
@@ -88,7 +87,7 @@ pub const std_options = .{
         else => .info,
     },
     // Define logFn to override the std implementation
-    .logFn = esp_idf.espLogFn,
+    .logFn = idf.espLogFn,
 };
 
 const tag = "mqtt-client";
