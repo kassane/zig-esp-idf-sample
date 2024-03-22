@@ -24,22 +24,22 @@ pub const HeapCapsAllocator = struct {
     pub fn dump(self: Self) void {
         idf.heap_caps_dump(self.caps);
     }
-    pub fn allocated_size(_: Self, ptr: ?*anyopaque) usize {
+    pub fn allocatedSize(_: Self, ptr: ?*anyopaque) usize {
         return idf.heap_caps_get_allocated_size(ptr);
     }
-    pub fn largest_free_block(self: Self) usize {
+    pub fn largestFreeBlock(self: Self) usize {
         return idf.heap_caps_get_largest_free_block(self.caps);
     }
-    pub fn total_size(self: Self) usize {
+    pub fn totalSize(self: Self) usize {
         return idf.heap_caps_get_total_size(@intFromEnum(self.caps));
     }
-    pub fn free_size(self: Self) usize {
+    pub fn freeSize(self: Self) usize {
         return idf.heap_caps_get_free_size(@intFromEnum(self.caps));
     }
-    pub fn minimum_free_size(self: Self) usize {
+    pub fn minimumFreeSize(self: Self) usize {
         return idf.heap_caps_get_minimum_free_size(@intFromEnum(self.caps));
     }
-    pub fn internal_free_size(_: Self) usize {
+    pub fn internalFreeSize(_: Self) usize {
         return idf.esp_get_free_internal_heap_size();
     }
 
@@ -93,13 +93,13 @@ pub const MultiHeapAllocator = struct {
         };
     }
 
-    pub fn allocated_size(self: Self, p: ?*anyopaque) usize {
+    pub fn allocatedSize(self: Self, p: ?*anyopaque) usize {
         return idf.multi_heap_get_allocated_size(self.multi_heap_alloc, p);
     }
-    pub fn free_size(self: Self) usize {
+    pub fn freeSize(self: Self) usize {
         return idf.multi_heap_free_size(self.multi_heap_alloc);
     }
-    pub fn minimum_free_size(self: Self) usize {
+    pub fn minimumFreeSize(self: Self) usize {
         return idf.multi_heap_minimum_free_size(self.multi_heap_alloc);
     }
 
@@ -151,10 +151,10 @@ pub const vPortAllocator = struct {
         };
     }
 
-    pub fn free_size(_: Self) usize {
+    pub fn freeSize(_: Self) usize {
         return idf.xPortGetFreeHeapSize();
     }
-    pub fn minimum_free_size(_: Self) usize {
+    pub fn minimumFreeSize(_: Self) usize {
         return idf.xPortGetMinimumEverFreeHeapSize();
     }
 

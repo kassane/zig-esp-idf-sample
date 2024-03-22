@@ -129,6 +129,28 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .path = "imports/idf-sys.zig",
         },
     });
+    const rtos = b.addModule("rtos", .{
+        .root_source_file = .{
+            .path = "imports/rtos.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const version = b.addModule("ver", .{
+        .root_source_file = .{
+            .path = "imports/version.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     const log = b.addModule("log", .{
         .root_source_file = .{
             .path = "imports/logger.zig",
@@ -199,17 +221,6 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
-    const gpio = b.addModule("gpio", .{
-        .root_source_file = .{
-            .path = "imports/gpio.zig",
-        },
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
     const heap = b.addModule("heap", .{
         .root_source_file = .{
             .path = "imports/heap.zig",
@@ -254,6 +265,21 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const gpio = b.addModule("gpio", .{
+        .root_source_file = .{
+            .path = "imports/gpio.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
     return b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = "imports/idf.zig",
@@ -268,8 +294,12 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .module = bootloader,
             },
             .{
-                .name = "sys",
-                .module = sys,
+                .name = "rtos",
+                .module = rtos,
+            },
+            .{
+                .name = "ver",
+                .module = version,
             },
             .{
                 .name = "lwip",
@@ -313,54 +343,57 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
 
 // Targets config
 const espressif_targets: []const std.Target.Query = if (isEspXtensa())
-    &[_]std.Target.Query{
-        // need zig-fork (using espressif-llvm backend) to support this
-        .{
-            .cpu_arch = .xtensa,
-            .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32 },
-            .os_tag = .freestanding,
-            .abi = .none,
-        },
-        .{
-            .cpu_arch = .xtensa,
-            .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s2 },
-            .os_tag = .freestanding,
-            .abi = .none,
-        },
-        .{
-            .cpu_arch = .xtensa,
-            .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s3 },
-            .os_tag = .freestanding,
-            .abi = .none,
-        },
-    }
+    xtensa_targets ++ riscv_targets
 else
-    &.{
-        // esp32-c3/c2
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-            .os_tag = .freestanding,
-            .abi = .none,
-            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c }),
-        },
-        // esp32-c6/61/h2
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-            .os_tag = .freestanding,
-            .abi = .none,
-            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c }),
-        },
-        // esp32-p4
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-            .os_tag = .freestanding,
-            .abi = .none,
-            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .f }),
-        },
-    };
+    riscv_targets;
+
+const riscv_targets = &[_]std.Target.Query{
+    // esp32-c3/c2
+    .{
+        .cpu_arch = .riscv32,
+        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+        .os_tag = .freestanding,
+        .abi = .none,
+        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c }),
+    },
+    // esp32-c6/61/h2
+    .{
+        .cpu_arch = .riscv32,
+        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+        .os_tag = .freestanding,
+        .abi = .none,
+        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c }),
+    },
+    // esp32-p4
+    .{
+        .cpu_arch = .riscv32,
+        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+        .os_tag = .freestanding,
+        .abi = .eabihf,
+        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .f }),
+    },
+};
+const xtensa_targets = &[_]std.Target.Query{
+    // need zig-fork (using espressif-llvm backend) to support this
+    .{
+        .cpu_arch = .xtensa,
+        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32 },
+        .os_tag = .freestanding,
+        .abi = .none,
+    },
+    .{
+        .cpu_arch = .xtensa,
+        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s2 },
+        .os_tag = .freestanding,
+        .abi = .none,
+    },
+    .{
+        .cpu_arch = .xtensa,
+        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s3 },
+        .os_tag = .freestanding,
+        .abi = .none,
+    },
+};
 
 fn isEspXtensa() bool {
     var result = false;

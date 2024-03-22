@@ -7,11 +7,11 @@ export fn app_main() callconv(.C) void {
     // std.heap.raw_c_allocator
 
     // custom allocators (based on raw_c_allocator)
-    // idf.HeapCapsAllocator
-    // idf.MultiHeapAllocator
-    // idf.vPortAllocator
+    // idf.heap.HeapCapsAllocator
+    // idf.heap.MultiHeapAllocator
+    // idf.heap.vPortAllocator
 
-    var heap = idf.HeapCapsAllocator.init(.MALLOC_CAP_8BIT);
+    var heap = idf.heap.HeapCapsAllocator.init(.MALLOC_CAP_8BIT);
     var arena = std.heap.ArenaAllocator.init(heap.allocator());
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -24,7 +24,11 @@ export fn app_main() callconv(.C) void {
         \\* Version: {s}
         \\* Stage: {s}
         \\
-    , .{ builtin.zig_version_string, @tagName(builtin.zig_backend) });
+    , .{
+        builtin.zig_version_string,
+        @tagName(builtin.zig_backend),
+    });
+
     idf.ESP_LOG(allocator, tag,
         \\
         \\[ESP-IDF Info]
@@ -43,11 +47,12 @@ export fn app_main() callconv(.C) void {
         \\
     ,
         .{
-            heap.total_size(),
-            heap.free_size(),
-            heap.minimum_free_size(),
+            heap.totalSize(),
+            heap.freeSize(),
+            heap.minimumFreeSize(),
         },
     );
+
     idf.ESP_LOG(
         allocator,
         tag,
@@ -69,10 +74,15 @@ export fn app_main() callconv(.C) void {
         @panic(@errorName(err));
 
     for (arr.items) |index| {
-        idf.ESP_LOG(allocator, tag, "Arr value: {}\n", .{index});
+        idf.ESP_LOG(
+            allocator,
+            tag,
+            "Arr value: {}\n",
+            .{index},
+        );
     }
     if (builtin.mode == .Debug)
-        idf.heap_caps_dump_all();
+        heap.dump();
 
     // FreeRTOS Tasks
     if (idf.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
@@ -87,23 +97,26 @@ export fn app_main() callconv(.C) void {
 }
 
 // comptime function
-fn blinkLED(delay_ms: u32) void {
-    idf.espCheckError(idf.gpio_set_direction(.GPIO_NUM_18, .GPIO_MODE_OUTPUT)) catch |err|
-        @panic(@errorName(err));
+fn blinkLED(delay_ms: u32) !void {
+    try idf.gpio.setDirection(
+        .GPIO_NUM_18,
+        .GPIO_MODE_OUTPUT,
+    );
     while (true) {
         log.info("LED: ON", .{});
-        idf.espCheckError(idf.gpio_set_level(.GPIO_NUM_18, 1)) catch |err|
-            @panic(@errorName(err));
+        try idf.gpio.setLevel(.GPIO_NUM_18, 1);
+
         idf.vTaskDelay(delay_ms / idf.portTICK_PERIOD_MS);
+
         log.info("LED: OFF", .{});
-        idf.espCheckError(idf.gpio_set_level(.GPIO_NUM_18, 0)) catch |err|
-            @panic(@errorName(err));
+        try idf.gpio.setLevel(.GPIO_NUM_18, 0);
     }
 }
 
 // Task functions (must be exported to C ABI) - runtime functions
 export fn blinkclock(_: ?*anyopaque) void {
-    blinkLED(1000);
+    blinkLED(1000) catch |err|
+        @panic(@errorName(err));
 }
 
 export fn foo(_: ?*anyopaque) callconv(.C) void {
@@ -120,12 +133,7 @@ export fn bar(_: ?*anyopaque) callconv(.C) void {
 }
 
 // override the std panic function with idf.panic
-pub usingnamespace if (!@hasDecl(@This(), "panic"))
-    struct {
-        pub const panic = idf.panic;
-    }
-else
-    struct {};
+pub const panic = idf.panic;
 
 const log = std.log.scoped(.@"esp-idf");
 pub const std_options = .{

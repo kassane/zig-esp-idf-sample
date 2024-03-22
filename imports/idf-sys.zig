@@ -3,50 +3,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-pub const Version = struct {
-    major: u32 = 0,
-    minor: u32 = 0,
-    patch: u32 = 0,
-    pub fn get() Version {
-        var final_version: Version = undefined;
-        const idf_version = std.mem.span(esp_get_idf_version());
-
-        if (!std.mem.startsWith(u8, idf_version, "v"))
-            return .{};
-
-        // skip [0] == 'v' and remove [idf_version.len - 4] == "-dev"
-        var it = if (std.mem.endsWith(u8, idf_version, "-dev"))
-            std.mem.split(u8, idf_version[1 .. idf_version.len - 4], ".")
-        else
-            std.mem.split(u8, idf_version[1..], ".");
-
-        final_version.major = std.fmt.parseUnsigned(u32, it.first(), 10) catch |err|
-            @panic(@errorName(err));
-
-        while (it.next()) |token| {
-            if (!std.ascii.isDigit(token[0]))
-                continue;
-            const digit = std.fmt.parseUnsigned(u32, token, 10) catch |err|
-                @panic(@errorName(err));
-            final_version.minor = digit;
-            if (digit != final_version.minor)
-                final_version.patch = digit;
-        }
-
-        return final_version;
-    }
-    pub fn toString(self: Version, allocator: std.mem.Allocator) []const u8 {
-        const idf_version = std.mem.span(esp_get_idf_version());
-
-        // e.g.: v4.0.0 or commit-hash: g5d5f5c3
-        if (!std.mem.startsWith(u8, idf_version, "v"))
-            return idf_version
-        else
-            return std.fmt.allocPrint(allocator, "{d}.{d}.{d}", .{ self.major, self.minor, self.patch }) catch |err|
-                @panic(@errorName(err));
-    }
-};
-
 // C error
 pub const esp_err_t = enum(c_int) {
     ESP_OK = 0,
@@ -75,7 +31,7 @@ pub extern fn esp_err_to_name(code: esp_err_t) [*:0]const u8;
 pub extern fn esp_err_to_name_r(code: esp_err_t, buf: [*:0]u8, buflen: usize) [*:0]const u8;
 pub extern fn _esp_error_check_failed(rc: esp_err_t, file: [*:0]const u8, line: c_int, function: [*:0]const u8, expression: [*:0]const u8) noreturn;
 pub extern fn _esp_error_check_failed_without_abort(rc: esp_err_t, file: [*:0]const u8, line: c_int, function: [*:0]const u8, expression: [*:0]const u8) void;
-extern fn esp_get_idf_version() [*:0]const u8;
+pub extern fn esp_get_idf_version() [*:0]const u8;
 pub const esp_reset_reason_t = enum(c_uint) {
     ESP_RST_UNKNOWN = 0,
     ESP_RST_POWERON = 1,
@@ -4319,6 +4275,7 @@ pub extern fn esp_timer_get_period(timer: esp_timer_handle_t, period: [*c]u64) e
 pub extern fn esp_timer_get_expiry_time(timer: esp_timer_handle_t, expiry: [*c]u64) esp_err_t;
 pub extern fn esp_timer_dump(stream: std.c.FILE) esp_err_t;
 pub extern fn esp_timer_is_active(timer: esp_timer_handle_t) bool;
+pub extern fn esp_timer_new_etm_alarm_event(out_event: [*c]esp_etm_event_handle_t) esp_err_t;
 pub const esp_apptrace_tmo_t = extern struct {
     start: i64 = std.mem.zeroes(i64),
     tmo: i64 = std.mem.zeroes(i64),
@@ -4837,3 +4794,93 @@ pub const va_list = extern struct {
     __va_reg: [*c]c_int = std.mem.zeroes([*c]c_int),
     __va_ndx: c_int = std.mem.zeroes(c_int),
 };
+
+/// C Wrapper
+pub const gpio_etm_event_edge_t = enum(c_uint) {
+    GPIO_ETM_EVENT_EDGE_POS = 0,
+    GPIO_ETM_EVENT_EDGE_NEG = 1,
+    GPIO_ETM_EVENT_EDGE_ANY = 2,
+};
+pub const gpio_etm_event_config_t = extern struct {
+    edge: gpio_etm_event_edge_t = std.mem.zeroes(gpio_etm_event_edge_t),
+};
+pub extern fn gpio_new_etm_event(config: [*c]const gpio_etm_event_config_t, ret_event: [*c]esp_etm_event_handle_t) esp_err_t;
+pub extern fn gpio_etm_event_bind_gpio(event: esp_etm_event_handle_t, gpio_num: c_int) esp_err_t;
+pub const gpio_etm_task_action_t = enum(c_uint) {
+    GPIO_ETM_TASK_ACTION_SET = 0,
+    GPIO_ETM_TASK_ACTION_CLR = 1,
+    GPIO_ETM_TASK_ACTION_TOG = 2,
+};
+pub const gpio_etm_task_config_t = extern struct {
+    action: gpio_etm_task_action_t = std.mem.zeroes(gpio_etm_task_action_t),
+};
+pub extern fn gpio_new_etm_task(config: [*c]const gpio_etm_task_config_t, ret_task: [*c]esp_etm_task_handle_t) esp_err_t;
+pub extern fn gpio_etm_task_add_gpio(task: esp_etm_task_handle_t, gpio_num: c_int) esp_err_t;
+pub extern fn gpio_etm_task_rm_gpio(task: esp_etm_task_handle_t, gpio_num: c_int) esp_err_t;
+pub const gpio_isr_handle_t = intr_handle_t;
+pub const gpio_isr_t = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const gpio_config_t = extern struct {
+    pin_bit_mask: u64 = std.mem.zeroes(u64),
+    mode: gpio_mode_t = std.mem.zeroes(gpio_mode_t),
+    pull_up_en: gpio_pullup_t = std.mem.zeroes(gpio_pullup_t),
+    pull_down_en: gpio_pulldown_t = std.mem.zeroes(gpio_pulldown_t),
+    intr_type: gpio_int_type_t = std.mem.zeroes(gpio_int_type_t),
+};
+pub extern fn gpio_config(pGPIOConfig: [*c]const gpio_config_t) esp_err_t;
+pub extern fn gpio_reset_pin(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_set_intr_type(gpio_num: gpio_num_t, intr_type: gpio_int_type_t) esp_err_t;
+pub extern fn gpio_intr_enable(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_intr_disable(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_set_level(gpio_num: gpio_num_t, level: u32) esp_err_t;
+pub extern fn gpio_get_level(gpio_num: gpio_num_t) c_int;
+pub extern fn gpio_set_direction(gpio_num: gpio_num_t, mode: gpio_mode_t) esp_err_t;
+pub extern fn gpio_set_pull_mode(gpio_num: gpio_num_t, pull: gpio_pull_mode_t) esp_err_t;
+pub extern fn gpio_wakeup_enable(gpio_num: gpio_num_t, intr_type: gpio_int_type_t) esp_err_t;
+pub extern fn gpio_wakeup_disable(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_isr_register(@"fn": ?*const fn (?*anyopaque) callconv(.C) void, arg: ?*anyopaque, intr_alloc_flags: c_int, handle: [*c]gpio_isr_handle_t) esp_err_t;
+pub extern fn gpio_pullup_en(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_pullup_dis(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_pulldown_en(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_pulldown_dis(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_install_isr_service(intr_alloc_flags: c_int) esp_err_t;
+pub extern fn gpio_uninstall_isr_service() void;
+pub extern fn gpio_isr_handler_add(gpio_num: gpio_num_t, isr_handler: gpio_isr_t, args: ?*anyopaque) esp_err_t;
+pub extern fn gpio_isr_handler_remove(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_set_drive_capability(gpio_num: gpio_num_t, strength: gpio_drive_cap_t) esp_err_t;
+pub extern fn gpio_get_drive_capability(gpio_num: gpio_num_t, strength: [*c]gpio_drive_cap_t) esp_err_t;
+pub extern fn gpio_hold_en(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_hold_dis(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_deep_sleep_hold_en() void;
+pub extern fn gpio_deep_sleep_hold_dis() void;
+pub extern fn gpio_iomux_in(gpio_num: u32, signal_idx: u32) void;
+pub extern fn gpio_iomux_out(gpio_num: u8, func: c_int, oen_inv: bool) void;
+pub extern fn gpio_force_hold_all() esp_err_t;
+pub extern fn gpio_force_unhold_all() esp_err_t;
+pub extern fn gpio_sleep_sel_en(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_sleep_sel_dis(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_sleep_set_direction(gpio_num: gpio_num_t, mode: gpio_mode_t) esp_err_t;
+pub extern fn gpio_sleep_set_pull_mode(gpio_num: gpio_num_t, pull: gpio_pull_mode_t) esp_err_t;
+pub extern fn gpio_deep_sleep_wakeup_enable(gpio_num: gpio_num_t, intr_type: gpio_int_type_t) esp_err_t;
+pub extern fn gpio_deep_sleep_wakeup_disable(gpio_num: gpio_num_t) esp_err_t;
+pub extern fn gpio_dump_io_configuration(out_stream: std.c.FILE, io_bit_mask: u64) esp_err_t;
+pub extern fn esp_rom_gpio_pad_select_gpio(iopad_num: u32) void;
+pub extern fn esp_rom_gpio_pad_pullup_only(iopad_num: u32) void;
+pub extern fn esp_rom_gpio_pad_unhold(gpio_num: u32) void;
+pub extern fn esp_rom_gpio_pad_set_drv(iopad_num: u32, drv: u32) void;
+pub extern fn esp_rom_gpio_connect_in_signal(gpio_num: u32, signal_idx: u32, inv: bool) void;
+pub extern fn esp_rom_gpio_connect_out_signal(gpio_num: u32, signal_idx: u32, out_inv: bool, oen_inv: bool) void;
+pub const esp_etm_channel_t = opaque {};
+pub const esp_etm_channel_handle_t = ?*esp_etm_channel_t;
+pub const esp_etm_event_t = opaque {};
+pub const esp_etm_event_handle_t = ?*esp_etm_event_t;
+pub const esp_etm_task_t = opaque {};
+pub const esp_etm_task_handle_t = ?*esp_etm_task_t;
+pub const esp_etm_channel_config_t = extern struct {};
+pub extern fn esp_etm_new_channel(config: [*c]const esp_etm_channel_config_t, ret_chan: [*c]esp_etm_channel_handle_t) esp_err_t;
+pub extern fn esp_etm_del_channel(chan: esp_etm_channel_handle_t) esp_err_t;
+pub extern fn esp_etm_channel_enable(chan: esp_etm_channel_handle_t) esp_err_t;
+pub extern fn esp_etm_channel_disable(chan: esp_etm_channel_handle_t) esp_err_t;
+pub extern fn esp_etm_channel_connect(chan: esp_etm_channel_handle_t, event: esp_etm_event_handle_t, task: esp_etm_task_handle_t) esp_err_t;
+pub extern fn esp_etm_del_event(event: esp_etm_event_handle_t) esp_err_t;
+pub extern fn esp_etm_del_task(task: esp_etm_task_handle_t) esp_err_t;
+pub extern fn esp_etm_dump(out_stream: std.c.FILE) esp_err_t;
