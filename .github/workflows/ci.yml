@@ -8,37 +8,11 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu-latest]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32p4]
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
-      - uses: korandoru/setup-zig@v1
+      - uses: espressif/esp-idf-ci-action@v1
         with:
-          zig-version: master
-      
-      - name: prepare-linux
-        run: |
-            sudo apt-get update
-            sudo apt-get install -y cmake
-            git clone --recursive https://github.com/espressif/esp-idf -b v5.3-dev --depth 1
-            cd esp-idf && chmod +x ./install.sh && ./install.sh
-            chmod +x ./export.sh && source ./export.sh
-            cd ..
-
-      - name: Build for esp32-c3
-        run: |
-            idf.py set-target esp32c3
-            idf.py build
-            idf.py size
-            idf.py fullclean
-      - name: Build for esp32-h2
-        run: |
-            idf.py set-target esp32h2
-            idf.py build
-            idf.py size
-            idf.py fullclean
-      - name: Build for esp32-p4
-        run: |
-            idf.py --preview set-target esp32p4
-            idf.py build
-            idf.py size
-            idf.py fullclean
+          esp_idf_version: v5.2
+          target: ${{ matrix.target }}
