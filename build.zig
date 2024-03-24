@@ -65,7 +65,9 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
     if (!std.mem.eql(u8, idf_path, "")) {
         try searched_idf_include(b, lib, idf_path);
     }
-    try searched_idf_libs(b, lib);
+    const build_exists = !std.meta.isError(std.fs.accessAbsolute(b.pathJoin(&.{ @src().file, "..", "build" }), .{}));
+    if (build_exists)
+        try searched_idf_libs(b, lib);
 
     const home_dir = std.process.getEnvVarOwned(b.allocator, "HOME") catch "";
     if (!std.mem.eql(u8, home_dir, "")) {
