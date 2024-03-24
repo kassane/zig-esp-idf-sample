@@ -15,6 +15,8 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
+    // led_strip_component(lib);
+
     // if detect zig root_source_file, enable zig modules (or use c/c++ files)
     if (lib.root_module.root_source_file != null) {
         lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
@@ -46,18 +48,24 @@ pub fn build(b: *std.Build) !void {
         lib.linkLibCpp();
     }
 
-    includeDeps(b, lib);
+    try includeDeps(b, lib);
     b.installArtifact(lib);
 }
 
-fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
+fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
     const include_dirs = std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS") catch "";
     if (!std.mem.eql(u8, include_dirs, "")) {
         var it_inc = std.mem.tokenize(u8, include_dirs, ";");
         while (it_inc.next()) |dir| {
-            lib.addSystemIncludePath(.{ .path = dir });
+            lib.addIncludePath(.{ .path = dir });
         }
     }
+
+    const idf_path = std.process.getEnvVarOwned(b.allocator, "IDF_PATH") catch "";
+    if (!std.mem.eql(u8, idf_path, "")) {
+        try searched_idf_include(b, lib, idf_path);
+    }
+    try searched_idf_libs(b, lib);
 
     const home_dir = std.process.getEnvVarOwned(b.allocator, "HOME") catch "";
     if (!std.mem.eql(u8, home_dir, "")) {
@@ -65,7 +73,7 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
             @tagName(lib.rootModuleTarget().cpu.arch),
         });
 
-        lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{
+        lib.addIncludePath(.{ .path = b.pathJoin(&.{
             home_dir,
             ".espressif",
             "tools",
@@ -74,7 +82,7 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
             archtools,
             "include",
         }) });
-        lib.addSystemIncludePath(.{ .path = b.pathJoin(&.{
+        lib.addIncludePath(.{ .path = b.pathJoin(&.{
             home_dir,
             ".espressif",
             "tools",
@@ -84,7 +92,7 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
             archtools,
             "sys-include",
         }) });
-        lib.addSystemIncludePath(.{
+        lib.addIncludePath(.{
             .path = b.pathJoin(&.{
                 home_dir,
                 ".espressif",
@@ -108,19 +116,73 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) void {
                 "lib",
             }),
         });
-        lib.addLibraryPath(.{
-            .path = b.pathJoin(&.{
-                home_dir,
-                ".espressif",
-                "tools",
-                archtools,
-                "esp-13.2.0_20230928",
-                archtools,
-                "lib",
-            }),
-        });
     }
     lib.addIncludePath(.{ .path = "include" });
+}
+
+// https://github.com/kassane/zig-esp-idf-sample/issues/3
+fn led_strip_component(lib: *std.Build.Step.Compile) void {
+    lib.addIncludePath(.{
+        .cwd_relative = "../managed_components/espressif__led_strip/include",
+    });
+    lib.addIncludePath(.{
+        .cwd_relative = "../managed_components/espressif__led_strip/interface",
+    });
+    lib.addCSourceFiles(.{
+        .root = .{ .cwd_relative = "../managed_components/espressif__led_strip/src" },
+        .files = &.{
+            "led_strip_api.c",
+            "led_strip_rmt_encoder.c",
+            "led_strip_rmt_dev.c",
+            "led_strip_spi_dev.c",
+        },
+        .flags = &.{},
+    });
+}
+
+pub fn searched_idf_libs(b: *std.Build, lib: *std.Build.Step.Compile) !void {
+    var dir = try std.fs.cwd().openDir("../build", .{
+        .iterate = true,
+    });
+    defer dir.close();
+    var walker = try dir.walk(b.allocator);
+    defer walker.deinit();
+
+    while (try walker.next()) |entry| {
+        const ext = std.fs.path.extension(entry.basename);
+        const lib_ext = inline for (&.{".obj"}) |e| {
+            if (std.mem.eql(u8, ext, e))
+                break true;
+        } else false;
+        if (lib_ext) {
+            const src_path = std.fs.path.dirname(@src().file).?;
+            const cwd_path = b.pathJoin(&.{ src_path, "build", b.dupe(entry.path) });
+            const lib_file: std.Build.LazyPath = .{ .path = cwd_path };
+            lib.addObjectFile(lib_file);
+        }
+    }
+}
+
+pub fn searched_idf_include(b: *std.Build, lib: *std.Build.Step.Compile, idf_path: []const u8) !void {
+    const comp = b.pathJoin(&.{ idf_path, "components" });
+    var dir = try std.fs.cwd().openDir(comp, .{
+        .iterate = true,
+    });
+    defer dir.close();
+    var walker = try dir.walk(b.allocator);
+    defer walker.deinit();
+
+    while (try walker.next()) |entry| {
+        const ext = std.fs.path.extension(entry.basename);
+        const include_file = inline for (&.{".h"}) |e| {
+            if (std.mem.eql(u8, ext, e))
+                break true;
+        } else false;
+        if (include_file) {
+            const include_dir = b.pathJoin(&.{ comp, std.fs.path.dirname(b.dupe(entry.path)).? });
+            lib.addIncludePath(.{ .path = include_dir });
+        }
+    }
 }
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {

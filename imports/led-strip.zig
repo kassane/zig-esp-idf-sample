@@ -17,7 +17,7 @@ pub const led_model_t = enum(c_uint) {
 pub const led_strip_t = opaque {};
 pub const led_strip_handle_t = ?*led_strip_t;
 // /espressif/zig-esp-idf-sample/managed_components/espressif__led_strip/include/led_strip_types.h:48:18: warning: struct demoted to opaque type - has bitfield
-const unnamed_3 = opaque {};
+const unnamed_3 = extern struct { with_dma: bool = false };
 pub const led_strip_config_t = extern struct {
     strip_gpio_num: c_int = std.mem.zeroes(c_int),
     max_leds: u32 = std.mem.zeroes(u32),
@@ -115,7 +115,7 @@ pub const soc_periph_i2c_clk_src_t = enum(c_uint) {
     I2C_CLK_SRC_DEFAULT = 10,
 };
 pub const soc_periph_spi_clk_src_t = enum(c_uint) {
-    SPI_CLK_SRC_DEFAULT = 4,
+    // SPI_CLK_SRC_DEFAULT = 4,
     SPI_CLK_SRC_APB = 4,
     SPI_CLK_SRC_XTAL = 10,
 };
@@ -318,9 +318,9 @@ pub extern fn spi_get_actual_clock(fapb: c_int, hz: c_int, duty_cycle: c_int) c_
 pub extern fn spi_get_timing(gpio_is_used: bool, input_delay_ns: c_int, eff_clk: c_int, dummy_o: [*c]c_int, cycles_remain_o: [*c]c_int) void;
 pub extern fn spi_get_freq_limit(gpio_is_used: bool, input_delay_ns: c_int) c_int;
 pub extern fn spi_bus_get_max_transaction_len(host_id: spi_host_device_t, max_bytes: [*c]usize) idf.esp_err_t; // /home/kassane/espressif/zig-esp-idf-sample/managed_components/espressif__led_strip/include/led_strip_spi.h:24:18: warning: struct demoted to opaque type - has bitfield
-const unnamed_13 = opaque {};
+const unnamed_13 = extern struct { with_dma: bool = false };
 pub const led_strip_spi_config_t = extern struct {
-    clk_src: spi_clock_source_t = std.mem.zeroes(spi_clock_source_t),
+    clk_src: spi_clock_source_t = .SPI_CLK_SRC_APB,
     spi_bus: spi_host_device_t = std.mem.zeroes(spi_host_device_t),
     flags: unnamed_13 = std.mem.zeroes(unnamed_13),
 };

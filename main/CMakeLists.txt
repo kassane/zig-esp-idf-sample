@@ -1,4 +1,4 @@
-set(DEPS "pthread" "driver" "vfs")
+set(DEPS pthread driver)
 idf_component_register(SRCS "placeholder.c"
     INCLUDE_DIRS "."
     PRIV_REQUIRES "${DEPS}"
@@ -83,7 +83,6 @@ add_custom_target(zig_build
     -Doptimize=${ZIG_BUILD_TYPE}
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
-    --sysroot "${IDF_PATH}/components"
     -freference-trace
     --prominent-compile-errors
     --cache-dir ${CMAKE_BINARY_DIR}/zig-cache

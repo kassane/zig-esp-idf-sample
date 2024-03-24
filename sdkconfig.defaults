@@ -11,3 +11,7 @@ CONFIG_COMPILER_STACK_CHECK=y
 # not working using `HeapCapsAllocator`,
 # but std `raw_c_allocator` or `vPortAllocator` works
 # CONFIG_HEAP_TASK_TRACKING=y
+
+# CONFIG_BLINK_LED_STRIP=y
+# CONFIG_BLINK_LED_STRIP_BACKEND_SPI=y
+# CONFIG_BLINK_GPIO=48
