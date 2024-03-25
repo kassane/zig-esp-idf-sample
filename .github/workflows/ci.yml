@@ -16,6 +16,8 @@ jobs:
         with:
           esp_idf_version: v5.2
           target: ${{ matrix.target }}
+      - run: |
+          cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
       - uses: wokwi/wokwi-ci-action@v1
         with:
           token: ${{ secrets.WOKWI_CI_TOKEN }}
