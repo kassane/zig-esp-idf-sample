@@ -15,6 +15,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
+    // https://github.com/kassane/zig-esp-idf-sample/issues/3
     // led_strip_component(lib);
 
     // if detect zig root_source_file, enable zig modules (or use c/c++ files)
@@ -64,10 +65,8 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
     const idf_path = std.process.getEnvVarOwned(b.allocator, "IDF_PATH") catch "";
     if (!std.mem.eql(u8, idf_path, "")) {
         try searched_idf_include(b, lib, idf_path);
-    }
-    const build_exists = !std.meta.isError(std.fs.accessAbsolute(b.pathJoin(&.{ @src().file, "..", "build" }), .{}));
-    if (build_exists)
         try searched_idf_libs(b, lib);
+    }
 
     const home_dir = std.process.getEnvVarOwned(b.allocator, "HOME") catch "";
     if (!std.mem.eql(u8, home_dir, "")) {
@@ -106,23 +105,10 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
                 "include",
             }),
         });
-        lib.addLibraryPath(.{
-            .path = b.pathJoin(&.{
-                home_dir,
-                ".espressif",
-                "tools",
-                archtools,
-                "esp-13.2.0_20230928",
-                archtools,
-                archtools,
-                "lib",
-            }),
-        });
     }
     lib.addIncludePath(.{ .path = "include" });
 }
 
-// https://github.com/kassane/zig-esp-idf-sample/issues/3
 fn led_strip_component(lib: *std.Build.Step.Compile) void {
     lib.addIncludePath(.{
         .cwd_relative = "../managed_components/espressif__led_strip/include",
