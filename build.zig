@@ -330,6 +330,28 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const uart = b.addModule("uart", .{
+        .root_source_file = .{
+            .path = "imports/uart.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const dsp = b.addModule("dsp", .{
+        .root_source_file = .{
+            .path = "imports/dsp.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     return b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = "imports/idf.zig",
@@ -376,6 +398,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .module = gpio,
             },
             .{
+                .name = "uart",
+                .module = uart,
+            },
+            .{
                 .name = "error",
                 .module = errors,
             },
@@ -386,6 +412,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "bluetooth",
                 .module = bt,
+            },
+            .{
+                .name = "dsp",
+                .module = dsp,
             },
         },
     });

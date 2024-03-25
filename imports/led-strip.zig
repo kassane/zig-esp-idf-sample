@@ -97,12 +97,6 @@ pub const soc_periph_temperature_sensor_clk_src_t = enum(c_uint) {
     TEMPERATURE_SENSOR_CLK_SRC_DEFAULT = 10,
 };
 pub const temperature_sensor_clk_src_t = soc_periph_temperature_sensor_clk_src_t;
-pub const soc_periph_uart_clk_src_legacy_t = enum(c_uint) {
-    UART_SCLK_APB = 4,
-    UART_SCLK_RTC = 8,
-    UART_SCLK_XTAL = 10,
-    UART_SCLK_DEFAULT = 4,
-};
 pub const soc_periph_i2s_clk_src_t = enum(c_int) {
     I2S_CLK_SRC_DEFAULT = 6,
     I2S_CLK_SRC_PLL_160M = 6,

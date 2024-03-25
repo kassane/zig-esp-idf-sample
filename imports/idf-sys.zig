@@ -979,6 +979,569 @@ pub const touch_pad_sleep_channel_t = extern struct {
     touch_num: touch_pad_t = std.mem.zeroes(touch_pad_t),
     en_proximity: bool = std.mem.zeroes(bool),
 };
+
+pub const RingbufHandle_t = ?*anyopaque;
+pub const RingbufferType_t = enum(c_uint) {
+    RINGBUF_TYPE_NOSPLIT = 0,
+    RINGBUF_TYPE_ALLOWSPLIT = 1,
+    RINGBUF_TYPE_BYTEBUF = 2,
+    RINGBUF_TYPE_MAX = 3,
+};
+pub const uart_port_t = enum(c_uint) {
+    UART_NUM_0 = 0,
+    UART_NUM_1 = 1,
+    UART_NUM_2 = 2,
+    UART_NUM_MAX = 3,
+};
+pub const uart_mode_t = enum(c_uint) {
+    UART_MODE_UART = 0,
+    UART_MODE_RS485_HALF_DUPLEX = 1,
+    UART_MODE_IRDA = 2,
+    UART_MODE_RS485_COLLISION_DETECT = 3,
+    UART_MODE_RS485_APP_CTRL = 4,
+};
+pub const uart_word_length_t = enum(c_uint) {
+    UART_DATA_5_BITS = 0,
+    UART_DATA_6_BITS = 1,
+    UART_DATA_7_BITS = 2,
+    UART_DATA_8_BITS = 3,
+    UART_DATA_BITS_MAX = 4,
+};
+pub const uart_stop_bits_t = enum(c_uint) {
+    UART_STOP_BITS_1 = 1,
+    UART_STOP_BITS_1_5 = 2,
+    UART_STOP_BITS_2 = 3,
+    UART_STOP_BITS_MAX = 4,
+};
+pub const uart_parity_t = enum(c_uint) {
+    UART_PARITY_DISABLE = 0,
+    UART_PARITY_EVEN = 2,
+    UART_PARITY_ODD = 3,
+};
+pub const uart_hw_flowcontrol_t = enum(c_uint) {
+    UART_HW_FLOWCTRL_DISABLE = 0,
+    UART_HW_FLOWCTRL_RTS = 1,
+    UART_HW_FLOWCTRL_CTS = 2,
+    UART_HW_FLOWCTRL_CTS_RTS = 3,
+    UART_HW_FLOWCTRL_MAX = 4,
+};
+pub const uart_signal_inv_t = enum(c_uint) {
+    UART_SIGNAL_INV_DISABLE = 0,
+    UART_SIGNAL_IRDA_TX_INV = 1,
+    UART_SIGNAL_IRDA_RX_INV = 2,
+    UART_SIGNAL_RXD_INV = 4,
+    UART_SIGNAL_CTS_INV = 8,
+    UART_SIGNAL_DSR_INV = 16,
+    UART_SIGNAL_TXD_INV = 32,
+    UART_SIGNAL_RTS_INV = 64,
+    UART_SIGNAL_DTR_INV = 128,
+};
+pub const soc_periph_uart_clk_src_legacy_t = enum(c_uint) {
+    UART_SCLK_APB = 4,
+    UART_SCLK_RTC = 8,
+    UART_SCLK_XTAL = 10,
+    UART_SCLK_DEFAULT = 4,
+};
+pub const uart_sclk_t = soc_periph_uart_clk_src_legacy_t;
+pub const uart_at_cmd_t = extern struct {
+    cmd_char: u8 = std.mem.zeroes(u8),
+    char_num: u8 = std.mem.zeroes(u8),
+    gap_tout: u32 = std.mem.zeroes(u32),
+    pre_idle: u32 = std.mem.zeroes(u32),
+    post_idle: u32 = std.mem.zeroes(u32),
+};
+pub const uart_sw_flowctrl_t = extern struct {
+    xon_char: u8 = std.mem.zeroes(u8),
+    xoff_char: u8 = std.mem.zeroes(u8),
+    xon_thrd: u8 = std.mem.zeroes(u8),
+    xoff_thrd: u8 = std.mem.zeroes(u8),
+};
+const union_unnamed_52 = extern union {
+    source_clk: uart_sclk_t,
+};
+pub const uart_config_t = extern struct {
+    baud_rate: c_int = std.mem.zeroes(c_int),
+    data_bits: uart_word_length_t = std.mem.zeroes(uart_word_length_t),
+    parity: uart_parity_t = std.mem.zeroes(uart_parity_t),
+    stop_bits: uart_stop_bits_t = std.mem.zeroes(uart_stop_bits_t),
+    flow_ctrl: uart_hw_flowcontrol_t = std.mem.zeroes(uart_hw_flowcontrol_t),
+    rx_flow_ctrl_thresh: u8 = std.mem.zeroes(u8),
+    unnamed_0: union_unnamed_52 = std.mem.zeroes(union_unnamed_52),
+};
+pub const uart_intr_config_t = extern struct {
+    intr_enable_mask: u32 = std.mem.zeroes(u32),
+    rx_timeout_thresh: u8 = std.mem.zeroes(u8),
+    txfifo_empty_intr_thresh: u8 = std.mem.zeroes(u8),
+    rxfifo_full_thresh: u8 = std.mem.zeroes(u8),
+};
+pub const uart_event_type_t = enum(c_uint) {
+    UART_DATA = 0,
+    UART_BREAK = 1,
+    UART_BUFFER_FULL = 2,
+    UART_FIFO_OVF = 3,
+    UART_FRAME_ERR = 4,
+    UART_PARITY_ERR = 5,
+    UART_DATA_BREAK = 6,
+    UART_PATTERN_DET = 7,
+    UART_WAKEUP = 8,
+    UART_EVENT_MAX = 9,
+};
+pub const uart_event_t = extern struct {
+    type: uart_event_type_t = std.mem.zeroes(uart_event_type_t),
+    size: usize = std.mem.zeroes(usize),
+    timeout_flag: bool = std.mem.zeroes(bool),
+};
+pub const uart_isr_handle_t = intr_handle_t;
+pub extern fn uart_driver_install(uart_num: uart_port_t, rx_buffer_size: c_int, tx_buffer_size: c_int, queue_size: c_int, uart_queue: [*c]QueueHandle_t, intr_alloc_flags: c_int) esp_err_t;
+pub extern fn uart_driver_delete(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_is_driver_installed(uart_num: uart_port_t) bool;
+pub extern fn uart_set_word_length(uart_num: uart_port_t, data_bit: uart_word_length_t) esp_err_t;
+pub extern fn uart_get_word_length(uart_num: uart_port_t, data_bit: [*c]uart_word_length_t) esp_err_t;
+pub extern fn uart_set_stop_bits(uart_num: uart_port_t, stop_bits: uart_stop_bits_t) esp_err_t;
+pub extern fn uart_get_stop_bits(uart_num: uart_port_t, stop_bits: [*c]uart_stop_bits_t) esp_err_t;
+pub extern fn uart_set_parity(uart_num: uart_port_t, parity_mode: uart_parity_t) esp_err_t;
+pub extern fn uart_get_parity(uart_num: uart_port_t, parity_mode: [*c]uart_parity_t) esp_err_t;
+pub extern fn uart_get_sclk_freq(sclk: uart_sclk_t, out_freq_hz: [*c]u32) esp_err_t;
+pub extern fn uart_set_baudrate(uart_num: uart_port_t, baudrate: u32) esp_err_t;
+pub extern fn uart_get_baudrate(uart_num: uart_port_t, baudrate: [*c]u32) esp_err_t;
+pub extern fn uart_set_line_inverse(uart_num: uart_port_t, inverse_mask: u32) esp_err_t;
+pub extern fn uart_set_hw_flow_ctrl(uart_num: uart_port_t, flow_ctrl: uart_hw_flowcontrol_t, rx_thresh: u8) esp_err_t;
+pub extern fn uart_set_sw_flow_ctrl(uart_num: uart_port_t, enable: bool, rx_thresh_xon: u8, rx_thresh_xoff: u8) esp_err_t;
+pub extern fn uart_get_hw_flow_ctrl(uart_num: uart_port_t, flow_ctrl: [*c]uart_hw_flowcontrol_t) esp_err_t;
+pub extern fn uart_clear_intr_status(uart_num: uart_port_t, clr_mask: u32) esp_err_t;
+pub extern fn uart_enable_intr_mask(uart_num: uart_port_t, enable_mask: u32) esp_err_t;
+pub extern fn uart_disable_intr_mask(uart_num: uart_port_t, disable_mask: u32) esp_err_t;
+pub extern fn uart_enable_rx_intr(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_disable_rx_intr(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_disable_tx_intr(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_enable_tx_intr(uart_num: uart_port_t, enable: c_int, thresh: c_int) esp_err_t;
+pub extern fn uart_set_pin(uart_num: uart_port_t, tx_io_num: c_int, rx_io_num: c_int, rts_io_num: c_int, cts_io_num: c_int) esp_err_t;
+pub extern fn uart_set_rts(uart_num: uart_port_t, level: c_int) esp_err_t;
+pub extern fn uart_set_dtr(uart_num: uart_port_t, level: c_int) esp_err_t;
+pub extern fn uart_set_tx_idle_num(uart_num: uart_port_t, idle_num: u16) esp_err_t;
+pub extern fn uart_param_config(uart_num: uart_port_t, uart_config: [*c]const uart_config_t) esp_err_t;
+pub extern fn uart_intr_config(uart_num: uart_port_t, intr_conf: [*c]const uart_intr_config_t) esp_err_t;
+pub extern fn uart_wait_tx_done(uart_num: uart_port_t, ticks_to_wait: TickType_t) esp_err_t;
+pub extern fn uart_tx_chars(uart_num: uart_port_t, buffer: [*c]const u8, len: u32) c_int;
+pub extern fn uart_write_bytes(uart_num: uart_port_t, src: ?*const anyopaque, size: usize) c_int;
+pub extern fn uart_write_bytes_with_break(uart_num: uart_port_t, src: ?*const anyopaque, size: usize, brk_len: c_int) c_int;
+pub extern fn uart_read_bytes(uart_num: uart_port_t, buf: ?*anyopaque, length: u32, ticks_to_wait: TickType_t) c_int;
+pub extern fn uart_flush(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_flush_input(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_get_buffered_data_len(uart_num: uart_port_t, size: [*c]usize) esp_err_t;
+pub extern fn uart_get_tx_buffer_free_size(uart_num: uart_port_t, size: [*c]usize) esp_err_t;
+pub extern fn uart_disable_pattern_det_intr(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_enable_pattern_det_baud_intr(uart_num: uart_port_t, pattern_chr: u8, chr_num: u8, chr_tout: c_int, post_idle: c_int, pre_idle: c_int) esp_err_t;
+pub extern fn uart_pattern_pop_pos(uart_num: uart_port_t) c_int;
+pub extern fn uart_pattern_get_pos(uart_num: uart_port_t) c_int;
+pub extern fn uart_pattern_queue_reset(uart_num: uart_port_t, queue_length: c_int) esp_err_t;
+pub extern fn uart_set_mode(uart_num: uart_port_t, mode: uart_mode_t) esp_err_t;
+pub extern fn uart_set_rx_full_threshold(uart_num: uart_port_t, threshold: c_int) esp_err_t;
+pub extern fn uart_set_tx_empty_threshold(uart_num: uart_port_t, threshold: c_int) esp_err_t;
+pub extern fn uart_set_rx_timeout(uart_num: uart_port_t, tout_thresh: u8) esp_err_t;
+pub extern fn uart_get_collision_flag(uart_num: uart_port_t, collision_flag: [*c]bool) esp_err_t;
+pub extern fn uart_set_wakeup_threshold(uart_num: uart_port_t, wakeup_threshold: c_int) esp_err_t;
+pub extern fn uart_get_wakeup_threshold(uart_num: uart_port_t, out_wakeup_threshold: [*c]c_int) esp_err_t;
+pub extern fn uart_wait_tx_idle_polling(uart_num: uart_port_t) esp_err_t;
+pub extern fn uart_set_loop_back(uart_num: uart_port_t, loop_back_en: bool) esp_err_t;
+pub extern fn uart_set_always_rx_timeout(uart_num: uart_port_t, always_rx_timeout_en: bool) void;
+const struct_unnamed_53 = extern struct {
+    rxfifo_rd_byte: u32 = std.mem.zeroes(u32),
+};
+pub const uart_fifo_reg_t = extern union {
+    unnamed_0: struct_unnamed_53,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:44:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_54 = opaque {};
+pub const uart_mem_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_54,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:90:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_55 = opaque {};
+pub const uart_int_raw_reg_t = extern union {
+    unnamed_0: struct_unnamed_55,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:199:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_56 = opaque {};
+pub const uart_int_st_reg_t = extern union {
+    unnamed_0: struct_unnamed_56,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:294:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_57 = opaque {};
+pub const uart_int_ena_reg_t = extern union {
+    unnamed_0: struct_unnamed_57,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:384:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_58 = opaque {};
+pub const uart_int_clr_reg_t = extern union {
+    unnamed_0: struct_unnamed_58,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:476:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_59 = opaque {};
+pub const uart_clkdiv_reg_t = extern union {
+    unnamed_0: struct_unnamed_59,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:495:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_60 = opaque {};
+pub const uart_rx_filt_reg_t = extern union {
+    unnamed_0: struct_unnamed_60,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:513:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_61 = opaque {};
+pub const uart_conf0_reg_t = extern union {
+    unnamed_0: struct_unnamed_61,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:638:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_62 = opaque {};
+pub const uart_conf1_reg_t = extern union {
+    unnamed_0: struct_unnamed_62,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:674:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_63 = opaque {};
+pub const uart_flow_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_63,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:709:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_64 = opaque {};
+pub const uart_sleep_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_64,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:724:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_65 = opaque {};
+pub const uart_swfc_conf0_reg_t = extern union {
+    unnamed_0: struct_unnamed_65,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:743:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_66 = opaque {};
+pub const uart_swfc_conf1_reg_t = extern union {
+    unnamed_0: struct_unnamed_66,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:762:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_67 = opaque {};
+pub const uart_txbrk_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_67,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:777:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_68 = opaque {};
+pub const uart_idle_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_68,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:795:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_69 = opaque {};
+pub const uart_rs485_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_69,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:834:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_70 = opaque {};
+pub const uart_clk_conf_reg_t = extern union {
+    unnamed_0: struct_unnamed_70,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:886:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_71 = opaque {};
+pub const uart_status_reg_t = extern union {
+    unnamed_0: struct_unnamed_71,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:930:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_72 = opaque {};
+pub const uart_mem_tx_status_reg_t = extern union {
+    unnamed_0: struct_unnamed_72,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:951:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_73 = opaque {};
+pub const uart_mem_rx_status_reg_t = extern union {
+    unnamed_0: struct_unnamed_73,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:971:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_74 = opaque {};
+pub const uart_fsm_status_reg_t = extern union {
+    unnamed_0: struct_unnamed_74,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:992:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_75 = opaque {};
+pub const uart_lowpulse_reg_t = extern union {
+    unnamed_0: struct_unnamed_75,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1007:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_76 = opaque {};
+pub const uart_highpulse_reg_t = extern union {
+    unnamed_0: struct_unnamed_76,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1022:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_77 = opaque {};
+pub const uart_rxd_cnt_reg_t = extern union {
+    unnamed_0: struct_unnamed_77,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1037:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_78 = opaque {};
+pub const uart_pospulse_reg_t = extern union {
+    unnamed_0: struct_unnamed_78,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1052:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_79 = opaque {};
+pub const uart_negpulse_reg_t = extern union {
+    unnamed_0: struct_unnamed_79,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1069:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_80 = opaque {};
+pub const uart_at_cmd_precnt_reg_t = extern union {
+    unnamed_0: struct_unnamed_80,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1084:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_81 = opaque {};
+pub const uart_at_cmd_postcnt_reg_t = extern union {
+    unnamed_0: struct_unnamed_81,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1098:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_82 = opaque {};
+pub const uart_at_cmd_gaptout_reg_t = extern union {
+    unnamed_0: struct_unnamed_82,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1112:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_83 = opaque {};
+pub const uart_at_cmd_char_reg_t = extern union {
+    unnamed_0: struct_unnamed_83,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1133:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_84 = opaque {};
+pub const uart_date_reg_t = extern union {
+    unnamed_0: struct_unnamed_84,
+    val: u32,
+}; // /home/kassane/espressif/esp-idf/components/soc/esp32s3/include/soc/uart_struct.h:1146:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_85 = opaque {};
+pub const uart_id_reg_t = extern union {
+    unnamed_0: struct_unnamed_85,
+    val: u32,
+};
+pub const uart_dev_t = extern struct {
+    fifo: uart_fifo_reg_t = std.mem.zeroes(uart_fifo_reg_t),
+    int_raw: uart_int_raw_reg_t = std.mem.zeroes(uart_int_raw_reg_t),
+    int_st: uart_int_st_reg_t = std.mem.zeroes(uart_int_st_reg_t),
+    int_ena: uart_int_ena_reg_t = std.mem.zeroes(uart_int_ena_reg_t),
+    int_clr: uart_int_clr_reg_t = std.mem.zeroes(uart_int_clr_reg_t),
+    clkdiv: uart_clkdiv_reg_t = std.mem.zeroes(uart_clkdiv_reg_t),
+    rx_filt: uart_rx_filt_reg_t = std.mem.zeroes(uart_rx_filt_reg_t),
+    status: uart_status_reg_t = std.mem.zeroes(uart_status_reg_t),
+    conf0: uart_conf0_reg_t = std.mem.zeroes(uart_conf0_reg_t),
+    conf1: uart_conf1_reg_t = std.mem.zeroes(uart_conf1_reg_t),
+    lowpulse: uart_lowpulse_reg_t = std.mem.zeroes(uart_lowpulse_reg_t),
+    highpulse: uart_highpulse_reg_t = std.mem.zeroes(uart_highpulse_reg_t),
+    rxd_cnt: uart_rxd_cnt_reg_t = std.mem.zeroes(uart_rxd_cnt_reg_t),
+    flow_conf: uart_flow_conf_reg_t = std.mem.zeroes(uart_flow_conf_reg_t),
+    sleep_conf: uart_sleep_conf_reg_t = std.mem.zeroes(uart_sleep_conf_reg_t),
+    swfc_conf0: uart_swfc_conf0_reg_t = std.mem.zeroes(uart_swfc_conf0_reg_t),
+    swfc_conf1: uart_swfc_conf1_reg_t = std.mem.zeroes(uart_swfc_conf1_reg_t),
+    txbrk_conf: uart_txbrk_conf_reg_t = std.mem.zeroes(uart_txbrk_conf_reg_t),
+    idle_conf: uart_idle_conf_reg_t = std.mem.zeroes(uart_idle_conf_reg_t),
+    rs485_conf: uart_rs485_conf_reg_t = std.mem.zeroes(uart_rs485_conf_reg_t),
+    at_cmd_precnt: uart_at_cmd_precnt_reg_t = std.mem.zeroes(uart_at_cmd_precnt_reg_t),
+    at_cmd_postcnt: uart_at_cmd_postcnt_reg_t = std.mem.zeroes(uart_at_cmd_postcnt_reg_t),
+    at_cmd_gaptout: uart_at_cmd_gaptout_reg_t = std.mem.zeroes(uart_at_cmd_gaptout_reg_t),
+    at_cmd_char: uart_at_cmd_char_reg_t = std.mem.zeroes(uart_at_cmd_char_reg_t),
+    mem_conf: uart_mem_conf_reg_t = std.mem.zeroes(uart_mem_conf_reg_t),
+    mem_tx_status: uart_mem_tx_status_reg_t = std.mem.zeroes(uart_mem_tx_status_reg_t),
+    mem_rx_status: uart_mem_rx_status_reg_t = std.mem.zeroes(uart_mem_rx_status_reg_t),
+    fsm_status: uart_fsm_status_reg_t = std.mem.zeroes(uart_fsm_status_reg_t),
+    pospulse: uart_pospulse_reg_t = std.mem.zeroes(uart_pospulse_reg_t),
+    negpulse: uart_negpulse_reg_t = std.mem.zeroes(uart_negpulse_reg_t),
+    clk_conf: uart_clk_conf_reg_t = std.mem.zeroes(uart_clk_conf_reg_t),
+    date: uart_date_reg_t = std.mem.zeroes(uart_date_reg_t),
+    id: uart_id_reg_t = std.mem.zeroes(uart_id_reg_t),
+};
+
+const struct_unnamed_11 = opaque {};
+const union_unnamed_10 = extern union {
+    unnamed_0: struct_unnamed_11,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:30:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_13 = opaque {};
+const union_unnamed_12 = extern union {
+    unnamed_0: struct_unnamed_13,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:37:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_15 = opaque {};
+const union_unnamed_14 = extern union {
+    unnamed_0: struct_unnamed_15,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:44:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_17 = opaque {};
+const union_unnamed_16 = extern union {
+    unnamed_0: struct_unnamed_17,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:54:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_19 = opaque {};
+const union_unnamed_18 = extern union {
+    unnamed_0: struct_unnamed_19,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:61:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_21 = opaque {};
+const union_unnamed_20 = extern union {
+    unnamed_0: struct_unnamed_21,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:68:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_23 = opaque {};
+const union_unnamed_22 = extern union {
+    unnamed_0: struct_unnamed_23,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:75:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_25 = opaque {};
+const union_unnamed_24 = extern union {
+    unnamed_0: struct_unnamed_25,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:83:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_27 = opaque {};
+const union_unnamed_26 = extern union {
+    unnamed_0: struct_unnamed_27,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:93:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_29 = opaque {};
+const union_unnamed_28 = extern union {
+    unnamed_0: struct_unnamed_29,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:100:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_31 = opaque {};
+const union_unnamed_30 = extern union {
+    unnamed_0: struct_unnamed_31,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:107:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_33 = opaque {};
+const union_unnamed_32 = extern union {
+    unnamed_0: struct_unnamed_33,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:117:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_35 = opaque {};
+const union_unnamed_34 = extern union {
+    unnamed_0: struct_unnamed_35,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:124:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_37 = opaque {};
+const union_unnamed_36 = extern union {
+    unnamed_0: struct_unnamed_37,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:131:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_39 = opaque {};
+const union_unnamed_38 = extern union {
+    unnamed_0: struct_unnamed_39,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:138:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_41 = opaque {};
+const union_unnamed_40 = extern union {
+    unnamed_0: struct_unnamed_41,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:153:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_43 = opaque {};
+const union_unnamed_42 = extern union {
+    unnamed_0: struct_unnamed_43,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:160:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_45 = opaque {};
+const union_unnamed_44 = extern union {
+    unnamed_0: struct_unnamed_45,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:169:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_47 = opaque {};
+const union_unnamed_46 = extern union {
+    unnamed_0: struct_unnamed_47,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:179:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_49 = opaque {};
+const union_unnamed_48 = extern union {
+    unnamed_0: struct_unnamed_49,
+    val: u32,
+}; // /esp-idf/components/soc/esp32s3/include/soc/gpio_struct.h:237:22: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_51 = opaque {};
+const union_unnamed_50 = extern union {
+    unnamed_0: struct_unnamed_51,
+    val: u32,
+};
+pub const gpio_dev_t = extern struct {
+    bt_select: u32 = std.mem.zeroes(u32),
+    out: u32 = std.mem.zeroes(u32),
+    out_w1ts: u32 = std.mem.zeroes(u32),
+    out_w1tc: u32 = std.mem.zeroes(u32),
+    out1: union_unnamed_10 = std.mem.zeroes(union_unnamed_10),
+    out1_w1ts: union_unnamed_12 = std.mem.zeroes(union_unnamed_12),
+    out1_w1tc: union_unnamed_14 = std.mem.zeroes(union_unnamed_14),
+    sdio_select: union_unnamed_16 = std.mem.zeroes(union_unnamed_16),
+    enable: u32 = std.mem.zeroes(u32),
+    enable_w1ts: u32 = std.mem.zeroes(u32),
+    enable_w1tc: u32 = std.mem.zeroes(u32),
+    enable1: union_unnamed_18 = std.mem.zeroes(union_unnamed_18),
+    enable1_w1ts: union_unnamed_20 = std.mem.zeroes(union_unnamed_20),
+    enable1_w1tc: union_unnamed_22 = std.mem.zeroes(union_unnamed_22),
+    strap: union_unnamed_24 = std.mem.zeroes(union_unnamed_24),
+    in: u32 = std.mem.zeroes(u32),
+    in1: union_unnamed_26 = std.mem.zeroes(union_unnamed_26),
+    status: u32 = std.mem.zeroes(u32),
+    status_w1ts: u32 = std.mem.zeroes(u32),
+    status_w1tc: u32 = std.mem.zeroes(u32),
+    status1: union_unnamed_28 = std.mem.zeroes(union_unnamed_28),
+    status1_w1ts: union_unnamed_30 = std.mem.zeroes(union_unnamed_30),
+    status1_w1tc: union_unnamed_32 = std.mem.zeroes(union_unnamed_32),
+    pcpu_int: u32 = std.mem.zeroes(u32),
+    pcpu_nmi_int: u32 = std.mem.zeroes(u32),
+    cpusdio_int: u32 = std.mem.zeroes(u32),
+    pcpu_int1: union_unnamed_34 = std.mem.zeroes(union_unnamed_34),
+    pcpu_nmi_int1: union_unnamed_36 = std.mem.zeroes(union_unnamed_36),
+    cpusdio_int1: union_unnamed_38 = std.mem.zeroes(union_unnamed_38),
+    pin: [54]union_unnamed_40 = std.mem.zeroes([54]union_unnamed_40),
+    status_next: u32 = std.mem.zeroes(u32),
+    status_next1: union_unnamed_42 = std.mem.zeroes(union_unnamed_42),
+    func_in_sel_cfg: [256]union_unnamed_44 = std.mem.zeroes([256]union_unnamed_44),
+    func_out_sel_cfg: [54]union_unnamed_46 = std.mem.zeroes([54]union_unnamed_46),
+    clock_gate: union_unnamed_48 = std.mem.zeroes(union_unnamed_48),
+    reserved_630: u32 = std.mem.zeroes(u32),
+    reserved_634: u32 = std.mem.zeroes(u32),
+    reserved_638: u32 = std.mem.zeroes(u32),
+    reserved_63c: u32 = std.mem.zeroes(u32),
+    reserved_640: u32 = std.mem.zeroes(u32),
+    reserved_644: u32 = std.mem.zeroes(u32),
+    reserved_648: u32 = std.mem.zeroes(u32),
+    reserved_64c: u32 = std.mem.zeroes(u32),
+    reserved_650: u32 = std.mem.zeroes(u32),
+    reserved_654: u32 = std.mem.zeroes(u32),
+    reserved_658: u32 = std.mem.zeroes(u32),
+    reserved_65c: u32 = std.mem.zeroes(u32),
+    reserved_660: u32 = std.mem.zeroes(u32),
+    reserved_664: u32 = std.mem.zeroes(u32),
+    reserved_668: u32 = std.mem.zeroes(u32),
+    reserved_66c: u32 = std.mem.zeroes(u32),
+    reserved_670: u32 = std.mem.zeroes(u32),
+    reserved_674: u32 = std.mem.zeroes(u32),
+    reserved_678: u32 = std.mem.zeroes(u32),
+    reserved_67c: u32 = std.mem.zeroes(u32),
+    reserved_680: u32 = std.mem.zeroes(u32),
+    reserved_684: u32 = std.mem.zeroes(u32),
+    reserved_688: u32 = std.mem.zeroes(u32),
+    reserved_68c: u32 = std.mem.zeroes(u32),
+    reserved_690: u32 = std.mem.zeroes(u32),
+    reserved_694: u32 = std.mem.zeroes(u32),
+    reserved_698: u32 = std.mem.zeroes(u32),
+    reserved_69c: u32 = std.mem.zeroes(u32),
+    reserved_6a0: u32 = std.mem.zeroes(u32),
+    reserved_6a4: u32 = std.mem.zeroes(u32),
+    reserved_6a8: u32 = std.mem.zeroes(u32),
+    reserved_6ac: u32 = std.mem.zeroes(u32),
+    reserved_6b0: u32 = std.mem.zeroes(u32),
+    reserved_6b4: u32 = std.mem.zeroes(u32),
+    reserved_6b8: u32 = std.mem.zeroes(u32),
+    reserved_6bc: u32 = std.mem.zeroes(u32),
+    reserved_6c0: u32 = std.mem.zeroes(u32),
+    reserved_6c4: u32 = std.mem.zeroes(u32),
+    reserved_6c8: u32 = std.mem.zeroes(u32),
+    reserved_6cc: u32 = std.mem.zeroes(u32),
+    reserved_6d0: u32 = std.mem.zeroes(u32),
+    reserved_6d4: u32 = std.mem.zeroes(u32),
+    reserved_6d8: u32 = std.mem.zeroes(u32),
+    reserved_6dc: u32 = std.mem.zeroes(u32),
+    reserved_6e0: u32 = std.mem.zeroes(u32),
+    reserved_6e4: u32 = std.mem.zeroes(u32),
+    reserved_6e8: u32 = std.mem.zeroes(u32),
+    reserved_6ec: u32 = std.mem.zeroes(u32),
+    reserved_6f0: u32 = std.mem.zeroes(u32),
+    reserved_6f4: u32 = std.mem.zeroes(u32),
+    reserved_6f8: u32 = std.mem.zeroes(u32),
+    date: union_unnamed_50 = std.mem.zeroes(union_unnamed_50),
+};
 pub const gpio_num_t = enum(c_int) {
     GPIO_NUM_NC = -1,
     GPIO_NUM_0 = 0,
@@ -1020,7 +1583,16 @@ pub const gpio_num_t = enum(c_int) {
     GPIO_NUM_37 = 37,
     GPIO_NUM_38 = 38,
     GPIO_NUM_39 = 39,
-    GPIO_NUM_MAX = 40,
+    GPIO_NUM_40 = 40,
+    GPIO_NUM_41 = 41,
+    GPIO_NUM_42 = 42,
+    GPIO_NUM_43 = 43,
+    GPIO_NUM_44 = 44,
+    GPIO_NUM_45 = 45,
+    GPIO_NUM_46 = 46,
+    GPIO_NUM_47 = 47,
+    GPIO_NUM_48 = 48,
+    GPIO_NUM_MAX = 49,
 };
 pub const gpio_port_t = enum(c_uint) {
     GPIO_PORT_0 = 0,
@@ -1946,6 +2518,43 @@ pub extern fn esp_int_wdt_init() void;
 pub extern fn esp_int_wdt_cpu_init() void;
 pub const portTICK_PERIOD_MS: TickType_t = @as(TickType_t, @divExact(@as(c_int, 1000), configTICK_RATE_HZ));
 pub const configTICK_RATE_HZ: c_int = 100;
+pub const StaticRingbuffer_t = extern struct {
+    xDummy1: [2]usize = std.mem.zeroes([2]usize),
+    uxDummy2: UBaseType_t = std.mem.zeroes(UBaseType_t),
+    pvDummy3: [11]?*anyopaque = std.mem.zeroes([11]?*anyopaque),
+    xDummy4: BaseType_t = std.mem.zeroes(BaseType_t),
+    xDummy5: [2]StaticList_t = std.mem.zeroes([2]StaticList_t),
+    pvDummy6: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    muxDummy: portMUX_TYPE = std.mem.zeroes(portMUX_TYPE),
+};
+pub extern fn xRingbufferCreate(xBufferSize: usize, xBufferType: RingbufferType_t) RingbufHandle_t;
+pub extern fn xRingbufferCreateNoSplit(xItemSize: usize, xItemNum: usize) RingbufHandle_t;
+pub extern fn xRingbufferCreateStatic(xBufferSize: usize, xBufferType: RingbufferType_t, pucRingbufferStorage: [*c]u8, pxStaticRingbuffer: [*c]StaticRingbuffer_t) RingbufHandle_t;
+pub extern fn xRingbufferSend(xRingbuffer: RingbufHandle_t, pvItem: ?*const anyopaque, xItemSize: usize, xTicksToWait: TickType_t) BaseType_t;
+pub extern fn xRingbufferSendFromISR(xRingbuffer: RingbufHandle_t, pvItem: ?*const anyopaque, xItemSize: usize, pxHigherPriorityTaskWoken: [*c]BaseType_t) BaseType_t;
+pub extern fn xRingbufferSendAcquire(xRingbuffer: RingbufHandle_t, ppvItem: [*c]?*anyopaque, xItemSize: usize, xTicksToWait: TickType_t) BaseType_t;
+pub extern fn xRingbufferSendComplete(xRingbuffer: RingbufHandle_t, pvItem: ?*anyopaque) BaseType_t;
+pub extern fn xRingbufferReceive(xRingbuffer: RingbufHandle_t, pxItemSize: [*c]usize, xTicksToWait: TickType_t) ?*anyopaque;
+pub extern fn xRingbufferReceiveFromISR(xRingbuffer: RingbufHandle_t, pxItemSize: [*c]usize) ?*anyopaque;
+pub extern fn xRingbufferReceiveSplit(xRingbuffer: RingbufHandle_t, ppvHeadItem: [*c]?*anyopaque, ppvTailItem: [*c]?*anyopaque, pxHeadItemSize: [*c]usize, pxTailItemSize: [*c]usize, xTicksToWait: TickType_t) BaseType_t;
+pub extern fn xRingbufferReceiveSplitFromISR(xRingbuffer: RingbufHandle_t, ppvHeadItem: [*c]?*anyopaque, ppvTailItem: [*c]?*anyopaque, pxHeadItemSize: [*c]usize, pxTailItemSize: [*c]usize) BaseType_t;
+pub extern fn xRingbufferReceiveUpTo(xRingbuffer: RingbufHandle_t, pxItemSize: [*c]usize, xTicksToWait: TickType_t, xMaxSize: usize) ?*anyopaque;
+pub extern fn xRingbufferReceiveUpToFromISR(xRingbuffer: RingbufHandle_t, pxItemSize: [*c]usize, xMaxSize: usize) ?*anyopaque;
+pub extern fn vRingbufferReturnItem(xRingbuffer: RingbufHandle_t, pvItem: ?*anyopaque) void;
+pub extern fn vRingbufferReturnItemFromISR(xRingbuffer: RingbufHandle_t, pvItem: ?*anyopaque, pxHigherPriorityTaskWoken: [*c]BaseType_t) void;
+pub extern fn vRingbufferDelete(xRingbuffer: RingbufHandle_t) void;
+pub extern fn xRingbufferGetMaxItemSize(xRingbuffer: RingbufHandle_t) usize;
+pub extern fn xRingbufferGetCurFreeSize(xRingbuffer: RingbufHandle_t) usize;
+pub extern fn xRingbufferAddToQueueSetRead(xRingbuffer: RingbufHandle_t, xQueueSet: QueueSetHandle_t) BaseType_t;
+pub fn xRingbufferCanRead(xRingbuffer: RingbufHandle_t, xMember: QueueSetMemberHandle_t) callconv(.C) BaseType_t {
+    return if (xMember == @as(QueueSetMemberHandle_t, @ptrCast(xRingbuffer))) @as(BaseType_t, @bitCast(@as(c_int, 1))) else @as(BaseType_t, @bitCast(@as(c_int, 0)));
+}
+pub extern fn xRingbufferRemoveFromQueueSetRead(xRingbuffer: RingbufHandle_t, xQueueSet: QueueSetHandle_t) BaseType_t;
+pub extern fn vRingbufferGetInfo(xRingbuffer: RingbufHandle_t, uxFree: [*c]UBaseType_t, uxRead: [*c]UBaseType_t, uxWrite: [*c]UBaseType_t, uxAcquire: [*c]UBaseType_t, uxItemsWaiting: [*c]UBaseType_t) void;
+pub extern fn xRingbufferPrintInfo(xRingbuffer: RingbufHandle_t) void;
+pub extern fn xRingbufferGetStaticBuffer(xRingbuffer: RingbufHandle_t, ppucRingbufferStorage: [*c][*c]u8, ppxStaticRingbuffer: [*c][*c]StaticRingbuffer_t) BaseType_t;
+pub extern fn xRingbufferCreateWithCaps(xBufferSize: usize, xBufferType: RingbufferType_t, uxMemoryCaps: UBaseType_t) RingbufHandle_t;
+pub extern fn vRingbufferDeleteWithCaps(xRingbuffer: RingbufHandle_t) void;
 
 pub const esp_event_base_t = [*:0]const u8;
 pub const esp_event_loop_handle_t = ?*anyopaque;
