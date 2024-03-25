@@ -339,6 +339,40 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .name = "sys",
                 .module = sys,
             },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
+    const i2s = b.addModule("i2s", .{
+        .root_source_file = .{
+            .path = "imports/i2s.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
+    const spi = b.addModule("spi", .{
+        .root_source_file = .{
+            .path = "imports/spi.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
         },
     });
     const dsp = b.addModule("dsp", .{
@@ -400,6 +434,14 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "uart",
                 .module = uart,
+            },
+            .{
+                .name = "i2s",
+                .module = i2s,
+            },
+            .{
+                .name = "spi",
+                .module = spi,
             },
             .{
                 .name = "error",

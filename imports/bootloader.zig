@@ -1,4 +1,4 @@
-const idf = @import("sys");
+const sys = @import("sys");
 const std = @import("std");
 
 pub const efuse_dev_t = extern struct {
@@ -148,7 +148,7 @@ pub const esp_partition_info_t = extern struct {
     label: [16]u8 = std.mem.zeroes([16]u8),
     flags: u32 = std.mem.zeroes(u32),
 };
-pub extern fn esp_partition_table_verify(partition_table: [*c]const esp_partition_info_t, log_errors: bool, num_partitions: [*c]c_int) idf.esp_err_t;
+pub extern fn esp_partition_table_verify(partition_table: [*c]const esp_partition_info_t, log_errors: bool, num_partitions: [*c]c_int) sys.esp_err_t;
 pub extern fn esp_partition_is_flash_region_writable(addr: usize, size: usize) bool;
 pub extern fn esp_partition_main_flash_region_safe(addr: usize, size: usize) bool;
 
@@ -223,12 +223,12 @@ pub const rtc_retain_mem_t = extern struct {
     crc: u32 = std.mem.zeroes(u32),
 };
 // /.espressif/tools/riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/sys-include/assert.h:45:24: warning: ignoring StaticAssert declaration
-pub extern fn esp_image_verify(mode: esp_image_load_mode_t, part: [*c]const esp_partition_pos_t, data: ?*esp_image_metadata_t) idf.esp_err_t;
-pub extern fn esp_image_get_metadata(part: [*c]const esp_partition_pos_t, metadata: ?*esp_image_metadata_t) idf.esp_err_t;
-pub extern fn bootloader_load_image(part: [*c]const esp_partition_pos_t, data: ?*esp_image_metadata_t) idf.esp_err_t;
-pub extern fn bootloader_load_image_no_verify(part: [*c]const esp_partition_pos_t, data: ?*esp_image_metadata_t) idf.esp_err_t;
-pub extern fn esp_image_verify_bootloader(length: [*c]u32) idf.esp_err_t;
-pub extern fn esp_image_verify_bootloader_data(data: ?*esp_image_metadata_t) idf.esp_err_t;
+pub extern fn esp_image_verify(mode: esp_image_load_mode_t, part: [*c]const esp_partition_pos_t, data: ?*esp_image_metadata_t) sys.esp_err_t;
+pub extern fn esp_image_get_metadata(part: [*c]const esp_partition_pos_t, metadata: ?*esp_image_metadata_t) sys.esp_err_t;
+pub extern fn bootloader_load_image(part: [*c]const esp_partition_pos_t, data: ?*esp_image_metadata_t) sys.esp_err_t;
+pub extern fn bootloader_load_image_no_verify(part: [*c]const esp_partition_pos_t, data: ?*esp_image_metadata_t) sys.esp_err_t;
+pub extern fn esp_image_verify_bootloader(length: [*c]u32) sys.esp_err_t;
+pub extern fn esp_image_verify_bootloader_data(data: ?*esp_image_metadata_t) sys.esp_err_t;
 pub extern fn esp_image_get_flash_size(app_flash_size: esp_image_flash_size_t) c_int;
 pub const esp_image_flash_mapping_t = extern struct {
     drom_addr: u32 = std.mem.zeroes(u32),
@@ -247,7 +247,7 @@ pub const esp_image_type = enum(c_uint) {
     ESP_IMAGE_BOOTLOADER = 0,
     ESP_IMAGE_APPLICATION = 1,
 };
-pub extern fn bootloader_common_read_otadata(ota_info: [*c]const esp_partition_pos_t, two_otadata: [*c]esp_ota_select_entry_t) idf.esp_err_t;
+pub extern fn bootloader_common_read_otadata(ota_info: [*c]const esp_partition_pos_t, two_otadata: [*c]esp_ota_select_entry_t) sys.esp_err_t;
 pub extern fn bootloader_common_ota_select_crc(s: [*c]const esp_ota_select_entry_t) u32;
 pub extern fn bootloader_common_ota_select_valid(s: [*c]const esp_ota_select_entry_t) bool;
 pub extern fn bootloader_common_ota_select_invalid(s: [*c]const esp_ota_select_entry_t) bool;
@@ -256,11 +256,11 @@ pub extern fn bootloader_common_check_long_hold_gpio_level(num_pin: u32, delay_s
 pub extern fn bootloader_common_erase_part_type_data(list_erase: [*:0]const u8, ota_data_erase: bool) bool;
 pub extern fn bootloader_common_label_search(list: [*:0]const u8, label: [*c]u8) bool;
 pub extern fn bootloader_configure_spi_pins(drv: c_int) void;
-pub extern fn bootloader_common_get_sha256_of_partition(address: u32, size: u32, @"type": c_int, out_sha_256: [*c]u8) idf.esp_err_t;
+pub extern fn bootloader_common_get_sha256_of_partition(address: u32, size: u32, @"type": c_int, out_sha_256: [*c]u8) sys.esp_err_t;
 pub extern fn bootloader_common_get_active_otadata(two_otadata: [*c]esp_ota_select_entry_t) c_int;
 pub extern fn bootloader_common_select_otadata(two_otadata: [*c]const esp_ota_select_entry_t, valid_two_otadata: [*c]bool, max: bool) c_int;
 pub extern fn bootloader_common_get_chip_ver_pkg() u32;
-pub extern fn bootloader_common_check_chip_validity(img_hdr: ?*const esp_image_header_t, @"type": esp_image_type) idf.esp_err_t;
+pub extern fn bootloader_common_check_chip_validity(img_hdr: ?*const esp_image_header_t, @"type": esp_image_type) sys.esp_err_t;
 pub extern fn bootloader_common_vddsdio_configure() void;
 pub fn bootloader_util_regions_overlap(start1: isize, end1: isize, start2: isize, end2: isize) callconv(.C) bool {
     return (end1 > start2) and (end2 > start1);
@@ -512,26 +512,26 @@ pub extern fn ets_secure_boot_revoke_public_key_digest(index: c_int) void;
 pub fn esp_secure_boot_enabled() callconv(.C) bool {
     return efuse_ll_get_secure_boot_v2_en();
 }
-pub extern fn esp_secure_boot_generate_digest() idf.esp_err_t;
-pub extern fn esp_secure_boot_permanently_enable() idf.esp_err_t;
-pub extern fn esp_secure_boot_v2_permanently_enable(image_data: ?*const esp_image_metadata_t) idf.esp_err_t;
-pub extern fn esp_secure_boot_verify_signature(src_addr: u32, length: u32) idf.esp_err_t;
+pub extern fn esp_secure_boot_generate_digest() sys.esp_err_t;
+pub extern fn esp_secure_boot_permanently_enable() sys.esp_err_t;
+pub extern fn esp_secure_boot_v2_permanently_enable(image_data: ?*const esp_image_metadata_t) sys.esp_err_t;
+pub extern fn esp_secure_boot_verify_signature(src_addr: u32, length: u32) sys.esp_err_t;
 pub const esp_secure_boot_sig_block_t = extern struct {
     version: u32 = std.mem.zeroes(u32),
     signature: [64]u8 = std.mem.zeroes([64]u8),
 };
-pub extern fn esp_secure_boot_verify_ecdsa_signature_block(sig_block: [*c]const esp_secure_boot_sig_block_t, image_digest: [*:0]const u8, verified_digest: [*c]u8) idf.esp_err_t;
+pub extern fn esp_secure_boot_verify_ecdsa_signature_block(sig_block: [*c]const esp_secure_boot_sig_block_t, image_digest: [*:0]const u8, verified_digest: [*c]u8) sys.esp_err_t;
 pub const esp_image_sig_public_key_digests_t = extern struct {
     key_digests: [3][32]u8 = std.mem.zeroes([3][32]u8),
     num_digests: c_uint = std.mem.zeroes(c_uint),
 };
-pub extern fn esp_secure_boot_verify_signature_block(sig_block: [*c]const esp_secure_boot_sig_block_t, image_digest: [*:0]const u8) idf.esp_err_t;
+pub extern fn esp_secure_boot_verify_signature_block(sig_block: [*c]const esp_secure_boot_sig_block_t, image_digest: [*:0]const u8) sys.esp_err_t;
 pub const esp_secure_boot_iv_digest_t = extern struct {
     iv: [128]u8 = std.mem.zeroes([128]u8),
     digest: [64]u8 = std.mem.zeroes([64]u8),
 };
 pub extern fn esp_secure_boot_init_checks() void;
-pub extern fn esp_secure_boot_enable_secure_features() idf.esp_err_t;
+pub extern fn esp_secure_boot_enable_secure_features() sys.esp_err_t;
 pub extern fn esp_secure_boot_cfg_verify_release_mode() bool;
 pub const bootloader_state_t = extern struct {
     ota_info: esp_partition_pos_t = std.mem.zeroes(esp_partition_pos_t),
@@ -543,13 +543,13 @@ pub const bootloader_state_t = extern struct {
 };
 pub extern fn flash_encrypt(bs: [*c]bootloader_state_t) bool;
 pub extern var bootloader_image_hdr: esp_image_header_t;
-pub extern fn bootloader_read_bootloader_header() idf.esp_err_t;
-pub extern fn bootloader_check_bootloader_validity() idf.esp_err_t;
+pub extern fn bootloader_read_bootloader_header() sys.esp_err_t;
+pub extern fn bootloader_check_bootloader_validity() sys.esp_err_t;
 pub extern fn bootloader_clear_bss_section() void;
 pub extern fn bootloader_config_wdt() void;
 pub extern fn bootloader_enable_random() void;
 pub extern fn bootloader_print_banner() void;
-pub extern fn bootloader_init() idf.esp_err_t;
+pub extern fn bootloader_init() sys.esp_err_t;
 
 const unnamed_4 = opaque {};
 pub const efuse_pgm_data0_reg_t = extern union {

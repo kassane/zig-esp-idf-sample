@@ -1,5 +1,5 @@
 const std = @import("std");
-const idf = @import("sys");
+const sys = @import("sys");
 
 pub const esp_transport_keepalive = extern struct {
     keep_alive_enable: bool = std.mem.zeroes(bool),
@@ -28,14 +28,14 @@ pub const esp_tcp_transport_err_t = enum(c_int) {
     ERR_TCP_TRANSPORT_CONNECTION_TIMEOUT = 0,
 };
 pub extern fn esp_transport_list_init() esp_transport_list_handle_t;
-pub extern fn esp_transport_list_destroy(list: esp_transport_list_handle_t) idf.esp_err_t;
-pub extern fn esp_transport_list_add(list: esp_transport_list_handle_t, t: esp_transport_handle_t, scheme: [*:0]const u8) idf.esp_err_t;
-pub extern fn esp_transport_list_clean(list: esp_transport_list_handle_t) idf.esp_err_t;
+pub extern fn esp_transport_list_destroy(list: esp_transport_list_handle_t) sys.esp_err_t;
+pub extern fn esp_transport_list_add(list: esp_transport_list_handle_t, t: esp_transport_handle_t, scheme: [*:0]const u8) sys.esp_err_t;
+pub extern fn esp_transport_list_clean(list: esp_transport_list_handle_t) sys.esp_err_t;
 pub extern fn esp_transport_list_get_transport(list: esp_transport_list_handle_t, scheme: [*:0]const u8) esp_transport_handle_t;
 pub extern fn esp_transport_init() esp_transport_handle_t;
-pub extern fn esp_transport_destroy(t: esp_transport_handle_t) idf.esp_err_t;
+pub extern fn esp_transport_destroy(t: esp_transport_handle_t) sys.esp_err_t;
 pub extern fn esp_transport_get_default_port(t: esp_transport_handle_t) c_int;
-pub extern fn esp_transport_set_default_port(t: esp_transport_handle_t, port: c_int) idf.esp_err_t;
+pub extern fn esp_transport_set_default_port(t: esp_transport_handle_t, port: c_int) sys.esp_err_t;
 pub extern fn esp_transport_connect(t: esp_transport_handle_t, host: [*:0]const u8, port: c_int, timeout_ms: c_int) c_int;
 pub extern fn esp_transport_connect_async(t: esp_transport_handle_t, host: [*:0]const u8, port: c_int, timeout_ms: c_int) c_int;
 pub extern fn esp_transport_read(t: esp_transport_handle_t, buffer: [*:0]u8, len: c_int, timeout_ms: c_int) c_int;
@@ -45,13 +45,13 @@ pub extern fn esp_transport_poll_write(t: esp_transport_handle_t, timeout_ms: c_
 pub extern fn esp_transport_close(t: esp_transport_handle_t) c_int;
 pub extern fn esp_transport_get_context_data(t: esp_transport_handle_t) ?*anyopaque;
 pub extern fn esp_transport_get_payload_transport_handle(t: esp_transport_handle_t) esp_transport_handle_t;
-pub extern fn esp_transport_set_context_data(t: esp_transport_handle_t, data: ?*anyopaque) idf.esp_err_t;
-pub extern fn esp_transport_set_func(t: esp_transport_handle_t, _connect: connect_func, _read: io_read_func, _write: io_func, _close: trans_func, _poll_read: poll_func, _poll_write: poll_func, _destroy: trans_func) idf.esp_err_t;
-pub extern fn esp_transport_set_async_connect_func(t: esp_transport_handle_t, _connect_async_func: connect_async_func) idf.esp_err_t;
-pub extern fn esp_transport_set_parent_transport_func(t: esp_transport_handle_t, _parent_transport: payload_transfer_func) idf.esp_err_t;
+pub extern fn esp_transport_set_context_data(t: esp_transport_handle_t, data: ?*anyopaque) sys.esp_err_t;
+pub extern fn esp_transport_set_func(t: esp_transport_handle_t, _connect: connect_func, _read: io_read_func, _write: io_func, _close: trans_func, _poll_read: poll_func, _poll_write: poll_func, _destroy: trans_func) sys.esp_err_t;
+pub extern fn esp_transport_set_async_connect_func(t: esp_transport_handle_t, _connect_async_func: connect_async_func) sys.esp_err_t;
+pub extern fn esp_transport_set_parent_transport_func(t: esp_transport_handle_t, _parent_transport: payload_transfer_func) sys.esp_err_t;
 pub extern fn esp_transport_get_error_handle(t: esp_transport_handle_t) esp_tls_error_handle_t;
 pub extern fn esp_transport_get_errno(t: esp_transport_handle_t) c_int;
-pub extern fn esp_transport_translate_error(@"error": esp_tcp_transport_err_t) idf.esp_err_t;
+pub extern fn esp_transport_translate_error(@"error": esp_tcp_transport_err_t) sys.esp_err_t;
 pub const esp_mqtt_client = opaque {};
 pub const esp_mqtt_client_handle_t = ?*esp_mqtt_client;
 pub const esp_mqtt_event_id_t = enum(c_int) {
@@ -95,7 +95,7 @@ pub const esp_mqtt_protocol_ver_t = enum(c_uint) {
     MQTT_PROTOCOL_V_5 = 3,
 };
 pub const esp_mqtt_error_codes = extern struct {
-    esp_tls_last_esp_err: idf.esp_err_t = std.mem.zeroes(idf.esp_err_t),
+    esp_tls_last_esp_err: sys.esp_err_t = std.mem.zeroes(sys.esp_err_t),
     esp_tls_stack_err: c_int = std.mem.zeroes(c_int),
     esp_tls_cert_verify_flags: c_int = std.mem.zeroes(c_int),
     error_type: esp_mqtt_error_type_t = .MQTT_ERROR_TYPE_NONE,
@@ -131,7 +131,7 @@ pub const address_t_5 = extern struct {
 pub const psk_key_hint_7 = opaque {};
 pub const verification_t_6 = extern struct {
     use_global_ca_store: bool = false,
-    crt_bundle_attach: ?*const fn (?*anyopaque) callconv(.C) idf.esp_err_t = null,
+    crt_bundle_attach: ?*const fn (?*anyopaque) callconv(.C) sys.esp_err_t = null,
     certificate: [*:0]const u8 = "",
     certificate_len: usize = std.mem.zeroes(usize),
     psk_hint_key: ?*const psk_key_hint_7 = std.mem.zeroes(?*const psk_key_hint_7),
@@ -210,22 +210,22 @@ pub const topic_t = extern struct {
 };
 pub const esp_mqtt_topic_t = topic_t;
 pub extern fn esp_mqtt_client_init(config: [*c]const esp_mqtt_client_config_t) esp_mqtt_client_handle_t;
-pub extern fn esp_mqtt_client_set_uri(client: esp_mqtt_client_handle_t, uri: [*:0]const u8) idf.esp_err_t;
-pub extern fn esp_mqtt_client_start(client: esp_mqtt_client_handle_t) idf.esp_err_t;
-pub extern fn esp_mqtt_client_reconnect(client: esp_mqtt_client_handle_t) idf.esp_err_t;
-pub extern fn esp_mqtt_client_disconnect(client: esp_mqtt_client_handle_t) idf.esp_err_t;
-pub extern fn esp_mqtt_client_stop(client: esp_mqtt_client_handle_t) idf.esp_err_t;
+pub extern fn esp_mqtt_client_set_uri(client: esp_mqtt_client_handle_t, uri: [*:0]const u8) sys.esp_err_t;
+pub extern fn esp_mqtt_client_start(client: esp_mqtt_client_handle_t) sys.esp_err_t;
+pub extern fn esp_mqtt_client_reconnect(client: esp_mqtt_client_handle_t) sys.esp_err_t;
+pub extern fn esp_mqtt_client_disconnect(client: esp_mqtt_client_handle_t) sys.esp_err_t;
+pub extern fn esp_mqtt_client_stop(client: esp_mqtt_client_handle_t) sys.esp_err_t;
 pub extern fn esp_mqtt_client_subscribe_single(client: esp_mqtt_client_handle_t, topic: [*:0]const u8, qos: c_int) c_int;
 pub extern fn esp_mqtt_client_subscribe_multiple(client: esp_mqtt_client_handle_t, topic_list: [*c]const esp_mqtt_topic_t, size: c_int) c_int;
 pub extern fn esp_mqtt_client_unsubscribe(client: esp_mqtt_client_handle_t, topic: [*:0]const u8) c_int;
 pub extern fn esp_mqtt_client_publish(client: esp_mqtt_client_handle_t, topic: [*:0]const u8, data: [*:0]const u8, len: c_int, qos: c_int, retain: c_int) c_int;
 pub extern fn esp_mqtt_client_enqueue(client: esp_mqtt_client_handle_t, topic: [*:0]const u8, data: [*:0]const u8, len: c_int, qos: c_int, retain: c_int, store: bool) c_int;
-pub extern fn esp_mqtt_client_destroy(client: esp_mqtt_client_handle_t) idf.esp_err_t;
-pub extern fn esp_mqtt_set_config(client: esp_mqtt_client_handle_t, config: [*c]const esp_mqtt_client_config_t) idf.esp_err_t;
-pub extern fn esp_mqtt_client_register_event(client: esp_mqtt_client_handle_t, event: esp_mqtt_event_id_t, event_handler: idf.esp_event_handler_t, event_handler_arg: ?*anyopaque) idf.esp_err_t;
-pub extern fn esp_mqtt_client_unregister_event(client: esp_mqtt_client_handle_t, event: esp_mqtt_event_id_t, event_handler: idf.esp_event_handler_t) idf.esp_err_t;
+pub extern fn esp_mqtt_client_destroy(client: esp_mqtt_client_handle_t) sys.esp_err_t;
+pub extern fn esp_mqtt_set_config(client: esp_mqtt_client_handle_t, config: [*c]const esp_mqtt_client_config_t) sys.esp_err_t;
+pub extern fn esp_mqtt_client_register_event(client: esp_mqtt_client_handle_t, event: esp_mqtt_event_id_t, event_handler: sys.esp_event_handler_t, event_handler_arg: ?*anyopaque) sys.esp_err_t;
+pub extern fn esp_mqtt_client_unregister_event(client: esp_mqtt_client_handle_t, event: esp_mqtt_event_id_t, event_handler: sys.esp_event_handler_t) sys.esp_err_t;
 pub extern fn esp_mqtt_client_get_outbox_size(client: esp_mqtt_client_handle_t) c_int;
-pub extern fn esp_mqtt_dispatch_custom_event(client: esp_mqtt_client_handle_t, event: [*c]esp_mqtt_event_t) idf.esp_err_t;
+pub extern fn esp_mqtt_dispatch_custom_event(client: esp_mqtt_client_handle_t, event: [*c]esp_mqtt_event_t) sys.esp_err_t;
 pub const esp_mqtt5_client_handle_t = ?*esp_mqtt_client;
 pub const mqtt5_error_reason_code = enum(c_uint) {
     MQTT5_UNSPECIFIED_ERROR = 128,
@@ -332,12 +332,12 @@ pub const esp_mqtt5_user_property_item_t = extern struct {
     key: [*:0]const u8 = "",
     value: [*:0]const u8 = "",
 };
-pub extern fn esp_mqtt5_client_set_connect_property(client: esp_mqtt5_client_handle_t, connect_property: [*c]const esp_mqtt5_connection_property_config_t) idf.esp_err_t;
-pub extern fn esp_mqtt5_client_set_publish_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_publish_property_config_t) idf.esp_err_t;
-pub extern fn esp_mqtt5_client_set_subscribe_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_subscribe_property_config_t) idf.esp_err_t;
-pub extern fn esp_mqtt5_client_set_unsubscribe_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_unsubscribe_property_config_t) idf.esp_err_t;
-pub extern fn esp_mqtt5_client_set_disconnect_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_disconnect_property_config_t) idf.esp_err_t;
-pub extern fn esp_mqtt5_client_set_user_property(user_property: [*c]mqtt5_user_property_handle_t, item: [*c]esp_mqtt5_user_property_item_t, item_num: u8) idf.esp_err_t;
-pub extern fn esp_mqtt5_client_get_user_property(user_property: mqtt5_user_property_handle_t, item: [*c]esp_mqtt5_user_property_item_t, item_num: [*:0]u8) idf.esp_err_t;
+pub extern fn esp_mqtt5_client_set_connect_property(client: esp_mqtt5_client_handle_t, connect_property: [*c]const esp_mqtt5_connection_property_config_t) sys.esp_err_t;
+pub extern fn esp_mqtt5_client_set_publish_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_publish_property_config_t) sys.esp_err_t;
+pub extern fn esp_mqtt5_client_set_subscribe_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_subscribe_property_config_t) sys.esp_err_t;
+pub extern fn esp_mqtt5_client_set_unsubscribe_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_unsubscribe_property_config_t) sys.esp_err_t;
+pub extern fn esp_mqtt5_client_set_disconnect_property(client: esp_mqtt5_client_handle_t, property: [*c]const esp_mqtt5_disconnect_property_config_t) sys.esp_err_t;
+pub extern fn esp_mqtt5_client_set_user_property(user_property: [*c]mqtt5_user_property_handle_t, item: [*c]esp_mqtt5_user_property_item_t, item_num: u8) sys.esp_err_t;
+pub extern fn esp_mqtt5_client_get_user_property(user_property: mqtt5_user_property_handle_t, item: [*c]esp_mqtt5_user_property_item_t, item_num: [*:0]u8) sys.esp_err_t;
 pub extern fn esp_mqtt5_client_get_user_property_count(user_property: mqtt5_user_property_handle_t) u8;
 pub extern fn esp_mqtt5_client_delete_user_property(user_property: mqtt5_user_property_handle_t) void;

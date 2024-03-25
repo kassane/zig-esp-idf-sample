@@ -1,4 +1,4 @@
-const idf = @import("sys");
+const sys = @import("sys");
 const std = @import("std");
 
 // Zig error
@@ -25,7 +25,7 @@ const esp_error = error{
 };
 
 // C to Zig error
-pub fn espError(err: idf.esp_err_t) esp_error!idf.esp_err_t {
+pub fn espError(err: sys.esp_err_t) esp_error!sys.esp_err_t {
     return switch (err) {
         .ESP_FAIL => esp_error.Fail,
         .ESP_ERR_NO_MEM => esp_error.ErrorNoMem,
@@ -50,7 +50,7 @@ pub fn espError(err: idf.esp_err_t) esp_error!idf.esp_err_t {
     };
 }
 
-pub fn espCheckError(errc: idf.esp_err_t) esp_error!void {
-    if (try espError(errc) == idf.esp_err_t.ESP_OK)
+pub fn espCheckError(errc: sys.esp_err_t) esp_error!void {
+    if (try espError(errc) == sys.esp_err_t.ESP_OK)
         return;
 }

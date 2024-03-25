@@ -127,7 +127,7 @@ pub fn deepSleepWakeupEnable(gpio_num: sys.gpio_num_t, intr_type: sys.gpio_int_t
 pub fn deepSleepWakeupDisable(gpio_num: sys.gpio_num_t) !void {
     return try errors.espCheckError(sys.gpio_deep_sleep_wakeup_disable(gpio_num));
 }
-pub fn dumpIOConfiguration(out_stream: std.c.FILE, io_bit_mask: u64) !void {
+pub fn dumpIOConfiguration(out_stream: ?*std.c.FILE, io_bit_mask: u64) !void {
     return try errors.espCheckError(sys.gpio_dump_io_configuration(out_stream, io_bit_mask));
 }
 
@@ -174,7 +174,7 @@ pub const ETM = struct {
     pub fn delTask(task: sys.esp_etm_task_handle_t) !void {
         return try errors.espCheckError(sys.esp_etm_del_task(task));
     }
-    pub fn dump(out_stream: std.c.FILE) !void {
+    pub fn dump(out_stream: ?*std.c.FILE) !void {
         return try errors.espCheckError(sys.esp_etm_dump(out_stream));
     }
 };

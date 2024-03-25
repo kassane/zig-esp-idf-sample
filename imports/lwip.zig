@@ -1,5 +1,5 @@
 const std = @import("std");
-const idf = @import("sys");
+const sys = @import("sys");
 
 pub const pollfd = extern struct {
     fd: c_int = std.mem.zeroes(c_int),
@@ -14,11 +14,11 @@ pub extern fn sntp_get_system_time(sec: [*c]u32, us: [*c]u32) void;
 pub const lwip_sock = opaque {};
 pub extern fn lwip_setsockopt_impl_ext(sock: ?*lwip_sock, level: c_int, optname: c_int, optval: ?*const anyopaque, optlen: u32, err: [*c]c_int) bool;
 pub extern fn lwip_getsockopt_impl_ext(sock: ?*lwip_sock, level: c_int, optname: c_int, optval: ?*anyopaque, optlen: [*c]u32, err: [*c]c_int) bool;
-pub const sys_sem_t = idf.SemaphoreHandle_t;
-pub const sys_mutex_t = idf.SemaphoreHandle_t;
-pub const sys_thread_t = idf.TaskHandle_t;
+pub const sys_sem_t = sys.SemaphoreHandle_t;
+pub const sys_mutex_t = sys.SemaphoreHandle_t;
+pub const sys_thread_t = sys.TaskHandle_t;
 pub const sys_mbox_s = extern struct {
-    os_mbox: idf.QueueHandle_t = std.mem.zeroes(idf.QueueHandle_t),
+    os_mbox: sys.QueueHandle_t = std.mem.zeroes(sys.QueueHandle_t),
     owner: ?*anyopaque = null,
 };
 pub const sys_mbox_t = [*c]sys_mbox_s;

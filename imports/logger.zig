@@ -1,5 +1,5 @@
 const std = @import("std");
-const idf = @import("sys");
+const sys = @import("sys");
 
 pub fn espLogFn(
     comptime level: std.log.Level,
@@ -22,14 +22,14 @@ pub fn espLogFn(
     const prefix = default_color ++ "[" ++ comptime level.asText() ++ "] " ++ scope_prefix;
     ESP_LOG(allocator, "logging", prefix ++ format ++ "\n", args);
 }
-pub const default_level: idf.esp_log_level_t = switch (@import("builtin").mode) {
+pub const default_level: sys.esp_log_level_t = switch (@import("builtin").mode) {
     .Debug => .ESP_LOG_DEBUG,
     .ReleaseSafe => .ESP_LOG_INFO,
     .ReleaseFast, .ReleaseSmall => .ESP_LOG_ERROR,
 };
 pub fn ESP_LOG(allocator: std.mem.Allocator, comptime tag: [*:0]const u8, comptime fmt: []const u8, args: anytype) void {
     const buffer = std.fmt.allocPrintZ(allocator, fmt, args) catch |err| @panic(@errorName(err));
-    idf.esp_log_write(default_level, tag, buffer, idf.esp_log_timestamp(), tag);
+    sys.esp_log_write(default_level, tag, buffer, sys.esp_log_timestamp(), tag);
 }
 pub const default_color = switch (default_level) {
     .ESP_LOG_DEBUG => LOG_COLOR(LOG_COLOR_BLUE),
