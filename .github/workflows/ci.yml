@@ -21,4 +21,5 @@ jobs:
       - uses: wokwi/wokwi-ci-action@v1
         with:
           token: ${{ secrets.WOKWI_CI_TOKEN }}
+          timeout: 10000
           expect_text: 'Hello, world from Zig!'
