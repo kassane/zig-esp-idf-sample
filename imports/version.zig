@@ -27,7 +27,7 @@ pub const Version = struct {
                 continue;
             const digit = std.fmt.parseUnsigned(u32, token, 10) catch |err|
                 @panic(@errorName(err));
-            if (digit != final_version.minor) {
+            if (digit != final_version.minor and final_version.minor == 0) {
                 final_version.minor = digit;
                 continue;
             }
