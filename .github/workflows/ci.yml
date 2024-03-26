@@ -1,4 +1,4 @@
-name: CI Build
+name: Wokwi-CI Build
 
 on: [push]
 
@@ -8,11 +8,19 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu-latest]
-        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32p4]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6]
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
       - uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v5.2
+          esp_idf_version: v5.2.1
           target: ${{ matrix.target }}
+      - name: Copy diagram ${{ matrix.target }}
+        run: |
+          cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+      - uses: wokwi/wokwi-ci-action@v1
+        with:
+          token: ${{ secrets.WOKWI_CI_TOKEN }}
+          timeout: 5000
+          expect_text: 'Hello, world from Zig!'

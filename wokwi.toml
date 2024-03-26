@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+elf = "build/zig-sample-idf.elf"
+firmware = "build/zig-sample-idf.bin"
