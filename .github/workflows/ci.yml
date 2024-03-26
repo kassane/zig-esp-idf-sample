@@ -1,4 +1,4 @@
-name: CI Build
+name: Wokwi-CI Build
 
 on: [push]
 
