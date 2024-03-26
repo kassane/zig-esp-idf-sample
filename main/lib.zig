@@ -22,7 +22,7 @@ export fn app_main() callconv(.C) void {
         \\
         \\[Zig Info]
         \\* Version: {s}
-        \\* Stage: {s}
+        \\* Compiler Backend: {s}
         \\
     , .{
         builtin.zig_version_string,
