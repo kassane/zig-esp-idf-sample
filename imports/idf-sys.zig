@@ -5319,7 +5319,7 @@ pub const wifi_init_config_t = extern struct {
 };
 pub extern const g_wifi_default_wpa_crypto_funcs: wpa_crypto_funcs_t;
 pub extern var g_wifi_osi_funcs: wifi_osi_funcs_t;
-pub extern fn esp_wifi_init(config: [*c]const wifi_init_config_t) esp_err_t;
+pub extern fn esp_wifi_init(config: ?*const wifi_init_config_t) esp_err_t;
 pub extern fn esp_wifi_deinit() esp_err_t;
 pub extern fn esp_wifi_set_mode(mode: wifi_mode_t) esp_err_t;
 pub extern fn esp_wifi_get_mode(mode: [*c]wifi_mode_t) esp_err_t;
@@ -5340,7 +5340,7 @@ pub extern fn esp_wifi_sta_get_ap_info(ap_info: ?*wifi_ap_record_t) esp_err_t;
 pub extern fn esp_wifi_set_ps(@"type": wifi_ps_type_t) esp_err_t;
 pub extern fn esp_wifi_get_ps(@"type": [*c]wifi_ps_type_t) esp_err_t;
 pub extern fn esp_wifi_set_protocol(ifx: wifi_interface_t, protocol_bitmap: u8) esp_err_t;
-pub extern fn esp_wifi_get_protocol(ifx: wifi_interface_t, protocol_bitmap: [*c]u8) esp_err_t;
+pub extern fn esp_wifi_get_protocol(ifx: wifi_interface_t, protocol_bitmap: [*:0]u8) esp_err_t;
 pub extern fn esp_wifi_set_bandwidth(ifx: wifi_interface_t, bw: wifi_bandwidth_t) esp_err_t;
 pub extern fn esp_wifi_get_bandwidth(ifx: wifi_interface_t, bw: [*c]wifi_bandwidth_t) esp_err_t;
 pub extern fn esp_wifi_set_channel(primary: u8, second: wifi_second_chan_t) esp_err_t;
@@ -5348,7 +5348,7 @@ pub extern fn esp_wifi_get_channel(primary: [*c]u8, second: [*c]wifi_second_chan
 pub extern fn esp_wifi_set_country(country: [*c]const wifi_country_t) esp_err_t;
 pub extern fn esp_wifi_get_country(country: [*c]wifi_country_t) esp_err_t;
 pub extern fn esp_wifi_set_mac(ifx: wifi_interface_t, mac: [*:0]const u8) esp_err_t;
-pub extern fn esp_wifi_get_mac(ifx: wifi_interface_t, mac: [*c]u8) esp_err_t;
+pub extern fn esp_wifi_get_mac(ifx: wifi_interface_t, mac: [*:0]u8) esp_err_t;
 pub const wifi_promiscuous_cb_t = ?*const fn (?*anyopaque, wifi_promiscuous_pkt_type_t) callconv(.C) void;
 pub extern fn esp_wifi_set_promiscuous_rx_cb(cb: wifi_promiscuous_cb_t) esp_err_t;
 pub extern fn esp_wifi_set_promiscuous(en: bool) esp_err_t;
