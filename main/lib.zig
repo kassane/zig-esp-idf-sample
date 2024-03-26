@@ -19,7 +19,6 @@ export fn app_main() callconv(.C) void {
     log.info("Hello, world from Zig!", .{});
 
     log.info(
-        \\
         \\[Zig Info]
         \\* Version: {s}
         \\* Compiler Backend: {s}
@@ -30,7 +29,6 @@ export fn app_main() callconv(.C) void {
     });
 
     idf.ESP_LOG(allocator, tag,
-        \\
         \\[ESP-IDF Info]
         \\* Version: {s}
         \\
@@ -39,7 +37,6 @@ export fn app_main() callconv(.C) void {
     idf.ESP_LOG(
         allocator,
         tag,
-        \\
         \\[Memory Info]
         \\* Total: {d}
         \\* Free: {d}
@@ -56,31 +53,15 @@ export fn app_main() callconv(.C) void {
     idf.ESP_LOG(
         allocator,
         tag,
-        "\nLet's have a look at your shiny {s} - {s} system! :)\n\n",
+        "Let's have a look at your shiny {s} - {s} system! :)\n\n",
         .{
             @tagName(builtin.cpu.arch),
             builtin.cpu.model.name,
         },
     );
 
-    var arr = std.ArrayList(c_int).init(allocator);
-    defer arr.deinit();
+    arraylist(allocator) catch unreachable;
 
-    arr.append(10) catch |err|
-        @panic(@errorName(err));
-    arr.append(20) catch |err|
-        @panic(@errorName(err));
-    arr.append(30) catch |err|
-        @panic(@errorName(err));
-
-    for (arr.items) |index| {
-        idf.ESP_LOG(
-            allocator,
-            tag,
-            "Arr value: {}\n",
-            .{index},
-        );
-    }
     if (builtin.mode == .Debug)
         heap.dump();
 
@@ -98,21 +79,38 @@ export fn app_main() callconv(.C) void {
 
 // comptime function
 fn blinkLED(delay_ms: u32) !void {
-    try idf.gpio.setDirection(
+    try idf.gpio.Direction.set(
         .GPIO_NUM_18,
         .GPIO_MODE_OUTPUT,
     );
     while (true) {
         log.info("LED: ON", .{});
-        try idf.gpio.setLevel(.GPIO_NUM_18, 1);
+        try idf.gpio.Level.set(.GPIO_NUM_18, 1);
 
         idf.vTaskDelay(delay_ms / idf.portTICK_PERIOD_MS);
 
         log.info("LED: OFF", .{});
-        try idf.gpio.setLevel(.GPIO_NUM_18, 0);
+        try idf.gpio.Level.set(.GPIO_NUM_18, 0);
     }
 }
 
+fn arraylist(allocator: std.mem.Allocator) !void {
+    var arr = std.ArrayList(u32).init(allocator);
+    defer arr.deinit();
+
+    try arr.append(10);
+    try arr.append(20);
+    try arr.append(30);
+
+    for (arr.items) |index| {
+        idf.ESP_LOG(
+            allocator,
+            tag,
+            "Arr value: {}\n",
+            .{index},
+        );
+    }
+}
 // Task functions (must be exported to C ABI) - runtime functions
 export fn blinkclock(_: ?*anyopaque) void {
     blinkLED(1000) catch |err|
@@ -134,7 +132,6 @@ export fn bar(_: ?*anyopaque) callconv(.C) void {
 
 // override the std panic function with idf.panic
 pub const panic = idf.panic;
-
 const log = std.log.scoped(.@"esp-idf");
 pub const std_options = .{
     .log_level = switch (builtin.mode) {

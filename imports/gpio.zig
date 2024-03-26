@@ -34,15 +34,22 @@ pub fn intrDisable(gpio_num: sys.gpio_num_t) !void {
     return try errors.espCheckError(sys.gpio_intr_disable(gpio_num));
 }
 
-pub fn setLevel(gpio_num: sys.gpio_num_t, level: u32) !void {
-    return try errors.espCheckError(sys.gpio_set_level(gpio_num, level));
-}
-pub fn getLevel(gpio_num: sys.gpio_num_t) bool {
-    return @as(bool, sys.gpio_get_level(gpio_num));
-}
-pub fn setDirection(gpio_num: sys.gpio_num_t, mode: sys.gpio_mode_t) !void {
-    return try errors.espCheckError(sys.gpio_set_direction(gpio_num, mode));
-}
+pub const Level = struct {
+    pub fn set(gpio_num: sys.gpio_num_t, level: u32) !void {
+        return try errors.espCheckError(sys.gpio_set_level(gpio_num, level));
+    }
+    pub fn get(gpio_num: sys.gpio_num_t) bool {
+        return @as(bool, sys.gpio_get_level(gpio_num));
+    }
+};
+pub const Direction = struct {
+    pub fn set(gpio_num: sys.gpio_num_t, mode: sys.gpio_mode_t) !void {
+        return try errors.espCheckError(sys.gpio_set_direction(gpio_num, mode));
+    }
+    pub fn sleepSet(gpio_num: sys.gpio_num_t, mode: sys.gpio_mode_t) !void {
+        return try errors.espCheckError(sys.gpio_sleep_set_direction(gpio_num, mode));
+    }
+};
 pub fn setPullMode(gpio_num: sys.gpio_num_t, pull: sys.gpio_pull_mode_t) !void {
     return try errors.espCheckError(sys.gpio_set_pull_mode(gpio_num, pull));
 }
@@ -55,18 +62,20 @@ pub fn wakeupDisable(gpio_num: sys.gpio_num_t) !void {
 pub fn isrRegister(@"fn": ?*const fn (?*anyopaque) callconv(.C) void, arg: ?*anyopaque, intr_alloc_flags: c_int, handle: [*c]sys.gpio_isr_handle_t) !void {
     return try errors.espCheckError(sys.gpio_isr_register(@"fn", arg, intr_alloc_flags, handle));
 }
-pub fn pullupEn(gpio_num: sys.gpio_num_t) !void {
-    return try errors.espCheckError(sys.gpio_pullup_en(gpio_num));
-}
-pub fn pullupDis(gpio_num: sys.gpio_num_t) !void {
-    return try errors.espCheckError(sys.gpio_pullup_dis(gpio_num));
-}
-pub fn pulldownEn(gpio_num: sys.gpio_num_t) !void {
-    return try errors.espCheckError(sys.gpio_pulldown_en(gpio_num));
-}
-pub fn pulldownDis(gpio_num: sys.gpio_num_t) !void {
-    return try errors.espCheckError(sys.gpio_pulldown_dis(gpio_num));
-}
+pub const PULL = struct {
+    pub fn upEn(gpio_num: sys.gpio_num_t) !void {
+        return try errors.espCheckError(sys.gpio_pullup_en(gpio_num));
+    }
+    pub fn upDis(gpio_num: sys.gpio_num_t) !void {
+        return try errors.espCheckError(sys.gpio_pullup_dis(gpio_num));
+    }
+    pub fn downEn(gpio_num: sys.gpio_num_t) !void {
+        return try errors.espCheckError(sys.gpio_pulldown_en(gpio_num));
+    }
+    pub fn downDis(gpio_num: sys.gpio_num_t) !void {
+        return try errors.espCheckError(sys.gpio_pulldown_dis(gpio_num));
+    }
+};
 pub fn installISRService(intr_alloc_flags: c_int) !void {
     return try errors.espCheckError(sys.gpio_install_isr_service(intr_alloc_flags));
 }
@@ -115,9 +124,6 @@ pub fn sleepSelEn(gpio_num: sys.gpio_num_t) !void {
 pub fn sleepSelDis(gpio_num: sys.gpio_num_t) !void {
     return try errors.espCheckError(sys.gpio_sleep_sel_dis(gpio_num));
 }
-pub fn sleepSetDirection(gpio_num: sys.gpio_num_t, mode: sys.gpio_mode_t) !void {
-    return try errors.espCheckError(sys.gpio_sleep_set_direction(gpio_num, mode));
-}
 pub fn sleepSetPullMode(gpio_num: sys.gpio_num_t, pull: sys.gpio_pull_mode_t) !void {
     return try errors.espCheckError(sys.gpio_sleep_set_pull_mode(gpio_num, pull));
 }
@@ -131,7 +137,7 @@ pub fn dumpIOConfiguration(out_stream: ?*std.c.FILE, io_bit_mask: u64) !void {
     return try errors.espCheckError(sys.gpio_dump_io_configuration(out_stream, io_bit_mask));
 }
 
-pub const Rom = struct {
+pub const ROM = struct {
     pub fn padSelectGPIO(iopad_num: u32) void {
         sys.esp_rom_gpio_pad_select_gpio(iopad_num);
     }

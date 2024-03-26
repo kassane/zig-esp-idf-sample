@@ -31,7 +31,7 @@ pub fn getMode(mode: [*c]sys.wifi_mode_t) !void {
 pub fn stop() !void {
     return try errors.espCheckError(sys.esp_wifi_stop());
 }
-pub fn sestore() !void {
+pub fn restore() !void {
     return try errors.espCheckError(sys.esp_wifi_restore());
 }
 pub fn connect() !void {
@@ -42,9 +42,6 @@ pub fn disconnect() !void {
 }
 pub fn clearFastConnect() !void {
     return try errors.espCheckError(sys.esp_wifi_clear_fast_connect());
-}
-pub fn deauthStation(aid: u16) !void {
-    return try errors.espCheckError(sys.esp_wifi_deauth_sta(aid));
 }
 pub const Scan = struct {
     pub fn start(config: [*c]const sys.wifi_scan_config_t, block: bool) !void {
@@ -63,42 +60,60 @@ pub const Scan = struct {
         return try errors.espCheckError(sys.esp_wifi_scan_get_ap_record(ap_record));
     }
 };
-pub fn wifiSet_ps(@"type": sys.wifi_ps_type_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_ps(@"type"));
-}
-pub fn wifiGet_ps(@"type": [*c]sys.wifi_ps_type_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_ps(@"type"));
-}
-pub fn wifiSet_protocol(ifx: sys.wifi_interface_t, protocol_bitmap: u8) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_protocol(ifx, protocol_bitmap));
-}
-pub fn wifiGet_protocol(ifx: sys.wifi_interface_t, protocol_bitmap: [*:0]u8) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_protocol(ifx, protocol_bitmap));
-}
-pub fn wifiSet_bandwidth(ifx: sys.wifi_interface_t, bw: sys.wifi_bandwidth_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_bandwidth(ifx, bw));
-}
-pub fn wifiGet_bandwidth(ifx: sys.wifi_interface_t, bw: [*c]sys.wifi_bandwidth_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_bandwidth(ifx, bw));
-}
-pub fn wifiSet_channel(primary: u8, second: sys.wifi_second_chan_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_channel(primary, second));
-}
-pub fn wifiGet_channel(primary: [*c]u8, second: [*c]sys.wifi_second_chan_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_channel(primary, second));
-}
-pub fn wifiSet_country(country: [*c]const sys.wifi_country_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_country(country));
-}
-pub fn wifiGet_country(country: [*c]sys.wifi_country_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_country(country));
-}
-pub fn wifiSet_mac(ifx: sys.wifi_interface_t, mac: [*:0]const u8) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_mac(ifx, mac));
-}
-pub fn wifiGet_mac(ifx: sys.wifi_interface_t, mac: [*:0]u8) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_mac(ifx, mac));
-}
+pub const PowerSave = struct {
+    pub fn set(@"type": sys.wifi_ps_type_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_ps(@"type"));
+    }
+    pub fn get(@"type": [*c]sys.wifi_ps_type_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_ps(@"type"));
+    }
+};
+pub const Protocol = struct {
+    pub fn set(ifx: sys.wifi_interface_t, protocol_bitmap: u8) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_protocol(ifx, protocol_bitmap));
+    }
+    pub fn get(ifx: sys.wifi_interface_t, protocol_bitmap: [*:0]u8) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_protocol(ifx, protocol_bitmap));
+    }
+};
+pub const Bandwidth = struct {
+    pub fn set(ifx: sys.wifi_interface_t, bw: sys.wifi_bandwidth_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_bandwidth(ifx, bw));
+    }
+    pub fn get(ifx: sys.wifi_interface_t, bw: [*c]sys.wifi_bandwidth_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_bandwidth(ifx, bw));
+    }
+};
+pub const Channel = struct {
+    pub fn set(primary: u8, second: sys.wifi_second_chan_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_channel(primary, second));
+    }
+    pub fn get(primary: [*c]u8, second: [*c]sys.wifi_second_chan_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_channel(primary, second));
+    }
+};
+pub const Country = struct {
+    pub fn set(country: [*c]const sys.wifi_country_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_country(country));
+    }
+    pub fn get(country: [*c]sys.wifi_country_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_country(country));
+    }
+    pub fn setCode(country: [*:0]const u8, ieee80211d_enabled: bool) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_country_code(country, ieee80211d_enabled));
+    }
+    pub fn getCode(country: [*:0]u8) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_country_code(country));
+    }
+};
+pub const MAC = struct {
+    pub fn set(ifx: sys.wifi_interface_t, mac: [*:0]const u8) !void {
+        return try errors.espCheckError(sys.esp_wifi_set_mac(ifx, mac));
+    }
+    pub fn get(ifx: sys.wifi_interface_t, mac: [*:0]u8) !void {
+        return try errors.espCheckError(sys.esp_wifi_get_mac(ifx, mac));
+    }
+};
 pub const Promiscuous = struct {
     pub const promiscuous_callback_type = sys.wifi_promiscuous_cb_t;
     pub fn setRXCallback(cb: sys.wifi_promiscuous_cb_t) !void {
@@ -216,12 +231,6 @@ pub fn forceWakeupAcquire() !void {
 pub fn forceWakeupRelease() !void {
     return try errors.espCheckError(sys.esp_wifi_force_wakeup_release());
 }
-pub fn setCountryCode(country: [*:0]const u8, ieee80211d_enabled: bool) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_country_code(country, ieee80211d_enabled));
-}
-pub fn getCountryCode(country: [*c]u8) !void {
-    return try errors.espCheckError(sys.esp_wifi_get_country_code(country));
-}
 pub fn config80211TXRate(ifx: sys.wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
     return try errors.espCheckError(sys.esp_wifi_config_80211_tx_rate(ifx, rate));
 }
@@ -247,11 +256,14 @@ pub const Station = struct {
     pub fn getNegotiatedPHYMode(phymode: [*c]sys.wifi_phy_mode_t) !void {
         return try errors.espCheckError(sys.esp_wifi_sta_get_negotiated_phymode(phymode));
     }
+    pub fn deauth(aid: u16) !void {
+        return try errors.espCheckError(sys.esp_wifi_deauth_sta(aid));
+    }
     pub const AP = struct {
-        pub fn getStationList(sta: ?*sys.wifi_sta_list_t) !void {
+        pub fn getList(sta: ?*sys.wifi_sta_list_t) !void {
             return try errors.espCheckError(sys.esp_wifi_ap_get_sta_list(sta));
         }
-        pub fn getStationAid(mac: [*:0]const u8, aid: [*c]u16) !void {
+        pub fn getAid(mac: [*:0]const u8, aid: [*c]u16) !void {
             return try errors.espCheckError(sys.esp_wifi_ap_get_sta_aid(mac, aid));
         }
         pub fn clearList() !void {

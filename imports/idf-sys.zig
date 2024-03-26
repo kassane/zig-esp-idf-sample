@@ -5391,7 +5391,7 @@ pub extern fn esp_wifi_connectionless_module_set_wake_interval(wake_interval: u1
 pub extern fn esp_wifi_force_wakeup_acquire() esp_err_t;
 pub extern fn esp_wifi_force_wakeup_release() esp_err_t;
 pub extern fn esp_wifi_set_country_code(country: [*:0]const u8, ieee80211d_enabled: bool) esp_err_t;
-pub extern fn esp_wifi_get_country_code(country: [*c]u8) esp_err_t;
+pub extern fn esp_wifi_get_country_code(country: [*:0]u8) esp_err_t;
 pub extern fn esp_wifi_config_80211_tx_rate(ifx: wifi_interface_t, rate: wifi_phy_rate_t) esp_err_t;
 pub extern fn esp_wifi_disable_pmf_config(ifx: wifi_interface_t) esp_err_t;
 pub extern fn esp_wifi_sta_get_aid(aid: [*c]u16) esp_err_t;
