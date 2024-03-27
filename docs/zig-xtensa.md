@@ -1,6 +1,6 @@
 # Zig on Xtensa (Esp32, Esp8266 and Esp32-S series)
 
-Similar to [esp-rs](https://github.com/espressif/rust-esp32-example/blob/main/docs/rust-on-xtensa.md), forked zig toolchain uses **LLVM codegen** for xtensa target.
+Like [esp-rs](https://github.com/espressif/rust-esp32-example/blob/main/docs/rust-on-xtensa.md), forked zig toolchain uses **LLVM codegen** for xtensa target.
 
 **Current version:**
 
@@ -10,19 +10,19 @@ Similar to [esp-rs](https://github.com/espressif/rust-esp32-example/blob/main/do
 
 ### Commands
 
-**Zig CLI commands:**
+**Zig command line interface:**
 
-- `build-lib`: build static-lib or shared-lib to add `-dynamic`;
-- `build-obj`: build object file, similar to `clang/gcc -c`.
-- `build-exe`: build executables
+- `build-lib`: build static-lib or shared-lib (add `-dynamic` flag);
+- `build-obj`: build object file, like `clang/gcc -c`.
+- `build-exe`: build executable
 - `build`: build-system mode, need `build.zig`.
 
-**Zig clang CLI commands:**
+**Clang command line interface:**
 
-- `zig cc`: clang cli interface
-- `zig c++`: clang++ cli interface (uses `libc++` + `llvm-libunwind` by default)
+- `zig cc`: clang CLI
+- `zig c++`: clang++ CLI (uses `llvm-libc++` + `llvm-libunwind` by default)
 
-**Note:** Zig toolchain not modify `libclang` codegen. But uses `-fsanitize=undefined` by default config.
+**Note:** Zig toolchain does not change `libclang` codegen. However, the default config uses `-fsanitize=undefined`.
 
 ### Targets available
 
@@ -40,11 +40,11 @@ info: available CPUs for architecture 'xtensa':
 error: unknown CPU: ''
 ```
 
-**Note:** Freestanding targets are not listed on `zig targets | jq .libc` (triple targets)
+**Note:** Freestanding targets are not listed on `zig targets | jq .libc` (triple-targets)
 
 #### CPU Features
 
-Similar to [Targets available](#targets-available), add on `-mcpu` or `-Dcpu=` (need `build.zig`).
+Similar to [Targets available](#targets-available) command, add `-mcpu` or `-Dcpu=` (need `build.zig`).
 
 - `+` add feature
 - `-` remove feature

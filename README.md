@@ -29,7 +29,7 @@ This project aims to integrate Zig language and toolchain with the [Espressif Io
 <sub>
   
 > [!WARNING]
-> [Zig](https://ziglang.org/download) upstream (LLVM-Codegen) does not have xtensa support. Similar to [esp-rs](https://github.com/esp-rs), it is necessary to use the [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) - **toolchain forked**.
+> [Zig](https://ziglang.org/download) upstream (LLVM-Codegen) does not have xtensa support. Like [esp-rs](https://github.com/esp-rs), it is necessary to use the [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) - **toolchain forked**.
 
 </sub>
 </br>
@@ -37,15 +37,14 @@ This project aims to integrate Zig language and toolchain with the [Espressif Io
 
 ### Key Features:
 
-- **Zig Language Integration**: Utilize the Zig programming language to write firmware code, offering modern language features such as comptime, meta-programming, and error handling.
+- **Zig Language Integration**: Use the Zig programming language to write firmware code. It provides modern language features such as comptime, meta-programming, and error handling.
 
-- **Zig Toolchain Integration**: Zig toolchain uses `build.zig`, can be used to build Zig libraries and executables, and can be integrated with the ESP-IDF build system. Also,
-replace clang and clang++ with Zig compiler and linker.
+- **Zig Toolchain Integration**: The Zig toolchain can be used to build zig libraries and executables, and can also be integrated with the ESP-IDF build system. Also, system compiler and linker can be replaced to `zig cc`/`zig c++`.
   - **Note:** For C++ support, zig toolchain uses `llvm-libc++` ABI by default.
 
 - **ESP-IDF Compatibility**: Seamlessly integrate Zig with the ESP-IDF framework, allowing developers to leverage the rich set of APIs and functionalities provided by ESP-IDF for IoT development.
 
-- **Build System Configuration**: Employ CMake to build Zig libraries, enabling easy integration with existing ESP-IDF projects while ensuring efficient dependency management and build configuration.
+- **Build System Configuration**: Using CMake to build Zig libraries allows easy integration with existing ESP-IDF projects while providing efficient dependency management and build configuration.
 
 - **Cross-Platform Development**: Facilitate development across various ESP32 variants including ESP32-C2, ESP32-C3, ESP32-C5, ESP32-C6, ESP32-H2, ESP32-P4, ESP32-S2, and ESP32-S3, ensuring broad compatibility and versatility.
 
@@ -66,3 +65,10 @@ replace clang and clang++ with Zig compiler and linker.
 > - `idf.heap.HeapCapsAllocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/v5.2.1/esp32c3/api-reference/system/mem_alloc.html)
 > - `idf.heap.MultiHeapAllocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/v5.2.1/esp32c3/api-reference/system/mem_alloc.html)
 > - `idf.heap.vPortAllocator` - ref.: [FreeRTOS-doc](https://www.freertos.org/a00111.html)
+
+
+### License
+
+This project is licensed twice:
+- [Apache](LICENSE-APACHE)
+- [MIT-0](LICENSE-MIT)
