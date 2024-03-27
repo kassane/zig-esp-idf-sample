@@ -174,14 +174,15 @@ pub fn searched_idf_include(b: *std.Build, lib: *std.Build.Step.Compile, idf_pat
 }
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
+    const src_path = std.fs.path.dirname(@src().file).?;
     const sys = b.addModule("sys", .{
         .root_source_file = .{
-            .path = "imports/idf-sys.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "idf-sys.zig" }),
         },
     });
     const rtos = b.addModule("rtos", .{
         .root_source_file = .{
-            .path = "imports/rtos.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "rtos.zig" }),
         },
         .imports = &.{
             .{
@@ -192,7 +193,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const version = b.addModule("ver", .{
         .root_source_file = .{
-            .path = "imports/version.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "version.zig" }),
         },
         .imports = &.{
             .{
@@ -203,7 +204,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const log = b.addModule("log", .{
         .root_source_file = .{
-            .path = "imports/logger.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "logger.zig" }),
         },
         .imports = &.{
             .{
@@ -214,7 +215,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const panic = b.addModule("panic", .{
         .root_source_file = .{
-            .path = "imports/panic.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "panic.zig" }),
         },
         .imports = &.{
             .{
@@ -229,7 +230,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const led = b.addModule("led", .{
         .root_source_file = .{
-            .path = "imports/led-strip.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "led-strip.zig" }),
         },
         .imports = &.{
             .{
@@ -240,7 +241,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const bootloader = b.addModule("bootloader", .{
         .root_source_file = .{
-            .path = "imports/bootloader.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "bootloader.zig" }),
         },
         .imports = &.{
             .{
@@ -251,7 +252,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const lwip = b.addModule("lwip", .{
         .root_source_file = .{
-            .path = "imports/lwip.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "lwip.zig" }),
         },
         .imports = &.{
             .{
@@ -262,7 +263,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const mqtt = b.addModule("mqtt", .{
         .root_source_file = .{
-            .path = "imports/mqtt.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "mqtt.zig" }),
         },
         .imports = &.{
             .{
@@ -273,7 +274,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const heap = b.addModule("heap", .{
         .root_source_file = .{
-            .path = "imports/heap.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "heap.zig" }),
         },
         .imports = &.{
             .{
@@ -284,7 +285,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const bt = b.addModule("bluetooth", .{
         .root_source_file = .{
-            .path = "imports/bluetooth.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "bluetooth.zig" }),
         },
         .imports = &.{
             .{
@@ -295,7 +296,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const wifi = b.addModule("wifi", .{
         .root_source_file = .{
-            .path = "imports/wifi.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "wifi.zig" }),
         },
         .imports = &.{
             .{
@@ -306,7 +307,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const errors = b.addModule("error", .{
         .root_source_file = .{
-            .path = "imports/error.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "error.zig" }),
         },
         .imports = &.{
             .{
@@ -317,7 +318,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const gpio = b.addModule("gpio", .{
         .root_source_file = .{
-            .path = "imports/gpio.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "gpio.zig" }),
         },
         .imports = &.{
             .{
@@ -332,7 +333,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const uart = b.addModule("uart", .{
         .root_source_file = .{
-            .path = "imports/uart.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "uart.zig" }),
         },
         .imports = &.{
             .{
@@ -347,7 +348,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const i2c = b.addModule("i2c", .{
         .root_source_file = .{
-            .path = "imports/i2c.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "i2c.zig" }),
         },
         .imports = &.{
             .{
@@ -362,7 +363,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const i2s = b.addModule("i2s", .{
         .root_source_file = .{
-            .path = "imports/i2s.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "i2s.zig" }),
         },
         .imports = &.{
             .{
@@ -377,7 +378,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const spi = b.addModule("spi", .{
         .root_source_file = .{
-            .path = "imports/spi.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "spi.zig" }),
         },
         .imports = &.{
             .{
@@ -392,7 +393,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const phy = b.addModule("phy", .{
         .root_source_file = .{
-            .path = "imports/phy.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "phy.zig" }),
         },
         .imports = &.{
             .{
@@ -403,7 +404,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const segger = b.addModule("segger", .{
         .root_source_file = .{
-            .path = "imports/segger.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "segger.zig" }),
         },
         .imports = &.{
             .{
@@ -414,7 +415,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     const dsp = b.addModule("dsp", .{
         .root_source_file = .{
-            .path = "imports/dsp.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "dsp.zig" }),
         },
         .imports = &.{
             .{
@@ -425,7 +426,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
     return b.addModule("esp_idf", .{
         .root_source_file = .{
-            .path = "imports/idf.zig",
+            .path = b.pathJoin(&.{ src_path, "imports", "idf.zig" }),
         },
         .imports = &.{
             .{
