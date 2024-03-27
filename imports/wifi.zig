@@ -1,12 +1,12 @@
 const sys = @import("sys");
-const std = @import("std");
 const errors = @import("error");
 
-pub fn init(config: ?*const sys.wifi_init_config_t) !?*const sys.wifi_init_config_t {
-    try errors.espCheckError(sys.esp_wifi_init(config));
-    return config;
+pub fn init(config: ?*const sys.wifi_init_config_t) !*const sys.wifi_init_config_t {
+    if (config) |c| {
+        try errors.espCheckError(sys.esp_wifi_init(c));
+        return c;
+    } else return .{};
 }
-
 pub fn setDefaultWifiStationHandlers() !void {
     return try errors.espCheckError(sys.esp_wifi_set_default_wifi_sta_handlers());
 }
@@ -270,4 +270,12 @@ pub const Station = struct {
             return try errors.espCheckError(sys.esp_wifi_clear_ap_list());
         }
     };
+};
+pub const PowerDomain = struct {
+    pub fn On() void {
+        sys.esp_wifi_power_domain_on();
+    }
+    pub fn Off() void {
+        sys.esp_wifi_power_domain_off();
+    }
 };

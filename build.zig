@@ -345,6 +345,21 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const i2c = b.addModule("i2c", .{
+        .root_source_file = .{
+            .path = "imports/i2c.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
     const i2s = b.addModule("i2s", .{
         .root_source_file = .{
             .path = "imports/i2s.zig",
@@ -372,6 +387,28 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "error",
                 .module = errors,
+            },
+        },
+    });
+    const phy = b.addModule("phy", .{
+        .root_source_file = .{
+            .path = "imports/phy.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
+    const segger = b.addModule("segger", .{
+        .root_source_file = .{
+            .path = "imports/segger.zig",
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
             },
         },
     });
@@ -436,8 +473,16 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .module = uart,
             },
             .{
+                .name = "i2c",
+                .module = i2c,
+            },
+            .{
                 .name = "i2s",
                 .module = i2s,
+            },
+            .{
+                .name = "phy",
+                .module = phy,
             },
             .{
                 .name = "spi",
@@ -458,6 +503,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "dsp",
                 .module = dsp,
+            },
+            .{
+                .name = "segger",
+                .module = segger,
             },
         },
     });

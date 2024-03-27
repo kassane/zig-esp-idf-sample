@@ -171,3 +171,37 @@ pub const vPortAllocator = struct {
         sys.vPortFree(buf.ptr);
     }
 };
+
+const errors = @import("error");
+pub const TRACE = struct {
+    pub fn initStandalone(record_buffer: [*c]sys.heap_trace_record_t, num_records: usize) !void {
+        return try errors.espCheckError(sys.heap_trace_init_standalone(record_buffer, num_records));
+    }
+    pub fn initTohost() !void {
+        return try errors.espCheckError(sys.heap_trace_init_tohost());
+    }
+    pub fn start(mode: sys.heap_trace_mode_t) !void {
+        return try errors.espCheckError(sys.heap_trace_start(mode));
+    }
+    pub fn stop() !void {
+        return try errors.espCheckError(sys.heap_trace_stop());
+    }
+    pub fn @"resume"() !void {
+        return try errors.espCheckError(sys.heap_trace_resume());
+    }
+    pub fn getCount() usize {
+        return sys.heap_trace_get_count();
+    }
+    pub fn get(index: usize, record: [*c]sys.heap_trace_record_t) !void {
+        return try errors.espCheckError(sys.heap_trace_get(index, record));
+    }
+    pub fn dump() void {
+        sys.heap_trace_dump();
+    }
+    pub fn dumpCaps(caps: u32) void {
+        sys.heap_trace_dump_caps(caps);
+    }
+    pub fn summary(sum: [*c]sys.heap_trace_summary_t) !void {
+        return try errors.espCheckError(sys.heap_trace_summary(sum));
+    }
+};

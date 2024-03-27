@@ -52,3 +52,37 @@ pub fn getFreqLimit(gpio_is_used: bool, input_delay_ns: c_int) c_int {
 pub fn busGetMaxTransactionLen(host_id: sys.spi_host_device_t, max_bytes: [*c]usize) !void {
     return try errors.espCheckError(sys.spi_bus_get_max_transaction_len(host_id, max_bytes));
 }
+
+pub const SDSPI = struct {
+    pub const Host = struct {
+        pub fn init() !void {
+            return try errors.espCheckError(sys.sdspi_host_init());
+        }
+        pub fn initDevice(dev_config: [*c]const sys.sdspi_device_config_t, out_handle: [*c]sys.sdspi_dev_handle_t) !void {
+            return try errors.espCheckError(sys.sdspi_host_init_device(dev_config, out_handle));
+        }
+        pub fn removeDevice(handle: sys.sdspi_dev_handle_t) !void {
+            return try errors.espCheckError(sys.sdspi_host_remove_device(handle));
+        }
+        pub fn doTransaction(handle: sys.sdspi_dev_handle_t, cmdinfo: [*c]sys.sdmmc_command_t) !void {
+            return try errors.espCheckError(sys.sdspi_host_do_transaction(handle, cmdinfo));
+        }
+        pub fn setCardClk(host: sys.sdspi_dev_handle_t, freq_khz: u32) !void {
+            return try errors.espCheckError(sys.sdspi_host_set_card_clk(host, freq_khz));
+        }
+        pub fn getRealFreq(handle: sys.sdspi_dev_handle_t, real_freq_khz: [*c]c_int) !void {
+            return try errors.espCheckError(sys.sdspi_host_get_real_freq(handle, real_freq_khz));
+        }
+        pub fn deinit() !void {
+            return try errors.espCheckError(sys.sdspi_host_deinit());
+        }
+        pub const IO = struct {
+            pub fn intEnable(handle: sys.sdspi_dev_handle_t) !void {
+                return try errors.espCheckError(sys.sdspi_host_io_int_enable(handle));
+            }
+            pub fn intWait(handle: sys.sdspi_dev_handle_t, timeout_ticks: sys.TickType_t) !void {
+                return try errors.espCheckError(sys.sdspi_host_io_int_wait(handle, timeout_ticks));
+            }
+        };
+    };
+};

@@ -5398,6 +5398,50 @@ pub extern fn esp_wifi_sta_get_aid(aid: [*c]u16) esp_err_t;
 pub extern fn esp_wifi_sta_get_negotiated_phymode(phymode: [*c]wifi_phy_mode_t) esp_err_t;
 pub extern fn esp_wifi_set_dynamic_cs(enabled: bool) esp_err_t;
 pub extern fn esp_wifi_sta_get_rssi(rssi: [*c]c_int) esp_err_t;
+pub const linenoiseCompletions = opaque {};
+pub const esp_console_config_t = extern struct {
+    max_cmdline_length: usize = std.mem.zeroes(usize),
+    max_cmdline_args: usize = std.mem.zeroes(usize),
+    heap_alloc_caps: u32 = std.mem.zeroes(u32),
+    hint_color: c_int = std.mem.zeroes(c_int),
+    hint_bold: c_int = std.mem.zeroes(c_int),
+};
+pub const esp_console_repl_config_t = extern struct {
+    max_history_len: u32 = std.mem.zeroes(u32),
+    history_save_path: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    task_stack_size: u32 = std.mem.zeroes(u32),
+    task_priority: u32 = std.mem.zeroes(u32),
+    prompt: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    max_cmdline_length: usize = std.mem.zeroes(usize),
+};
+pub const esp_console_dev_uart_config_t = extern struct {
+    channel: c_int = std.mem.zeroes(c_int),
+    baud_rate: c_int = std.mem.zeroes(c_int),
+    tx_gpio_num: c_int = std.mem.zeroes(c_int),
+    rx_gpio_num: c_int = std.mem.zeroes(c_int),
+};
+pub extern fn esp_console_init(config: [*c]const esp_console_config_t) esp_err_t;
+pub extern fn esp_console_deinit() esp_err_t;
+pub const esp_console_cmd_func_t = ?*const fn (c_int, [*c][*c]u8) callconv(.C) c_int;
+pub const esp_console_cmd_t = extern struct {
+    command: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    help: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    hint: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    func: esp_console_cmd_func_t = std.mem.zeroes(esp_console_cmd_func_t),
+    argtable: ?*anyopaque = null,
+};
+pub extern fn esp_console_cmd_register(cmd: [*c]const esp_console_cmd_t) esp_err_t;
+pub extern fn esp_console_run(cmdline: [*:0]const u8, cmd_ret: [*c]c_int) esp_err_t;
+pub extern fn esp_console_split_argv(line: [*c]u8, argv: [*c][*c]u8, argv_size: usize) usize;
+pub extern fn esp_console_get_completion(buf: [*:0]const u8, lc: ?*linenoiseCompletions) void;
+pub extern fn esp_console_get_hint(buf: [*:0]const u8, color: [*c]c_int, bold: [*c]c_int) [*:0]const u8;
+pub extern fn esp_console_register_help_command() esp_err_t;
+pub const esp_console_repl_t = esp_console_repl_s;
+pub const esp_console_repl_s = extern struct {
+    del: ?*const fn ([*c]esp_console_repl_t) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn ([*c]esp_console_repl_t) callconv(.C) esp_err_t),
+};
+pub extern fn esp_console_new_repl_uart(dev_config: [*c]const esp_console_dev_uart_config_t, repl_config: [*c]const esp_console_repl_config_t, ret_repl: [*c][*c]esp_console_repl_t) esp_err_t;
+pub extern fn esp_console_start_repl(repl: [*c]esp_console_repl_t) esp_err_t;
 
 pub const va_list = extern struct {
     __va_stk: [*c]c_int = std.mem.zeroes([*c]c_int),
@@ -5881,6 +5925,176 @@ pub const sdmmc_host_t = extern struct {
     input_delay_phase: sdmmc_delay_phase_t = std.mem.zeroes(sdmmc_delay_phase_t),
     set_input_delay: ?*const fn (c_int, sdmmc_delay_phase_t) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (c_int, sdmmc_delay_phase_t) callconv(.C) esp_err_t),
 };
+pub const esp_phy_wifi_rate_t = enum(c_uint) {
+    PHY_RATE_1M = 0,
+    PHY_RATE_2M = 1,
+    PHY_RATE_5M5 = 2,
+    PHY_RATE_11M = 3,
+    PHY_RATE_6M = 11,
+    PHY_RATE_9M = 15,
+    PHY_RATE_12M = 10,
+    PHY_RATE_18M = 14,
+    PHY_RATE_24M = 9,
+    PHY_RATE_36M = 13,
+    PHY_RATE_48M = 8,
+    PHY_RATE_54M = 12,
+    PHY_RATE_MCS0 = 16,
+    PHY_RATE_MCS1 = 17,
+    PHY_RATE_MCS2 = 18,
+    PHY_RATE_MCS3 = 19,
+    PHY_RATE_MCS4 = 20,
+    PHY_RATE_MCS5 = 21,
+    PHY_RATE_MCS6 = 22,
+    PHY_RATE_MCS7 = 23,
+    PHY_WIFI_RATE_MAX = 24,
+};
+pub const esp_phy_ble_rate_t = enum(c_uint) {
+    PHY_BLE_RATE_1M = 0,
+    PHY_BLE_RATE_2M = 1,
+    PHY_BLE_RATE_125K = 2,
+    PHY_BLE_RATE_500k = 3,
+    PHY_BLE_RATE_MAX = 4,
+};
+pub const esp_phy_ble_type_t = enum(c_uint) {
+    PHY_BLE_TYPE_1010 = 0,
+    PHY_BLE_TYPE_00001111 = 1,
+    PHY_BLE_TYPE_prbs9 = 2,
+    PHY_BLE_TYPE_00111100 = 4,
+    PHY_BLE_TYPE_MAX = 5,
+};
+pub const esp_phy_rx_result_t = extern struct {
+    phy_rx_correct_count: u32 = std.mem.zeroes(u32),
+    phy_rx_rssi: c_int = std.mem.zeroes(c_int),
+    phy_rx_total_count: u32 = std.mem.zeroes(u32),
+    phy_rx_result_flag: u32 = std.mem.zeroes(u32),
+};
+pub extern fn esp_wifi_power_domain_on() void;
+pub extern fn esp_wifi_power_domain_off() void;
+pub extern fn esp_phy_rftest_config(conf: u8) void;
+pub extern fn esp_phy_rftest_init() void;
+pub extern fn esp_phy_tx_contin_en(contin_en: bool) void;
+pub extern fn esp_phy_cbw40m_en(en: bool) void;
+pub extern fn esp_phy_wifi_tx(chan: u32, rate: esp_phy_wifi_rate_t, backoff: i8, length_byte: u32, packet_delay: u32, packet_num: u32) void;
+pub extern fn esp_phy_test_start_stop(value: u8) void;
+pub extern fn esp_phy_wifi_rx(chan: u32, rate: esp_phy_wifi_rate_t) void;
+pub extern fn esp_phy_wifi_tx_tone(start: u32, chan: u32, backoff: u32) void;
+pub extern fn esp_phy_ble_tx(txpwr: u32, chan: u32, len: u32, data_type: esp_phy_ble_type_t, syncw: u32, rate: esp_phy_ble_rate_t, tx_num_in: u32) void;
+pub extern fn esp_phy_ble_rx(chan: u32, syncw: u32, rate: esp_phy_ble_rate_t) void;
+pub extern fn esp_phy_bt_tx_tone(start: u32, chan: u32, power: u32) void;
+pub extern fn esp_phy_get_rx_result(rx_result: [*c]esp_phy_rx_result_t) void;
+
+pub const i2c_port_t = enum(c_uint) {
+    I2C_NUM_0 = 0,
+    I2C_NUM_1 = 1,
+    I2C_NUM_MAX = 2,
+};
+pub const i2c_addr_bit_len_t = enum(c_uint) {
+    I2C_ADDR_BIT_LEN_7 = 0,
+    I2C_ADDR_BIT_LEN_10 = 1,
+};
+pub const i2c_hal_clk_config_t = extern struct {
+    clkm_div: u16 = std.mem.zeroes(u16),
+    scl_low: u16 = std.mem.zeroes(u16),
+    scl_high: u16 = std.mem.zeroes(u16),
+    scl_wait_high: u16 = std.mem.zeroes(u16),
+    sda_hold: u16 = std.mem.zeroes(u16),
+    sda_sample: u16 = std.mem.zeroes(u16),
+    setup: u16 = std.mem.zeroes(u16),
+    hold: u16 = std.mem.zeroes(u16),
+    tout: u16 = std.mem.zeroes(u16),
+};
+pub const i2c_mode_t = enum(c_uint) {
+    I2C_MODE_SLAVE = 0,
+    I2C_MODE_MASTER = 1,
+    I2C_MODE_MAX = 2,
+};
+pub const i2c_rw_t = enum(c_uint) {
+    I2C_MASTER_WRITE = 0,
+    I2C_MASTER_READ = 1,
+};
+pub const i2c_trans_mode_t = enum(c_uint) {
+    I2C_DATA_MODE_MSB_FIRST = 0,
+    I2C_DATA_MODE_LSB_FIRST = 1,
+    I2C_DATA_MODE_MAX = 2,
+};
+pub const i2c_addr_mode_t = enum(c_uint) {
+    I2C_ADDR_BIT_7 = 0,
+    I2C_ADDR_BIT_10 = 1,
+    I2C_ADDR_BIT_MAX = 2,
+};
+pub const i2c_ack_type_t = enum(c_uint) {
+    I2C_MASTER_ACK = 0,
+    I2C_MASTER_NACK = 1,
+    I2C_MASTER_LAST_NACK = 2,
+    I2C_MASTER_ACK_MAX = 3,
+};
+pub const i2c_slave_stretch_cause_t = enum(c_uint) {
+    I2C_SLAVE_STRETCH_CAUSE_ADDRESS_MATCH = 0,
+    I2C_SLAVE_STRETCH_CAUSE_TX_EMPTY = 1,
+    I2C_SLAVE_STRETCH_CAUSE_RX_FULL = 2,
+    I2C_SLAVE_STRETCH_CAUSE_SENDING_ACK = 3,
+};
+pub const i2c_clock_source_t = soc_periph_i2c_clk_src_t;
+pub const i2c_port_num_t = c_int;
+pub const i2c_master_status_t = enum(c_uint) {
+    I2C_STATUS_READ = 0,
+    I2C_STATUS_WRITE = 1,
+    I2C_STATUS_START = 2,
+    I2C_STATUS_STOP = 3,
+    I2C_STATUS_IDLE = 4,
+    I2C_STATUS_ACK_ERROR = 5,
+    I2C_STATUS_DONE = 6,
+    I2C_STATUS_TIMEOUT = 7,
+};
+pub const i2c_master_event_t = enum(c_uint) {
+    I2C_EVENT_ALIVE = 0,
+    I2C_EVENT_DONE = 1,
+    I2C_EVENT_NACK = 2,
+};
+pub const i2c_master_bus_t = opaque {};
+pub const i2c_master_bus_handle_t = ?*i2c_master_bus_t;
+pub const i2c_master_dev_t = opaque {};
+pub const i2c_master_dev_handle_t = ?*i2c_master_dev_t;
+pub const i2c_slave_dev_t = opaque {};
+pub const i2c_slave_dev_handle_t = ?*i2c_slave_dev_t;
+pub const i2c_master_event_data_t = extern struct {
+    event: i2c_master_event_t = std.mem.zeroes(i2c_master_event_t),
+};
+pub const i2c_master_callback_t = ?*const fn (i2c_master_dev_handle_t, [*c]const i2c_master_event_data_t, ?*anyopaque) callconv(.C) bool;
+pub const i2c_slave_rx_done_event_data_t = extern struct {
+    buffer: [*:0]u8 = std.mem.zeroes([*:0]u8),
+};
+pub const i2c_slave_received_callback_t = ?*const fn (i2c_slave_dev_handle_t, [*c]const i2c_slave_rx_done_event_data_t, ?*anyopaque) callconv(.C) bool;
+pub const i2c_master_bus_config_t = extern struct {
+    i2c_port: i2c_port_num_t = std.mem.zeroes(i2c_port_num_t),
+    sda_io_num: gpio_num_t = std.mem.zeroes(gpio_num_t),
+    scl_io_num: gpio_num_t = std.mem.zeroes(gpio_num_t),
+    clk_source: i2c_clock_source_t = std.mem.zeroes(i2c_clock_source_t),
+    glitch_ignore_cnt: u8 = std.mem.zeroes(u8),
+    intr_priority: c_int = std.mem.zeroes(c_int),
+    trans_queue_depth: usize = std.mem.zeroes(usize),
+    flags: opaque {} = std.mem.zeroes(opaque {}),
+};
+pub const i2c_device_config_t = extern struct {
+    dev_addr_length: i2c_addr_bit_len_t = std.mem.zeroes(i2c_addr_bit_len_t),
+    device_address: u16 = std.mem.zeroes(u16),
+    scl_speed_hz: u32 = std.mem.zeroes(u32),
+};
+pub const i2c_master_event_callbacks_t = extern struct {
+    on_trans_done: i2c_master_callback_t = std.mem.zeroes(i2c_master_callback_t),
+};
+pub extern fn i2c_new_master_bus(bus_config: ?*const i2c_master_bus_config_t, ret_bus_handle: [*c]i2c_master_bus_handle_t) esp_err_t;
+pub extern fn i2c_master_bus_add_device(bus_handle: i2c_master_bus_handle_t, dev_config: [*c]const i2c_device_config_t, ret_handle: [*c]i2c_master_dev_handle_t) esp_err_t;
+pub extern fn i2c_del_master_bus(bus_handle: i2c_master_bus_handle_t) esp_err_t;
+pub extern fn i2c_master_bus_rm_device(handle: i2c_master_dev_handle_t) esp_err_t;
+pub extern fn i2c_master_transmit(i2c_dev: i2c_master_dev_handle_t, write_buffer: [*:0]const u8, write_size: usize, xfer_timeout_ms: c_int) esp_err_t;
+pub extern fn i2c_master_transmit_receive(i2c_dev: i2c_master_dev_handle_t, write_buffer: [*:0]const u8, write_size: usize, read_buffer: [*:0]u8, read_size: usize, xfer_timeout_ms: c_int) esp_err_t;
+pub extern fn i2c_master_receive(i2c_dev: i2c_master_dev_handle_t, read_buffer: [*:0]u8, read_size: usize, xfer_timeout_ms: c_int) esp_err_t;
+pub extern fn i2c_master_probe(i2c_master: i2c_master_bus_handle_t, address: u16, xfer_timeout_ms: c_int) esp_err_t;
+pub extern fn i2c_master_register_event_callbacks(i2c_dev: i2c_master_dev_handle_t, cbs: [*c]const i2c_master_event_callbacks_t, user_data: ?*anyopaque) esp_err_t;
+pub extern fn i2c_master_bus_reset(handle: i2c_master_bus_handle_t) esp_err_t;
+pub extern fn i2c_master_wait_all_done(i2c_master: i2c_master_bus_handle_t, timeout_ms: c_int) esp_err_t;
+
 // const union_unnamed_5 = extern union {
 //     cid: sdmmc_cid_t,
 //     raw_cid: sdmmc_response_t,

@@ -1,5 +1,4 @@
 const sys = @import("sys");
-const std = @import("std");
 
 pub const PowerDomain = struct {
     pub fn On() void {
