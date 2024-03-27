@@ -28,6 +28,9 @@ pub fn setMode(mode: sys.wifi_mode_t) !void {
 pub fn getMode(mode: [*c]sys.wifi_mode_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_mode(mode));
 }
+pub fn start() !void {
+    return try errors.espCheckError(sys.esp_wifi_start());
+}
 pub fn stop() !void {
     return try errors.espCheckError(sys.esp_wifi_stop());
 }
@@ -241,9 +244,6 @@ pub fn setDynCS(enabled: bool) !void {
     return try errors.espCheckError(sys.esp_wifi_set_dynamic_cs(enabled));
 }
 pub const Station = struct {
-    pub fn rt() !void {
-        return try errors.espCheckError(sys.esp_wifi_start());
-    }
     pub fn getAPInfo(ap_info: ?*sys.wifi_ap_record_t) !void {
         return try errors.espCheckError(sys.esp_wifi_sta_get_ap_info(ap_info));
     }
