@@ -53,7 +53,7 @@ pub fn build(b: *std.Build) !void {
     b.installArtifact(lib);
 }
 
-fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
+pub fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
     const include_dirs = std.process.getEnvVarOwned(b.allocator, "INCLUDE_DIRS") catch "";
     if (!std.mem.eql(u8, include_dirs, "")) {
         var it_inc = std.mem.tokenize(u8, include_dirs, ";");
@@ -513,7 +513,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
 }
 
 // Targets config
-const espressif_targets: []const std.Target.Query = if (isEspXtensa())
+pub const espressif_targets: []const std.Target.Query = if (isEspXtensa())
     xtensa_targets ++ riscv_targets
 else
     riscv_targets;
