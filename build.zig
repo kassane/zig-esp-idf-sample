@@ -250,6 +250,17 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const errors = b.addModule("error", .{
+        .root_source_file = .{
+            .path = b.pathJoin(&.{ src_path, "imports", "error.zig" }),
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     const lwip = b.addModule("lwip", .{
         .root_source_file = .{
             .path = b.pathJoin(&.{ src_path, "imports", "lwip.zig" }),
@@ -283,6 +294,21 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const http = b.addModule("http", .{
+        .root_source_file = .{
+            .path = b.pathJoin(&.{ src_path, "imports", "http.zig" }),
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
     const bt = b.addModule("bluetooth", .{
         .root_source_file = .{
             .path = b.pathJoin(&.{ src_path, "imports", "bluetooth.zig" }),
@@ -297,17 +323,6 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     const wifi = b.addModule("wifi", .{
         .root_source_file = .{
             .path = b.pathJoin(&.{ src_path, "imports", "wifi.zig" }),
-        },
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const errors = b.addModule("error", .{
-        .root_source_file = .{
-            .path = b.pathJoin(&.{ src_path, "imports", "error.zig" }),
         },
         .imports = &.{
             .{
@@ -508,6 +523,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "segger",
                 .module = segger,
+            },
+            .{
+                .name = "http",
+                .module = http,
             },
         },
     });

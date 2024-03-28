@@ -4,6 +4,7 @@ pub const dsp = @import("dsp");
 pub usingnamespace @import("error");
 pub const gpio = @import("gpio");
 pub const heap = @import("heap");
+pub const http = @import("http");
 pub const i2c = @import("i2c");
 pub const i2s = @import("i2s");
 pub usingnamespace @import("led");

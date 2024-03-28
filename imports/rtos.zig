@@ -1,5 +1,92 @@
 const sys = @import("sys");
 
+pub const xTimerCreate = sys.xTimerCreate;
+pub const xTimerCreateStatic = sys.xTimerCreateStatic;
+pub const pvTimerGetTimerID = sys.pvTimerGetTimerID;
+pub const vTimerSetTimerID = sys.vTimerSetTimerID;
+pub const xTimerIsTimerActive = sys.xTimerIsTimerActive;
+pub const xTimerGetTimerDaemonTaskHandle = sys.xTimerGetTimerDaemonTaskHandle;
+pub const xTimerPendFunctionCallFromISR = sys.xTimerPendFunctionCallFromISR;
+pub const xTimerPendFunctionCall = sys.xTimerPendFunctionCall;
+pub const pcTimerGetName = sys.pcTimerGetName;
+pub const vTimerSetReloadMode = sys.vTimerSetReloadMode;
+pub const uxTimerGetReloadMode = sys.uxTimerGetReloadMode;
+pub const xTimerGetPeriod = sys.xTimerGetPeriod;
+pub const xTimerGetExpiryTime = sys.xTimerGetExpiryTime;
+pub const xTimerGetStaticBuffer = sys.xTimerGetStaticBuffer;
+pub const xTimerCreateTimerTask = sys.xTimerCreateTimerTask;
+pub const xTimerGenericCommandFromTask = sys.xTimerGenericCommandFromTask;
+pub const xTimerGenericCommandFromISR = sys.xTimerGenericCommandFromISR;
+pub const vApplicationGetTimerTaskMemory = sys.vApplicationGetTimerTaskMemory;
+pub const xEventGroupCreate = sys.xEventGroupCreate;
+pub const xEventGroupCreateStatic = sys.xEventGroupCreateStatic;
+pub const xEventGroupWaitBits = sys.xEventGroupWaitBits;
+pub const xEventGroupClearBits = sys.xEventGroupClearBits;
+pub const xEventGroupSetBits = sys.xEventGroupSetBits;
+pub const xEventGroupSync = sys.xEventGroupSync;
+pub const xEventGroupGetBitsFromISR = sys.xEventGroupGetBitsFromISR;
+pub const vEventGroupDelete = sys.vEventGroupDelete;
+pub const xEventGroupGetStaticBuffer = sys.xEventGroupGetStaticBuffer;
+pub const vEventGroupSetBitsCallback = sys.vEventGroupSetBitsCallback;
+pub const vEventGroupClearBitsCallback = sys.vEventGroupClearBitsCallback;
+pub const xStreamBufferGetStaticBuffers = sys.xStreamBufferGetStaticBuffers;
+pub const xStreamBufferSend = sys.xStreamBufferSend;
+pub const xStreamBufferSendFromISR = sys.xStreamBufferSendFromISR;
+pub const xStreamBufferReceive = sys.xStreamBufferReceive;
+pub const xStreamBufferReceiveFromISR = sys.xStreamBufferReceiveFromISR;
+pub const vStreamBufferDelete = sys.vStreamBufferDelete;
+pub const xStreamBufferIsFull = sys.xStreamBufferIsFull;
+pub const xStreamBufferIsEmpty = sys.xStreamBufferIsEmpty;
+pub const xStreamBufferReset = sys.xStreamBufferReset;
+pub const xStreamBufferSpacesAvailable = sys.xStreamBufferSpacesAvailable;
+pub const xStreamBufferBytesAvailable = sys.xStreamBufferBytesAvailable;
+pub const xStreamBufferSetTriggerLevel = sys.xStreamBufferSetTriggerLevel;
+pub const xStreamBufferSendCompletedFromISR = sys.xStreamBufferSendCompletedFromISR;
+pub const xStreamBufferReceiveCompletedFromISR = sys.xStreamBufferReceiveCompletedFromISR;
+pub const xStreamBufferGenericCreate = sys.xStreamBufferGenericCreate;
+pub const xStreamBufferGenericCreateStatic = sys.xStreamBufferGenericCreateStatic;
+pub const xStreamBufferNextMessageLengthBytes = sys.xStreamBufferNextMessageLengthBytes;
+
+pub const xQueueGenericSend = sys.xQueueGenericSend;
+pub const xQueuePeek = sys.xQueuePeek;
+pub const xQueuePeekFromISR = sys.xQueuePeekFromISR;
+pub const xQueueReceive = sys.xQueueReceive;
+pub const uxQueueMessagesWaiting = sys.uxQueueMessagesWaiting;
+pub const uxQueueSpacesAvailable = sys.uxQueueSpacesAvailable;
+pub const vQueueDelete = sys.vQueueDelete;
+pub const xQueueGenericSendFromISR = sys.xQueueGenericSendFromISR;
+pub const xQueueGiveFromISR = sys.xQueueGiveFromISR;
+pub const xQueueReceiveFromISR = sys.xQueueReceiveFromISR;
+pub const xQueueIsQueueEmptyFromISR = sys.xQueueIsQueueEmptyFromISR;
+pub const xQueueIsQueueFullFromISR = sys.xQueueIsQueueFullFromISR;
+pub const uxQueueMessagesWaitingFromISR = sys.uxQueueMessagesWaitingFromISR;
+pub const xQueueCRSendFromISR = sys.xQueueCRSendFromISR;
+pub const xQueueCRReceiveFromISR = sys.xQueueCRReceiveFromISR;
+pub const xQueueCRSend = sys.xQueueCRSend;
+pub const xQueueCRReceive = sys.xQueueCRReceive;
+pub const xQueueCreateMutex = sys.xQueueCreateMutex;
+pub const xQueueCreateMutexStatic = sys.xQueueCreateMutexStatic;
+pub const xQueueCreateCountingSemaphore = sys.xQueueCreateCountingSemaphore;
+pub const xQueueCreateCountingSemaphoreStatic = sys.xQueueCreateCountingSemaphoreStatic;
+pub const xQueueSemaphoreTake = sys.xQueueSemaphoreTake;
+pub const xQueueGetMutexHolder = sys.xQueueGetMutexHolder;
+pub const xQueueGetMutexHolderFromISR = sys.xQueueGetMutexHolderFromISR;
+pub const xQueueTakeMutexRecursive = sys.xQueueTakeMutexRecursive;
+pub const xQueueGiveMutexRecursive = sys.xQueueGiveMutexRecursive;
+pub const xQueueGenericCreate = sys.xQueueGenericCreate;
+pub const xQueueGenericCreateStatic = sys.xQueueGenericCreateStatic;
+pub const xQueueGenericGetStaticBuffers = sys.xQueueGenericGetStaticBuffers;
+pub const xQueueCreateSet = sys.xQueueCreateSet;
+pub const xQueueAddToSet = sys.xQueueAddToSet;
+pub const xQueueRemoveFromSet = sys.xQueueRemoveFromSet;
+pub const xQueueSelectFromSet = sys.xQueueSelectFromSet;
+pub const xQueueSelectFromSetFromISR = sys.xQueueSelectFromSetFromISR;
+pub const vQueueWaitForMessageRestricted = sys.vQueueWaitForMessageRestricted;
+pub const xQueueGenericReset = sys.xQueueGenericReset;
+pub const vQueueSetQueueNumber = sys.vQueueSetQueueNumber;
+pub const uxQueueGetQueueNumber = sys.uxQueueGetQueueNumber;
+pub const ucQueueGetQueueType = sys.ucQueueGetQueueType;
+
 pub const xTaskCreatePinnedToCore = sys.xTaskCreatePinnedToCore;
 pub const xTaskCreate = sys.xTaskCreate;
 pub const xTaskCreateStaticPinnedToCore = sys.xTaskCreateStaticPinnedToCore;
@@ -102,3 +189,64 @@ pub const xRingbufferPrintInfo = sys.xRingbufferPrintInfo;
 pub const xRingbufferGetStaticBuffer = sys.xRingbufferGetStaticBuffer;
 pub const xRingbufferCreateWithCaps = sys.xRingbufferCreateWithCaps;
 pub const vRingbufferDeleteWithCaps = sys.vRingbufferDeleteWithCaps;
+
+pub inline fn xSemaphoreCreateBinary() sys.QueueHandle_t {
+    return xQueueGenericCreate(1, 1, 3);
+}
+pub inline fn xSemaphoreCreateBinaryStatic(pxStaticSemaphore: anytype) sys.QueueHandle_t {
+    return xQueueGenericCreateStatic(@import("std").zig.c_translation.cast(sys.UBaseType_t, @as(c_int, 1)), 0, null, pxStaticSemaphore, 3);
+}
+pub inline fn xSemaphoreTake(xSemaphore: anytype, xBlockTime: anytype) sys.BaseType_t {
+    return xQueueSemaphoreTake(xSemaphore, xBlockTime);
+}
+pub inline fn xSemaphoreTakeRecursive(xMutex: anytype, xBlockTime: anytype) sys.BaseType_t {
+    return xQueueTakeMutexRecursive(xMutex, xBlockTime);
+}
+pub inline fn xSemaphoreGive(xSemaphore: anytype) sys.BaseType_t {
+    return xQueueGenericSend(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore), null, 0, 0);
+}
+pub inline fn xSemaphoreGiveRecursive(xMutex: anytype) sys.BaseType_t {
+    return xQueueGiveMutexRecursive(xMutex);
+}
+pub inline fn xSemaphoreGiveFromISR(xSemaphore: anytype, pxHigherPriorityTaskWoken: anytype) sys.BaseType_t {
+    return xQueueGiveFromISR(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore), pxHigherPriorityTaskWoken);
+}
+pub inline fn xSemaphoreTakeFromISR(xSemaphore: anytype, pxHigherPriorityTaskWoken: anytype) sys.BaseType_t {
+    return xQueueReceiveFromISR(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore), null, pxHigherPriorityTaskWoken);
+}
+pub inline fn xSemaphoreCreateMutex() sys.QueueHandle_t {
+    return xQueueCreateMutex(3);
+}
+pub inline fn xSemaphoreCreateMutexStatic(pxMutexBuffer: anytype) sys.QueueHandle_t {
+    return xQueueCreateMutexStatic(3, pxMutexBuffer);
+}
+pub inline fn xSemaphoreCreateRecursiveMutex() @TypeOf(xQueueCreateMutex(4)) {
+    return xQueueCreateMutex(4);
+}
+pub inline fn xSemaphoreCreateRecursiveMutexStatic(pxStaticSemaphore: anytype) sys.QueueHandle_t {
+    return xQueueCreateMutexStatic(4, pxStaticSemaphore);
+}
+pub inline fn xSemaphoreCreateCounting(uxMaxCount: anytype, uxInitialCount: anytype) sys.QueueHandle_t {
+    return xQueueCreateCountingSemaphore(uxMaxCount, uxInitialCount);
+}
+pub inline fn xSemaphoreCreateCountingStatic(uxMaxCount: anytype, uxInitialCount: anytype, pxSemaphoreBuffer: anytype) sys.QueueHandle_t {
+    return xQueueCreateCountingSemaphoreStatic(uxMaxCount, uxInitialCount, pxSemaphoreBuffer);
+}
+pub inline fn vSemaphoreDelete(xSemaphore: anytype) void {
+    return vQueueDelete(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore));
+}
+pub inline fn xSemaphoreGetMutexHolder(xSemaphore: anytype) sys.TaskHandle_t {
+    return xQueueGetMutexHolder(xSemaphore);
+}
+pub inline fn xSemaphoreGetMutexHolderFromISR(xSemaphore: anytype) sys.TaskHandle_t {
+    return xQueueGetMutexHolderFromISR(xSemaphore);
+}
+pub inline fn uxSemaphoreGetCount(xSemaphore: anytype) sys.UBaseType_t {
+    return uxQueueMessagesWaiting(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore));
+}
+pub inline fn uxSemaphoreGetCountFromISR(xSemaphore: anytype) sys.UBaseType_t {
+    return uxQueueMessagesWaitingFromISR(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore));
+}
+pub inline fn xSemaphoreGetStaticBuffer(xSemaphore: anytype, ppxSemaphoreBuffer: anytype) sys.BaseType_t {
+    return xQueueGenericGetStaticBuffers(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore), null, ppxSemaphoreBuffer);
+}

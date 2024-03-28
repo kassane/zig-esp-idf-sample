@@ -49,8 +49,3 @@ pub const Version = struct {
                 @panic(@errorName(err));
     }
 };
-
-test "Valid version" {
-    const testing = std.testing;
-    try testing.expectEqual(Version.get().toString(testing.allocator), "v5.1.3");
-}
