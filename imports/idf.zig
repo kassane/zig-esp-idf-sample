@@ -1,5 +1,6 @@
 pub const bl = @import("bootloader");
 pub const bt = @import("bluetooth");
+pub usingnamespace @import("crc");
 pub const dsp = @import("dsp");
 pub usingnamespace @import("error");
 pub const gpio = @import("gpio");

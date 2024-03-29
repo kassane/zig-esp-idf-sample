@@ -2264,10 +2264,8 @@ pub extern fn esp_deregister_freertos_idle_hook(old_idle_cb: esp_freertos_idle_c
 pub extern fn esp_deregister_freertos_tick_hook_for_cpu(old_tick_cb: esp_freertos_tick_cb_t, cpuid: UBaseType_t) void;
 pub extern fn esp_deregister_freertos_tick_hook(old_tick_cb: esp_freertos_tick_cb_t) void;
 pub fn Atomic_CompareAndSwap_u32(pulDestination: [*c]volatile u32, ulExchange: u32, ulComparand: u32) callconv(.C) u32 {
-    var ulReturnValue: u32 = undefined;
-    _ = &ulReturnValue;
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulReturnValue: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         if (pulDestination.* == ulComparand) {
             pulDestination.* = ulExchange;
@@ -2280,10 +2278,8 @@ pub fn Atomic_CompareAndSwap_u32(pulDestination: [*c]volatile u32, ulExchange: u
     return ulReturnValue;
 }
 pub fn Atomic_SwapPointers_p32(ppvDestination: [*c]volatile ?*anyopaque, pvExchange: ?*anyopaque) callconv(.C) ?*anyopaque {
-    var pReturnValue: ?*anyopaque = undefined;
-    _ = &pReturnValue;
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var pReturnValue: ?*anyopaque = null;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         pReturnValue = ppvDestination.*;
         ppvDestination.* = pvExchange;
@@ -2293,9 +2289,7 @@ pub fn Atomic_SwapPointers_p32(ppvDestination: [*c]volatile ?*anyopaque, pvExcha
 }
 pub fn Atomic_CompareAndSwapPointers_p32(ppvDestination: [*c]volatile ?*anyopaque, pvExchange: ?*anyopaque, pvComparand: ?*anyopaque) callconv(.C) u32 {
     var ulReturnValue: u32 = 0;
-    _ = &ulReturnValue;
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         if (ppvDestination.* == pvComparand) {
             ppvDestination.* = pvExchange;
@@ -2306,10 +2300,8 @@ pub fn Atomic_CompareAndSwapPointers_p32(ppvDestination: [*c]volatile ?*anyopaqu
     return ulReturnValue;
 }
 pub fn Atomic_Add_u32(pulAddend: [*c]volatile u32, ulCount: u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulAddend.*;
         pulAddend.* +%= @as(u32, @bitCast(ulCount));
@@ -2318,9 +2310,8 @@ pub fn Atomic_Add_u32(pulAddend: [*c]volatile u32, ulCount: u32) callconv(.C) u3
     return ulCurrent;
 }
 pub fn Atomic_Subtract_u32(pulAddend: [*c]volatile u32, ulCount: u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulAddend.*;
         pulAddend.* -%= @as(u32, @bitCast(ulCount));
@@ -2329,9 +2320,8 @@ pub fn Atomic_Subtract_u32(pulAddend: [*c]volatile u32, ulCount: u32) callconv(.
     return ulCurrent;
 }
 pub fn Atomic_Increment_u32(pulAddend: [*c]volatile u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulAddend.*;
         pulAddend.* +%= @as(u32, @bitCast(@as(u32, @bitCast(@as(c_int, 1)))));
@@ -2340,10 +2330,8 @@ pub fn Atomic_Increment_u32(pulAddend: [*c]volatile u32) callconv(.C) u32 {
     return ulCurrent;
 }
 pub fn Atomic_Decrement_u32(pulAddend: [*c]volatile u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulAddend.*;
         pulAddend.* -%= @as(u32, @bitCast(@as(u32, @bitCast(@as(c_int, 1)))));
@@ -2352,10 +2340,8 @@ pub fn Atomic_Decrement_u32(pulAddend: [*c]volatile u32) callconv(.C) u32 {
     return ulCurrent;
 }
 pub fn Atomic_OR_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulDestination.*;
         pulDestination.* |= @as(u32, @bitCast(ulValue));
@@ -2364,10 +2350,8 @@ pub fn Atomic_OR_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C
     return ulCurrent;
 }
 pub fn Atomic_AND_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulDestination.*;
         pulDestination.* &= @as(u32, @bitCast(ulValue));
@@ -2376,10 +2360,8 @@ pub fn Atomic_AND_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.
     return ulCurrent;
 }
 pub fn Atomic_NAND_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulDestination.*;
         pulDestination.* = ~(ulCurrent & ulValue);
@@ -2388,10 +2370,8 @@ pub fn Atomic_NAND_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(
     return ulCurrent;
 }
 pub fn Atomic_XOR_u32(pulDestination: [*c]volatile u32, ulValue: u32) callconv(.C) u32 {
-    var ulCurrent: u32 = undefined;
-
-    var uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
-    _ = &uxCriticalSectionType;
+    var ulCurrent: u32 = 0;
+    const uxCriticalSectionType: UBaseType_t = xPortSetInterruptMaskFromISR();
     {
         ulCurrent = pulDestination.*;
         pulDestination.* ^= @as(u32, @bitCast(ulValue));
@@ -6472,9 +6452,9 @@ pub const httpd_config_t = extern struct {
     lru_purge_enable: bool = std.mem.zeroes(bool),
     recv_wait_timeout: u16 = std.mem.zeroes(u16),
     send_wait_timeout: u16 = std.mem.zeroes(u16),
-    global_user_ctx: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    global_user_ctx: ?*anyopaque = null,
     global_user_ctx_free_fn: httpd_free_ctx_fn_t = std.mem.zeroes(httpd_free_ctx_fn_t),
-    global_transport_ctx: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    global_transport_ctx: ?*anyopaque = null,
     global_transport_ctx_free_fn: httpd_free_ctx_fn_t = std.mem.zeroes(httpd_free_ctx_fn_t),
     enable_so_linger: bool = std.mem.zeroes(bool),
     linger_timeout: c_int = std.mem.zeroes(c_int),
@@ -6493,9 +6473,9 @@ pub const httpd_req_t = extern struct {
     method: c_int = std.mem.zeroes(c_int),
     uri: [513]u8 = std.mem.zeroes([513]u8),
     content_len: usize = std.mem.zeroes(usize),
-    aux: ?*anyopaque = std.mem.zeroes(?*anyopaque),
-    user_ctx: ?*anyopaque = std.mem.zeroes(?*anyopaque),
-    sess_ctx: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    aux: ?*anyopaque = null,
+    user_ctx: ?*anyopaque = null,
+    sess_ctx: ?*anyopaque = null,
     free_ctx: httpd_free_ctx_fn_t = std.mem.zeroes(httpd_free_ctx_fn_t),
     ignore_sess_ctx_changes: bool = std.mem.zeroes(bool),
 };
@@ -6503,7 +6483,7 @@ pub const httpd_uri_t = extern struct {
     uri: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
     method: httpd_method_t = std.mem.zeroes(httpd_method_t),
     handler: ?*const fn ([*c]httpd_req_t) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn ([*c]httpd_req_t) callconv(.C) esp_err_t),
-    user_ctx: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    user_ctx: ?*anyopaque = null,
 };
 pub extern fn httpd_register_uri_handler(handle: httpd_handle_t, uri_handler: [*c]const httpd_uri_t) esp_err_t;
 pub extern fn httpd_unregister_uri_handler(handle: httpd_handle_t, uri: [*:0]const u8, method: httpd_method_t) esp_err_t;
@@ -6525,7 +6505,7 @@ pub const httpd_err_code_t = enum(c_uint) {
 };
 pub const httpd_err_handler_func_t = ?*const fn ([*c]httpd_req_t, httpd_err_code_t) callconv(.C) esp_err_t;
 pub extern fn httpd_register_err_handler(handle: httpd_handle_t, @"error": httpd_err_code_t, handler_fn: httpd_err_handler_func_t) esp_err_t;
-pub const httpd_send_func_t = ?*const fn (httpd_handle_t, c_int, [*c]const u8, usize, c_int) callconv(.C) c_int;
+pub const httpd_send_func_t = ?*const fn (httpd_handle_t, c_int, [*:0]const u8, usize, c_int) callconv(.C) c_int;
 pub const httpd_recv_func_t = ?*const fn (httpd_handle_t, c_int, [*:0]u8, usize, c_int) callconv(.C) c_int;
 pub const httpd_pending_func_t = ?*const fn (httpd_handle_t, c_int) callconv(.C) c_int;
 pub extern fn httpd_sess_set_recv_override(hd: httpd_handle_t, sockfd: c_int, recv_func: httpd_recv_func_t) esp_err_t;
@@ -6677,7 +6657,7 @@ pub const eth_mac_config_t = extern struct {
     flags: u32 = std.mem.zeroes(u32),
 };
 pub const eth_spi_custom_driver_config_t = extern struct {
-    config: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    config: ?*anyopaque = null,
     init: ?*const fn (?*const anyopaque) callconv(.C) ?*anyopaque = std.mem.zeroes(?*const fn (?*const anyopaque) callconv(.C) ?*anyopaque),
     deinit: ?*const fn (?*anyopaque) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (?*anyopaque) callconv(.C) esp_err_t),
     read: ?*const fn (?*anyopaque, u32, u32, ?*anyopaque, u32) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (?*anyopaque, u32, u32, ?*anyopaque, u32) callconv(.C) esp_err_t),
@@ -6765,7 +6745,7 @@ pub extern fn esp_crypto_base64_encode(dst: [*:0]u8, dlen: usize, olen: [*c]usiz
 // /espressif/esp-idf/components/http_parser/http_parser.h:224:16: warning: struct demoted to opaque type - has bitfield
 pub const http_parser = opaque {};
 pub const http_cb = ?*const fn (?*http_parser) callconv(.C) c_int;
-pub const http_data_cb = ?*const fn (?*http_parser, [*c]const u8, usize) callconv(.C) c_int;
+pub const http_data_cb = ?*const fn (?*http_parser, [*:0]const u8, usize) callconv(.C) c_int;
 pub const http_parser_settings = extern struct {
     on_message_begin: http_cb = std.mem.zeroes(http_cb),
     on_url: http_data_cb = std.mem.zeroes(http_data_cb),
@@ -6894,3 +6874,89 @@ pub extern fn http_parser_url_init(u: [*c]http_parser_url) void;
 pub extern fn http_parser_parse_url(buf: [*:0]const u8, buflen: usize, is_connect: c_int, u: [*c]http_parser_url) c_int;
 pub extern fn http_parser_pause(parser: ?*http_parser, paused: c_int) void;
 pub extern fn http_body_is_final(parser: ?*const http_parser) c_int;
+
+pub const esp_now_send_status_t = enum(c_uint) {
+    ESP_NOW_SEND_SUCCESS = 0,
+    ESP_NOW_SEND_FAIL = 1,
+};
+pub const esp_now_peer_info = extern struct {
+    peer_addr: [6]u8 = std.mem.zeroes([6]u8),
+    lmk: [16]u8 = std.mem.zeroes([16]u8),
+    channel: u8 = std.mem.zeroes(u8),
+    ifidx: wifi_interface_t = std.mem.zeroes(wifi_interface_t),
+    encrypt: bool = std.mem.zeroes(bool),
+    priv: ?*anyopaque = null,
+};
+pub const esp_now_peer_info_t = esp_now_peer_info;
+pub const esp_now_peer_num = extern struct {
+    total_num: c_int = std.mem.zeroes(c_int),
+    encrypt_num: c_int = std.mem.zeroes(c_int),
+};
+pub const esp_now_peer_num_t = esp_now_peer_num;
+pub const esp_now_recv_info = extern struct {
+    src_addr: [*:0]u8 = std.mem.zeroes([*:0]u8),
+    des_addr: [*:0]u8 = std.mem.zeroes([*:0]u8),
+    rx_ctrl: ?*wifi_pkt_rx_ctrl_t = std.mem.zeroes(?*wifi_pkt_rx_ctrl_t),
+};
+pub const esp_now_recv_info_t = esp_now_recv_info;
+pub const esp_now_rate_config = extern struct {
+    phymode: wifi_phy_mode_t = std.mem.zeroes(wifi_phy_mode_t),
+    rate: wifi_phy_rate_t = std.mem.zeroes(wifi_phy_rate_t),
+    ersu: bool = std.mem.zeroes(bool),
+};
+pub const esp_now_rate_config_t = esp_now_rate_config;
+pub const esp_now_recv_cb_t = ?*const fn ([*c]const esp_now_recv_info_t, [*:0]const u8, c_int) callconv(.C) void;
+pub const esp_now_send_cb_t = ?*const fn ([*:0]const u8, esp_now_send_status_t) callconv(.C) void;
+pub extern fn esp_now_init() esp_err_t;
+pub extern fn esp_now_deinit() esp_err_t;
+pub extern fn esp_now_get_version(version: [*c]u32) esp_err_t;
+pub extern fn esp_now_register_recv_cb(cb: esp_now_recv_cb_t) esp_err_t;
+pub extern fn esp_now_unregister_recv_cb() esp_err_t;
+pub extern fn esp_now_register_send_cb(cb: esp_now_send_cb_t) esp_err_t;
+pub extern fn esp_now_unregister_send_cb() esp_err_t;
+pub extern fn esp_now_send(peer_addr: [*:0]const u8, data: [*:0]const u8, len: usize) esp_err_t;
+pub extern fn esp_now_add_peer(peer: [*c]const esp_now_peer_info_t) esp_err_t;
+pub extern fn esp_now_del_peer(peer_addr: [*:0]const u8) esp_err_t;
+pub extern fn esp_now_mod_peer(peer: [*c]const esp_now_peer_info_t) esp_err_t;
+pub extern fn esp_wifi_config_espnow_rate(ifx: wifi_interface_t, rate: wifi_phy_rate_t) esp_err_t;
+pub extern fn esp_now_set_peer_rate_config(peer_addr: [*:0]const u8, config: [*c]esp_now_rate_config_t) esp_err_t;
+pub extern fn esp_now_get_peer(peer_addr: [*:0]const u8, peer: [*c]esp_now_peer_info_t) esp_err_t;
+pub extern fn esp_now_fetch_peer(from_head: bool, peer: [*c]esp_now_peer_info_t) esp_err_t;
+pub extern fn esp_now_is_peer_exist(peer_addr: [*:0]const u8) bool;
+pub extern fn esp_now_get_peer_num(num: [*c]esp_now_peer_num_t) esp_err_t;
+pub extern fn esp_now_set_pmk(pmk: [*:0]const u8) esp_err_t;
+pub extern fn esp_now_set_wake_window(window: u16) esp_err_t;
+
+pub const esp_eap_ttls_phase2_types = enum(c_uint) {
+    ESP_EAP_TTLS_PHASE2_EAP = 0,
+    ESP_EAP_TTLS_PHASE2_MSCHAPV2 = 1,
+    ESP_EAP_TTLS_PHASE2_MSCHAP = 2,
+    ESP_EAP_TTLS_PHASE2_PAP = 3,
+    ESP_EAP_TTLS_PHASE2_CHAP = 4,
+};
+pub const esp_eap_fast_config = extern struct {
+    fast_provisioning: c_int = std.mem.zeroes(c_int),
+    fast_max_pac_list_len: c_int = std.mem.zeroes(c_int),
+    fast_pac_format_binary: bool = std.mem.zeroes(bool),
+};
+pub extern fn esp_wifi_sta_enterprise_enable() esp_err_t;
+pub extern fn esp_wifi_sta_enterprise_disable() esp_err_t;
+pub extern fn esp_eap_client_set_identity(identity: [*:0]const u8, len: c_int) esp_err_t;
+pub extern fn esp_eap_client_clear_identity() void;
+pub extern fn esp_eap_client_set_username(username: [*:0]const u8, len: c_int) esp_err_t;
+pub extern fn esp_eap_client_clear_username() void;
+pub extern fn esp_eap_client_set_password(password: [*:0]const u8, len: c_int) esp_err_t;
+pub extern fn esp_eap_client_clear_password() void;
+pub extern fn esp_eap_client_set_new_password(new_password: [*:0]const u8, len: c_int) esp_err_t;
+pub extern fn esp_eap_client_clear_new_password() void;
+pub extern fn esp_eap_client_set_ca_cert(ca_cert: [*:0]const u8, ca_cert_len: c_int) esp_err_t;
+pub extern fn esp_eap_client_clear_ca_cert() void;
+pub extern fn esp_eap_client_set_certificate_and_key(client_cert: [*:0]const u8, client_cert_len: c_int, private_key: [*:0]const u8, private_key_len: c_int, private_key_password: [*:0]const u8, private_key_passwd_len: c_int) esp_err_t;
+pub extern fn esp_eap_client_clear_certificate_and_key() void;
+pub extern fn esp_eap_client_set_disable_time_check(disable: bool) esp_err_t;
+pub extern fn esp_eap_client_get_disable_time_check(disable: [*c]bool) esp_err_t;
+pub extern fn esp_eap_client_set_ttls_phase2_method(@"type": esp_eap_ttls_phase2_types) esp_err_t;
+pub extern fn esp_eap_client_set_suiteb_192bit_certification(enable: bool) esp_err_t;
+pub extern fn esp_eap_client_set_pac_file(pac_file: [*:0]const u8, pac_file_len: c_int) esp_err_t;
+pub extern fn esp_eap_client_set_fast_params(config: esp_eap_fast_config) esp_err_t;
+pub extern fn esp_eap_client_use_default_cert_bundle(use_default_bundle: bool) esp_err_t;

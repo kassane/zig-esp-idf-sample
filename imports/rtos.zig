@@ -17,7 +17,9 @@ pub const xTimerGetStaticBuffer = sys.xTimerGetStaticBuffer;
 pub const xTimerCreateTimerTask = sys.xTimerCreateTimerTask;
 pub const xTimerGenericCommandFromTask = sys.xTimerGenericCommandFromTask;
 pub const xTimerGenericCommandFromISR = sys.xTimerGenericCommandFromISR;
+
 pub const vApplicationGetTimerTaskMemory = sys.vApplicationGetTimerTaskMemory;
+
 pub const xEventGroupCreate = sys.xEventGroupCreate;
 pub const xEventGroupCreateStatic = sys.xEventGroupCreateStatic;
 pub const xEventGroupWaitBits = sys.xEventGroupWaitBits;
@@ -250,3 +252,26 @@ pub inline fn uxSemaphoreGetCountFromISR(xSemaphore: anytype) sys.UBaseType_t {
 pub inline fn xSemaphoreGetStaticBuffer(xSemaphore: anytype, ppxSemaphoreBuffer: anytype) sys.BaseType_t {
     return xQueueGenericGetStaticBuffers(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore), null, ppxSemaphoreBuffer);
 }
+
+pub const Hook = struct {
+    pub const Register = struct {
+        pub fn idleForCPU(new_idle_cb: sys.esp_freertos_idle_cb_t, cpuid: sys.UBaseType_t) !void {
+            return try @import("error").espCheckError(sys.esp_register_freertos_idle_hook_for_cpu(new_idle_cb, cpuid));
+        }
+        pub fn idle(new_idle_cb: sys.esp_freertos_idle_cb_t) !void {
+            return try @import("error").espCheckError(sys.esp_register_freertos_idle_hook(new_idle_cb));
+        }
+        pub fn tickForCPU(new_tick_cb: sys.esp_freertos_tick_cb_t, cpuid: sys.UBaseType_t) !void {
+            return try @import("error").espCheckError(sys.esp_register_freertos_tick_hook_for_cpu(new_tick_cb, cpuid));
+        }
+        pub fn tick(new_tick_cb: sys.esp_freertos_tick_cb_t) !void {
+            return try @import("error").espCheckError(sys.esp_register_freertos_tick_hook(new_tick_cb));
+        }
+    };
+    pub const Deregister = struct {
+        pub const idleForCPU = sys.esp_deregister_freertos_idle_hook_for_cpu;
+        pub const idle = sys.esp_deregister_freertos_idle_hook;
+        pub const tickForCPU = sys.esp_deregister_freertos_tick_hook_for_cpu;
+        pub const tick = sys.esp_deregister_freertos_tick_hook;
+    };
+};

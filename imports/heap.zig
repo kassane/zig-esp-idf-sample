@@ -6,10 +6,10 @@ pub const HeapCapsAllocator = struct {
     caps: sys.Caps = .MALLOC_CAP_DEFAULT,
 
     const Self = @This();
-    pub fn init(cap: sys.Caps) Self {
-        return .{
-            .caps = cap,
-        };
+    pub fn init(cap: ?sys.Caps) Self {
+        if (cap) |user_cap| {
+            return .{ .caps = user_cap };
+        } else return .{}; // keep .MALLOC_CAP_DEFAULT
     }
     pub fn allocator(self: *Self) std.mem.Allocator {
         return .{

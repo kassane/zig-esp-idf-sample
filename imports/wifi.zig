@@ -156,7 +156,7 @@ pub const Vendor = struct {
         return try errors.espCheckError(sys.esp_wifi_set_vendor_ie(enable, @"type", idx, vnd_ie));
     }
     pub fn setIECallback(callback: sys.esp_vendor_ie_cb_t, ctx: ?*anyopaque) !void {
-        return try errors.espCheckError(sys.esp_ifi_set_vendor_ie_cb(callback, ctx));
+        return try errors.espCheckError(sys.esp_wifi_set_vendor_ie_cb(callback, ctx));
     }
 };
 pub fn setMaxTXPower(power: i8) !void {
@@ -278,4 +278,120 @@ pub const PowerDomain = struct {
     pub fn Off() void {
         sys.esp_wifi_power_domain_off();
     }
+};
+
+pub const EspNow = struct {
+    pub fn init() !void {
+        return try errors.espCheckError(sys.esp_now_init());
+    }
+    pub fn deinit() !void {
+        return try errors.espCheckError(sys.esp_now_deinit());
+    }
+    pub fn getVersion(version: [*c]u32) !void {
+        return try errors.espCheckError(sys.esp_now_get_version(version));
+    }
+    pub fn registerReceiveCallback(cb: sys.esp_now_recv_cb_t) !void {
+        return try errors.espCheckError(sys.esp_now_register_recv_cb(cb));
+    }
+    pub fn unregisterReceiveCallback() !void {
+        return try errors.espCheckError(sys.esp_now_unregister_recv_cb());
+    }
+    pub fn registerSendCallback(cb: sys.esp_now_send_cb_t) !void {
+        return try errors.espCheckError(sys.esp_now_register_send_cb(cb));
+    }
+    pub fn unregisterSendCallback() !void {
+        return try errors.espCheckError(sys.esp_now_unregister_send_cb());
+    }
+    pub fn send(peer_addr: [*:0]const u8, data: [*:0]const u8, len: usize) !void {
+        return try errors.espCheckError(sys.esp_now_send(peer_addr, data, len));
+    }
+    pub fn addPeer(peer: [*c]const sys.esp_now_peer_info_t) !void {
+        return try errors.espCheckError(sys.esp_now_add_peer(peer));
+    }
+    pub fn delPeer(peer_addr: [*:0]const u8) !void {
+        return try errors.espCheckError(sys.esp_now_del_peer(peer_addr));
+    }
+    pub fn modPeer(peer: [*c]const sys.esp_now_peer_info_t) !void {
+        return try errors.espCheckError(sys.esp_now_mod_peer(peer));
+    }
+    pub fn wifiConfigRate(ifx: sys.wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_config_espnow_rate(ifx, rate));
+    }
+    pub fn setPeerRateConfig(peer_addr: [*:0]const u8, config: [*c]sys.esp_now_rate_config_t) !void {
+        return try errors.espCheckError(sys.esp_now_set_peer_rate_config(peer_addr, config));
+    }
+    pub fn getPeer(peer_addr: [*:0]const u8, peer: [*c]sys.esp_now_peer_info_t) !void {
+        return try errors.espCheckError(sys.esp_now_get_peer(peer_addr, peer));
+    }
+    pub fn fetchPeer(from_head: bool, peer: [*c]sys.esp_now_peer_info_t) !void {
+        return try errors.espCheckError(sys.esp_now_fetch_peer(from_head, peer));
+    }
+    pub const isPeerExist = sys.esp_now_is_peer_exist;
+    pub fn getPeerNum(num: [*c]sys.esp_now_peer_num_t) !void {
+        return try errors.espCheckError(sys.esp_now_get_peer_num(num));
+    }
+    pub fn setPMK(pmk: [*:0]const u8) !void {
+        return try errors.espCheckError(sys.esp_now_set_pmk(pmk));
+    }
+    pub fn setWakeWindow(window: u16) !void {
+        return try errors.espCheckError(sys.esp_now_set_wake_window(window));
+    }
+};
+
+pub const Enterprise = struct {
+    pub const Station = struct {
+        pub fn enable() !void {
+            return try errors.espCheckError(sys.esp_wifi_sta_enterprise_enable());
+        }
+        pub fn disable() !void {
+            return try errors.espCheckError(sys.esp_wifi_sta_enterprise_disable());
+        }
+    };
+    pub const Client = struct {
+        pub fn setIdentity(identity: [*:0]const u8, len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_identity(identity, len));
+        }
+        pub const clearIdentity = sys.esp_eap_client_clear_identity;
+        pub fn setUsername(username: [*:0]const u8, len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_username(username, len));
+        }
+        pub const clearUsername = sys.esp_eap_client_clear_username;
+        pub fn setPassword(password: [*:0]const u8, len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_password(password, len));
+        }
+        pub const clearPassword = sys.esp_eap_client_clear_new_password;
+        pub fn setNewPassword(new_password: [*:0]const u8, len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_new_password(new_password, len));
+        }
+        pub const clearNewPassword = sys.esp_eap_client_clear_new_password;
+        pub fn setCACertificate(ca_cert: [*:0]const u8, ca_cert_len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_ca_cert(ca_cert, ca_cert_len));
+        }
+        pub const clearCACertificate = sys.esp_eap_client_clear_ca_cert;
+        pub fn setCertificateKey(client_cert: [*:0]const u8, client_cert_len: c_int, private_key: [*:0]const u8, private_key_len: c_int, private_key_password: [*:0]const u8, private_key_passwd_len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_certificate_and_key(client_cert, client_cert_len, private_key, private_key_len, private_key_password, private_key_passwd_len));
+        }
+        pub const clearCertificateKey = sys.esp_eap_client_clear_certificate_and_key;
+        pub fn setDisableTimeCheck(disable: bool) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_disable_time_check(disable));
+        }
+        pub fn getDisableTimeCheck(disable: [*c]bool) !void {
+            return try errors.espCheckError(sys.esp_eap_client_get_disable_time_check(disable));
+        }
+        pub fn setTTLSPhase2Method(@"type": sys.esp_eap_ttls_phase2_types) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_ttls_phase2_method(@"type"));
+        }
+        pub fn setSuiteb192bitCertification(enable: bool) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_suiteb_192bit_certification(enable));
+        }
+        pub fn setPACFile(pac_file: [*:0]const u8, pac_file_len: c_int) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_pac_file(pac_file, pac_file_len));
+        }
+        pub fn setFastParams(config: sys.esp_eap_fast_config) !void {
+            return try errors.espCheckError(sys.esp_eap_client_set_fast_params(config));
+        }
+        pub fn useDefaultCertificateBundle(use_default_bundle: bool) !void {
+            return try errors.espCheckError(sys.esp_eap_client_use_default_cert_bundle(use_default_bundle));
+        }
+    };
 };

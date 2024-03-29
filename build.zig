@@ -439,6 +439,17 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const crc = b.addModule("crc", .{
+        .root_source_file = .{
+            .path = b.pathJoin(&.{ src_path, "imports", "crc.zig" }),
+        },
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     return b.addModule("esp_idf", .{
         .root_source_file = .{
             .path = b.pathJoin(&.{ src_path, "imports", "idf.zig" }),
@@ -447,6 +458,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "led",
                 .module = led,
+            },
+            .{
+                .name = "crc",
+                .module = crc,
             },
             .{
                 .name = "bootloader",
