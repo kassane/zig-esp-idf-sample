@@ -1886,7 +1886,7 @@ pub extern fn heap_caps_malloc_extmem_enable(limit: usize) void;
 pub extern fn heap_caps_malloc_prefer(size: usize, num: usize, ...) ?*anyopaque;
 pub extern fn heap_caps_realloc_prefer(ptr: ?*anyopaque, size: usize, num: usize, ...) ?*anyopaque;
 pub extern fn heap_caps_calloc_prefer(n: usize, size: usize, num: usize, ...) ?*anyopaque;
-pub extern fn heap_caps_dump(caps: u32) void;
+pub extern fn heap_caps_dump(caps: Caps) void;
 pub extern fn heap_caps_dump_all() void;
 pub extern fn heap_caps_get_allocated_size(ptr: ?*anyopaque) usize;
 pub const StackType_t = u8;
