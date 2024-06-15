@@ -1,5 +1,5 @@
 build/
-zig-*/
+*zig-*/
 .vscode/
 .cache/
 sdkconfig

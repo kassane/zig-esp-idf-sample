@@ -1,9 +1,9 @@
 const std = @import("std");
 
 pub const Version = struct {
-    major: ?u32 = null,
-    minor: ?u32 = null,
-    patch: ?u32 = null,
+    major: ?u32 = 0,
+    minor: ?u32 = 0,
+    patch: ?u32 = 0,
     pub fn get() Version {
         var final_version: Version = .{};
         const idf_version = std.mem.span(@import("sys").esp_get_idf_version());
@@ -11,8 +11,8 @@ pub const Version = struct {
         if (!std.mem.startsWith(u8, idf_version, "v"))
             return final_version;
 
-        var strip = std.mem.split(u8, idf_version, "-");
-        var it = std.mem.tokenize(u8, strip.first(), ".");
+        var strip = std.mem.splitScalar(u8, idf_version, '-');
+        var it = std.mem.tokenizeScalar(u8, strip.first(), '.');
 
         while (it.next()) |token| {
             // skip [0] == 'v'
@@ -23,11 +23,11 @@ pub const Version = struct {
                 std.fmt.parseUnsigned(u32, token, 10) catch |err|
                     @panic(@errorName(err));
 
-            if (final_version.major == null) {
+            if (final_version.major == 0) {
                 final_version.major = digit;
-            } else if (final_version.minor == null) {
+            } else if (final_version.minor == 0) {
                 final_version.minor = digit;
-            } else if (final_version.patch == null) {
+            } else if (final_version.patch == 0) {
                 final_version.patch = digit;
             }
         }
