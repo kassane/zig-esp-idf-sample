@@ -24,11 +24,11 @@ ENV QEMU_SHA256=e7c72ef5705ad1444d391711088c8717fc89f42e9bf6d1487f9c2a326b8cfa83
 ENV QEMU_DIST=qemu-${QEMU_REL}.tar.xz
 ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-8.2.0-20240122/${QEMU_DIST}
 
-# Zig v0.12.0 - xtensa
-ENV ZIG_REL=zig-x86_64-relsafe-espressif-linux-musl-baseline
-ENV ZIG_SHA256=d0a3d816160421c6ca9e4e533e15a392850dce9e421817c42f6d2e686c54463f
+# Zig v0.14.0 - xtensa
+ENV ZIG_REL=zig-relsafe-espressif-x86_64-linux-musl-baseline
+ENV ZIG_SHA256=0b70670e28f9568bb8112c59572e6790d897ba17ed50ac15b3c3b42330a3c2d7
 ENV ZIG_DIST=${ZIG_REL}.tar.xz
-ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.12.0-dev/${ZIG_DIST}
+ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/${ZIG_DIST}
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
