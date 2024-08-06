@@ -2,31 +2,27 @@ FROM espressif/idf
 
 ARG DEBIAN_FRONTEND=nointeractive
 ARG CONTAINER_USER=esp
-ARG USER_UID=1000
+ARG USER_UID=1050
 ARG USER_GID=$USER_UID
 
 RUN apt-get update \
   && apt install -y -q \
   cmake \
   git \
-  hwdata \
   libglib2.0-0 \
   libnuma1 \
   libpixman-1-0 \
-  linux-tools-virtual \
   && rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/local/bin/usbip usbip `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
-
 # QEMU
-ENV QEMU_REL=xtensa-softmmu-esp_develop_8.2.0_20240122-x86_64-linux-gnu
+ENV QEMU_REL=esp_develop_8.2.0_20240122
 ENV QEMU_SHA256=e7c72ef5705ad1444d391711088c8717fc89f42e9bf6d1487f9c2a326b8cfa83
-ENV QEMU_DIST=qemu-${QEMU_REL}.tar.xz
+ENV QEMU_DIST=qemu-xtensa-softmmu-${QEMU_REL}-x86_64-linux-gnu.tar.xz
 ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-8.2.0-20240122/${QEMU_DIST}
 
 # Zig v0.14.0 - xtensa
 ENV ZIG_REL=zig-relsafe-espressif-x86_64-linux-musl-baseline
-ENV ZIG_SHA256=0b70670e28f9568bb8112c59572e6790d897ba17ed50ac15b3c3b42330a3c2d7
+ENV ZIG_SHA256=a7a23429a8cbc4cd872a25aafac6dbab24b9d20f3fd0b5624fac6fe20f16425e
 ENV ZIG_DIST=${ZIG_REL}.tar.xz
 ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/${ZIG_DIST}
 
