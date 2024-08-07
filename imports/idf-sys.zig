@@ -6558,6 +6558,168 @@ pub extern fn httpd_sess_update_lru_counter(handle: httpd_handle_t, sockfd: c_in
 pub extern fn httpd_get_client_list(handle: httpd_handle_t, fds: [*c]usize, client_fds: [*c]c_int) esp_err_t;
 pub const httpd_work_fn_t = ?*const fn (?*anyopaque) callconv(.C) void;
 pub extern fn httpd_queue_work(handle: httpd_handle_t, work: httpd_work_fn_t, arg: ?*anyopaque) esp_err_t;
+
+pub const esp_http_client_on_data = extern struct {
+    client: esp_http_client_handle_t = std.mem.zeroes(esp_http_client_handle_t),
+    data_process: i64 = std.mem.zeroes(i64),
+};
+pub const esp_http_client_redirect_event_data = extern struct {
+    client: esp_http_client_handle_t = std.mem.zeroes(esp_http_client_handle_t),
+    status_code: c_int = std.mem.zeroes(c_int),
+};
+pub const esp_http_client_event_id_t = enum(c_uint) {
+    HTTP_EVENT_ERROR = 0,
+    HTTP_EVENT_ON_CONNECTED = 1,
+    HTTP_EVENT_HEADERS_SENT = 2,
+    HTTP_EVENT_HEADER_SENT = 2,
+    HTTP_EVENT_ON_HEADER = 3,
+    HTTP_EVENT_ON_DATA = 4,
+    HTTP_EVENT_ON_FINISH = 5,
+    HTTP_EVENT_DISCONNECTED = 6,
+    HTTP_EVENT_REDIRECT = 7,
+};
+pub const esp_http_client_handle_t = ?*anyopaque;
+pub const esp_http_client_event_t = extern struct {
+    event_id: esp_http_client_event_id_t = std.mem.zeroes(esp_http_client_event_id_t),
+    client: esp_http_client_handle_t = std.mem.zeroes(esp_http_client_handle_t),
+    data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    data_len: c_int = std.mem.zeroes(c_int),
+    user_data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    header_key: [*c]u8 = std.mem.zeroes([*c]u8),
+    header_value: [*c]u8 = std.mem.zeroes([*c]u8),
+};
+pub const esp_http_client_proto_ver_t = enum(c_uint) {
+    ESP_HTTP_CLIENT_TLS_VER_ANY = 0,
+    ESP_HTTP_CLIENT_TLS_VER_TLS_1_2 = 1,
+    ESP_HTTP_CLIENT_TLS_VER_TLS_1_3 = 2,
+    ESP_HTTP_CLIENT_TLS_VER_MAX = 3,
+};
+pub const http_event_handle_cb = ?*const fn ([*c]esp_http_client_event_t) callconv(.C) esp_err_t;
+pub const esp_http_client_method_t = enum(c_uint) {
+    HTTP_METHOD_GET = 0,
+    HTTP_METHOD_POST = 1,
+    HTTP_METHOD_PUT = 2,
+    HTTP_METHOD_PATCH = 3,
+    HTTP_METHOD_DELETE = 4,
+    HTTP_METHOD_HEAD = 5,
+    HTTP_METHOD_NOTIFY = 6,
+    HTTP_METHOD_SUBSCRIBE = 7,
+    HTTP_METHOD_UNSUBSCRIBE = 8,
+    HTTP_METHOD_OPTIONS = 9,
+    HTTP_METHOD_COPY = 10,
+    HTTP_METHOD_MOVE = 11,
+    HTTP_METHOD_LOCK = 12,
+    HTTP_METHOD_UNLOCK = 13,
+    HTTP_METHOD_PROPFIND = 14,
+    HTTP_METHOD_PROPPATCH = 15,
+    HTTP_METHOD_MKCOL = 16,
+    HTTP_METHOD_MAX = 17,
+};
+pub const esp_http_client_auth_type_t = enum(c_uint) {
+    HTTP_AUTH_TYPE_NONE = 0,
+    HTTP_AUTH_TYPE_BASIC = 1,
+    HTTP_AUTH_TYPE_DIGEST = 2,
+};
+pub const esp_http_client_transport_t = enum(c_uint) {
+    HTTP_TRANSPORT_UNKNOWN = 0,
+    HTTP_TRANSPORT_OVER_TCP = 1,
+    HTTP_TRANSPORT_OVER_SSL = 2,
+};
+pub const esp_http_client_config_t = extern struct {
+    url: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    host: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    port: c_int = std.mem.zeroes(c_int),
+    username: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    password: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    auth_type: esp_http_client_auth_type_t = std.mem.zeroes(esp_http_client_auth_type_t),
+    path: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    query: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    cert_pem: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    cert_len: usize = std.mem.zeroes(usize),
+    client_cert_pem: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    client_cert_len: usize = std.mem.zeroes(usize),
+    client_key_pem: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    client_key_len: usize = std.mem.zeroes(usize),
+    client_key_password: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    client_key_password_len: usize = std.mem.zeroes(usize),
+    tls_version: esp_http_client_proto_ver_t = std.mem.zeroes(esp_http_client_proto_ver_t),
+    user_agent: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    method: esp_http_client_method_t = std.mem.zeroes(esp_http_client_method_t),
+    timeout_ms: c_int = std.mem.zeroes(c_int),
+    disable_auto_redirect: bool = std.mem.zeroes(bool),
+    max_redirection_count: c_int = std.mem.zeroes(c_int),
+    max_authorization_retries: c_int = std.mem.zeroes(c_int),
+    event_handler: http_event_handle_cb = std.mem.zeroes(http_event_handle_cb),
+    transport_type: esp_http_client_transport_t = std.mem.zeroes(esp_http_client_transport_t),
+    buffer_size: c_int = std.mem.zeroes(c_int),
+    buffer_size_tx: c_int = std.mem.zeroes(c_int),
+    user_data: ?*anyopaque = std.mem.zeroes(?*anyopaque),
+    is_async: bool = std.mem.zeroes(bool),
+    use_global_ca_store: bool = std.mem.zeroes(bool),
+    skip_cert_common_name_check: bool = std.mem.zeroes(bool),
+    common_name: [*:0]const u8 = std.mem.zeroes([*:0]const u8),
+    crt_bundle_attach: ?*const fn (?*anyopaque) callconv(.C) esp_err_t = std.mem.zeroes(?*const fn (?*anyopaque) callconv(.C) esp_err_t),
+    keep_alive_enable: bool = std.mem.zeroes(bool),
+    keep_alive_idle: c_int = std.mem.zeroes(c_int),
+    keep_alive_interval: c_int = std.mem.zeroes(c_int),
+    keep_alive_count: c_int = std.mem.zeroes(c_int),
+    if_name: [*c]ifreq = std.mem.zeroes([*c]ifreq),
+};
+pub const ifreq = extern struct {
+    ifr_name: [6]u8 = std.mem.zeroes([6]u8),
+};
+pub const HttpStatus_Code = enum(c_uint) {
+    HttpStatus_Ok = 200,
+    HttpStatus_MultipleChoices = 300,
+    HttpStatus_MovedPermanently = 301,
+    HttpStatus_Found = 302,
+    HttpStatus_SeeOther = 303,
+    HttpStatus_TemporaryRedirect = 307,
+    HttpStatus_PermanentRedirect = 308,
+    HttpStatus_BadRequest = 400,
+    HttpStatus_Unauthorized = 401,
+    HttpStatus_Forbidden = 403,
+    HttpStatus_NotFound = 404,
+    HttpStatus_InternalError = 500,
+};
+pub extern fn esp_http_client_init(config: [*c]const esp_http_client_config_t) esp_http_client_handle_t;
+pub extern fn esp_http_client_perform(client: esp_http_client_handle_t) esp_err_t;
+pub extern fn esp_http_client_cancel_request(client: esp_http_client_handle_t) esp_err_t;
+pub extern fn esp_http_client_set_url(client: esp_http_client_handle_t, url: [*:0]const u8) esp_err_t;
+pub extern fn esp_http_client_set_post_field(client: esp_http_client_handle_t, data: [*:0]const u8, len: c_int) esp_err_t;
+pub extern fn esp_http_client_get_post_field(client: esp_http_client_handle_t, data: [*c][*c]u8) c_int;
+pub extern fn esp_http_client_set_header(client: esp_http_client_handle_t, key: [*:0]const u8, value: [*:0]const u8) esp_err_t;
+pub extern fn esp_http_client_get_header(client: esp_http_client_handle_t, key: [*:0]const u8, value: [*c][*c]u8) esp_err_t;
+pub extern fn esp_http_client_get_username(client: esp_http_client_handle_t, value: [*c][*c]u8) esp_err_t;
+pub extern fn esp_http_client_set_username(client: esp_http_client_handle_t, username: [*:0]const u8) esp_err_t;
+pub extern fn esp_http_client_get_password(client: esp_http_client_handle_t, value: [*c][*c]u8) esp_err_t;
+pub extern fn esp_http_client_set_password(client: esp_http_client_handle_t, password: [*:0]const u8) esp_err_t;
+pub extern fn esp_http_client_set_authtype(client: esp_http_client_handle_t, auth_type: esp_http_client_auth_type_t) esp_err_t;
+pub extern fn esp_http_client_get_user_data(client: esp_http_client_handle_t, data: [*c]?*anyopaque) esp_err_t;
+pub extern fn esp_http_client_set_user_data(client: esp_http_client_handle_t, data: ?*anyopaque) esp_err_t;
+pub extern fn esp_http_client_get_errno(client: esp_http_client_handle_t) c_int;
+pub extern fn esp_http_client_set_method(client: esp_http_client_handle_t, method: esp_http_client_method_t) esp_err_t;
+pub extern fn esp_http_client_set_timeout_ms(client: esp_http_client_handle_t, timeout_ms: c_int) esp_err_t;
+pub extern fn esp_http_client_delete_header(client: esp_http_client_handle_t, key: [*:0]const u8) esp_err_t;
+pub extern fn esp_http_client_open(client: esp_http_client_handle_t, write_len: c_int) esp_err_t;
+pub extern fn esp_http_client_write(client: esp_http_client_handle_t, buffer: [*:0]const u8, len: c_int) c_int;
+pub extern fn esp_http_client_fetch_headers(client: esp_http_client_handle_t) i64;
+pub extern fn esp_http_client_is_chunked_response(client: esp_http_client_handle_t) bool;
+pub extern fn esp_http_client_read(client: esp_http_client_handle_t, buffer: [*:0]u8, len: c_int) c_int;
+pub extern fn esp_http_client_get_status_code(client: esp_http_client_handle_t) c_int;
+pub extern fn esp_http_client_get_content_length(client: esp_http_client_handle_t) i64;
+pub extern fn esp_http_client_close(client: esp_http_client_handle_t) esp_err_t;
+pub extern fn esp_http_client_cleanup(client: esp_http_client_handle_t) esp_err_t;
+pub extern fn esp_http_client_get_transport_type(client: esp_http_client_handle_t) esp_http_client_transport_t;
+pub extern fn esp_http_client_set_redirection(client: esp_http_client_handle_t) esp_err_t;
+pub extern fn esp_http_client_reset_redirect_counter(client: esp_http_client_handle_t) esp_err_t;
+pub extern fn esp_http_client_set_auth_data(client: esp_http_client_handle_t, auth_data: [*:0]const u8, len: c_int) esp_err_t;
+pub extern fn esp_http_client_add_auth(client: esp_http_client_handle_t) void;
+pub extern fn esp_http_client_is_complete_data_received(client: esp_http_client_handle_t) bool;
+pub extern fn esp_http_client_read_response(client: esp_http_client_handle_t, buffer: [*:0]u8, len: c_int) c_int;
+pub extern fn esp_http_client_flush_response(client: esp_http_client_handle_t, len: [*c]c_int) esp_err_t;
+pub extern fn esp_http_client_get_url(client: esp_http_client_handle_t, url: [*:0]u8, len: c_int) esp_err_t;
+pub extern fn esp_http_client_get_chunk_length(client: esp_http_client_handle_t, len: [*c]c_int) esp_err_t;
 pub const eth_data_interface_t = enum(c_uint) {
     EMAC_DATA_INTERFACE_RMII = 0,
     EMAC_DATA_INTERFACE_MII = 1,
@@ -6960,3 +7122,95 @@ pub extern fn esp_eap_client_set_suiteb_192bit_certification(enable: bool) esp_e
 pub extern fn esp_eap_client_set_pac_file(pac_file: [*:0]const u8, pac_file_len: c_int) esp_err_t;
 pub extern fn esp_eap_client_set_fast_params(config: esp_eap_fast_config) esp_err_t;
 pub extern fn esp_eap_client_use_default_cert_bundle(use_default_bundle: bool) esp_err_t;
+
+pub const esp_ota_handle_t = u32;
+pub extern fn esp_ota_get_app_description() [*c]const esp_app_desc_t;
+pub extern fn esp_ota_get_app_elf_sha256(dst: [*:0]u8, size: usize) c_int;
+pub extern fn esp_ota_begin(partition: [*c]const esp_partition_t, image_size: usize, out_handle: [*c]esp_ota_handle_t) esp_err_t;
+pub extern fn esp_ota_write(handle: esp_ota_handle_t, data: ?*const anyopaque, size: usize) esp_err_t;
+pub extern fn esp_ota_write_with_offset(handle: esp_ota_handle_t, data: ?*const anyopaque, size: usize, offset: u32) esp_err_t;
+pub extern fn esp_ota_end(handle: esp_ota_handle_t) esp_err_t;
+pub extern fn esp_ota_abort(handle: esp_ota_handle_t) esp_err_t;
+pub extern fn esp_ota_set_boot_partition(partition: [*c]const esp_partition_t) esp_err_t;
+pub extern fn esp_ota_get_boot_partition() [*c]const esp_partition_t;
+pub extern fn esp_ota_get_running_partition() [*c]const esp_partition_t;
+pub extern fn esp_ota_get_next_update_partition(start_from: [*c]const esp_partition_t) [*c]const esp_partition_t;
+pub extern fn esp_ota_get_partition_description(partition: [*c]const esp_partition_t, app_desc: [*c]esp_app_desc_t) esp_err_t;
+pub extern fn esp_ota_get_bootloader_description(bootloader_partition: [*c]const esp_partition_t, desc: [*c]esp_bootloader_desc_t) esp_err_t;
+pub extern fn esp_ota_get_app_partition_count() u8;
+pub extern fn esp_ota_mark_app_valid_cancel_rollback() esp_err_t;
+pub extern fn esp_ota_mark_app_invalid_rollback_and_reboot() esp_err_t;
+pub extern fn esp_ota_get_last_invalid_partition() [*c]const esp_partition_t;
+pub extern fn esp_ota_get_state_partition(partition: [*c]const esp_partition_t, ota_state: [*c]esp_ota_img_states_t) esp_err_t;
+pub extern fn esp_ota_erase_last_boot_app_partition() esp_err_t;
+pub extern fn esp_ota_check_rollback_is_possible() bool;
+pub const esp_app_desc_t = extern struct {
+    magic_word: u32 = std.mem.zeroes(u32),
+    secure_version: u32 = std.mem.zeroes(u32),
+    reserv1: [2]u32 = std.mem.zeroes([2]u32),
+    version: [32]u8 = std.mem.zeroes([32]u8),
+    project_name: [32]u8 = std.mem.zeroes([32]u8),
+    time: [16]u8 = std.mem.zeroes([16]u8),
+    date: [16]u8 = std.mem.zeroes([16]u8),
+    idf_ver: [32]u8 = std.mem.zeroes([32]u8),
+    app_elf_sha256: [32]u8 = std.mem.zeroes([32]u8),
+    reserv2: [20]u32 = std.mem.zeroes([20]u32),
+};
+pub extern fn esp_app_get_description() [*c]const esp_app_desc_t;
+pub extern fn esp_app_get_elf_sha256(dst: [*:0]u8, size: usize) c_int;
+pub const app_elf_sha256_str: [*:0]u8 = @extern([*:0]u8, .{
+    .name = "app_elf_sha256_str",
+});
+pub inline fn esp_app_get_elf_sha256_str() [*:0]u8 {
+    return @as([*:0]u8, @ptrCast(@alignCast(&app_elf_sha256_str)));
+}
+pub const esp_bootloader_desc_t = extern struct {
+    magic_byte: u8 = std.mem.zeroes(u8),
+    reserved: [3]u8 = std.mem.zeroes([3]u8),
+    version: u32 = std.mem.zeroes(u32),
+    idf_ver: [32]u8 = std.mem.zeroes([32]u8),
+    date_time: [24]u8 = std.mem.zeroes([24]u8),
+    reserved2: [16]u8 = std.mem.zeroes([16]u8),
+};
+
+pub const esp_ota_img_states_t = enum(c_uint) {
+    ESP_OTA_IMG_NEW = 0,
+    ESP_OTA_IMG_PENDING_VERIFY = 1,
+    ESP_OTA_IMG_VALID = 2,
+    ESP_OTA_IMG_INVALID = 3,
+    ESP_OTA_IMG_ABORTED = 4,
+    ESP_OTA_IMG_UNDEFINED = 4294967295,
+};
+
+pub extern const ESP_HTTPS_OTA_EVENT: esp_event_base_t;
+
+pub const esp_https_ota_event_t = enum(c_uint) {
+    ESP_HTTPS_OTA_START = 0,
+    ESP_HTTPS_OTA_CONNECTED = 1,
+    ESP_HTTPS_OTA_GET_IMG_DESC = 2,
+    ESP_HTTPS_OTA_VERIFY_CHIP_ID = 3,
+    ESP_HTTPS_OTA_DECRYPT_CB = 4,
+    ESP_HTTPS_OTA_WRITE_FLASH = 5,
+    ESP_HTTPS_OTA_UPDATE_BOOT_PARTITION = 6,
+    ESP_HTTPS_OTA_FINISH = 7,
+    ESP_HTTPS_OTA_ABORT = 8,
+};
+pub const esp_https_ota_handle_t = ?*anyopaque;
+pub const http_client_init_cb_t = ?*const fn (esp_http_client_handle_t) callconv(.C) esp_err_t;
+pub const esp_https_ota_config_t = extern struct {
+    http_config: [*c]const esp_http_client_config_t = std.mem.zeroes([*c]const esp_http_client_config_t),
+    http_client_init_cb: http_client_init_cb_t = std.mem.zeroes(http_client_init_cb_t),
+    bulk_flash_erase: bool = false,
+    partial_http_download: bool = false,
+    max_http_request_size: c_int = 0,
+    buffer_caps: u32 = 0,
+};
+pub extern fn esp_https_ota(ota_config: [*c]const esp_https_ota_config_t) esp_err_t;
+pub extern fn esp_https_ota_begin(ota_config: [*c]const esp_https_ota_config_t, handle: [*c]esp_https_ota_handle_t) esp_err_t;
+pub extern fn esp_https_ota_perform(https_ota_handle: esp_https_ota_handle_t) esp_err_t;
+pub extern fn esp_https_ota_is_complete_data_received(https_ota_handle: esp_https_ota_handle_t) bool;
+pub extern fn esp_https_ota_finish(https_ota_handle: esp_https_ota_handle_t) esp_err_t;
+pub extern fn esp_https_ota_abort(https_ota_handle: esp_https_ota_handle_t) esp_err_t;
+pub extern fn esp_https_ota_get_img_desc(https_ota_handle: esp_https_ota_handle_t, new_app_info: [*c]esp_app_desc_t) esp_err_t;
+pub extern fn esp_https_ota_get_image_len_read(https_ota_handle: esp_https_ota_handle_t) c_int;
+pub extern fn esp_https_ota_get_image_size(https_ota_handle: esp_https_ota_handle_t) c_int;

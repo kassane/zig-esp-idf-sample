@@ -122,14 +122,7 @@ pub const efuse_dev_t = extern struct {
     date: efuse_date_reg_t = std.mem.zeroes(efuse_date_reg_t),
 };
 pub extern var EFUSE: efuse_dev_t;
-pub const esp_ota_img_states_t = enum(c_uint) {
-    ESP_OTA_IMG_NEW = 0,
-    ESP_OTA_IMG_PENDING_VERIFY = 1,
-    ESP_OTA_IMG_VALID = 2,
-    ESP_OTA_IMG_INVALID = 3,
-    ESP_OTA_IMG_ABORTED = 4,
-    ESP_OTA_IMG_UNDEFINED = 4294967295,
-};
+
 pub const esp_ota_select_entry_t = extern struct {
     ota_seq: u32 = std.mem.zeroes(u32),
     seq_label: [20]u8 = std.mem.zeroes([20]u8),

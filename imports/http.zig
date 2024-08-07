@@ -113,3 +113,76 @@ pub const Server = struct {
         return try errors.espCheckError(sys.httpd_queue_work(handle, work, arg));
     }
 };
+
+pub const Client = struct {
+    c_config: sys.esp_http_client_config_t = null,
+
+    pub fn init(config: [*c]const sys.esp_http_client_config_t) Client {
+        return .{
+            .c_config = sys.esp_http_client_init(config),
+        };
+    }
+    pub const Get = struct {
+        pub fn url(client: sys.esp_http_client_handle_t, _url: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_get_url(client, _url));
+        }
+        pub fn postField(client: sys.esp_http_client_handle_t, data: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_get_post_field(client, data, @import("std").mem.len(data)));
+        }
+        pub fn header(client: sys.esp_http_client_handle_t, field: [*:0]const u8, value: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_get_header(client, field, value));
+        }
+        pub fn username(client: sys.esp_http_client_handle_t, _username: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_get_username(client, _username));
+        }
+        pub fn password(client: sys.esp_http_client_handle_t, _password: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_get_password(client, _password));
+        }
+        pub fn userData(client: sys.esp_http_client_handle_t, user_data: ?*anyopaque) !void {
+            return try errors.espCheckError(sys.esp_http_client_get_user_data(client, user_data));
+        }
+    };
+    pub const Set = struct {
+        pub fn url(client: sys.esp_http_client_handle_t, _url: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_url(client, _url));
+        }
+        pub fn postField(client: sys.esp_http_client_handle_t, data: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_post_field(client, data, @import("std").mem.len(data)));
+        }
+        pub fn header(client: sys.esp_http_client_handle_t, field: [*:0]const u8, value: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_header(client, field, value));
+        }
+        pub fn username(client: sys.esp_http_client_handle_t, _username: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_username(client, _username));
+        }
+        pub fn password(client: sys.esp_http_client_handle_t, _password: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_password(client, _password));
+        }
+        pub fn method(client: sys.esp_http_client_handle_t, _method: sys.esp_http_method_t) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_method(client, _method));
+        }
+        pub fn timeout(client: sys.esp_http_client_handle_t, timeout_ms: u32) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_timeout_ms(client, timeout_ms));
+        }
+        pub fn userData(client: sys.esp_http_client_handle_t, user_data: ?*anyopaque) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_user_data(client, user_data));
+        }
+        pub fn authData(client: sys.esp_http_client_handle_t, auth_data: [*:0]const u8) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_auth_data(client, auth_data, @import("std").mem.len(auth_data)));
+        }
+        pub fn authType(client: sys.esp_http_client_handle_t, auth_type: sys.esp_http_auth_type_t) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_authtype(client, auth_type));
+        }
+        pub fn redirection(client: sys.esp_http_client_handle_t) !void {
+            return try errors.espCheckError(sys.esp_http_client_set_redirection(client));
+        }
+    };
+    pub fn perform(client: sys.esp_http_client_handle_t) !void {
+        return try errors.espCheckError(sys.esp_http_client_perform(client));
+    }
+    pub const request = struct {
+        pub fn cancel(client: sys.esp_http_client_handle_t) !void {
+            return try errors.espCheckError(sys.esp_http_client_cancel_request(client));
+        }
+    };
+};
