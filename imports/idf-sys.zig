@@ -2478,6 +2478,15 @@ pub extern fn xQueueGenericReset(xQueue: QueueHandle_t, xNewQueue: BaseType_t) B
 pub extern fn vQueueSetQueueNumber(xQueue: QueueHandle_t, uxQueueNumber: UBaseType_t) void;
 pub extern fn uxQueueGetQueueNumber(xQueue: QueueHandle_t) UBaseType_t;
 pub extern fn ucQueueGetQueueType(xQueue: QueueHandle_t) u8;
+pub const queueSEND_TO_BACK = std.zig.c_translation.cast(BaseType_t, @as(c_int, 0));
+pub const queueSEND_TO_FRONT = std.zig.c_translation.cast(BaseType_t, @as(c_int, 1));
+pub const queueOVERWRITE = std.zig.c_translation.cast(BaseType_t, @as(c_int, 2));
+pub const queueQUEUE_TYPE_BASE = std.zig.c_translation.cast(u8, @as(c_uint, 0));
+pub const queueQUEUE_TYPE_SET = std.zig.c_translation.cast(u8, @as(c_uint, 0));
+pub const queueQUEUE_TYPE_MUTEX = std.zig.c_translation.cast(u8, @as(c_uint, 1));
+pub const queueQUEUE_TYPE_COUNTING_SEMAPHORE = std.zig.c_translation.cast(u8, @as(c_uint, 2));
+pub const queueQUEUE_TYPE_BINARY_SEMAPHORE = std.zig.c_translation.cast(u8, @as(c_uint, 3));
+pub const queueQUEUE_TYPE_RECURSIVE_MUTEX = std.zig.c_translation.cast(u8, @as(c_uint, 4));
 pub const SemaphoreHandle_t = QueueHandle_t;
 pub const xTASK_SNAPSHOT = extern struct {
     pxTCB: ?*anyopaque = null,
@@ -7215,25 +7224,23 @@ pub extern fn esp_https_ota_get_image_len_read(https_ota_handle: esp_https_ota_h
 pub extern fn esp_https_ota_get_image_size(https_ota_handle: esp_https_ota_handle_t) c_int;
 
 pub const pcnt_channel_level_action_t = enum(c_uint) {
-    pub const PCNT_CHANNEL_LEVEL_ACTION_KEEP: c_int = 0;
-    pub const PCNT_CHANNEL_LEVEL_ACTION_INVERSE: c_int = 1;
-    pub const PCNT_CHANNEL_LEVEL_ACTION_HOLD: c_int = 2;
+    PCNT_CHANNEL_LEVEL_ACTION_KEEP = 0,
+    PCNT_CHANNEL_LEVEL_ACTION_INVERSE = 1,
+    PCNT_CHANNEL_LEVEL_ACTION_HOLD = 2,
 };
 pub const pcnt_channel_edge_action_t = enum(c_uint) {
-    pub const PCNT_CHANNEL_EDGE_ACTION_HOLD: c_int = 0;
-    pub const PCNT_CHANNEL_EDGE_ACTION_INCREASE: c_int = 1;
-    pub const PCNT_CHANNEL_EDGE_ACTION_DECREASE: c_int = 2;
+    PCNT_CHANNEL_EDGE_ACTION_HOLD = 0,
+    PCNT_CHANNEL_EDGE_ACTION_INCREASE = 1,
+    PCNT_CHANNEL_EDGE_ACTION_DECREASE = 2,
 };
 pub const pcnt_unit_zero_cross_mode_t = enum(c_uint) {
-    pub const PCNT_UNIT_ZERO_CROSS_POS_ZERO: c_int = 0;
-    pub const PCNT_UNIT_ZERO_CROSS_NEG_ZERO: c_int = 1;
-    pub const PCNT_UNIT_ZERO_CROSS_NEG_POS: c_int = 2;
-    pub const PCNT_UNIT_ZERO_CROSS_POS_NEG: c_int = 3;
+    PCNT_UNIT_ZERO_CROSS_POS_ZERO = 0,
+    PCNT_UNIT_ZERO_CROSS_NEG_ZERO = 1,
+    PCNT_UNIT_ZERO_CROSS_NEG_POS = 2,
+    PCNT_UNIT_ZERO_CROSS_POS_NEG = 3,
 };
-pub const struct_pcnt_unit_t = opaque {};
-pub const pcnt_unit_handle_t = ?*struct_pcnt_unit_t;
-pub const struct_pcnt_chan_t = opaque {};
-pub const pcnt_channel_handle_t = ?*struct_pcnt_chan_t;
+pub const pcnt_unit_handle_t = ?*anyopaque;
+pub const pcnt_channel_handle_t = ?*anyopaque;
 pub const pcnt_watch_event_data_t = extern struct {
     watch_point_value: c_int = std.mem.zeroes(c_int),
     zero_cross_mode: pcnt_unit_zero_cross_mode_t = std.mem.zeroes(pcnt_unit_zero_cross_mode_t),
@@ -7248,7 +7255,7 @@ pub const pcnt_unit_config_t = extern struct {
     low_limit: c_int = std.mem.zeroes(c_int),
     high_limit: c_int = std.mem.zeroes(c_int),
     intr_priority: c_int = std.mem.zeroes(c_int),
-    flags: struct_unnamed_3 = std.mem.zeroes(struct_unnamed_3),
+    flags: ?*anyerror = null,
 };
 // /home/kassane/esp/v5.3/esp-idf/components/esp_driver_pcnt/include/driver/pulse_cnt.h:78:18: warning: struct demoted to opaque type - has bitfield
 const struct_unnamed_04 = opaque {};

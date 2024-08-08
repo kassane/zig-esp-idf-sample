@@ -97,7 +97,7 @@ pub fn searched_idf_libs(b: *std.Build, lib: *std.Build.Step.Compile) !void {
                 break true;
         } else false;
         if (lib_ext) {
-            const src_path = std.fs.path.dirname(@src().file) orelse "..";
+            const src_path = std.fs.path.dirname(@src().file) orelse b.pathResolve(&.{".."});
             const cwd_path = b.pathJoin(&.{ src_path, "build", b.dupe(entry.path) });
             const lib_file: std.Build.LazyPath = .{ .cwd_relative = cwd_path };
             lib.addObjectFile(lib_file);
@@ -128,7 +128,7 @@ pub fn searched_idf_include(b: *std.Build, lib: *std.Build.Step.Compile, idf_pat
 }
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
-    const src_path = std.fs.path.dirname(@src().file) orelse ".";
+    const src_path = std.fs.path.dirname(@src().file) orelse b.pathResolve(&.{"."});
     const sys = b.addModule("sys", .{
         .root_source_file = b.path(b.pathJoin(&.{
             src_path,

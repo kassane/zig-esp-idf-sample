@@ -192,6 +192,8 @@ pub const xRingbufferGetStaticBuffer = sys.xRingbufferGetStaticBuffer;
 pub const xRingbufferCreateWithCaps = sys.xRingbufferCreateWithCaps;
 pub const vRingbufferDeleteWithCaps = sys.vRingbufferDeleteWithCaps;
 
+pub const QueueHandle_t = sys.QueueHandle_t;
+
 pub inline fn xSemaphoreCreateBinary() sys.QueueHandle_t {
     return xQueueGenericCreate(1, 1, 3);
 }
@@ -253,6 +255,43 @@ pub inline fn xSemaphoreGetStaticBuffer(xSemaphore: anytype, ppxSemaphoreBuffer:
     return xQueueGenericGetStaticBuffers(@import("std").zig.c_translation.cast(sys.QueueHandle_t, xSemaphore), null, ppxSemaphoreBuffer);
 }
 
+pub inline fn xQueueCreate(uxQueueLength: anytype, uxItemSize: anytype) @TypeOf(xQueueGenericCreate(uxQueueLength, uxItemSize, sys.queueQUEUE_TYPE_BASE)) {
+    return xQueueGenericCreate(uxQueueLength, uxItemSize, sys.queueQUEUE_TYPE_BASE);
+}
+pub inline fn xQueueCreateStatic(uxQueueLength: anytype, uxItemSize: anytype, pucQueueStorage: anytype, pxQueueBuffer: anytype) @TypeOf(xQueueGenericCreateStatic(uxQueueLength, uxItemSize, pucQueueStorage, pxQueueBuffer, sys.queueQUEUE_TYPE_BASE)) {
+    return xQueueGenericCreateStatic(uxQueueLength, uxItemSize, pucQueueStorage, pxQueueBuffer, sys.queueQUEUE_TYPE_BASE);
+}
+pub inline fn xQueueGetStaticBuffers(xQueue: anytype, ppucQueueStorage: anytype, ppxStaticQueue: anytype) @TypeOf(xQueueGenericGetStaticBuffers(xQueue, ppucQueueStorage, ppxStaticQueue)) {
+    return xQueueGenericGetStaticBuffers(xQueue, ppucQueueStorage, ppxStaticQueue);
+}
+pub inline fn xQueueSendToFront(xQueue: anytype, pvItemToQueue: anytype, xTicksToWait: anytype) @TypeOf(xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait, sys.queueSEND_TO_FRONT)) {
+    return xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait, sys.queueSEND_TO_FRONT);
+}
+pub inline fn xQueueSendToBack(xQueue: anytype, pvItemToQueue: anytype, xTicksToWait: anytype) @TypeOf(xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait, sys.queueSEND_TO_BACK)) {
+    return xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait, sys.queueSEND_TO_BACK);
+}
+pub inline fn xQueueSend(xQueue: anytype, pvItemToQueue: anytype, xTicksToWait: anytype) @TypeOf(xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait, sys.queueSEND_TO_BACK)) {
+    return xQueueGenericSend(xQueue, pvItemToQueue, xTicksToWait, sys.queueSEND_TO_BACK);
+}
+pub inline fn xQueueOverwrite(xQueue: anytype, pvItemToQueue: anytype) @TypeOf(xQueueGenericSend(xQueue, pvItemToQueue, @as(c_int, 0), sys.queueOVERWRITE)) {
+    return xQueueGenericSend(xQueue, pvItemToQueue, @as(c_int, 0), sys.queueOVERWRITE);
+}
+pub inline fn xQueueSendToFrontFromISR(xQueue: anytype, pvItemToQueue: anytype, pxHigherPriorityTaskWoken: anytype) @TypeOf(xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueSEND_TO_FRONT)) {
+    return xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueSEND_TO_FRONT);
+}
+pub inline fn xQueueSendToBackFromISR(xQueue: anytype, pvItemToQueue: anytype, pxHigherPriorityTaskWoken: anytype) @TypeOf(xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueSEND_TO_BACK)) {
+    return xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueSEND_TO_BACK);
+}
+pub inline fn xQueueOverwriteFromISR(xQueue: anytype, pvItemToQueue: anytype, pxHigherPriorityTaskWoken: anytype) @TypeOf(xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueOVERWRITE)) {
+    return xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueOVERWRITE);
+}
+pub inline fn xQueueSendFromISR(xQueue: anytype, pvItemToQueue: anytype, pxHigherPriorityTaskWoken: anytype) @TypeOf(xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueSEND_TO_BACK)) {
+    return xQueueGenericSendFromISR(xQueue, pvItemToQueue, pxHigherPriorityTaskWoken, sys.queueSEND_TO_BACK);
+}
+pub inline fn xQueueReset(xQueue: anytype) @TypeOf(xQueueGenericReset(xQueue, @intFromBool(false))) {
+    return xQueueGenericReset(xQueue, @intFromBool(false));
+}
+
 pub const Hook = struct {
     pub const Register = struct {
         pub fn idleForCPU(new_idle_cb: sys.esp_freertos_idle_cb_t, cpuid: sys.UBaseType_t) !void {
@@ -275,3 +314,10 @@ pub const Hook = struct {
         pub const tick = sys.esp_deregister_freertos_tick_hook;
     };
 };
+
+pub inline fn pdMS_TO_TICKS(xTimeInMs: anytype) sys.TickType_t {
+    return @divExact(@as(sys.TickType_t, xTimeInMs) * sys.configTICK_RATE_HZ, @as(sys.TickType_t, 1000));
+}
+pub inline fn pdTICKS_TO_MS(xTicks: anytype) sys.TickType_t {
+    return @divExact(@as(sys.TickType_t, xTicks) * @as(sys.TickType_t, 1000), sys.configTICK_RATE_HZ);
+}

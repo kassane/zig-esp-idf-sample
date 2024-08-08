@@ -2,7 +2,14 @@ const sys = @import("sys");
 const errors = @import("error");
 
 pub const PulseCounter = struct {
+    pub const watchEventData_t = sys.pcnt_watch_event_data_t;
+    pub const eventCallbacks_t = sys.pcnt_event_callbacks_t;
+    pub const glitchFilterConfig_t = sys.pcnt_glitch_filter_config_t;
+
     pub const Unit = struct {
+        pub const config_t = sys.pcnt_unit_config_t;
+        pub const handle_t = sys.pcnt_unit_handle_t;
+
         pub fn init(config: ?*const sys.pcnt_unit_config_t, unit: ?*sys.pcnt_unit_handle_t) !void {
             return try errors.espCheckError(sys.pcnt_new_unit(config, unit));
         }
@@ -41,6 +48,11 @@ pub const PulseCounter = struct {
         }
     };
     pub const Channel = struct {
+        pub const handle_t = sys.pcnt_channel_handle_t;
+        pub const config_t = sys.pcnt_chan_config_t;
+        pub const edgeAction_t = sys.pcnt_channel_edge_action_t;
+        pub const level_t = sys.pcnt_channel_level_t;
+
         pub fn init(unit: sys.pcnt_unit_handle_t, config: ?*const sys.pcnt_chan_config_t, chan: ?*sys.pcnt_channel_handle_t) !void {
             return try errors.espCheckError(sys.pcnt_new_channel(unit, config, chan));
         }
