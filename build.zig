@@ -9,45 +9,12 @@ pub fn build(b: *std.Build) !void {
 
     const lib = b.addStaticLibrary(.{
         .name = "zig",
-        // comment or remove .root_source_file, make null value for module detection
         .root_source_file = b.path("main/lib.zig"),
         .target = target,
         .optimize = optimize,
     });
-
-    // https://github.com/kassane/zig-esp-idf-sample/issues/3
-    // led_strip_component(lib);
-
-    // if detect zig root_source_file, enable zig modules (or use c/c++ files)
-    if (lib.root_module.root_source_file != null) {
-        lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
-        lib.linkLibC(); // stubs for libc
-    } else {
-        // For C and/or C++ files (using clang/clang++)
-        lib.addCSourceFiles(.{
-            .files = &.{
-                "main/lib.cc",
-            },
-            .flags = &.{
-                "-Wall",
-                "-Wextra",
-                "-Wpedantic",
-                "-fno-threadsafe-statics",
-                "-std=c++23",
-                "-ffreestanding",
-                "-fexperimental-library",
-            },
-        });
-        lib.defineCMacro("_LIBCPP_HAS_NO_THREADS", null);
-        lib.defineCMacro("_LIBCPP_HAS_NO_LOCALIZATION", null);
-        // lib.defineCMacro("_LIBCPP_HAS_NO_WIDE_CHARACTERS", null);
-        // lib.defineCMacro("_LIBCPP_HAS_NO_FILESYSTEM", null);
-        // lib.defineCMacro("_LIBCPP_HAS_NO_RANDOM_DEVICE", null);
-        lib.defineCMacro("_LIBCPP_FREESTANDING", null);
-
-        // static linking (libc++ + libunwind + libc++abi) + libc
-        lib.linkLibCpp();
-    }
+    lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
+    lib.linkLibC(); // stubs for libc
 
     try includeDeps(b, lib);
     b.installArtifact(lib);
@@ -74,58 +41,45 @@ fn includeDeps(b: *std.Build, lib: *std.Build.Step.Compile) !void {
             @tagName(lib.rootModuleTarget().cpu.arch),
         });
 
-        lib.addIncludePath(.{ .cwd_relative = b.pathJoin(&.{
-            home_dir,
-            ".espressif",
-            "tools",
-            archtools,
-            "esp-13.2.0_20230928",
-            archtools,
-            "include",
-        }) });
-        lib.addIncludePath(.{ .cwd_relative = b.pathJoin(&.{
-            home_dir,
-            ".espressif",
-            "tools",
-            archtools,
-            "esp-13.2.0_20230928",
-            archtools,
-            archtools,
-            "sys-include",
-        }) });
         lib.addIncludePath(.{
             .cwd_relative = b.pathJoin(&.{
                 home_dir,
                 ".espressif",
                 "tools",
                 archtools,
-                "esp-13.2.0_20230928",
+                "esp-13.2.0_20240530",
+                archtools,
+                "include",
+            }),
+        });
+        lib.addSystemIncludePath(.{
+            .cwd_relative = b.pathJoin(&.{
+                home_dir,
+                ".espressif",
+                "tools",
+                archtools,
+                "esp-13.2.0_20240530",
+                archtools,
+                archtools,
+                "sys-include",
+            }),
+        });
+        lib.addIncludePath(.{
+            .cwd_relative = b.pathJoin(&.{
+                home_dir,
+                ".espressif",
+                "tools",
+                archtools,
+                "esp-13.2.0_20240530",
                 archtools,
                 archtools,
                 "include",
             }),
         });
     }
-    lib.addIncludePath(b.path("include"));
-}
 
-fn led_strip_component(lib: *std.Build.Step.Compile) void {
-    lib.addIncludePath(.{
-        .cwd_relative = "../managed_components/espressif__led_strip/include",
-    });
-    lib.addIncludePath(.{
-        .cwd_relative = "../managed_components/espressif__led_strip/interface",
-    });
-    lib.addCSourceFiles(.{
-        .root = .{ .cwd_relative = "../managed_components/espressif__led_strip/src" },
-        .files = &.{
-            "led_strip_api.c",
-            "led_strip_rmt_encoder.c",
-            "led_strip_rmt_dev.c",
-            "led_strip_spi_dev.c",
-        },
-        .flags = &.{},
-    });
+    // user include dirs
+    lib.addIncludePath(b.path("include"));
 }
 
 pub fn searched_idf_libs(b: *std.Build, lib: *std.Build.Step.Compile) !void {
@@ -321,6 +275,23 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             src_path,
             "imports",
             "http.zig",
+        })),
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
+    const pcnt = b.addModule("pulse", .{
+        .root_source_file = b.path(b.pathJoin(&.{
+            src_path,
+            "imports",
+            "pcnt.zig",
         })),
         .imports = &.{
             .{
@@ -590,6 +561,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "http",
                 .module = http,
+            },
+            .{
+                .name = "pulse",
+                .module = pcnt,
             },
         },
     });

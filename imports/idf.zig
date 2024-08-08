@@ -13,6 +13,7 @@ pub usingnamespace @import("log");
 pub const lwip = @import("lwip");
 pub const mqtt = @import("mqtt");
 pub const phy = @import("phy");
+pub usingnamespace @import("pulse");
 pub usingnamespace @import("panic");
 pub usingnamespace @import("rtos");
 pub const segger = @import("segger");

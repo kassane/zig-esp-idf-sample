@@ -6535,14 +6535,13 @@ pub extern fn httpd_resp_set_type(r: [*c]httpd_req_t, @"type": [*:0]const u8) es
 pub extern fn httpd_resp_set_hdr(r: [*c]httpd_req_t, field: [*:0]const u8, value: [*:0]const u8) esp_err_t;
 pub extern fn httpd_resp_send_err(req: [*c]httpd_req_t, @"error": httpd_err_code_t, msg: [*:0]const u8) esp_err_t;
 pub fn httpd_resp_send_404(r: [*c]httpd_req_t) callconv(.C) esp_err_t {
-    _ = r; // autofix
-    return httpd_resp_send_err(.HTTPD_404_NOT_FOUND, null);
+    return httpd_resp_send_err(r, .HTTPD_404_NOT_FOUND, "Error: 404 Not Found");
 }
 pub fn httpd_resp_send_408(r: [*c]httpd_req_t) callconv(.C) esp_err_t {
-    return httpd_resp_send_err(r, .HTTPD_408_REQ_TIMEOUT, null);
+    return httpd_resp_send_err(r, .HTTPD_408_REQ_TIMEOUT, "Error: 408 Request Timeout");
 }
 pub fn httpd_resp_send_500(r: [*c]httpd_req_t) callconv(.C) esp_err_t {
-    return httpd_resp_send_err(r, .HTTPD_500_INTERNAL_SERVER_ERROR, null);
+    return httpd_resp_send_err(r, .HTTPD_500_INTERNAL_SERVER_ERROR, "Error: 500 Internal Server");
 }
 pub extern fn httpd_send(r: [*c]httpd_req_t, buf: [*:0]const u8, buf_len: usize) c_int;
 pub extern fn httpd_socket_send(hd: httpd_handle_t, sockfd: c_int, buf: [*:0]const u8, buf_len: usize, flags: c_int) c_int;
@@ -7214,3 +7213,66 @@ pub extern fn esp_https_ota_abort(https_ota_handle: esp_https_ota_handle_t) esp_
 pub extern fn esp_https_ota_get_img_desc(https_ota_handle: esp_https_ota_handle_t, new_app_info: [*c]esp_app_desc_t) esp_err_t;
 pub extern fn esp_https_ota_get_image_len_read(https_ota_handle: esp_https_ota_handle_t) c_int;
 pub extern fn esp_https_ota_get_image_size(https_ota_handle: esp_https_ota_handle_t) c_int;
+
+pub const pcnt_channel_level_action_t = enum(c_uint) {
+    pub const PCNT_CHANNEL_LEVEL_ACTION_KEEP: c_int = 0;
+    pub const PCNT_CHANNEL_LEVEL_ACTION_INVERSE: c_int = 1;
+    pub const PCNT_CHANNEL_LEVEL_ACTION_HOLD: c_int = 2;
+};
+pub const pcnt_channel_edge_action_t = enum(c_uint) {
+    pub const PCNT_CHANNEL_EDGE_ACTION_HOLD: c_int = 0;
+    pub const PCNT_CHANNEL_EDGE_ACTION_INCREASE: c_int = 1;
+    pub const PCNT_CHANNEL_EDGE_ACTION_DECREASE: c_int = 2;
+};
+pub const pcnt_unit_zero_cross_mode_t = enum(c_uint) {
+    pub const PCNT_UNIT_ZERO_CROSS_POS_ZERO: c_int = 0;
+    pub const PCNT_UNIT_ZERO_CROSS_NEG_ZERO: c_int = 1;
+    pub const PCNT_UNIT_ZERO_CROSS_NEG_POS: c_int = 2;
+    pub const PCNT_UNIT_ZERO_CROSS_POS_NEG: c_int = 3;
+};
+pub const struct_pcnt_unit_t = opaque {};
+pub const pcnt_unit_handle_t = ?*struct_pcnt_unit_t;
+pub const struct_pcnt_chan_t = opaque {};
+pub const pcnt_channel_handle_t = ?*struct_pcnt_chan_t;
+pub const pcnt_watch_event_data_t = extern struct {
+    watch_point_value: c_int = std.mem.zeroes(c_int),
+    zero_cross_mode: pcnt_unit_zero_cross_mode_t = std.mem.zeroes(pcnt_unit_zero_cross_mode_t),
+};
+pub const pcnt_watch_cb_t = ?*const fn (pcnt_unit_handle_t, [*c]const pcnt_watch_event_data_t, ?*anyopaque) callconv(.C) bool;
+pub const pcnt_event_callbacks_t = extern struct {
+    on_reach: pcnt_watch_cb_t = std.mem.zeroes(pcnt_watch_cb_t),
+};
+// /home/kassane/esp/v5.3/esp-idf/components/esp_driver_pcnt/include/driver/pulse_cnt.h:67:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_3 = opaque {};
+pub const pcnt_unit_config_t = extern struct {
+    low_limit: c_int = std.mem.zeroes(c_int),
+    high_limit: c_int = std.mem.zeroes(c_int),
+    intr_priority: c_int = std.mem.zeroes(c_int),
+    flags: struct_unnamed_3 = std.mem.zeroes(struct_unnamed_3),
+};
+// /home/kassane/esp/v5.3/esp-idf/components/esp_driver_pcnt/include/driver/pulse_cnt.h:78:18: warning: struct demoted to opaque type - has bitfield
+const struct_unnamed_04 = opaque {};
+pub const pcnt_chan_config_t = extern struct {
+    edge_gpio_num: c_int = std.mem.zeroes(c_int),
+    level_gpio_num: c_int = std.mem.zeroes(c_int),
+    flags: struct_unnamed_04 = std.mem.zeroes(struct_unnamed_04),
+};
+pub const pcnt_glitch_filter_config_t = extern struct {
+    max_glitch_ns: u32 = std.mem.zeroes(u32),
+};
+pub extern fn pcnt_new_unit(config: ?*const pcnt_unit_config_t, ret_unit: [*c]pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_del_unit(unit: pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_unit_set_glitch_filter(unit: pcnt_unit_handle_t, config: [*c]const pcnt_glitch_filter_config_t) esp_err_t;
+pub extern fn pcnt_unit_enable(unit: pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_unit_disable(unit: pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_unit_start(unit: pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_unit_stop(unit: pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_unit_clear_count(unit: pcnt_unit_handle_t) esp_err_t;
+pub extern fn pcnt_unit_get_count(unit: pcnt_unit_handle_t, value: [*c]c_int) esp_err_t;
+pub extern fn pcnt_unit_register_event_callbacks(unit: pcnt_unit_handle_t, cbs: [*c]const pcnt_event_callbacks_t, user_data: ?*anyopaque) esp_err_t;
+pub extern fn pcnt_unit_add_watch_point(unit: pcnt_unit_handle_t, watch_point: c_int) esp_err_t;
+pub extern fn pcnt_unit_remove_watch_point(unit: pcnt_unit_handle_t, watch_point: c_int) esp_err_t;
+pub extern fn pcnt_new_channel(unit: pcnt_unit_handle_t, config: ?*const pcnt_chan_config_t, ret_chan: [*c]pcnt_channel_handle_t) esp_err_t;
+pub extern fn pcnt_del_channel(chan: pcnt_channel_handle_t) esp_err_t;
+pub extern fn pcnt_channel_set_edge_action(chan: pcnt_channel_handle_t, pos_act: pcnt_channel_edge_action_t, neg_act: pcnt_channel_edge_action_t) esp_err_t;
+pub extern fn pcnt_channel_set_level_action(chan: pcnt_channel_handle_t, high_act: pcnt_channel_level_action_t, low_act: pcnt_channel_level_action_t) esp_err_t;
