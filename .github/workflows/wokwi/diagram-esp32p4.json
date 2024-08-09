@@ -1,16 +1,14 @@
 {
-    "version": 1,
-    "author": "Uri Shaked",
-    "editor": "wokwi",
-    "parts": [
-      {
-        "type": "board-esp32-p4-preview",
-        "id": "esp",
-        "top": 0,
-        "left": 0,
-        "attrs": { "builder": "esp-idf" }
-      }
-    ],
-    "connections": [ [ "esp:TX", "$serialMonitor:RX", "", [] ], [ "esp:RX", "$serialMonitor:TX", "", [] ] ],
-    "dependencies": {}
-  }
+  "version": 1,
+  "author": "Uri Shaked",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-p4-preview", "id": "esp", "top": -17.23, "left": -16.04, "attrs": {} }
+  ],
+  "connections": [
+    ["esp:TX", "$serialMonitor:RX", "", []],
+    ["esp:RX", "$serialMonitor:TX", "", []]
+  ],
+  "serialMonitor": { "display": "terminal" },
+  "dependencies": {}
+}

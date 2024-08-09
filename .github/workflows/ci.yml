@@ -7,9 +7,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest]
-        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6]
-    runs-on: ${{ matrix.runs-on }}
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32p4]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: espressif/esp-idf-ci-action@v1
