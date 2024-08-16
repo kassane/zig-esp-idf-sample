@@ -23,7 +23,7 @@ This project aims to integrate Zig language and toolchain with the [Espressif Io
 | esp32-s3 | `-Dtarget=xtensa-freestanding-none -Dcpu=esp32s3` |
 | esp32-c2/c3 | `-Dtarget=riscv32-freestanding-none -Dcpu=generic_rv32+c+m` |
 | esp32-h2/c5/c6 | `-Dtarget=riscv32-freestanding-none -Dcpu=generic_rv32+a+c+m` |
-| esp32-p4 | `-Dtarget=riscv32-freestanding-eabihf -Dcpu=generic_rv32+a+c+f+m` |
+| esp32-p4 | `-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32p4` |
 
 <br>
 <sub>

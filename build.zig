@@ -596,10 +596,10 @@ const riscv_targets = &[_]std.Target.Query{
     // esp32-p4
     .{
         .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
         .os_tag = .freestanding,
         .abi = .eabihf,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .f }),
+        .cpu_features_sub = std.Target.riscv.featureSet(&.{.xesppie}), // FIXME
     },
 };
 const xtensa_targets = &[_]std.Target.Query{
