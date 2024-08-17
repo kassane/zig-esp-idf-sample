@@ -5387,6 +5387,52 @@ pub extern fn esp_wifi_sta_get_aid(aid: [*c]u16) esp_err_t;
 pub extern fn esp_wifi_sta_get_negotiated_phymode(phymode: [*c]wifi_phy_mode_t) esp_err_t;
 pub extern fn esp_wifi_set_dynamic_cs(enabled: bool) esp_err_t;
 pub extern fn esp_wifi_sta_get_rssi(rssi: [*c]c_int) esp_err_t;
+
+// ------------------------------ wifi internal STUBS
+pub export fn esp_wifi_internal_set_sta_ip() callconv(.C) esp_err_t {
+    return .ESP_OK;
+}
+
+pub const wifi_netstack_buf_ref_cb_t = ?*const fn (?*anyopaque) callconv(.C) void;
+pub const wifi_netstack_buf_free_cb_t = ?*const fn (?*anyopaque) callconv(.C) void;
+pub export fn esp_wifi_internal_reg_netstack_buf_cb(ref: wifi_netstack_buf_ref_cb_t, free: wifi_netstack_buf_free_cb_t) esp_err_t {
+    _ = ref; // unused
+    _ = free; // unused
+    return .ESP_OK;
+}
+
+pub export fn esp_wifi_internal_free_rx_buffer(buffer: ?*anyopaque) void {
+    std.c.free(buffer);
+}
+const struct_esp_remote_channel = opaque {};
+pub const esp_remote_channel_t = ?*struct_esp_remote_channel;
+pub const esp_remote_channel_tx_fn_t = ?*const fn (?*anyopaque, ?*anyopaque, usize) callconv(.C) esp_err_t;
+var s_tx_cb: [2]esp_remote_channel_tx_fn_t = std.mem.zeroes([2]esp_remote_channel_tx_fn_t);
+var s_channel: [2]esp_remote_channel_t = std.mem.zeroes([2]esp_remote_channel_t);
+var s_rx_fn: [2]wifi_rxcb_t = std.mem.zeroes([2]wifi_rxcb_t);
+pub const wifi_rxcb_t = ?*const fn (?*anyopaque, u16, ?*anyopaque) callconv(.C) esp_err_t;
+
+pub export fn esp_wifi_internal_tx(ifx: wifi_interface_t, buffer: ?*anyopaque, len: u16) esp_err_t {
+    if (ifx == .WIFI_IF_STA) {
+        return s_tx_cb[@as(c_uint, @intCast(@as(c_int, 0)))].?(@as(?*anyopaque, @ptrCast(s_channel[@as(c_uint, @intCast(@as(c_int, 0)))])), buffer, @as(usize, @bitCast(@as(c_ulong, len))));
+    }
+    if (ifx == .WIFI_IF_AP) {
+        return s_tx_cb[@as(c_uint, @intCast(@as(c_int, 1)))].?(@as(?*anyopaque, @ptrCast(s_channel[@as(c_uint, @intCast(@as(c_int, 1)))])), buffer, @as(usize, @bitCast(@as(c_ulong, len))));
+    }
+    return .ESP_FAIL;
+}
+pub export fn esp_wifi_internal_reg_rxcb(ifx: wifi_interface_t, @"fn": wifi_rxcb_t) esp_err_t {
+    if (ifx == .WIFI_IF_STA) {
+        s_rx_fn[@as(c_uint, @intCast(@as(c_int, 0)))] = @"fn";
+        return .ESP_OK;
+    }
+    if (ifx == .WIFI_IF_AP) {
+        s_rx_fn[@as(c_uint, @intCast(@as(c_int, 1)))] = @"fn";
+        return .ESP_OK;
+    }
+    return .ESP_FAIL;
+}
+// -------------------------------------------------
 pub const linenoiseCompletions = opaque {};
 pub const esp_console_config_t = extern struct {
     max_cmdline_length: usize = std.mem.zeroes(usize),

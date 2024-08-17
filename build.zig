@@ -328,6 +328,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .name = "sys",
                 .module = sys,
             },
+            .{
+                .name = "error",
+                .module = errors,
+            },
         },
     });
     const gpio = b.addModule("gpio", .{

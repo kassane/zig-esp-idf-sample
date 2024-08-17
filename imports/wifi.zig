@@ -271,6 +271,7 @@ pub const Station = struct {
         }
     };
 };
+
 pub const PowerDomain = struct {
     pub fn On() void {
         sys.esp_wifi_power_domain_on();
@@ -394,4 +395,24 @@ pub const Enterprise = struct {
             return try errors.espCheckError(sys.esp_eap_client_use_default_cert_bundle(use_default_bundle));
         }
     };
+};
+
+pub const Internal = struct {
+    // STUBS
+    pub fn setStationIp() !void {
+        return try errors.espCheckError(sys.esp_wifi_internal_set_sta_ip());
+    }
+    pub fn registryNetstackBufCallback(ref: sys.wifi_netstack_buf_ref_cb_t, free: sys.wifi_netstack_buf_free_cb_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_internal_reg_netstack_buf_cb(ref, free));
+    }
+    pub fn freeRXBuffer(buffer: ?*anyopaque) !void {
+        if (buffer) |b|
+            return try errors.espCheckError(sys.esp_wifi_internal_free_rx_buffer(b));
+    }
+    pub fn txBuffer(ifx: sys.wifi_interface_t, buffer: ?*anyopaque, len: u16) !void {
+        return try errors.espCheckError(sys.esp_wifi_internal_tx(ifx, buffer, len));
+    }
+    pub fn registryTXCallBack(ifx: sys.wifi_interface_t, @"fn": sys.wifi_rxcb_t) !void {
+        return try errors.espCheckError(sys.esp_wifi_internal_reg_rxcb(ifx, @"fn"));
+    }
 };
