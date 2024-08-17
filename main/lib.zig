@@ -24,7 +24,7 @@ export fn app_main() callconv(.C) void {
         \\* Compiler Backend: {s}
         \\
     , .{
-        builtin.zig_version_string,
+        @as([]const u8, builtin.zig_version_string), // fix esp32p4(.xesppie) fmt-slice bug
         @tagName(builtin.zig_backend),
     });
 

@@ -593,13 +593,12 @@ const riscv_targets = &[_]std.Target.Query{
         .abi = .none,
         .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c }),
     },
-    // esp32-p4
+    // esp32-p4 have .xesppie cpu-feature (espressif vendor extension)
     .{
         .cpu_arch = .riscv32,
         .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
         .os_tag = .freestanding,
         .abi = .eabihf,
-        .cpu_features_sub = std.Target.riscv.featureSet(&.{.xesppie}), // FIXME
     },
 };
 const xtensa_targets = &[_]std.Target.Query{
