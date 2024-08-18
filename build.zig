@@ -587,7 +587,7 @@ const riscv_targets = &[_]std.Target.Query{
         .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
         .os_tag = .freestanding,
         .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c }),
+        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
     },
     // esp32-c6/61/h2
     .{
@@ -595,7 +595,7 @@ const riscv_targets = &[_]std.Target.Query{
         .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
         .os_tag = .freestanding,
         .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c }),
+        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
     },
     // esp32-p4 have .xesppie cpu-feature (espressif vendor extension)
     .{
