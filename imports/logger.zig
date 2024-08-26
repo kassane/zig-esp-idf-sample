@@ -28,7 +28,10 @@ pub const default_level: sys.esp_log_level_t = switch (@import("builtin").mode) 
     .ReleaseFast, .ReleaseSmall => .ESP_LOG_ERROR,
 };
 pub fn ESP_LOG(allocator: std.mem.Allocator, comptime tag: [*:0]const u8, comptime fmt: []const u8, args: anytype) void {
-    const buffer = std.fmt.allocPrintZ(allocator, fmt, args) catch |err| @panic(@errorName(err));
+    const buffer = if (isComptime(args))
+        std.fmt.comptimePrint(fmt, args)
+    else
+        std.fmt.allocPrintZ(allocator, fmt, args) catch |err| @panic(@errorName(err));
     sys.esp_log_write(default_level, tag, buffer, sys.esp_log_timestamp(), tag);
 }
 pub const default_color = switch (default_level) {
@@ -57,3 +60,7 @@ pub const LOG_COLOR_E = LOG_COLOR(LOG_COLOR_RED);
 pub const LOG_COLOR_W = LOG_COLOR(LOG_COLOR_BROWN);
 pub const LOG_COLOR_I = LOG_COLOR(LOG_COLOR_GREEN);
 pub const default_log_scope = .espressif;
+
+inline fn isComptime(val: anytype) bool {
+    return @typeInfo(@TypeOf(.{val})).Struct.fields[0].is_comptime;
+}
