@@ -62,5 +62,5 @@ pub const LOG_COLOR_I = LOG_COLOR(LOG_COLOR_GREEN);
 pub const default_log_scope = .espressif;
 
 inline fn isComptime(val: anytype) bool {
-    return @typeInfo(@TypeOf(.{val})).Struct.fields[0].is_comptime;
+    return @typeInfo(@TypeOf(.{val})).@"struct".fields[0].is_comptime;
 }
