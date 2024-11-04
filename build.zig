@@ -603,6 +603,7 @@ const riscv_targets = &[_]std.Target.Query{
         .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
         .os_tag = .freestanding,
         .abi = .eabihf,
+        .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
     },
 };
 const xtensa_targets = &[_]std.Target.Query{
