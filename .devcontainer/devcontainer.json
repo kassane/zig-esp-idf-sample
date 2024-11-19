@@ -3,6 +3,10 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
+	"mounts": [
+		// Unfortunately this mount only works for linux users:
+		"source=/dev/bus/usb,target=/dev/bus/usb,type=bind,consistency=cached"
+	],
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -14,7 +18,8 @@
 				"idf.gitPath": "/usr/bin/git"
 			},
 			"extensions": [
-				"espressif.esp-idf-extension"
+				"espressif.esp-idf-extension",
+				"ziglang.vscode-zig"
 			]
 		},
 		"codespaces": {
@@ -28,9 +33,12 @@
 			},
 			"extensions": [
 				"espressif.esp-idf-extension",
+				"ziglang.vscode-zig",
 				"espressif.esp-idf-web"
 			]
 		}
 	},
-	"runArgs": ["--privileged"]
+	"runArgs": [
+		"--privileged"
+	]
 }
