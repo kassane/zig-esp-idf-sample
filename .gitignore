@@ -6,3 +6,5 @@ sdkconfig
 *.old
 *.lock
 managed_components/
+
+!flake.lock
