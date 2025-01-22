@@ -1,6 +1,10 @@
 name: Wokwi-CI Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
@@ -13,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v5.3
+          esp_idf_version: v5.4
           target: ${{ matrix.target }}
       - name: Copy diagram ${{ matrix.target }}
         run: |
