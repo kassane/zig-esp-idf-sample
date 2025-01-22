@@ -29,7 +29,7 @@
 
                 src = pkgs.fetchurl {
                   url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-x86_64-linux-musl-baseline.tar.xz";
-                  sha256 = "sha256-rZRlawDcRfsJinzz3ANpa/AW2nZ5Hu4yss3VAANchak=";
+                  sha256 = "sha256-KAFGYgUP1poWbUJCsvqrJIs7VyZayWbGDqeD+jUG7og=";
                 };
                 dontConfigure = true;
                 dontBuild = true;

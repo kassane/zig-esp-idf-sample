@@ -4,8 +4,8 @@ Like [esp-rs](https://github.com/espressif/rust-esp32-example/blob/main/docs/rus
 
 **Current version:**
 
-- **Zig**: v0.12.0 ([bootstrap fork](https://github.com/kassane/zig-espressif-bootstrap))
-- **LLVM**: v17.0.1 ([espressif-fork](https://github.com/espressif/llvm-project))
+- **Zig**: v0.14.0 ([bootstrap fork](https://github.com/kassane/zig-espressif-bootstrap))
+- **LLVM**: v19.0.2 ([espressif-fork](https://github.com/espressif/llvm-project))
 
 
 ### Commands
@@ -96,7 +96,7 @@ error: unknown CPU feature: ''
 
 #### Target info (builtin)
 
-**Note:** If like syntax-highlighting use `| bat -p -l zig` pipeline command or save this output as `filename.zig` and open on your code editor.
+**Note:** If like syntax-highlighting use `| bat -p -l zig` pipeline command or save this output as `builtin.zig` and open on your code editor.
 
 ```bash
 $> zig build-lib --show-builtin -target xtensa-freestanding-none -mcpu=esp32s3
@@ -106,7 +106,7 @@ const std = @import("std");
 /// Zig version. When writing code that supports multiple versions of Zig, prefer
 /// feature detection (i.e. with `@hasDecl` or `@hasField`) over version checks.
 pub const zig_version = std.SemanticVersion.parse(zig_version_string) catch unreachable;
-pub const zig_version_string = "0.12.0";
+pub const zig_version_string = "0.14.0";
 pub const zig_backend = std.builtin.CompilerBackend.stage2_llvm;
 
 pub const output_mode = std.builtin.OutputMode.Lib;

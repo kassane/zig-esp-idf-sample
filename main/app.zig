@@ -133,7 +133,7 @@ export fn bar(_: ?*anyopaque) callconv(.C) void {
 // override the std panic function with idf.panic
 pub const panic = idf.panic;
 const log = std.log.scoped(.@"esp-idf");
-pub const std_options = .{
+pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
         .Debug => .debug,
         else => .info,
