@@ -9,6 +9,8 @@
 
 This project aims to integrate Zig language and toolchain with the [Espressif IoT Development Framework](https://github.com/espressif/esp-idf) for enhanced development capabilities on ESP32 and its variants.
 
+More information about building and using Zig with ESP-IDF can be found in the [documentation](docs/build-internals.md).
+
 ## Prerequisites
 
 - [Zig](https://ziglang.org/download) toolchain - v0.13.0 or master

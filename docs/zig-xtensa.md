@@ -5,7 +5,7 @@ Like [esp-rs](https://github.com/espressif/rust-esp32-example/blob/main/docs/rus
 **Current version:**
 
 - **Zig**: v0.14.0 ([bootstrap fork](https://github.com/kassane/zig-espressif-bootstrap))
-- **LLVM**: v19.0.2 ([espressif-fork](https://github.com/espressif/llvm-project))
+- **LLVM**: v19.1.2 ([espressif-fork](https://github.com/espressif/llvm-project))
 
 
 ### Commands
