@@ -334,6 +334,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    wifi.addIncludePath(.{ .cwd_relative = "/home/joseph/Documents/zig-esp-idf-sample/build/config" });
     const gpio = b.addModule("gpio", .{
         .root_source_file = b.path(b.pathJoin(&.{
             src_path,
@@ -569,6 +570,11 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "pulse",
                 .module = pcnt,
+            },
+
+            .{
+                .name = "sys",
+                .module = sys,
             },
         },
     });
