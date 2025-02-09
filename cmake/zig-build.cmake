@@ -185,7 +185,6 @@ if(ARCH_DEFINE)
 endif()
 
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
-set(IDF_SYS_P1 "${CMAKE_SOURCE_DIR}/patches/wifi_sta_config_t.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/stubs.c")
 
 # Run `translate-c` to generate `idf-sys.zig`
@@ -203,10 +202,10 @@ set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
 
 add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/patches_applied.done"
-    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -P ${CMAKE_SOURCE_DIR}/cmake/patches.cmake
+    TARGET translate_c
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
-    DEPENDS "${IDF_SYS_ZIG}"
 )
 
 
