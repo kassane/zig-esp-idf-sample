@@ -168,6 +168,7 @@ separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
     "-Dtarget=${ZIG_TARGET}"
+    "-Dmcpu=esp32s3"
     "-D__${TARGET_IDF_ARCH}"
     "-D${ARCH_DEFINE}"
     "-Dcpu_${TARGET_CPU_MODEL}"
@@ -198,81 +199,15 @@ add_custom_command(
 add_custom_target(translate_c ALL DEPENDS "${IDF_SYS_ZIG}")
 set_property(TARGET translate_c PROPERTY GENERATED TRUE)
 
-# Remove `wifi_sta_config_t`
-configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/modify_file.cmake
-    ${CMAKE_BINARY_DIR}/remove_wifi_sta_config.cmake
-    @ONLY
-)
+set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
+message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
+
 add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/remove_wifi_sta_config.done"
-    COMMAND ${CMAKE_COMMAND}
-    -D TARGET_FILE=${IDF_SYS_ZIG}
-    -D SEARCH_STRING="pub const wifi_sta_config_t.*?;"
-    -D REPLACE_STRING=""
-    -P ${CMAKE_BINARY_DIR}/remove_wifi_sta_config.cmake
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/remove_wifi_sta_config.done
-    DEPENDS translate_c "${IDF_SYS_ZIG}"
+    OUTPUT "${CMAKE_BINARY_DIR}/patches_applied.done"
+    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -P ${CMAKE_SOURCE_DIR}/cmake/patches.cmake
+    COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
+    DEPENDS "${IDF_SYS_ZIG}"
 )
-
-# Append `wifi_sta_config_t`
-configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/modify_file.cmake
-    ${CMAKE_BINARY_DIR}/append_wifi_sta_config.cmake
-    @ONLY
-)
-add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/append_wifi_sta_config.done"
-    COMMAND ${CMAKE_COMMAND}
-    -D TARGET_FILE="${IDF_SYS_ZIG}"
-    -D SEARCH_STRING=""
-    -D REPLACE_STRING=""
-    -D APPEND_FILE="${CMAKE_SOURCE_DIR}/patches/wifi_sta_config_t.zig"
-    -P "${CMAKE_BINARY_DIR}/append_wifi_sta_config.cmake"
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/append_wifi_sta_config.done
-    DEPENDS "${CMAKE_BINARY_DIR}/remove_wifi_sta_config.done"
-)
-
-# Remove `portTICK_PERIOD_MS`
-configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/modify_file.cmake
-    ${CMAKE_BINARY_DIR}/replace_portTICK_PERIOD_MS.cmake
-    @ONLY
-)
-add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/replace_portTICK_PERIOD_MS.done"
-    COMMAND ${CMAKE_COMMAND}
-    -D TARGET_FILE="${IDF_SYS_ZIG}"
-    -D SEARCH_STRING="pub const portTICK_PERIOD_MS.*?;"
-    -D REPLACE_STRING=""
-    -P "${CMAKE_BINARY_DIR}/replace_portTICK_PERIOD_MS.cmake"
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/replace_portTICK_PERIOD_MS.done
-    DEPENDS "${CMAKE_BINARY_DIR}/append_wifi_sta_config.done"
-)
-
-# Append new `portTICK_PERIOD_MS` from file
-configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/modify_file.cmake
-    ${CMAKE_BINARY_DIR}/append_portTICK_PERIOD_MS.cmake
-    @ONLY
-)
-add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/append_portTICK_PERIOD_MS.done"
-    COMMAND ${CMAKE_COMMAND}
-    -D TARGET_FILE="${IDF_SYS_ZIG}"
-    -D SEARCH_STRING=""
-    -D REPLACE_STRING=""
-    -D APPEND_FILE="${CMAKE_SOURCE_DIR}/patches/porttick_period_ms.zig"
-    -P "${CMAKE_BINARY_DIR}/append_portTICK_PERIOD_MS.cmake"
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/append_portTICK_PERIOD_MS.done
-    DEPENDS "${CMAKE_BINARY_DIR}/replace_portTICK_PERIOD_MS.done"
-)
-
-# Create a target to enforce execution order
-add_custom_target(modify_idf_sys ALL
-    DEPENDS "${CMAKE_BINARY_DIR}/append_portTICK_PERIOD_MS.done"
-)
-
 
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
