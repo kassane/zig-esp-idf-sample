@@ -3172,25 +3172,6 @@ pub extern fn gpio_deep_sleep_wakeup_disable(gpio_num: gpio_num_t) esp_err_t;
 pub extern fn gpio_dump_io_configuration(out_stream: [*c]FILE, io_bit_mask: u64) esp_err_t;
 pub var s_wifi_event_group: EventGroupHandle_t = @import("std").mem.zeroes(EventGroupHandle_t);
 pub var TAG: [*c]const u8 = "wifi station";
-pub export fn ignore_fn() void {
-    while (true) {
-        if (@as(c_int, 3) >= ESP_LOG_ERROR) while (true) {
-            if (ESP_LOG_ERROR == ESP_LOG_ERROR) {
-                esp_log_write(@as(c_uint, @bitCast(ESP_LOG_ERROR)), TAG, "E (%u) %s: UNEXPECTED EVENT\n", esp_log_timestamp(), TAG);
-            } else if (ESP_LOG_ERROR == ESP_LOG_WARN) {
-                esp_log_write(@as(c_uint, @bitCast(ESP_LOG_WARN)), TAG, "W (%u) %s: UNEXPECTED EVENT\n", esp_log_timestamp(), TAG);
-            } else if (ESP_LOG_ERROR == ESP_LOG_DEBUG) {
-                esp_log_write(@as(c_uint, @bitCast(ESP_LOG_DEBUG)), TAG, "D (%u) %s: UNEXPECTED EVENT\n", esp_log_timestamp(), TAG);
-            } else if (ESP_LOG_ERROR == ESP_LOG_VERBOSE) {
-                esp_log_write(@as(c_uint, @bitCast(ESP_LOG_VERBOSE)), TAG, "V (%u) %s: UNEXPECTED EVENT\n", esp_log_timestamp(), TAG);
-            } else {
-                esp_log_write(@as(c_uint, @bitCast(ESP_LOG_INFO)), TAG, "I (%u) %s: UNEXPECTED EVENT\n", esp_log_timestamp(), TAG);
-            }
-            if (!false) break;
-        };
-        if (!false) break;
-    }
-}
 pub const __llvm__ = @as(c_int, 1);
 pub const __clang__ = @as(c_int, 1);
 pub const __clang_major__ = @as(c_int, 19);
@@ -10484,11 +10465,11 @@ pub inline fn GPIO_IS_DEEP_SLEEP_WAKEUP_VALID_GPIO(gpio_num: anytype) @TypeOf((g
     return (gpio_num >= @as(c_int, 0)) and (((@as(c_ulonglong, 1) << gpio_num) & SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK) != @as(c_int, 0));
 }
 pub const EXAMPLE_ESP_WIFI_SSID = @compileError("unable to translate macro: undefined identifier `CONFIG_ESP_WIFI_SSID`");
-// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/station_example_main.c:40:9
+// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/stubs.c:40:9
 pub const EXAMPLE_ESP_WIFI_PASS = @compileError("unable to translate macro: undefined identifier `CONFIG_ESP_WIFI_PASSWORD`");
-// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/station_example_main.c:41:9
+// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/stubs.c:41:9
 pub const EXAMPLE_ESP_MAXIMUM_RETRY = @compileError("unable to translate macro: undefined identifier `CONFIG_ESP_MAXIMUM_RETRY`");
-// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/station_example_main.c:42:9
+// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/stubs.c:42:9
 pub const WIFI_CONNECTED_BIT = BIT0;
 pub const WIFI_FAIL_BIT = BIT1;
 pub const __lock = struct___lock;
