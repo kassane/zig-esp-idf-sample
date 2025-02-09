@@ -37,9 +37,9 @@ else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
 
-if(CONFIG_IDF_TARGET_ARCH_XTENSA)
+if(CONFIG_IDF_TARGET_ARCH_XTENSA OR CONFIG_IDF_TARGET_ESP32P4)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-        file(DOWNLOAD "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
+        file(DOWNLOAD "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
             "${CMAKE_BINARY_DIR}/zig.${EXT}")
 
         if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -127,7 +127,7 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
         set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/xtensa-esp-elf")
     endif()
     set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
+    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
 
@@ -170,10 +170,6 @@ set(INCLUDE_DIRS
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
 )
-
-# Detect if running inside a Docker environment by checking if IDF_TOOLS_PATH is set
-
-
 
 set(INCLUDE_FLAGS "")
 foreach(dir ${INCLUDE_DIRS})
