@@ -109,13 +109,25 @@ endif()
 
 if(CONFIG_IDF_TARGET_ARCH_RISCV)
   set(ARCH "riscv")
-  set(TOOLCHAIN_SYS_INCLUDE "$ENV{HOME}/.espressif/tools/riscv32-esp-elf/sys-include")
-  set(TOOLCHAIN_ELF_INCLUDE "$ENV{HOME}/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
+  if(DEFINED ENV{IDF_TOOLS_PATH})
+      set(TOOLCHAIN_BASE_PATH "$ENV{IDF_TOOLS_PATH}/tools/riscv32-esp-elf")
+  else()
+      set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/riscv32-esp-elf")
+  endif()
+
+  # Define the toolchain include paths
+  set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+  set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
   set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
   set(ARCH "xtensa")
-  set(TOOLCHAIN_SYS_INCLUDE "$ENV{HOME}/.espressif/tools/xtensa-esp-elf/sys-include")
-  set(TOOLCHAIN_ELF_INCLUDE "$ENV{HOME}/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include")
+  if(DEFINED ENV{IDF_TOOLS_PATH})
+      set(TOOLCHAIN_BASE_PATH "$ENV{IDF_TOOLS_PATH}/tools/xtensa-esp-elf")
+  else()
+      set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/xtensa-esp-elf")
+  endif()
+  set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+  set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
   set(ARCH_DEFINE "__XTENSA__")
 endif()
 
@@ -158,6 +170,10 @@ set(INCLUDE_DIRS
   "${TOOLCHAIN_SYS_INCLUDE}"
   "${TOOLCHAIN_ELF_INCLUDE}"
 )
+
+# Detect if running inside a Docker environment by checking if IDF_TOOLS_PATH is set
+
+
 
 set(INCLUDE_FLAGS "")
 foreach(dir ${INCLUDE_DIRS})
