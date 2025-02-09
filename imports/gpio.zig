@@ -2,55 +2,73 @@ const sys = @import("sys");
 const std = @import("std");
 const errors = @import("error");
 
-pub const Num = enum(sys.gpio_num_t) {
-    GPIO_NUM_NC = sys.GPIO_NUM_NC,
-    GPIO_NUM_0 = sys.GPIO_NUM_0,
-    GPIO_NUM_1 = sys.GPIO_NUM_1,
-    GPIO_NUM_2 = sys.GPIO_NUM_2,
-    GPIO_NUM_3 = sys.GPIO_NUM_3,
-    GPIO_NUM_4 = sys.GPIO_NUM_4,
-    GPIO_NUM_5 = sys.GPIO_NUM_5,
-    GPIO_NUM_6 = sys.GPIO_NUM_6,
-    GPIO_NUM_7 = sys.GPIO_NUM_7,
-    GPIO_NUM_8 = sys.GPIO_NUM_8,
-    GPIO_NUM_9 = sys.GPIO_NUM_9,
-    GPIO_NUM_10 = sys.GPIO_NUM_10,
-    GPIO_NUM_11 = sys.GPIO_NUM_11,
-    GPIO_NUM_12 = sys.GPIO_NUM_12,
-    GPIO_NUM_13 = sys.GPIO_NUM_13,
-    GPIO_NUM_14 = sys.GPIO_NUM_14,
-    GPIO_NUM_15 = sys.GPIO_NUM_15,
-    GPIO_NUM_16 = sys.GPIO_NUM_16,
-    GPIO_NUM_17 = sys.GPIO_NUM_17,
-    GPIO_NUM_18 = sys.GPIO_NUM_18,
-    GPIO_NUM_19 = sys.GPIO_NUM_19,
-    GPIO_NUM_20 = sys.GPIO_NUM_20,
-    GPIO_NUM_21 = sys.GPIO_NUM_21,
-    GPIO_NUM_26 = sys.GPIO_NUM_26,
-    GPIO_NUM_27 = sys.GPIO_NUM_27,
-    GPIO_NUM_28 = sys.GPIO_NUM_28,
-    GPIO_NUM_29 = sys.GPIO_NUM_29,
-    GPIO_NUM_30 = sys.GPIO_NUM_30,
-    GPIO_NUM_31 = sys.GPIO_NUM_31,
-    GPIO_NUM_32 = sys.GPIO_NUM_32,
-    GPIO_NUM_33 = sys.GPIO_NUM_33,
-    GPIO_NUM_34 = sys.GPIO_NUM_34,
-    GPIO_NUM_35 = sys.GPIO_NUM_35,
-    GPIO_NUM_36 = sys.GPIO_NUM_36,
-    GPIO_NUM_37 = sys.GPIO_NUM_37,
-    GPIO_NUM_38 = sys.GPIO_NUM_38,
-    GPIO_NUM_39 = sys.GPIO_NUM_39,
-    GPIO_NUM_40 = sys.GPIO_NUM_40,
-    GPIO_NUM_41 = sys.GPIO_NUM_41,
-    GPIO_NUM_42 = sys.GPIO_NUM_42,
-    GPIO_NUM_43 = sys.GPIO_NUM_43,
-    GPIO_NUM_44 = sys.GPIO_NUM_44,
-    GPIO_NUM_45 = sys.GPIO_NUM_45,
-    GPIO_NUM_46 = sys.GPIO_NUM_46,
-    GPIO_NUM_47 = sys.GPIO_NUM_47,
-    GPIO_NUM_48 = sys.GPIO_NUM_48,
-    GPIO_NUM_MAX = sys.GPIO_NUM_MAX,
-};
+inline fn buildExtendedGPIO(comptime lib: type) []const std.builtin.Type.EnumField {
+    var targets: []const std.builtin.Type.EnumField = &[_]std.builtin.Type.EnumField{
+        .{
+            .name = "GPIO_NUM_NC",
+            .value = lib.GPIO_NUM_NC,
+        },
+    };
+
+    for ([_]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }) |n| {
+        const field_name = std.fmt.comptimePrint("GPIO_NUM_{}", .{n});
+        if (@hasField(lib, field_name)) {
+            targets = targets ++ &[_]std.builtin.Type.EnumField{
+                .{
+                    .name = field_name,
+                    .value = @field(lib, field_name),
+                },
+            };
+        }
+    }
+
+    return targets ++ &[_]std.builtin.Type.EnumField{
+        .{ .name = "GPIO_NUM_MAX", .value = lib.GPIO_NUM_MAX },
+    };
+}
+
+// Ensure it runs at comptime
+pub const extended_gpio = buildExtendedGPIO(sys);
+
+pub const Num = @Type(.{ .@"enum" = .{
+    .tag_type = sys.gpio_num_t,
+    .fields = extended_gpio,
+    .decls = &[_]std.builtin.Type.Declaration{},
+    .is_exhaustive = false,
+} });
+
+// comptime {
+// // Depending on Xtensa or RiscV there may be more or less pins
+// const extended_gpio = blk: {
+//     var targets: []const std.builtin.Type.EnumField = &[_]std.builtin.Type.EnumField{
+//         .{
+//             .name = "GPIO_NUM_NC",
+//             .value = sys.GPIO_NUM_NC,
+//         },
+//     };
+//     for ([_]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }) |n| {
+//         const field_name = std.fmt.comptimePrint("GPIO_NUM_{}", .{n});
+//         if (@hasField(sys, field_name)) {
+//             targets = targets ++ &[_]std.builtin.Type.EnumField{
+//                 .{
+//                     .name = field_name,
+//                     .value = @field(sys, field_name),
+//                 },
+//             };
+//         }
+//     }
+//     break :blk targets ++ &[_]std.builtin.Type.EnumField{
+//         .{ .name = "GPIO_NUM_MAX", .value = sys.GPIO_NUM_MAX },
+//     };
+// };
+
+// pub const Num = @Type(.{ .@"enum" = .{
+//     .tag_type = sys.gpio_num_t,
+//     .fields = extended_gpio,
+//     .decls = &[_]std.builtin.Type.Declaration{},
+//     .is_exhaustive = false,
+// } });
+// }
 
 pub const Port = enum(sys.gpio_port_t) {
     GPIO_PORT_0 = sys.GPIO_PORT_0,
@@ -101,7 +119,6 @@ pub const DriveCap = enum(sys.gpio_drive_cap_t) {
     GPIO_DRIVE_CAP_3 = sys.GPIO_DRIVE_CAP_3,
     GPIO_DRIVE_CAP_MAX = sys.GPIO_DRIVE_CAP_MAX,
 };
-
 
 pub fn newEtmEvent(cfg: [*c]const sys.gpio_etm_event_config_t, ret_event: [*c]sys.esp_etm_event_handle_t) !void {
     return try errors.espCheckError(sys.gpio_new_etm_event(cfg, ret_event));

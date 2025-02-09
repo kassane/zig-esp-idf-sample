@@ -62,16 +62,16 @@ pub const __int16_t = c_short;
 pub const __uint16_t = c_ushort;
 pub const __int32_t = c_int;
 pub const __uint32_t = c_uint;
-pub const __int64_t = c_long;
-pub const __uint64_t = c_ulong;
+pub const __int64_t = c_longlong;
+pub const __uint64_t = c_ulonglong;
 pub const __int_least8_t = i8;
 pub const __uint_least8_t = u8;
 pub const __int_least16_t = c_short;
 pub const __uint_least16_t = c_ushort;
 pub const __int_least32_t = c_int;
 pub const __uint_least32_t = c_uint;
-pub const __int_least64_t = c_long;
-pub const __uint_least64_t = c_ulong;
+pub const __int_least64_t = c_longlong;
+pub const __uint_least64_t = c_ulonglong;
 pub const __intmax_t = c_long;
 pub const __uintmax_t = c_ulong;
 pub const __intptr_t = c_long;
@@ -92,28 +92,19 @@ pub const int_fast16_t = c_short;
 pub const uint_fast16_t = c_ushort;
 pub const int_fast32_t = c_int;
 pub const uint_fast32_t = c_uint;
-pub const int_fast64_t = c_long;
-pub const uint_fast64_t = c_ulong;
+pub const int_fast64_t = c_longlong;
+pub const uint_fast64_t = c_ulonglong;
 pub const esp_event_base_t = [*c]const u8;
 pub const esp_event_loop_handle_t = ?*anyopaque;
 pub const esp_event_handler_t = ?*const fn (?*anyopaque, esp_event_base_t, i32, ?*anyopaque) callconv(.c) void;
 pub const esp_event_handler_instance_t = ?*anyopaque;
 pub const ptrdiff_t = c_long;
 pub const wchar_t = c_int;
-pub const max_align_t = extern struct {
-    __clang_max_align_nonce1: c_longlong align(8) = @import("std").mem.zeroes(c_longlong),
-    __clang_max_align_nonce2: c_longdouble align(16) = @import("std").mem.zeroes(c_longdouble),
-};
-pub const struct___va_list_tag_1 = extern struct {
-    gp_offset: c_uint = @import("std").mem.zeroes(c_uint),
-    fp_offset: c_uint = @import("std").mem.zeroes(c_uint),
-    overflow_arg_area: ?*anyopaque = @import("std").mem.zeroes(?*anyopaque),
-    reg_save_area: ?*anyopaque = @import("std").mem.zeroes(?*anyopaque),
-};
-pub const __builtin_va_list = [1]struct___va_list_tag_1;
+pub const max_align_t = c_longdouble;
+pub const __builtin_va_list = [*c]u8;
 pub const __gnuc_va_list = __builtin_va_list;
 pub const va_list = __gnuc_va_list;
-pub const wint_t = c_uint;
+pub const wint_t = c_int;
 pub const __blkcnt_t = c_long;
 pub const __blksize_t = c_long;
 pub const __fsblkcnt_t = __uint64_t;
@@ -134,13 +125,13 @@ pub const _fpos_t = c_long;
 pub const __size_t = c_ulong;
 pub const _ssize_t = c_long;
 pub const __ssize_t = _ssize_t;
-const union_unnamed_2 = extern union {
+const union_unnamed_1 = extern union {
     __wch: wint_t,
     __wchb: [4]u8,
 };
 pub const _mbstate_t = extern struct {
     __count: c_int = @import("std").mem.zeroes(c_int),
-    __value: union_unnamed_2 = @import("std").mem.zeroes(union_unnamed_2),
+    __value: union_unnamed_1 = @import("std").mem.zeroes(union_unnamed_1),
 };
 pub const _iconv_t = ?*anyopaque;
 pub const __clock_t = c_ulong;
@@ -196,8 +187,8 @@ pub const struct___sFILE = extern struct {
     _lbfsize: c_int = @import("std").mem.zeroes(c_int),
     _data: [*c]struct__reent = @import("std").mem.zeroes([*c]struct__reent),
     _cookie: ?*anyopaque = @import("std").mem.zeroes(?*anyopaque),
-    _read: ?*const fn ([*c]struct__reent, ?*anyopaque, [*c]u8, c_int) callconv(.c) c_int = @import("std").mem.zeroes(?*const fn ([*c]struct__reent, ?*anyopaque, [*c]u8, c_int) callconv(.c) c_int),
-    _write: ?*const fn ([*c]struct__reent, ?*anyopaque, [*c]const u8, c_int) callconv(.c) c_int = @import("std").mem.zeroes(?*const fn ([*c]struct__reent, ?*anyopaque, [*c]const u8, c_int) callconv(.c) c_int),
+    _read: ?*const fn ([*c]struct__reent, ?*anyopaque, [*c]u8, c_int) callconv(.c) _ssize_t = @import("std").mem.zeroes(?*const fn ([*c]struct__reent, ?*anyopaque, [*c]u8, c_int) callconv(.c) _ssize_t),
+    _write: ?*const fn ([*c]struct__reent, ?*anyopaque, [*c]const u8, c_int) callconv(.c) _ssize_t = @import("std").mem.zeroes(?*const fn ([*c]struct__reent, ?*anyopaque, [*c]const u8, c_int) callconv(.c) _ssize_t),
     _seek: ?*const fn ([*c]struct__reent, ?*anyopaque, _fpos_t, c_int) callconv(.c) _fpos_t = @import("std").mem.zeroes(?*const fn ([*c]struct__reent, ?*anyopaque, _fpos_t, c_int) callconv(.c) _fpos_t),
     _close: ?*const fn ([*c]struct__reent, ?*anyopaque) callconv(.c) c_int = @import("std").mem.zeroes(?*const fn ([*c]struct__reent, ?*anyopaque) callconv(.c) c_int),
     _ub: struct___sbuf = @import("std").mem.zeroes(struct___sbuf),
@@ -469,9 +460,9 @@ pub extern fn fscanf(noalias [*c]FILE, noalias [*c]const u8, ...) c_int;
 pub extern fn printf([*c]const u8, ...) c_int;
 pub extern fn scanf(noalias [*c]const u8, ...) c_int;
 pub extern fn sscanf(noalias [*c]const u8, noalias [*c]const u8, ...) c_int;
-pub extern fn vfprintf(noalias [*c]FILE, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vprintf(noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vsprintf(noalias [*c]u8, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
+pub extern fn vfprintf(noalias [*c]FILE, noalias [*c]const u8, __builtin_va_list) c_int;
+pub extern fn vprintf(noalias [*c]const u8, __builtin_va_list) c_int;
+pub extern fn vsprintf(noalias [*c]u8, noalias [*c]const u8, __builtin_va_list) c_int;
 pub extern fn fgetc([*c]FILE) c_int;
 pub extern fn fgets(noalias [*c]u8, c_int, noalias [*c]FILE) [*c]u8;
 pub extern fn fputc(c_int, [*c]FILE) c_int;
@@ -501,10 +492,10 @@ pub extern fn rename([*c]const u8, [*c]const u8) c_int;
 pub extern fn fseeko([*c]FILE, off_t, c_int) c_int;
 pub extern fn ftello([*c]FILE) off_t;
 pub extern fn snprintf(noalias [*c]u8, c_ulong, noalias [*c]const u8, ...) c_int;
-pub extern fn vsnprintf(noalias [*c]u8, c_ulong, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vfscanf(noalias [*c]FILE, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vscanf(noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vsscanf(noalias [*c]const u8, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
+pub extern fn vsnprintf(noalias [*c]u8, c_ulong, noalias [*c]const u8, __builtin_va_list) c_int;
+pub extern fn vfscanf(noalias [*c]FILE, noalias [*c]const u8, __builtin_va_list) c_int;
+pub extern fn vscanf(noalias [*c]const u8, __builtin_va_list) c_int;
+pub extern fn vsscanf(noalias [*c]const u8, noalias [*c]const u8, __builtin_va_list) c_int;
 pub extern fn asiprintf([*c][*c]u8, [*c]const u8, ...) c_int;
 pub extern fn asniprintf([*c]u8, [*c]usize, [*c]const u8, ...) [*c]u8;
 pub extern fn asnprintf(noalias [*c]u8, noalias [*c]usize, noalias [*c]const u8, ...) [*c]u8;
@@ -516,17 +507,17 @@ pub extern fn iscanf([*c]const u8, ...) c_int;
 pub extern fn siprintf([*c]u8, [*c]const u8, ...) c_int;
 pub extern fn siscanf([*c]const u8, [*c]const u8, ...) c_int;
 pub extern fn sniprintf([*c]u8, usize, [*c]const u8, ...) c_int;
-pub extern fn vasiprintf([*c][*c]u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vasniprintf([*c]u8, [*c]usize, [*c]const u8, [*c]struct___va_list_tag_1) [*c]u8;
-pub extern fn vasnprintf([*c]u8, [*c]usize, [*c]const u8, [*c]struct___va_list_tag_1) [*c]u8;
-pub extern fn vdiprintf(c_int, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vfiprintf([*c]FILE, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vfiscanf([*c]FILE, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn viprintf([*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn viscanf([*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vsiprintf([*c]u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vsiscanf([*c]const u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn vsniprintf([*c]u8, usize, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
+pub extern fn vasiprintf([*c][*c]u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn vasniprintf([*c]u8, [*c]usize, [*c]const u8, __gnuc_va_list) [*c]u8;
+pub extern fn vasnprintf([*c]u8, [*c]usize, [*c]const u8, __gnuc_va_list) [*c]u8;
+pub extern fn vdiprintf(c_int, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn vfiprintf([*c]FILE, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn vfiscanf([*c]FILE, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn viprintf([*c]const u8, __gnuc_va_list) c_int;
+pub extern fn viscanf([*c]const u8, __gnuc_va_list) c_int;
+pub extern fn vsiprintf([*c]u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn vsiscanf([*c]const u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn vsniprintf([*c]u8, usize, [*c]const u8, __gnuc_va_list) c_int;
 pub extern fn fdopen(c_int, [*c]const u8) [*c]FILE;
 pub extern fn fileno([*c]FILE) c_int;
 pub extern fn pclose([*c]FILE) c_int;
@@ -545,7 +536,7 @@ pub extern fn putchar_unlocked(c_int) c_int;
 pub extern fn dprintf(c_int, noalias [*c]const u8, ...) c_int;
 pub extern fn fmemopen(noalias ?*anyopaque, usize, noalias [*c]const u8) [*c]FILE;
 pub extern fn open_memstream([*c][*c]u8, [*c]usize) [*c]FILE;
-pub extern fn vdprintf(c_int, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
+pub extern fn vdprintf(c_int, noalias [*c]const u8, __gnuc_va_list) c_int;
 pub extern fn renameat(c_int, [*c]const u8, c_int, [*c]const u8) c_int;
 pub extern fn _asiprintf_r([*c]struct__reent, [*c][*c]u8, [*c]const u8, ...) c_int;
 pub extern fn _asniprintf_r([*c]struct__reent, [*c]u8, [*c]usize, [*c]const u8, ...) [*c]u8;
@@ -612,26 +603,26 @@ pub extern fn _tempnam_r([*c]struct__reent, [*c]const u8, [*c]const u8) [*c]u8;
 pub extern fn _tmpfile_r([*c]struct__reent) [*c]FILE;
 pub extern fn _tmpnam_r([*c]struct__reent, [*c]u8) [*c]u8;
 pub extern fn _ungetc_r([*c]struct__reent, c_int, [*c]FILE) c_int;
-pub extern fn _vasiprintf_r([*c]struct__reent, [*c][*c]u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vasniprintf_r([*c]struct__reent, [*c]u8, [*c]usize, [*c]const u8, [*c]struct___va_list_tag_1) [*c]u8;
-pub extern fn _vasnprintf_r([*c]struct__reent, [*c]u8, [*c]usize, [*c]const u8, [*c]struct___va_list_tag_1) [*c]u8;
-pub extern fn _vasprintf_r([*c]struct__reent, [*c][*c]u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vdiprintf_r([*c]struct__reent, c_int, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vdprintf_r([*c]struct__reent, c_int, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vfiprintf_r([*c]struct__reent, [*c]FILE, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vfiscanf_r([*c]struct__reent, [*c]FILE, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vfprintf_r([*c]struct__reent, noalias [*c]FILE, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vfscanf_r([*c]struct__reent, noalias [*c]FILE, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _viprintf_r([*c]struct__reent, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _viscanf_r([*c]struct__reent, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vprintf_r([*c]struct__reent, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vscanf_r([*c]struct__reent, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vsiprintf_r([*c]struct__reent, [*c]u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vsiscanf_r([*c]struct__reent, [*c]const u8, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vsniprintf_r([*c]struct__reent, [*c]u8, usize, [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vsnprintf_r([*c]struct__reent, noalias [*c]u8, usize, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vsprintf_r([*c]struct__reent, noalias [*c]u8, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
-pub extern fn _vsscanf_r([*c]struct__reent, noalias [*c]const u8, noalias [*c]const u8, [*c]struct___va_list_tag_1) c_int;
+pub extern fn _vasiprintf_r([*c]struct__reent, [*c][*c]u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vasniprintf_r([*c]struct__reent, [*c]u8, [*c]usize, [*c]const u8, __gnuc_va_list) [*c]u8;
+pub extern fn _vasnprintf_r([*c]struct__reent, [*c]u8, [*c]usize, [*c]const u8, __gnuc_va_list) [*c]u8;
+pub extern fn _vasprintf_r([*c]struct__reent, [*c][*c]u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vdiprintf_r([*c]struct__reent, c_int, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vdprintf_r([*c]struct__reent, c_int, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vfiprintf_r([*c]struct__reent, [*c]FILE, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vfiscanf_r([*c]struct__reent, [*c]FILE, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vfprintf_r([*c]struct__reent, noalias [*c]FILE, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vfscanf_r([*c]struct__reent, noalias [*c]FILE, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _viprintf_r([*c]struct__reent, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _viscanf_r([*c]struct__reent, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vprintf_r([*c]struct__reent, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vscanf_r([*c]struct__reent, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vsiprintf_r([*c]struct__reent, [*c]u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vsiscanf_r([*c]struct__reent, [*c]const u8, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vsniprintf_r([*c]struct__reent, [*c]u8, usize, [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vsnprintf_r([*c]struct__reent, noalias [*c]u8, usize, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vsprintf_r([*c]struct__reent, noalias [*c]u8, noalias [*c]const u8, __gnuc_va_list) c_int;
+pub extern fn _vsscanf_r([*c]struct__reent, noalias [*c]const u8, noalias [*c]const u8, __gnuc_va_list) c_int;
 pub extern fn fpurge([*c]FILE) c_int;
 pub extern fn __getdelim([*c][*c]u8, [*c]usize, c_int, [*c]FILE) isize;
 pub extern fn __getline([*c][*c]u8, [*c]usize, [*c]FILE) isize;
@@ -708,12 +699,12 @@ pub const struct_esp_ip4_addr = extern struct {
 };
 pub const esp_ip4_addr_t = struct_esp_ip4_addr;
 pub const esp_ip6_addr_t = struct_esp_ip6_addr;
-const union_unnamed_3 = extern union {
+const union_unnamed_2 = extern union {
     ip6: esp_ip6_addr_t,
     ip4: esp_ip4_addr_t,
 };
 pub const struct__ip_addr = extern struct {
-    u_addr: union_unnamed_3 = @import("std").mem.zeroes(union_unnamed_3),
+    u_addr: union_unnamed_2 = @import("std").mem.zeroes(union_unnamed_2),
     type: u8 = @import("std").mem.zeroes(u8),
 };
 pub const esp_ip_addr_t = struct__ip_addr;
@@ -880,546 +871,145 @@ pub const esp_netif_pair_mac_ip_t = extern struct {
     ip: esp_ip4_addr_t = @import("std").mem.zeroes(esp_ip4_addr_t),
 };
 pub const esp_netif_receive_t = ?*const fn (?*esp_netif_t, ?*anyopaque, usize, ?*anyopaque) callconv(.c) esp_err_t;
-pub extern const Xthal_rev_no: c_uint;
-pub extern fn xthal_save_extra(base: ?*anyopaque) void;
-pub extern fn xthal_restore_extra(base: ?*anyopaque) void;
-pub extern fn xthal_save_cpregs(base: ?*anyopaque, c_int) void;
-pub extern fn xthal_restore_cpregs(base: ?*anyopaque, c_int) void;
-pub extern fn xthal_save_cp0(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp1(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp2(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp3(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp4(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp5(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp6(base: ?*anyopaque) void;
-pub extern fn xthal_save_cp7(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp0(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp1(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp2(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp3(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp4(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp5(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp6(base: ?*anyopaque) void;
-pub extern fn xthal_restore_cp7(base: ?*anyopaque) void;
-pub extern var Xthal_cpregs_save_fn: [8]?*anyopaque;
-pub extern var Xthal_cpregs_restore_fn: [8]?*anyopaque;
-pub extern var Xthal_cpregs_save_nw_fn: [8]?*anyopaque;
-pub extern var Xthal_cpregs_restore_nw_fn: [8]?*anyopaque;
-pub extern const Xthal_extra_size: c_uint;
-pub extern const Xthal_extra_align: c_uint;
-pub extern const Xthal_cpregs_size: [8]c_uint;
-pub extern const Xthal_cpregs_align: [8]c_uint;
-pub extern const Xthal_all_extra_size: c_uint;
-pub extern const Xthal_all_extra_align: c_uint;
-pub extern const Xthal_cp_names: [8][*c]const u8;
-pub extern fn xthal_init_mem_extra(?*anyopaque) void;
-pub extern fn xthal_init_mem_cp(?*anyopaque, c_int) void;
-pub extern const Xthal_num_coprocessors: c_uint;
-pub extern const Xthal_cp_num: u8;
-pub extern const Xthal_cp_max: u8;
-pub extern const Xthal_cp_mask: c_uint;
-pub extern const Xthal_num_aregs: c_uint;
-pub extern const Xthal_num_aregs_log2: u8;
-pub extern const Xthal_icache_linewidth: u8;
-pub extern const Xthal_dcache_linewidth: u8;
-pub extern const Xthal_icache_linesize: c_ushort;
-pub extern const Xthal_dcache_linesize: c_ushort;
-pub extern const Xthal_icache_size: c_uint;
-pub extern const Xthal_dcache_size: c_uint;
-pub extern const Xthal_dcache_is_writeback: u8;
-pub extern fn xthal_icache_region_invalidate(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_region_invalidate(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_region_writeback(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_region_writeback_inv(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_icache_line_invalidate(addr: ?*anyopaque) void;
-pub extern fn xthal_dcache_line_invalidate(addr: ?*anyopaque) void;
-pub extern fn xthal_dcache_line_writeback(addr: ?*anyopaque) void;
-pub extern fn xthal_dcache_line_writeback_inv(addr: ?*anyopaque) void;
-pub extern fn xthal_icache_sync() void;
-pub extern fn xthal_dcache_sync() void;
-pub extern fn xthal_icache_get_ways() c_uint;
-pub extern fn xthal_icache_set_ways(ways: c_uint) void;
-pub extern fn xthal_dcache_get_ways() c_uint;
-pub extern fn xthal_dcache_set_ways(ways: c_uint) void;
-pub extern fn xthal_cache_coherence_on() void;
-pub extern fn xthal_cache_coherence_off() void;
-pub extern fn xthal_cache_coherence_optin() void;
-pub extern fn xthal_cache_coherence_optout() void;
-pub extern fn xthal_get_cache_prefetch() c_int;
-pub extern fn xthal_set_cache_prefetch(c_int) c_int;
-pub extern fn xthal_set_cache_prefetch_long(c_ulonglong) c_int;
-pub extern const Xthal_debug_configured: c_int;
-pub extern fn xthal_set_soft_break(addr: ?*anyopaque) c_uint;
-pub extern fn xthal_remove_soft_break(addr: ?*anyopaque, c_uint) void;
-pub extern fn xthal_disassemble(instr_buf: [*c]u8, tgt_addr: ?*anyopaque, buffer: [*c]u8, buflen: c_uint, options: c_uint) c_int;
-pub extern fn xthal_disassemble_size(instr_buf: [*c]u8) c_int;
-pub extern fn xthal_memcpy(dst: ?*anyopaque, src: ?*const anyopaque, len: c_uint) ?*anyopaque;
-pub extern fn xthal_bcopy(src: ?*const anyopaque, dst: ?*anyopaque, len: c_uint) ?*anyopaque;
-pub extern fn xthal_compare_and_set(addr: [*c]c_int, test_val: c_int, compare_val: c_int) c_int;
-pub extern const Xthal_release_major: c_uint;
-pub extern const Xthal_release_minor: c_uint;
-pub extern const Xthal_release_name: [*c]const u8;
-pub extern const Xthal_release_internal: [*c]const u8;
-pub extern const Xthal_memory_order: u8;
-pub extern const Xthal_have_windowed: u8;
-pub extern const Xthal_have_density: u8;
-pub extern const Xthal_have_booleans: u8;
-pub extern const Xthal_have_loops: u8;
-pub extern const Xthal_have_nsa: u8;
-pub extern const Xthal_have_minmax: u8;
-pub extern const Xthal_have_sext: u8;
-pub extern const Xthal_have_clamps: u8;
-pub extern const Xthal_have_mac16: u8;
-pub extern const Xthal_have_mul16: u8;
-pub extern const Xthal_have_fp: u8;
-pub extern const Xthal_have_speculation: u8;
-pub extern const Xthal_have_threadptr: u8;
-pub extern const Xthal_have_pif: u8;
-pub extern const Xthal_num_writebuffer_entries: c_ushort;
-pub extern const Xthal_build_unique_id: c_uint;
-pub extern const Xthal_hw_configid0: c_uint;
-pub extern const Xthal_hw_configid1: c_uint;
-pub extern const Xthal_hw_release_major: c_uint;
-pub extern const Xthal_hw_release_minor: c_uint;
-pub extern const Xthal_hw_release_name: [*c]const u8;
-pub extern const Xthal_hw_release_internal: [*c]const u8;
-pub extern fn xthal_clear_regcached_code() void;
-pub extern fn xthal_window_spill() void;
-pub extern fn xthal_validate_cp(c_int) void;
-pub extern fn xthal_invalidate_cp(c_int) void;
-pub extern fn xthal_set_cpenable(c_uint) void;
-pub extern fn xthal_get_cpenable() c_uint;
-pub extern const Xthal_num_intlevels: u8;
-pub extern const Xthal_num_interrupts: u8;
-pub extern const Xthal_excm_level: u8;
-pub extern const Xthal_intlevel_mask: [16]c_uint;
-pub extern const Xthal_intlevel_andbelow_mask: [16]c_uint;
-pub extern const Xthal_intlevel: [32]u8;
-pub extern const Xthal_inttype: [32]u8;
-pub extern const Xthal_inttype_mask: [11]c_uint;
-pub extern const Xthal_timer_interrupt: [4]c_int;
-pub extern fn xthal_get_intenable() c_uint;
-pub extern fn xthal_set_intenable(c_uint) void;
-pub extern fn xthal_get_interrupt() c_uint;
-pub extern fn xthal_set_intset(c_uint) void;
-pub extern fn xthal_set_intclear(c_uint) void;
-pub extern const Xthal_num_ibreak: c_int;
-pub extern const Xthal_num_dbreak: c_int;
-pub extern const Xthal_have_ccount: u8;
-pub extern const Xthal_num_ccompare: u8;
-pub extern fn xthal_get_ccount() c_uint;
-pub extern fn xthal_set_ccompare(c_int, c_uint) void;
-pub extern fn xthal_get_ccompare(c_int) c_uint;
-pub extern const Xthal_have_prid: u8;
-pub extern const Xthal_have_exceptions: u8;
-pub extern const Xthal_xea_version: u8;
-pub extern const Xthal_have_interrupts: u8;
-pub extern const Xthal_have_highlevel_interrupts: u8;
-pub extern const Xthal_have_nmi: u8;
-pub extern fn xthal_get_prid() c_uint;
-pub extern fn xthal_vpri_to_intlevel(vpri: c_uint) c_uint;
-pub extern fn xthal_intlevel_to_vpri(intlevel: c_uint) c_uint;
-pub extern fn xthal_int_enable(c_uint) c_uint;
-pub extern fn xthal_int_disable(c_uint) c_uint;
-pub extern fn xthal_set_int_vpri(intnum: c_int, vpri: c_int) c_int;
-pub extern fn xthal_get_int_vpri(intnum: c_int) c_int;
-pub extern fn xthal_set_vpri_locklevel(intlevel: c_uint) void;
-pub extern fn xthal_get_vpri_locklevel() c_uint;
-pub extern fn xthal_set_vpri(vpri: c_uint) c_uint;
-pub extern fn xthal_get_vpri() c_uint;
-pub extern fn xthal_set_vpri_intlevel(intlevel: c_uint) c_uint;
-pub extern fn xthal_set_vpri_lock() c_uint;
-pub const XtHalVoidFunc = fn () callconv(.c) void;
-pub extern var Xthal_tram_pending: c_uint;
-pub extern var Xthal_tram_enabled: c_uint;
-pub extern var Xthal_tram_sync: c_uint;
-pub extern fn xthal_tram_pending_to_service() c_uint;
-pub extern fn xthal_tram_done(serviced_mask: c_uint) void;
-pub extern fn xthal_tram_set_sync(intnum: c_int, sync: c_int) c_int;
-pub extern fn xthal_set_tram_trigger_func(trigger_fn: ?*const XtHalVoidFunc) ?*const XtHalVoidFunc;
-pub extern const Xthal_num_instrom: u8;
-pub extern const Xthal_num_instram: u8;
-pub extern const Xthal_num_datarom: u8;
-pub extern const Xthal_num_dataram: u8;
-pub extern const Xthal_num_xlmi: u8;
-pub const Xthal_instrom_vaddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_instrom_vaddr",
-});
-pub const Xthal_instrom_paddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_instrom_paddr",
-});
-pub const Xthal_instrom_size: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_instrom_size",
-});
-pub const Xthal_instram_vaddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_instram_vaddr",
-});
-pub const Xthal_instram_paddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_instram_paddr",
-});
-pub const Xthal_instram_size: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_instram_size",
-});
-pub const Xthal_datarom_vaddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_datarom_vaddr",
-});
-pub const Xthal_datarom_paddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_datarom_paddr",
-});
-pub const Xthal_datarom_size: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_datarom_size",
-});
-pub const Xthal_dataram_vaddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_dataram_vaddr",
-});
-pub const Xthal_dataram_paddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_dataram_paddr",
-});
-pub const Xthal_dataram_size: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_dataram_size",
-});
-pub const Xthal_xlmi_vaddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_xlmi_vaddr",
-});
-pub const Xthal_xlmi_paddr: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_xlmi_paddr",
-});
-pub const Xthal_xlmi_size: [*c]const c_uint = @extern([*c]const c_uint, .{
-    .name = "Xthal_xlmi_size",
-});
-pub extern const Xthal_icache_setwidth: u8;
-pub extern const Xthal_dcache_setwidth: u8;
-pub extern const Xthal_icache_ways: c_uint;
-pub extern const Xthal_dcache_ways: c_uint;
-pub extern const Xthal_icache_line_lockable: u8;
-pub extern const Xthal_dcache_line_lockable: u8;
-pub extern fn xthal_get_cacheattr() c_uint;
-pub extern fn xthal_get_icacheattr() c_uint;
-pub extern fn xthal_get_dcacheattr() c_uint;
-pub extern fn xthal_set_cacheattr(c_uint) void;
-pub extern fn xthal_set_icacheattr(c_uint) void;
-pub extern fn xthal_set_dcacheattr(c_uint) void;
-pub extern fn xthal_set_region_attribute(addr: ?*anyopaque, size: c_uint, cattr: c_uint, flags: c_uint) c_int;
-pub extern fn xthal_icache_enable() void;
-pub extern fn xthal_dcache_enable() void;
-pub extern fn xthal_icache_disable() void;
-pub extern fn xthal_dcache_disable() void;
-pub extern fn xthal_icache_all_invalidate() void;
-pub extern fn xthal_dcache_all_invalidate() void;
-pub extern fn xthal_dcache_all_writeback() void;
-pub extern fn xthal_dcache_all_writeback_inv() void;
-pub extern fn xthal_icache_all_unlock() void;
-pub extern fn xthal_dcache_all_unlock() void;
-pub extern fn xthal_icache_region_lock(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_region_lock(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_icache_region_unlock(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_region_unlock(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_icache_hugerange_invalidate(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_icache_hugerange_unlock(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_hugerange_invalidate(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_hugerange_unlock(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_hugerange_writeback(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_dcache_hugerange_writeback_inv(addr: ?*anyopaque, size: c_uint) void;
-pub extern fn xthal_icache_line_lock(addr: ?*anyopaque) void;
-pub extern fn xthal_dcache_line_lock(addr: ?*anyopaque) void;
-pub extern fn xthal_icache_line_unlock(addr: ?*anyopaque) void;
-pub extern fn xthal_dcache_line_unlock(addr: ?*anyopaque) void;
-pub extern fn xthal_memep_inject_error(addr: ?*anyopaque, size: c_int, flags: c_int) void;
-pub extern const Xthal_have_spanning_way: u8;
-pub extern const Xthal_have_identity_map: u8;
-pub extern const Xthal_have_mimic_cacheattr: u8;
-pub extern const Xthal_have_xlt_cacheattr: u8;
-pub extern const Xthal_have_cacheattr: u8;
-pub extern const Xthal_have_tlbs: u8;
-pub extern const Xthal_mmu_asid_bits: u8;
-pub extern const Xthal_mmu_asid_kernel: u8;
-pub extern const Xthal_mmu_rings: u8;
-pub extern const Xthal_mmu_ring_bits: u8;
-pub extern const Xthal_mmu_sr_bits: u8;
-pub extern const Xthal_mmu_ca_bits: u8;
-pub extern const Xthal_mmu_max_pte_page_size: c_uint;
-pub extern const Xthal_mmu_min_pte_page_size: c_uint;
-pub extern const Xthal_itlb_way_bits: u8;
-pub extern const Xthal_itlb_ways: u8;
-pub extern const Xthal_itlb_arf_ways: u8;
-pub extern const Xthal_dtlb_way_bits: u8;
-pub extern const Xthal_dtlb_ways: u8;
-pub extern const Xthal_dtlb_arf_ways: u8;
-pub extern fn xthal_static_v2p(vaddr: c_uint, paddrp: [*c]c_uint) c_int;
-pub extern fn xthal_static_p2v(paddr: c_uint, vaddrp: [*c]c_uint, cached: c_uint) c_int;
-pub extern fn xthal_set_region_translation(vaddr: ?*anyopaque, paddr: ?*anyopaque, size: c_uint, cache_atr: c_uint, flags: c_uint) c_int;
-pub extern fn xthal_v2p(?*anyopaque, [*c]?*anyopaque, [*c]c_uint, [*c]c_uint) c_int;
-pub extern fn xthal_invalidate_region(addr: ?*anyopaque) c_int;
-pub extern fn xthal_set_region_translation_raw(vaddr: ?*anyopaque, paddr: ?*anyopaque, cattr: c_uint) c_int;
-pub const struct_xthal_MPU_entry = extern struct {
-    as: u32 = @import("std").mem.zeroes(u32),
-    at: u32 = @import("std").mem.zeroes(u32),
-};
-pub const xthal_MPU_entry = struct_xthal_MPU_entry;
-pub const Xthal_mpu_bgmap: [*c]const xthal_MPU_entry = @extern([*c]const xthal_MPU_entry, .{
-    .name = "Xthal_mpu_bgmap",
-});
-pub extern fn xthal_is_kernel_readable(accessRights: u32) i32;
-pub extern fn xthal_is_kernel_writeable(accessRights: u32) i32;
-pub extern fn xthal_is_kernel_executable(accessRights: u32) i32;
-pub extern fn xthal_is_user_readable(accessRights: u32) i32;
-pub extern fn xthal_is_user_writeable(accessRights: u32) i32;
-pub extern fn xthal_is_user_executable(accessRights: u32) i32;
-pub extern fn xthal_encode_memory_type(x: u32) c_int;
-pub extern fn xthal_is_cacheable(memoryType: u32) i32;
-pub extern fn xthal_is_writeback(memoryType: u32) i32;
-pub extern fn xthal_is_device(memoryType: u32) i32;
-pub extern fn xthal_read_map(entries: [*c]struct_xthal_MPU_entry) i32;
-pub extern fn xthal_write_map(entries: [*c]const struct_xthal_MPU_entry, n: u32) void;
-pub extern fn xthal_check_map(entries: [*c]const struct_xthal_MPU_entry, n: u32) c_int;
-pub extern fn xthal_get_entry_for_address(vaddr: ?*anyopaque, infgmap: [*c]i32) struct_xthal_MPU_entry;
-pub extern fn xthal_calc_cacheadrdis(e: [*c]const struct_xthal_MPU_entry, n: u32) u32;
-pub extern fn xthal_mpu_set_region_attribute(vaddr: ?*anyopaque, size: usize, accessRights: i32, memoryType: i32, flags: u32) c_int;
-pub extern fn xthal_read_background_map(entries: [*c]struct_xthal_MPU_entry) i32;
-pub extern const Xthal_cp_id_FPU: u8;
-pub extern const Xthal_cp_mask_FPU: c_uint;
-pub extern const Xthal_cp_id_XCHAL_CP1_IDENT: u8;
-pub extern const Xthal_cp_mask_XCHAL_CP1_IDENT: c_uint;
-pub extern const Xthal_cp_id_XCHAL_CP2_IDENT: u8;
-pub extern const Xthal_cp_mask_XCHAL_CP2_IDENT: c_uint;
-pub extern const Xthal_cp_id_cop_ai: u8;
-pub extern const Xthal_cp_mask_cop_ai: c_uint;
-pub extern const Xthal_cp_id_XCHAL_CP4_IDENT: u8;
-pub extern const Xthal_cp_mask_XCHAL_CP4_IDENT: c_uint;
-pub extern const Xthal_cp_id_XCHAL_CP5_IDENT: u8;
-pub extern const Xthal_cp_mask_XCHAL_CP5_IDENT: c_uint;
-pub extern const Xthal_cp_id_XCHAL_CP6_IDENT: u8;
-pub extern const Xthal_cp_mask_XCHAL_CP6_IDENT: c_uint;
-pub extern const Xthal_cp_id_XCHAL_CP7_IDENT: u8;
-pub extern const Xthal_cp_mask_XCHAL_CP7_IDENT: c_uint;
-pub const KernelFrame = extern struct {
-    pc: c_long = @import("std").mem.zeroes(c_long),
-    ps: c_long = @import("std").mem.zeroes(c_long),
-    areg: [4]c_long = @import("std").mem.zeroes([4]c_long),
-    sar: c_long = @import("std").mem.zeroes(c_long),
-    lcount: c_long = @import("std").mem.zeroes(c_long),
-    lbeg: c_long = @import("std").mem.zeroes(c_long),
-    lend: c_long = @import("std").mem.zeroes(c_long),
-    acclo: c_long = @import("std").mem.zeroes(c_long),
-    acchi: c_long = @import("std").mem.zeroes(c_long),
-    mr: [4]c_long = @import("std").mem.zeroes([4]c_long),
-};
-pub const UserFrame = extern struct {
-    pc: c_long = @import("std").mem.zeroes(c_long),
-    ps: c_long = @import("std").mem.zeroes(c_long),
-    sar: c_long = @import("std").mem.zeroes(c_long),
-    vpri: c_long = @import("std").mem.zeroes(c_long),
-    a2: c_long = @import("std").mem.zeroes(c_long),
-    a3: c_long = @import("std").mem.zeroes(c_long),
-    a4: c_long = @import("std").mem.zeroes(c_long),
-    a5: c_long = @import("std").mem.zeroes(c_long),
-    exccause: c_long = @import("std").mem.zeroes(c_long),
-    lcount: c_long = @import("std").mem.zeroes(c_long),
-    lbeg: c_long = @import("std").mem.zeroes(c_long),
-    lend: c_long = @import("std").mem.zeroes(c_long),
-    acclo: c_long = @import("std").mem.zeroes(c_long),
-    acchi: c_long = @import("std").mem.zeroes(c_long),
-    mr: [4]c_long = @import("std").mem.zeroes([4]c_long),
-    pad: [2]c_long = @import("std").mem.zeroes([2]c_long),
-};
-pub const XtExcFrame = extern struct {
-    exit: c_long = @import("std").mem.zeroes(c_long),
-    pc: c_long = @import("std").mem.zeroes(c_long),
-    ps: c_long = @import("std").mem.zeroes(c_long),
-    a0: c_long = @import("std").mem.zeroes(c_long),
-    a1: c_long = @import("std").mem.zeroes(c_long),
-    a2: c_long = @import("std").mem.zeroes(c_long),
-    a3: c_long = @import("std").mem.zeroes(c_long),
-    a4: c_long = @import("std").mem.zeroes(c_long),
-    a5: c_long = @import("std").mem.zeroes(c_long),
-    a6: c_long = @import("std").mem.zeroes(c_long),
-    a7: c_long = @import("std").mem.zeroes(c_long),
-    a8: c_long = @import("std").mem.zeroes(c_long),
-    a9: c_long = @import("std").mem.zeroes(c_long),
-    a10: c_long = @import("std").mem.zeroes(c_long),
-    a11: c_long = @import("std").mem.zeroes(c_long),
-    a12: c_long = @import("std").mem.zeroes(c_long),
-    a13: c_long = @import("std").mem.zeroes(c_long),
-    a14: c_long = @import("std").mem.zeroes(c_long),
-    a15: c_long = @import("std").mem.zeroes(c_long),
-    sar: c_long = @import("std").mem.zeroes(c_long),
-    exccause: c_long = @import("std").mem.zeroes(c_long),
-    excvaddr: c_long = @import("std").mem.zeroes(c_long),
-    lbeg: c_long = @import("std").mem.zeroes(c_long),
-    lend: c_long = @import("std").mem.zeroes(c_long),
-    lcount: c_long = @import("std").mem.zeroes(c_long),
-    tmp0: c_long = @import("std").mem.zeroes(c_long),
-    tmp1: c_long = @import("std").mem.zeroes(c_long),
-    tmp2: c_long = @import("std").mem.zeroes(c_long),
-};
-pub const XtSolFrame = extern struct {
-    exit: c_long = @import("std").mem.zeroes(c_long),
-    pc: c_long = @import("std").mem.zeroes(c_long),
-    ps: c_long = @import("std").mem.zeroes(c_long),
-    threadptr: c_long = @import("std").mem.zeroes(c_long),
-    a0: c_long = @import("std").mem.zeroes(c_long),
-    a1: c_long = @import("std").mem.zeroes(c_long),
-    a2: c_long = @import("std").mem.zeroes(c_long),
-    a3: c_long = @import("std").mem.zeroes(c_long),
-};
 pub const TaskFunction_t = ?*const fn (?*anyopaque) callconv(.c) void;
-pub const xt_handler = ?*const fn (?*anyopaque) callconv(.c) void;
-pub const xt_exc_handler = ?*const fn ([*c]XtExcFrame) callconv(.c) void;
-pub extern fn xt_set_exception_handler(n: c_int, f: xt_exc_handler) xt_exc_handler;
-pub extern fn xt_set_interrupt_handler(n: c_int, f: xt_handler, arg: ?*anyopaque) xt_handler;
-pub extern fn xt_ints_on(mask: c_uint) void;
-pub extern fn xt_ints_off(mask: c_uint) void;
-pub fn xt_set_intset(arg_arg: c_uint) callconv(.c) void {
-    var arg = arg_arg;
-    _ = &arg;
-    xthal_set_intset(arg);
+pub const INTR_TYPE_LEVEL: c_int = 0;
+pub const INTR_TYPE_EDGE: c_int = 1;
+pub const enum_intr_type = c_uint;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/esp_private/interrupt_plic.h:43:24: warning: unable to translate function, demoted to extern
+pub extern fn assert_valid_rv_int_num(arg_rv_int_num: c_int) void;
+pub inline fn rv_utils_intr_get_enabled_mask() u32 {
+    return blk: {
+        break :blk @as([*c]volatile u32, @ptrFromInt(@as(c_int, 536875008) + @as(c_int, 0))).*;
+    };
 }
-pub fn xt_set_intclear(arg_arg: c_uint) callconv(.c) void {
-    var arg = arg_arg;
-    _ = &arg;
-    xthal_set_intclear(arg);
+pub inline fn rv_utils_intr_edge_ack(arg_intr_num: u32) void {
+    var intr_num = arg_intr_num;
+    _ = &intr_num;
+    while (true) {
+        @as([*c]volatile u32, @ptrFromInt(@as(c_int, 536875008) + @as(c_int, 8))).* = @as([*c]volatile u32, @ptrFromInt(@as(c_int, 536875008) + @as(c_int, 8))).* | intr_num;
+        if (!false) break;
+    }
 }
-pub extern fn xt_get_interrupt_handler_arg(n: c_int) ?*anyopaque;
-pub extern fn xt_int_has_handler(intr: c_int, cpu: c_int) bool;
-pub const XtosCoreState = extern struct {
-    signature: c_long = @import("std").mem.zeroes(c_long),
-    restore_label: c_long = @import("std").mem.zeroes(c_long),
-    aftersave_label: c_long = @import("std").mem.zeroes(c_long),
-    areg: [64]c_long = @import("std").mem.zeroes([64]c_long),
-    caller_regs: [16]c_long = @import("std").mem.zeroes([16]c_long),
-    caller_regs_saved: c_long = @import("std").mem.zeroes(c_long),
-    windowbase: c_long = @import("std").mem.zeroes(c_long),
-    windowstart: c_long = @import("std").mem.zeroes(c_long),
-    sar: c_long = @import("std").mem.zeroes(c_long),
-    epc1: c_long = @import("std").mem.zeroes(c_long),
-    ps: c_long = @import("std").mem.zeroes(c_long),
-    excsave1: c_long = @import("std").mem.zeroes(c_long),
-    depc: c_long = @import("std").mem.zeroes(c_long),
-    epc: [6]c_long = @import("std").mem.zeroes([6]c_long),
-    eps: [6]c_long = @import("std").mem.zeroes([6]c_long),
-    excsave: [6]c_long = @import("std").mem.zeroes([6]c_long),
-    lcount: c_long = @import("std").mem.zeroes(c_long),
-    lbeg: c_long = @import("std").mem.zeroes(c_long),
-    lend: c_long = @import("std").mem.zeroes(c_long),
-    vecbase: c_long = @import("std").mem.zeroes(c_long),
-    atomctl: c_long = @import("std").mem.zeroes(c_long),
-    memctl: c_long = @import("std").mem.zeroes(c_long),
-    ccount: c_long = @import("std").mem.zeroes(c_long),
-    ccompare: [3]c_long = @import("std").mem.zeroes([3]c_long),
-    intenable: c_long = @import("std").mem.zeroes(c_long),
-    interrupt: c_long = @import("std").mem.zeroes(c_long),
-    icount: c_long = @import("std").mem.zeroes(c_long),
-    icountlevel: c_long = @import("std").mem.zeroes(c_long),
-    debugcause: c_long = @import("std").mem.zeroes(c_long),
-    dbreakc: [2]c_long = @import("std").mem.zeroes([2]c_long),
-    dbreaka: [2]c_long = @import("std").mem.zeroes([2]c_long),
-    ibreaka: [2]c_long = @import("std").mem.zeroes([2]c_long),
-    ibreakenable: c_long = @import("std").mem.zeroes(c_long),
-    misc: [4]c_long = @import("std").mem.zeroes([4]c_long),
-    cpenable: c_long = @import("std").mem.zeroes(c_long),
-    tlbs: [16]c_long = @import("std").mem.zeroes([16]c_long),
-    ncp: [36]u8 align(16) = @import("std").mem.zeroes([36]u8),
-    cp0: [72]u8 align(4) = @import("std").mem.zeroes([72]u8),
-    cp3: [208]u8 align(16) = @import("std").mem.zeroes([208]u8),
-};
-pub const _xtos_handler_func = fn () callconv(.c) void;
-pub const _xtos_handler = ?*const _xtos_handler_func;
-pub extern fn _xtos_ints_off(mask: c_uint) c_uint;
-pub extern fn _xtos_ints_on(mask: c_uint) c_uint;
-pub fn _xtos_interrupt_enable(arg_intnum: c_uint) callconv(.c) void {
-    var intnum = arg_intnum;
-    _ = &intnum;
-    _ = _xtos_ints_on(@as(c_uint, 1) << @intCast(intnum));
+pub inline fn rv_utils_restore_intlevel_regval(arg_restoreval: u32) void {
+    var restoreval = arg_restoreval;
+    _ = &restoreval;
+    while (true) {
+        @as([*c]volatile u32, @ptrFromInt(@as(c_int, 536875008) + @as(c_int, 144))).* = restoreval;
+        if (!false) break;
+    }
 }
-pub fn _xtos_interrupt_disable(arg_intnum: c_uint) callconv(.c) void {
-    var intnum = arg_intnum;
-    _ = &intnum;
-    _ = _xtos_ints_off(@as(c_uint, 1) << @intCast(intnum));
-}
-pub extern fn _xtos_set_intlevel(intlevel: c_int) c_uint;
-pub extern fn _xtos_set_min_intlevel(intlevel: c_int) c_uint;
-pub extern fn _xtos_restore_intlevel(restoreval: c_uint) c_uint;
-pub extern fn _xtos_restore_just_intlevel(restoreval: c_uint) c_uint;
-pub extern fn _xtos_set_interrupt_handler(n: c_int, f: _xtos_handler) _xtos_handler;
-pub extern fn _xtos_set_interrupt_handler_arg(n: c_int, f: _xtos_handler, arg: ?*anyopaque) _xtos_handler;
-pub extern fn _xtos_set_exception_handler(n: c_int, f: _xtos_handler) _xtos_handler;
-pub extern fn _xtos_memep_initrams() void;
-pub extern fn _xtos_memep_enable(flags: c_int) void;
-pub extern fn _xtos_dispatch_level1_interrupts() void;
-pub extern fn _xtos_dispatch_level2_interrupts() void;
-pub extern fn _xtos_dispatch_level3_interrupts() void;
-pub extern fn _xtos_dispatch_level4_interrupts() void;
-pub extern fn _xtos_dispatch_level5_interrupts() void;
-pub extern fn _xtos_dispatch_level6_interrupts() void;
-pub extern fn _xtos_read_ints() c_uint;
-pub extern fn _xtos_clear_ints(mask: c_uint) void;
-pub extern fn _xtos_core_shutoff(flags: c_uint) c_int;
-pub extern fn _xtos_core_save(flags: c_uint, savearea: [*c]XtosCoreState, code: ?*anyopaque) c_int;
-pub extern fn _xtos_core_restore(retvalue: c_uint, savearea: [*c]XtosCoreState) void;
-pub extern fn _xtos_timer_0_delta(cycles: c_int) void;
-pub extern fn _xtos_timer_1_delta(cycles: c_int) void;
-pub extern fn _xtos_timer_2_delta(cycles: c_int) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:37:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:212:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:28:50: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_core_id() u32;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:52:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:47:50: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_raw_core_id() u32;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:64:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:61:25: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_sp() ?*anyopaque;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:68:28: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_get_cycle_count() u32;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:75:20: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_cycle_count(arg_ccount: u32) callconv(.c) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:82:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:80:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_wait_for_intr() void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:95:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:93:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_vecbase(arg_vecbase: u32) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:100:28: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_intr_get_enabled_mask() u32;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:117:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_breakpoint(arg_bp_num: c_int, arg_bp_addr: u32) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:132:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_clear_breakpoint(arg_bp_num: c_int) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:156:35: warning: TODO implement function '__builtin_ffsll' in std.zig.c_builtins
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:148:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_set_watchpoint(arg_wp_num: c_int, arg_wp_addr: u32, arg_size: usize, arg_on_read: bool, arg_on_write: bool) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:12:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:174:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_clear_watchpoint(arg_wp_num: c_int) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:15:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:188:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_dbgr_is_attached() bool;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:198:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:196:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_dbgr_break() void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:216:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_utils.h:205:24: warning: unable to translate function, demoted to extern
-pub extern fn xt_utils_compare_and_set(arg_addr: [*c]volatile u32, arg_compare_value: u32, arg_new_value: u32) bool;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/esp_private/interrupt_plic.h:85:28: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_set_intlevel_regval(arg_intlevel: u32) u32;
 pub const intr_handler_t = ?*const fn (?*anyopaque) callconv(.c) void;
+pub extern fn intr_handler_set(rv_int_num: c_int, @"fn": intr_handler_t, arg: ?*anyopaque) void;
+pub extern fn intr_handler_get(rv_int_num: c_int) intr_handler_t;
+pub extern fn intr_handler_get_arg(rv_int_num: c_int) ?*anyopaque;
+pub extern fn esprv_int_enable(unmask: u32) void;
+pub extern fn esprv_int_disable(mask: u32) void;
+pub extern fn esprv_int_set_type(intr_num: c_int, @"type": enum_intr_type) void;
+pub extern fn esprv_int_get_type(intr_num: c_int) enum_intr_type;
+pub extern fn esprv_int_set_priority(rv_int_num: c_int, priority: c_int) void;
+pub extern fn esprv_int_get_priority(rv_int_num: c_int) c_int;
+pub extern fn esprv_int_set_threshold(priority_threshold: c_int) void;
+pub extern fn esprv_get_interrupt_unmask() u32;
+pub extern fn esprv_int_is_vectored(rv_int_num: c_int) bool;
+pub extern fn esprv_int_set_vectored(rv_int_num: c_int, vectored: bool) void;
+pub extern fn esprv_intc_int_enable(unmask: u32) void;
+pub extern fn esprv_intc_int_disable(mask: u32) void;
+pub extern fn esprv_intc_int_set_type(intr_num: c_int, @"type": enum_intr_type) void;
+pub fn esprv_intc_int_get_type(arg_intr_num: c_int) callconv(.c) enum_intr_type {
+    var intr_num = arg_intr_num;
+    _ = &intr_num;
+    return esprv_int_get_type(intr_num);
+}
+pub extern fn esprv_intc_int_set_priority(rv_int_num: c_int, priority: c_int) void;
+pub fn esprv_intc_int_get_priority(arg_rv_int_num: c_int) callconv(.c) c_int {
+    var rv_int_num = arg_rv_int_num;
+    _ = &rv_int_num;
+    return esprv_int_get_priority(rv_int_num);
+}
+pub extern fn esprv_intc_int_set_threshold(priority_threshold: c_int) void;
+pub fn esprv_intc_get_interrupt_unmask() callconv(.c) u32 {
+    return esprv_get_interrupt_unmask();
+}
+pub extern fn intr_matrix_route(periph_intr_source: c_int, rv_int_num: c_int) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:62:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:60:55: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_wait_for_intr() void;
+pub inline fn rv_utils_get_core_id() u32 {
+    return 0;
+}
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:83:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:80:25: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_get_sp() ?*anyopaque;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:198:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:87:59: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_get_cycle_count() u32;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:201:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:96:55: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_set_cycle_count(arg_ccount: u32) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:201:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:111:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_set_mtvec(arg_mtvec_val: u32) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:212:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:118:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_intr_enable(arg_intr_mask: u32) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:212:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:126:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_intr_disable(arg_intr_mask: u32) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:208:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:134:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_intr_global_enable() void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:212:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:139:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_intr_global_disable() void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:201:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:252:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_set_breakpoint(arg_bp_num: c_int, arg_bp_addr: u32) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:201:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:262:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_set_watchpoint(arg_wp_num: c_int, arg_wp_addr: u32, arg_size: usize, arg_on_read: bool, arg_on_write: bool) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:201:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:300:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_clear_breakpoint(arg_bp_num: c_int) void;
+pub inline fn rv_utils_clear_watchpoint(arg_wp_num: c_int) void {
+    var wp_num = arg_wp_num;
+    _ = &wp_num;
+    rv_utils_clear_breakpoint(wp_num);
+}
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:201:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:315:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_is_trigger_fired(arg_id: c_int) bool;
+pub inline fn rv_utils_dbgr_is_attached() bool {
+    return (blk: {
+        break :blk @as(c_ulong, @bitCast(@as(c_ulong, @as([*c]volatile u32, @ptrFromInt(@as(c_int, 1611407360) + @as(c_int, 116))).*))) & (@as(c_ulong, 1) << @intCast(@as(c_int, 1)));
+    }) != 0;
+}
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:330:5: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:328:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_dbgr_break() void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:212:3: warning: TODO implement translation of stmt class GCCAsmStmtClass
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/rv_utils.h:337:24: warning: unable to translate function, demoted to extern
+pub extern fn rv_utils_compare_and_set(arg_addr: [*c]volatile u32, arg_compare_value: u32, arg_new_value: u32) bool;
 pub const struct_intr_handle_data_t = opaque {};
 pub const intr_handle_t = ?*struct_intr_handle_data_t;
 pub const ESP_INTR_CPU_AFFINITY_AUTO: c_int = 0;
@@ -1440,9 +1030,9 @@ pub extern fn esp_intr_noniram_disable() void;
 pub extern fn esp_intr_noniram_enable() void;
 pub extern fn esp_intr_enable_source(inum: c_int) void;
 pub extern fn esp_intr_disable_source(inum: c_int) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_intr_alloc.h:301:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_intr_alloc.h:301:12: warning: TODO implement function '__builtin_ffs' in std.zig.c_builtins
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_intr_alloc.h:299:19: warning: unable to translate function, demoted to extern
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_intr_alloc.h:299:19: warning: unable to translate function, demoted to extern
 pub extern fn esp_intr_flags_to_level(arg_flags: c_int) callconv(.c) c_int;
 pub fn esp_intr_level_to_flags(arg_level: c_int) callconv(.c) c_int {
     var level = arg_level;
@@ -1471,58 +1061,74 @@ pub extern fn esp_cpu_unstall(core_id: c_int) void;
 pub extern fn esp_cpu_reset(core_id: c_int) void;
 pub extern fn esp_cpu_wait_for_intr() void;
 pub inline fn esp_cpu_get_core_id() c_int {
-    return @as(c_int, @bitCast(xt_utils_get_core_id()));
+    return @as(c_int, @bitCast(rv_utils_get_core_id()));
 }
 pub inline fn esp_cpu_get_sp() ?*anyopaque {
-    return xt_utils_get_sp();
+    return rv_utils_get_sp();
 }
 pub inline fn esp_cpu_get_cycle_count() esp_cpu_cycle_count_t {
-    return @as(esp_cpu_cycle_count_t, @bitCast(xt_utils_get_cycle_count()));
+    return @as(esp_cpu_cycle_count_t, @bitCast(rv_utils_get_cycle_count()));
 }
 pub inline fn esp_cpu_set_cycle_count(arg_cycle_count: esp_cpu_cycle_count_t) void {
     var cycle_count = arg_cycle_count;
     _ = &cycle_count;
-    xt_utils_set_cycle_count(@as(u32, @bitCast(cycle_count)));
+    rv_utils_set_cycle_count(@as(u32, @bitCast(cycle_count)));
 }
 pub inline fn esp_cpu_pc_to_addr(arg_pc: u32) ?*anyopaque {
     var pc = arg_pc;
     _ = &pc;
-    return @as(?*anyopaque, @ptrFromInt((pc & @as(c_uint, 1073741823)) | @as(c_uint, 1073741824)));
+    return @as(?*anyopaque, @ptrFromInt(pc));
 }
 pub extern fn esp_cpu_intr_get_desc(core_id: c_int, intr_num: c_int, intr_desc_ret: [*c]esp_cpu_intr_desc_t) void;
 pub inline fn esp_cpu_intr_set_ivt_addr(arg_ivt_addr: ?*const anyopaque) void {
     var ivt_addr = arg_ivt_addr;
     _ = &ivt_addr;
-    xt_utils_set_vecbase(@as(u32, @intCast(@intFromPtr(ivt_addr))));
+    rv_utils_set_mtvec(@as(u32, @intCast(@intFromPtr(ivt_addr))));
 }
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:324:24: warning: unable to translate function, demoted to extern
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:260:24: warning: unable to translate function, demoted to extern
+pub extern fn esp_cpu_intr_set_type(arg_intr_num: c_int, arg_intr_type_1: esp_cpu_intr_type_t) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:276:39: warning: unable to translate function, demoted to extern
+pub extern fn esp_cpu_intr_get_type(arg_intr_num: c_int) esp_cpu_intr_type_t;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:291:24: warning: unable to translate function, demoted to extern
+pub extern fn esp_cpu_intr_set_priority(arg_intr_num: c_int, arg_intr_priority: c_int) void;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:306:23: warning: unable to translate function, demoted to extern
+pub extern fn esp_cpu_intr_get_priority(arg_intr_num: c_int) c_int;
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:324:24: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_has_handler(arg_intr_num: c_int) bool;
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:348:24: warning: unable to translate function, demoted to extern
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:348:24: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_set_handler(arg_intr_num: c_int, arg_handler: esp_cpu_intr_handler_t, arg_handler_arg: ?*anyopaque) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:366:25: warning: unable to translate function, demoted to extern
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:366:25: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_get_handler_arg(arg_intr_num: c_int) ?*anyopaque;
 pub inline fn esp_cpu_intr_enable(arg_intr_mask: u32) void {
     var intr_mask = arg_intr_mask;
     _ = &intr_mask;
-    xt_ints_on(intr_mask);
+    rv_utils_intr_enable(intr_mask);
 }
 pub inline fn esp_cpu_intr_disable(arg_intr_mask: u32) void {
     var intr_mask = arg_intr_mask;
     _ = &intr_mask;
-    xt_ints_off(intr_mask);
+    rv_utils_intr_disable(intr_mask);
 }
 pub inline fn esp_cpu_intr_get_enabled_mask() u32 {
-    return xt_utils_intr_get_enabled_mask();
+    return rv_utils_intr_get_enabled_mask();
 }
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:427:24: warning: unable to translate function, demoted to extern
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_cpu.h:427:24: warning: unable to translate function, demoted to extern
 pub extern fn esp_cpu_intr_edge_ack(arg_intr_num: c_int) void;
 pub extern fn esp_cpu_configure_region_protection() void;
 pub extern fn esp_cpu_set_breakpoint(bp_num: c_int, bp_addr: ?*const anyopaque) esp_err_t;
@@ -1530,91 +1136,92 @@ pub extern fn esp_cpu_clear_breakpoint(bp_num: c_int) esp_err_t;
 pub extern fn esp_cpu_set_watchpoint(wp_num: c_int, wp_addr: ?*const anyopaque, size: usize, trigger: esp_cpu_watchpoint_trigger_t) esp_err_t;
 pub extern fn esp_cpu_clear_watchpoint(wp_num: c_int) esp_err_t;
 pub inline fn esp_cpu_dbgr_is_attached() bool {
-    return xt_utils_dbgr_is_attached();
+    return rv_utils_dbgr_is_attached();
 }
 pub inline fn esp_cpu_dbgr_break() void {
-    xt_utils_dbgr_break();
+    rv_utils_dbgr_break();
 }
 pub inline fn esp_cpu_get_call_addr(arg_return_address: isize) isize {
     var return_address = arg_return_address;
     _ = &return_address;
-    return return_address - @as(isize, @bitCast(@as(c_long, @as(c_int, 3))));
+    return return_address - @as(isize, @bitCast(@as(c_long, @as(c_int, 4))));
 }
 pub extern fn esp_cpu_compare_and_set(addr: [*c]volatile u32, compare_value: u32, new_value: u32) bool;
 pub const spinlock_t = extern struct {
     owner: u32 = @import("std").mem.zeroes(u32),
     count: u32 = @import("std").mem.zeroes(u32),
 };
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
 
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/spinlock.h:51:51: warning: unable to translate function, demoted to extern
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/spinlock.h:51:51: warning: unable to translate function, demoted to extern
 pub extern fn spinlock_initialize(arg_lock: [*c]spinlock_t) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/spinlock.h:74:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_acquire(arg_lock: [*c]spinlock_t, arg_timeout: i32) bool;
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:23: warning: TODO implement function '__builtin_strrchr' in std.zig.c_builtins
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/spinlock.h:174:51: warning: unable to translate function, demoted to extern
-pub extern fn spinlock_release(arg_lock: [*c]spinlock_t) void;
+pub inline fn spinlock_acquire(arg_lock: [*c]spinlock_t, arg_timeout: i32) bool {
+    var lock = arg_lock;
+    _ = &lock;
+    var timeout = arg_timeout;
+    _ = &timeout;
+    return @as(c_int, 1) != 0;
+}
+pub inline fn spinlock_release(arg_lock: [*c]spinlock_t) void {
+    var lock = arg_lock;
+    _ = &lock;
+}
 pub extern fn esp_crosscore_int_init() void;
 pub extern fn esp_crosscore_int_send_yield(core_id: c_int) void;
 pub extern fn esp_crosscore_int_send_freq_switch(core_id: c_int) void;
 pub extern fn esp_crosscore_int_send_gdb_call(core_id: c_int) void;
-pub extern fn esp_crosscore_int_send_print_backtrace(core_id: c_int) void;
-pub extern fn esp_crosscore_int_send_twdt_abort(core_id: c_int) void;
 pub inline fn esp_dram_match_iram() bool {
-    return (@as(c_int, 1070104576) == @as(c_int, 1077346304)) and (@as(c_int, 1070596096) == @as(c_int, 1077805056));
+    return (@as(c_int, 1082130432) == @as(c_int, 1082130432)) and (@as(c_int, 1082654720) == @as(c_int, 1082654720));
 }
 pub inline fn esp_ptr_in_iram(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1077346304))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1077805056)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1082654720)))));
 }
 pub inline fn esp_ptr_in_dram(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1070104576))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1070596096)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1082654720)))));
 }
 pub inline fn esp_ptr_in_diram_dram(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1070104576))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1070530560)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1082654720)))));
 }
 pub inline fn esp_ptr_in_diram_iram(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1077379072))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1077805056)))));
+    return @as(c_int, 0) != 0;
 }
 pub inline fn esp_ptr_in_rtc_iram_fast(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1611653120))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1611661312)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1342177280))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1342193664)))));
 }
 pub inline fn esp_ptr_in_rtc_dram_fast(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1611653120))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1611661312)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1342177280))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1342193664)))));
 }
 pub inline fn esp_ptr_in_rtc_slow(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1342177280))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1342185472)))));
+    return @as(c_int, 0) != 0;
 }
 pub inline fn esp_ptr_diram_dram_to_iram(arg_p: ?*const anyopaque) ?*anyopaque {
     var p = arg_p;
     _ = &p;
-    return @as(?*anyopaque, @ptrFromInt(@as(isize, @bitCast(@as(c_long, @as(c_int, 1077379072)))) + (@as(isize, @intCast(@intFromPtr(p))) - @as(isize, @bitCast(@as(c_long, @as(c_int, 1070104576)))))));
+    return @as(?*anyopaque, @ptrFromInt(@as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432)))) + (@as(isize, @intCast(@intFromPtr(p))) - @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432)))))));
 }
 pub inline fn esp_ptr_diram_iram_to_dram(arg_p: ?*const anyopaque) ?*anyopaque {
     var p = arg_p;
     _ = &p;
-    return @as(?*anyopaque, @ptrFromInt(@as(isize, @bitCast(@as(c_long, @as(c_int, 1070104576)))) + (@as(isize, @intCast(@intFromPtr(p))) - @as(isize, @bitCast(@as(c_long, @as(c_int, 1077379072)))))));
+    return @as(?*anyopaque, @ptrFromInt(@as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432)))) + (@as(isize, @intCast(@intFromPtr(p))) - @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432)))))));
 }
 pub inline fn esp_ptr_dma_capable(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1070104576))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1070596096)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1082654720)))));
 }
 pub extern fn esp_ptr_dma_ext_capable(p: ?*const anyopaque) bool;
 pub inline fn esp_ptr_word_aligned(arg_p: ?*const anyopaque) bool {
@@ -1627,7 +1234,7 @@ pub inline fn esp_ptr_executable(arg_p: ?*const anyopaque) bool {
     _ = &p;
     var ip: isize = @as(isize, @intCast(@intFromPtr(p)));
     _ = &ip;
-    return ((((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1107296256))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1140850688)))))) or ((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1077346304))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1077805056))))))) or ((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1073741824))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1074135040))))))) or ((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1611653120))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1611661312))))));
+    return ((((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1107296256))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1107296256) + (@as(c_int, 32768) << @intCast(8))))))) or ((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1082654720))))))) or ((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1073741824))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1074069504))))))) or ((ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1342177280))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1342193664))))));
 }
 pub extern fn esp_ptr_byte_accessible(p: ?*const anyopaque) bool;
 pub inline fn esp_ptr_internal(arg_p: ?*const anyopaque) bool {
@@ -1635,30 +1242,29 @@ pub inline fn esp_ptr_internal(arg_p: ?*const anyopaque) bool {
     _ = &p;
     var r: bool = undefined;
     _ = &r;
-    r = (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1070104576))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1077805056)))));
-    r |= @as(bool, (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1342177280))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1342185472))))));
-    r |= @as(bool, (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1611653120))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1611661312))))));
+    r = (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1082130432))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1082654720)))));
+    r |= @as(bool, (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1342177280))))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1342193664))))));
     return r;
 }
 pub extern fn esp_ptr_external_ram(p: ?*const anyopaque) bool;
 pub inline fn esp_ptr_in_drom(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
-    var drom_start_addr: i32 = 1006632960;
+    var drom_start_addr: i32 = 1107296256;
     _ = &drom_start_addr;
-    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, drom_start_addr)))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1040187392)))));
+    return (@as(isize, @intCast(@intFromPtr(p))) >= @as(isize, @bitCast(@as(c_long, drom_start_addr)))) and (@as(isize, @intCast(@intFromPtr(p))) < @as(isize, @bitCast(@as(c_long, @as(c_int, 1107296256) + (@as(c_int, 32768) << @intCast(8))))));
 }
 pub inline fn esp_ptr_in_rom(arg_p: ?*const anyopaque) bool {
     var p = arg_p;
     _ = &p;
     var ip: isize = @as(isize, @intCast(@intFromPtr(p)));
     _ = &ip;
-    return (ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1073741824))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1074135040)))));
+    return (ip >= @as(isize, @bitCast(@as(c_long, @as(c_int, 1073741824))))) and (ip < @as(isize, @bitCast(@as(c_long, @as(c_int, 1074069504)))));
 }
 pub inline fn esp_stack_ptr_in_dram(arg_sp: u32) bool {
     var sp = arg_sp;
     _ = &sp;
-    return !(((sp < @as(u32, @bitCast(@as(c_int, 1070104576) + @as(c_int, 16)))) or (sp > @as(u32, @bitCast(@as(c_int, 1070596096) - @as(c_int, 16))))) or ((sp & @as(u32, @bitCast(@as(c_int, 15)))) != @as(u32, @bitCast(@as(c_int, 0)))));
+    return !(((sp < @as(u32, @bitCast(@as(c_int, 1082130432) + @as(c_int, 16)))) or (sp > @as(u32, @bitCast(@as(c_int, 1082654720) - @as(c_int, 16))))) or ((sp & @as(u32, @bitCast(@as(c_int, 15)))) != @as(u32, @bitCast(@as(c_int, 0)))));
 }
 pub inline fn esp_stack_ptr_is_sane(arg_sp: u32) bool {
     var sp = arg_sp;
@@ -1672,68 +1278,33 @@ pub const TickType_t = u32;
 pub const portMUX_TYPE = spinlock_t;
 pub extern fn xPortCheckIfInISR() BaseType_t;
 pub extern fn vPortAssertIfInISR() void;
-pub extern fn uxPortEnterCriticalFromISR() UBaseType_t;
-pub extern fn vPortExitCriticalFromISR(level: UBaseType_t) void;
-pub extern var port_xTaskLock: portMUX_TYPE;
-pub extern var port_xISRLock: portMUX_TYPE;
-pub extern fn vPortTakeLock(lock: [*c]portMUX_TYPE) void;
-pub extern fn vPortReleaseLock(lock: [*c]portMUX_TYPE) void;
 pub extern fn vPortYield() void;
 pub inline fn vPortYieldCore(arg_xCoreID: BaseType_t) void {
     var xCoreID = arg_xCoreID;
     _ = &xCoreID;
     esp_crosscore_int_send_yield(xCoreID);
 }
-pub inline fn vPortYieldFromISR() void {
-    _frxt_setup_switch();
-}
+pub extern fn ulPortSetInterruptMask() UBaseType_t;
+pub extern fn vPortClearInterruptMask(mask: UBaseType_t) void;
+pub extern fn vPortYieldFromISR() void;
 pub inline fn xPortGetCoreID() BaseType_t {
     return @as(BaseType_t, @bitCast(esp_cpu_get_core_id()));
 }
 pub extern fn vPortTCBPreDeleteHook(pxTCB: ?*anyopaque) void;
 pub extern fn vTaskEnterCritical() void;
 pub extern fn vTaskExitCritical() void;
-pub extern fn vTaskEnterCriticalFromISR() UBaseType_t;
-pub extern fn vTaskExitCriticalFromISR(uxSavedInterruptStatus: UBaseType_t) void;
-pub extern fn _frxt_setup_switch() void;
 pub fn xPortInIsrContext() callconv(.c) BaseType_t {
     return xPortCheckIfInISR();
 }
-pub extern fn xPortInterruptedFromISRContext() BaseType_t;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime.h:92:4: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:301:27: warning: unable to translate function, demoted to extern
-pub extern fn xPortSetInterruptMaskFromISR() callconv(.c) UBaseType_t;
-pub fn vPortClearInterruptMaskFromISR(arg_prev_level: UBaseType_t) callconv(.c) void {
-    var prev_level = arg_prev_level;
-    _ = &prev_level;
-    _ = _xtos_set_intlevel(@as(c_int, @bitCast(prev_level)));
+pub extern fn vPortEnterCritical() void;
+pub extern fn vPortExitCritical() void;
+pub fn xPortCanYield() callconv(.c) bool {
+    var threshold: u32 = blk: {
+        break :blk @as([*c]volatile u32, @ptrFromInt(@as(c_int, 536875008) + @as(c_int, 144))).*;
+    };
+    _ = &threshold;
+    return threshold <= @as(u32, @bitCast(@as(c_int, 1)));
 }
-pub inline fn vPortCPUAcquireMutexTimeout(arg_mux: [*c]portMUX_TYPE, arg_timeout: c_int) bool {
-    var mux = arg_mux;
-    _ = &mux;
-    var timeout = arg_timeout;
-    _ = &timeout;
-    return spinlock_acquire(mux, timeout);
-}
-pub inline fn vPortCPUReleaseMutex(arg_mux: [*c]portMUX_TYPE) void {
-    var mux = arg_mux;
-    _ = &mux;
-    spinlock_release(mux);
-}
-pub extern fn xPortEnterCriticalTimeout(lock: [*c]portMUX_TYPE, timeout: BaseType_t) BaseType_t;
-pub inline fn vPortEnterCriticalIDF(arg_lock: [*c]portMUX_TYPE) void {
-    var lock = arg_lock;
-    _ = &lock;
-    _ = xPortEnterCriticalTimeout(lock, -@as(c_int, 1));
-}
-pub extern fn vPortExitCriticalIDF(lock: [*c]portMUX_TYPE) void;
-pub extern fn vPortEnterCritical(lock: [*c]portMUX_TYPE) void;
-pub extern fn vPortExitCritical(lock: [*c]portMUX_TYPE) void;
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:11:30: warning: TODO implement translation of stmt class GCCAsmStmtClass
-
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:358:30: warning: unable to translate function, demoted to extern
-pub extern fn xPortCanYield() callconv(.c) bool;
 pub extern fn vPortSetStackWatchpoint(pxStackStart: ?*anyopaque) void;
 pub extern fn xPortCheckValidListMem(ptr: ?*const anyopaque) bool;
 pub extern fn xPortCheckValidTCBMem(ptr: ?*const anyopaque) bool;
@@ -1838,33 +1409,28 @@ pub extern fn wcstoimax_l(noalias [*c]const wchar_t, _restrict: [*c][*c]wchar_t,
 pub extern fn wcstoumax_l(noalias [*c]const wchar_t, _restrict: [*c][*c]wchar_t, c_int, locale_t) uintmax_t;
 pub const RESET_REASON_CHIP_POWER_ON: c_int = 1;
 pub const RESET_REASON_CHIP_BROWN_OUT: c_int = 1;
-pub const RESET_REASON_CHIP_SUPER_WDT: c_int = 1;
 pub const RESET_REASON_CORE_SW: c_int = 3;
 pub const RESET_REASON_CORE_DEEP_SLEEP: c_int = 5;
+pub const RESET_REASON_CORE_SDIO: c_int = 6;
 pub const RESET_REASON_CORE_MWDT0: c_int = 7;
 pub const RESET_REASON_CORE_MWDT1: c_int = 8;
 pub const RESET_REASON_CORE_RTC_WDT: c_int = 9;
 pub const RESET_REASON_CPU0_MWDT0: c_int = 11;
-pub const RESET_REASON_CPU1_MWDT0: c_int = 11;
 pub const RESET_REASON_CPU0_SW: c_int = 12;
-pub const RESET_REASON_CPU1_SW: c_int = 12;
 pub const RESET_REASON_CPU0_RTC_WDT: c_int = 13;
-pub const RESET_REASON_CPU1_RTC_WDT: c_int = 13;
 pub const RESET_REASON_SYS_BROWN_OUT: c_int = 15;
 pub const RESET_REASON_SYS_RTC_WDT: c_int = 16;
 pub const RESET_REASON_CPU0_MWDT1: c_int = 17;
-pub const RESET_REASON_CPU1_MWDT1: c_int = 17;
 pub const RESET_REASON_SYS_SUPER_WDT: c_int = 18;
-pub const RESET_REASON_SYS_CLK_GLITCH: c_int = 19;
 pub const RESET_REASON_CORE_EFUSE_CRC: c_int = 20;
 pub const RESET_REASON_CORE_USB_UART: c_int = 21;
 pub const RESET_REASON_CORE_USB_JTAG: c_int = 22;
-pub const RESET_REASON_CORE_PWR_GLITCH: c_int = 23;
+pub const RESET_REASON_CPU0_JTAG: c_int = 24;
 pub const soc_reset_reason_t = c_uint;
 pub extern fn esp_rom_software_reset_system() void;
 pub extern fn esp_rom_software_reset_cpu(cpu_no: c_int) void;
 pub extern fn esp_rom_printf(fmt: [*c]const u8, ...) c_int;
-pub extern fn esp_rom_vprintf(fmt: [*c]const u8, ap: [*c]struct___va_list_tag_1) c_int;
+pub extern fn esp_rom_vprintf(fmt: [*c]const u8, ap: va_list) c_int;
 pub extern fn esp_rom_delay_us(us: u32) void;
 pub extern fn esp_rom_install_channel_putc(channel: c_int, putc: ?*const fn (u8) callconv(.c) void) void;
 pub extern fn esp_rom_output_to_channels(c: u8) void;
@@ -1948,7 +1514,6 @@ pub const struct_xSTATIC_TCB = extern struct {
     uxDummy5: UBaseType_t = @import("std").mem.zeroes(UBaseType_t),
     pxDummy6: ?*anyopaque = @import("std").mem.zeroes(?*anyopaque),
     ucDummy7: [16]u8 = @import("std").mem.zeroes([16]u8),
-    xDummyCoreID: BaseType_t = @import("std").mem.zeroes(BaseType_t),
     pxDummy8: ?*anyopaque = @import("std").mem.zeroes(?*anyopaque),
     uxDummy9: UBaseType_t = @import("std").mem.zeroes(UBaseType_t),
     uxDummy12: [2]UBaseType_t = @import("std").mem.zeroes([2]UBaseType_t),
@@ -1960,13 +1525,13 @@ pub const struct_xSTATIC_TCB = extern struct {
     ucDummy21: u8 = @import("std").mem.zeroes(u8),
 };
 pub const StaticTask_t = struct_xSTATIC_TCB;
-const union_unnamed_4 = extern union {
+const union_unnamed_3 = extern union {
     pvDummy2: ?*anyopaque,
     uxDummy2: UBaseType_t,
 };
 pub const struct_xSTATIC_QUEUE = extern struct {
     pvDummy1: [3]?*anyopaque = @import("std").mem.zeroes([3]?*anyopaque),
-    u: union_unnamed_4 = @import("std").mem.zeroes(union_unnamed_4),
+    u: union_unnamed_3 = @import("std").mem.zeroes(union_unnamed_3),
     xDummy3: [2]StaticList_t = @import("std").mem.zeroes([2]StaticList_t),
     uxDummy4: [3]UBaseType_t = @import("std").mem.zeroes([3]UBaseType_t),
     ucDummy5: [2]u8 = @import("std").mem.zeroes([2]u8),
@@ -2375,9 +1940,9 @@ pub const WIFI_ANT_ANT0: c_int = 0;
 pub const WIFI_ANT_ANT1: c_int = 1;
 pub const WIFI_ANT_MAX: c_int = 2;
 pub const wifi_ant_t = c_uint;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:298:13: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:298:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_he_ap_info_t = opaque {};
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:317:14: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:317:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ap_record_t = opaque {};
 pub const WIFI_FAST_SCAN: c_int = 0;
 pub const WIFI_ALL_CHANNEL_SCAN: c_int = 1;
@@ -2482,7 +2047,7 @@ pub const wifi_ap_config_t = extern struct {
     pmf_cfg: wifi_pmf_config_t = @import("std").mem.zeroes(wifi_pmf_config_t),
     sae_pwe_h2e: wifi_sae_pwe_method_t = @import("std").mem.zeroes(wifi_sae_pwe_method_t),
 };
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:543:14: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:543:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_sta_config_t = opaque {};
 pub const wifi_nan_config_t = extern struct {
     op_channel: u8 = @import("std").mem.zeroes(u8),
@@ -2495,7 +2060,7 @@ pub const wifi_config_t = extern union {
     sta: wifi_sta_config_t,
     nan: wifi_nan_config_t,
 };
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:595:14: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:595:14: warning: struct demoted to opaque type - has bitfield
 pub const wifi_sta_info_t = opaque {};
 pub const WIFI_STORAGE_FLASH: c_int = 0;
 pub const WIFI_STORAGE_RAM: c_int = 1;
@@ -2539,7 +2104,7 @@ pub const wifi_promiscuous_filter_t = extern struct {
 };
 pub const struct_wifi_csi_info_t = opaque {};
 pub const wifi_csi_info_t = struct_wifi_csi_info_t;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:721:13: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:721:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ant_gpio_t = opaque {};
 pub const wifi_ant_gpio_config_t = extern struct {
     gpio_cfg: [4]wifi_ant_gpio_t = @import("std").mem.zeroes([4]wifi_ant_gpio_t),
@@ -2549,7 +2114,7 @@ pub const WIFI_ANT_MODE_ANT1: c_int = 1;
 pub const WIFI_ANT_MODE_AUTO: c_int = 2;
 pub const WIFI_ANT_MODE_MAX: c_int = 3;
 pub const wifi_ant_mode_t = c_uint;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:752:21: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:752:21: warning: struct demoted to opaque type - has bitfield
 pub const wifi_ant_config_t = opaque {};
 pub const wifi_action_rx_cb_t = ?*const fn ([*c]u8, [*c]u8, usize, u8) callconv(.c) c_int;
 pub const wifi_action_tx_req_t = extern struct {
@@ -2576,9 +2141,9 @@ pub const NAN_PUBLISH_UNSOLICITED: c_int = 1;
 pub const NAN_SUBSCRIBE_ACTIVE: c_int = 2;
 pub const NAN_SUBSCRIBE_PASSIVE: c_int = 3;
 pub const wifi_nan_service_type_t = c_uint;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:823:13: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:823:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_nan_publish_cfg_t = opaque {};
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:837:13: warning: struct demoted to opaque type - has bitfield
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:837:13: warning: struct demoted to opaque type - has bitfield
 pub const wifi_nan_subscribe_cfg_t = opaque {};
 pub const wifi_nan_followup_params_t = extern struct {
     inst_id: u8 = @import("std").mem.zeroes(u8),
@@ -2623,14 +2188,18 @@ pub const WIFI_PHY_RATE_MCS4_LGI: c_int = 20;
 pub const WIFI_PHY_RATE_MCS5_LGI: c_int = 21;
 pub const WIFI_PHY_RATE_MCS6_LGI: c_int = 22;
 pub const WIFI_PHY_RATE_MCS7_LGI: c_int = 23;
-pub const WIFI_PHY_RATE_MCS0_SGI: c_int = 24;
-pub const WIFI_PHY_RATE_MCS1_SGI: c_int = 25;
-pub const WIFI_PHY_RATE_MCS2_SGI: c_int = 26;
-pub const WIFI_PHY_RATE_MCS3_SGI: c_int = 27;
-pub const WIFI_PHY_RATE_MCS4_SGI: c_int = 28;
-pub const WIFI_PHY_RATE_MCS5_SGI: c_int = 29;
-pub const WIFI_PHY_RATE_MCS6_SGI: c_int = 30;
-pub const WIFI_PHY_RATE_MCS7_SGI: c_int = 31;
+pub const WIFI_PHY_RATE_MCS8_LGI: c_int = 24;
+pub const WIFI_PHY_RATE_MCS9_LGI: c_int = 25;
+pub const WIFI_PHY_RATE_MCS0_SGI: c_int = 26;
+pub const WIFI_PHY_RATE_MCS1_SGI: c_int = 27;
+pub const WIFI_PHY_RATE_MCS2_SGI: c_int = 28;
+pub const WIFI_PHY_RATE_MCS3_SGI: c_int = 29;
+pub const WIFI_PHY_RATE_MCS4_SGI: c_int = 30;
+pub const WIFI_PHY_RATE_MCS5_SGI: c_int = 31;
+pub const WIFI_PHY_RATE_MCS6_SGI: c_int = 32;
+pub const WIFI_PHY_RATE_MCS7_SGI: c_int = 33;
+pub const WIFI_PHY_RATE_MCS8_SGI: c_int = 34;
+pub const WIFI_PHY_RATE_MCS9_SGI: c_int = 35;
 pub const WIFI_PHY_RATE_LORA_250K: c_int = 41;
 pub const WIFI_PHY_RATE_LORA_500K: c_int = 42;
 pub const WIFI_PHY_RATE_MAX: c_int = 43;
@@ -2715,13 +2284,13 @@ pub const WPS_FAIL_REASON_RECV_M2D: c_int = 1;
 pub const WPS_FAIL_REASON_RECV_DEAUTH: c_int = 2;
 pub const WPS_FAIL_REASON_MAX: c_int = 3;
 pub const wifi_event_sta_wps_fail_reason_t = c_uint;
-const struct_unnamed_5 = extern struct {
+const struct_unnamed_4 = extern struct {
     ssid: [32]u8 = @import("std").mem.zeroes([32]u8),
     passphrase: [64]u8 = @import("std").mem.zeroes([64]u8),
 };
 pub const wifi_event_sta_wps_er_success_t = extern struct {
     ap_cred_cnt: u8 = @import("std").mem.zeroes(u8),
-    ap_cred: [3]struct_unnamed_5 = @import("std").mem.zeroes([3]struct_unnamed_5),
+    ap_cred: [3]struct_unnamed_4 = @import("std").mem.zeroes([3]struct_unnamed_4),
 };
 pub const wifi_event_ap_staconnected_t = extern struct {
     mac: [6]u8 = @import("std").mem.zeroes([6]u8),
@@ -3254,10 +2823,10 @@ pub fn esp_log_buffer_char(arg_tag: [*c]const u8, arg_buffer: ?*const anyopaque,
 pub extern fn esp_log_timestamp() u32;
 pub extern fn esp_log_system_timestamp() [*c]u8;
 pub extern fn esp_log_early_timestamp() u32;
-pub const vprintf_like_t = ?*const fn ([*c]const u8, [*c]struct___va_list_tag_1) callconv(.c) c_int;
+pub const vprintf_like_t = ?*const fn ([*c]const u8, va_list) callconv(.c) c_int;
 pub extern fn esp_log_set_vprintf(func: vprintf_like_t) vprintf_like_t;
 pub extern fn esp_log_write(level: esp_log_level_t, tag: [*c]const u8, format: [*c]const u8, ...) void;
-pub extern fn esp_log_writev(level: esp_log_level_t, tag: [*c]const u8, format: [*c]const u8, args: [*c]struct___va_list_tag_1) void;
+pub extern fn esp_log_writev(level: esp_log_level_t, tag: [*c]const u8, format: [*c]const u8, args: va_list) void;
 pub const nvs_handle_t = u32;
 pub const nvs_handle = nvs_handle_t;
 pub const NVS_READONLY: c_int = 0;
@@ -3457,30 +3026,16 @@ pub const GPIO_NUM_18: c_int = 18;
 pub const GPIO_NUM_19: c_int = 19;
 pub const GPIO_NUM_20: c_int = 20;
 pub const GPIO_NUM_21: c_int = 21;
+pub const GPIO_NUM_22: c_int = 22;
+pub const GPIO_NUM_23: c_int = 23;
+pub const GPIO_NUM_24: c_int = 24;
+pub const GPIO_NUM_25: c_int = 25;
 pub const GPIO_NUM_26: c_int = 26;
 pub const GPIO_NUM_27: c_int = 27;
 pub const GPIO_NUM_28: c_int = 28;
 pub const GPIO_NUM_29: c_int = 29;
 pub const GPIO_NUM_30: c_int = 30;
-pub const GPIO_NUM_31: c_int = 31;
-pub const GPIO_NUM_32: c_int = 32;
-pub const GPIO_NUM_33: c_int = 33;
-pub const GPIO_NUM_34: c_int = 34;
-pub const GPIO_NUM_35: c_int = 35;
-pub const GPIO_NUM_36: c_int = 36;
-pub const GPIO_NUM_37: c_int = 37;
-pub const GPIO_NUM_38: c_int = 38;
-pub const GPIO_NUM_39: c_int = 39;
-pub const GPIO_NUM_40: c_int = 40;
-pub const GPIO_NUM_41: c_int = 41;
-pub const GPIO_NUM_42: c_int = 42;
-pub const GPIO_NUM_43: c_int = 43;
-pub const GPIO_NUM_44: c_int = 44;
-pub const GPIO_NUM_45: c_int = 45;
-pub const GPIO_NUM_46: c_int = 46;
-pub const GPIO_NUM_47: c_int = 47;
-pub const GPIO_NUM_48: c_int = 48;
-pub const GPIO_NUM_MAX: c_int = 49;
+pub const GPIO_NUM_MAX: c_int = 31;
 pub const gpio_num_t = c_int;
 pub const GPIO_PORT_0: c_int = 0;
 pub const GPIO_PORT_MAX: c_int = 1;
@@ -3530,10 +3085,10 @@ pub const struct_esp_etm_event_t = opaque {};
 pub const esp_etm_event_handle_t = ?*struct_esp_etm_event_t;
 pub const struct_esp_etm_task_t = opaque {};
 pub const esp_etm_task_handle_t = ?*struct_esp_etm_task_t;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_etm.h:37:18: warning: struct demoted to opaque type - has bitfield
-pub const struct_etm_chan_flags_6 = opaque {};
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/esp_etm.h:37:18: warning: struct demoted to opaque type - has bitfield
+pub const struct_etm_chan_flags_5 = opaque {};
 pub const esp_etm_channel_config_t = extern struct {
-    flags: struct_etm_chan_flags_6 = @import("std").mem.zeroes(struct_etm_chan_flags_6),
+    flags: struct_etm_chan_flags_5 = @import("std").mem.zeroes(struct_etm_chan_flags_5),
 };
 pub extern fn esp_etm_new_channel(config: ?*const esp_etm_channel_config_t, ret_chan: [*c]esp_etm_channel_handle_t) esp_err_t;
 pub extern fn esp_etm_del_channel(chan: esp_etm_channel_handle_t) esp_err_t;
@@ -3547,12 +3102,12 @@ pub const GPIO_ETM_EVENT_EDGE_POS: c_int = 1;
 pub const GPIO_ETM_EVENT_EDGE_NEG: c_int = 2;
 pub const GPIO_ETM_EVENT_EDGE_ANY: c_int = 3;
 pub const gpio_etm_event_edge_t = c_uint;
-const union_unnamed_7 = extern union {
+const union_unnamed_6 = extern union {
     edge: gpio_etm_event_edge_t,
     edges: [3]gpio_etm_event_edge_t,
 };
 pub const gpio_etm_event_config_t = extern struct {
-    unnamed_0: union_unnamed_7 = @import("std").mem.zeroes(union_unnamed_7),
+    unnamed_0: union_unnamed_6 = @import("std").mem.zeroes(union_unnamed_6),
 };
 pub extern fn gpio_new_etm_event(config: [*c]const gpio_etm_event_config_t, ret_event: [*c]esp_etm_event_handle_t, ...) esp_err_t;
 pub extern fn gpio_etm_event_bind_gpio(event: esp_etm_event_handle_t, gpio_num: c_int) esp_err_t;
@@ -3560,12 +3115,12 @@ pub const GPIO_ETM_TASK_ACTION_SET: c_int = 1;
 pub const GPIO_ETM_TASK_ACTION_CLR: c_int = 2;
 pub const GPIO_ETM_TASK_ACTION_TOG: c_int = 3;
 pub const gpio_etm_task_action_t = c_uint;
-const union_unnamed_8 = extern union {
+const union_unnamed_7 = extern union {
     action: gpio_etm_task_action_t,
     actions: [3]gpio_etm_task_action_t,
 };
 pub const gpio_etm_task_config_t = extern struct {
-    unnamed_0: union_unnamed_8 = @import("std").mem.zeroes(union_unnamed_8),
+    unnamed_0: union_unnamed_7 = @import("std").mem.zeroes(union_unnamed_7),
 };
 pub extern fn gpio_new_etm_task(config: [*c]const gpio_etm_task_config_t, ret_task: [*c]esp_etm_task_handle_t, ...) esp_err_t;
 pub extern fn gpio_etm_task_add_gpio(task: esp_etm_task_handle_t, gpio_num: c_int) esp_err_t;
@@ -3604,8 +3159,6 @@ pub extern fn gpio_set_drive_capability(gpio_num: gpio_num_t, strength: gpio_dri
 pub extern fn gpio_get_drive_capability(gpio_num: gpio_num_t, strength: [*c]gpio_drive_cap_t) esp_err_t;
 pub extern fn gpio_hold_en(gpio_num: gpio_num_t) esp_err_t;
 pub extern fn gpio_hold_dis(gpio_num: gpio_num_t) esp_err_t;
-pub extern fn gpio_deep_sleep_hold_en() void;
-pub extern fn gpio_deep_sleep_hold_dis() void;
 pub extern fn gpio_iomux_in(gpio_num: u32, signal_idx: u32) void;
 pub extern fn gpio_iomux_out(gpio_num: u8, func: c_int, out_en_inv: bool) void;
 pub extern fn gpio_force_hold_all() esp_err_t;
@@ -3614,6 +3167,8 @@ pub extern fn gpio_sleep_sel_en(gpio_num: gpio_num_t) esp_err_t;
 pub extern fn gpio_sleep_sel_dis(gpio_num: gpio_num_t) esp_err_t;
 pub extern fn gpio_sleep_set_direction(gpio_num: gpio_num_t, mode: gpio_mode_t) esp_err_t;
 pub extern fn gpio_sleep_set_pull_mode(gpio_num: gpio_num_t, pull: gpio_pull_mode_t) esp_err_t;
+pub extern fn gpio_deep_sleep_wakeup_enable(gpio_num: gpio_num_t, intr_type: gpio_int_type_t) esp_err_t;
+pub extern fn gpio_deep_sleep_wakeup_disable(gpio_num: gpio_num_t) esp_err_t;
 pub extern fn gpio_dump_io_configuration(out_stream: [*c]FILE, io_bit_mask: u64) esp_err_t;
 pub var s_wifi_event_group: EventGroupHandle_t = @import("std").mem.zeroes(EventGroupHandle_t);
 pub var TAG: [*c]const u8 = "wifi station";
@@ -3641,7 +3196,7 @@ pub const __clang__ = @as(c_int, 1);
 pub const __clang_major__ = @as(c_int, 19);
 pub const __clang_minor__ = @as(c_int, 1);
 pub const __clang_patchlevel__ = @as(c_int, 7);
-pub const __clang_version__ = "19.1.7 (git@github.com:kassane/zig-espressif-bootstrap.git da1eb5f0196da1d670e5e60cfba4840483f868fa)";
+pub const __clang_version__ = "19.1.7 (https://github.com/ziglang/zig-bootstrap 50d8e88ba329b5d58a212f9fd2e9b1ad59a88e7d)";
 pub const __GNUC__ = @as(c_int, 4);
 pub const __GNUC_MINOR__ = @as(c_int, 2);
 pub const __GNUC_PATCHLEVEL__ = @as(c_int, 1);
@@ -3673,9 +3228,12 @@ pub const __FPCLASS_POSSUBNORMAL = @as(c_int, 0x0080);
 pub const __FPCLASS_POSNORMAL = @as(c_int, 0x0100);
 pub const __FPCLASS_POSINF = @as(c_int, 0x0200);
 pub const __PRAGMA_REDEFINE_EXTNAME = @as(c_int, 1);
-pub const __VERSION__ = "Clang 19.1.7 (git@github.com:kassane/zig-espressif-bootstrap.git da1eb5f0196da1d670e5e60cfba4840483f868fa)";
-pub const __OBJC_BOOL_IS_BOOL = @as(c_int, 0);
+pub const __VERSION__ = "Clang 19.1.7 (https://github.com/ziglang/zig-bootstrap 50d8e88ba329b5d58a212f9fd2e9b1ad59a88e7d)";
+pub const __OBJC_BOOL_IS_BOOL = @as(c_int, 1);
 pub const __CONSTANT_CFSTRINGS__ = @as(c_int, 1);
+pub const __block = @compileError("unable to translate macro: undefined identifier `__blocks__`");
+// (no file):42:9
+pub const __BLOCKS__ = @as(c_int, 1);
 pub const __clang_literal_encoding__ = "UTF-8";
 pub const __clang_wide_literal_encoding__ = "UTF-32";
 pub const __ORDER_LITTLE_ENDIAN__ = @as(c_int, 1234);
@@ -3691,7 +3249,7 @@ pub const __SHRT_WIDTH__ = @as(c_int, 16);
 pub const __INT_WIDTH__ = @as(c_int, 32);
 pub const __LONG_WIDTH__ = @as(c_int, 64);
 pub const __LLONG_WIDTH__ = @as(c_int, 64);
-pub const __BITINT_MAXWIDTH__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 8388608, .decimal);
+pub const __BITINT_MAXWIDTH__ = @as(c_int, 128);
 pub const __SCHAR_MAX__ = @as(c_int, 127);
 pub const __SHRT_MAX__ = @as(c_int, 32767);
 pub const __INT_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal);
@@ -3699,7 +3257,7 @@ pub const __LONG_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_lo
 pub const __LONG_LONG_MAX__ = @as(c_longlong, 9223372036854775807);
 pub const __WCHAR_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal);
 pub const __WCHAR_WIDTH__ = @as(c_int, 32);
-pub const __WINT_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 4294967295, .decimal);
+pub const __WINT_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal);
 pub const __WINT_WIDTH__ = @as(c_int, 32);
 pub const __INTMAX_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_long, 9223372036854775807, .decimal);
 pub const __INTMAX_WIDTH__ = @as(c_int, 64);
@@ -3717,7 +3275,7 @@ pub const __SIZEOF_DOUBLE__ = @as(c_int, 8);
 pub const __SIZEOF_FLOAT__ = @as(c_int, 4);
 pub const __SIZEOF_INT__ = @as(c_int, 4);
 pub const __SIZEOF_LONG__ = @as(c_int, 8);
-pub const __SIZEOF_LONG_DOUBLE__ = @as(c_int, 16);
+pub const __SIZEOF_LONG_DOUBLE__ = @as(c_int, 8);
 pub const __SIZEOF_LONG_LONG__ = @as(c_int, 8);
 pub const __SIZEOF_POINTER__ = @as(c_int, 8);
 pub const __SIZEOF_SHORT__ = @as(c_int, 2);
@@ -3730,14 +3288,14 @@ pub const __INTMAX_TYPE__ = c_long;
 pub const __INTMAX_FMTd__ = "ld";
 pub const __INTMAX_FMTi__ = "li";
 pub const __INTMAX_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `L`");
-// (no file):95:9
+// (no file):97:9
 pub const __UINTMAX_TYPE__ = c_ulong;
 pub const __UINTMAX_FMTo__ = "lo";
 pub const __UINTMAX_FMTu__ = "lu";
 pub const __UINTMAX_FMTx__ = "lx";
 pub const __UINTMAX_FMTX__ = "lX";
 pub const __UINTMAX_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `UL`");
-// (no file):101:9
+// (no file):103:9
 pub const __PTRDIFF_TYPE__ = c_long;
 pub const __PTRDIFF_FMTd__ = "ld";
 pub const __PTRDIFF_FMTi__ = "li";
@@ -3750,7 +3308,7 @@ pub const __SIZE_FMTu__ = "lu";
 pub const __SIZE_FMTx__ = "lx";
 pub const __SIZE_FMTX__ = "lX";
 pub const __WCHAR_TYPE__ = c_int;
-pub const __WINT_TYPE__ = c_uint;
+pub const __WINT_TYPE__ = c_int;
 pub const __SIG_ATOMIC_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal);
 pub const __SIG_ATOMIC_WIDTH__ = @as(c_int, 32);
 pub const __CHAR16_TYPE__ = c_ushort;
@@ -3805,24 +3363,23 @@ pub const __DBL_MAX__ = @as(f64, 1.7976931348623157e+308);
 pub const __DBL_MIN_10_EXP__ = -@as(c_int, 307);
 pub const __DBL_MIN_EXP__ = -@as(c_int, 1021);
 pub const __DBL_MIN__ = @as(f64, 2.2250738585072014e-308);
-pub const __LDBL_DENORM_MIN__ = @as(c_longdouble, 3.64519953188247460253e-4951);
-pub const __LDBL_NORM_MAX__ = @as(c_longdouble, 1.18973149535723176502e+4932);
+pub const __LDBL_DENORM_MIN__ = @as(c_longdouble, 4.9406564584124654e-324);
+pub const __LDBL_NORM_MAX__ = @as(c_longdouble, 1.7976931348623157e+308);
 pub const __LDBL_HAS_DENORM__ = @as(c_int, 1);
-pub const __LDBL_DIG__ = @as(c_int, 18);
-pub const __LDBL_DECIMAL_DIG__ = @as(c_int, 21);
-pub const __LDBL_EPSILON__ = @as(c_longdouble, 1.08420217248550443401e-19);
+pub const __LDBL_DIG__ = @as(c_int, 15);
+pub const __LDBL_DECIMAL_DIG__ = @as(c_int, 17);
+pub const __LDBL_EPSILON__ = @as(c_longdouble, 2.2204460492503131e-16);
 pub const __LDBL_HAS_INFINITY__ = @as(c_int, 1);
 pub const __LDBL_HAS_QUIET_NAN__ = @as(c_int, 1);
-pub const __LDBL_MANT_DIG__ = @as(c_int, 64);
-pub const __LDBL_MAX_10_EXP__ = @as(c_int, 4932);
-pub const __LDBL_MAX_EXP__ = @as(c_int, 16384);
-pub const __LDBL_MAX__ = @as(c_longdouble, 1.18973149535723176502e+4932);
-pub const __LDBL_MIN_10_EXP__ = -@as(c_int, 4931);
-pub const __LDBL_MIN_EXP__ = -@as(c_int, 16381);
-pub const __LDBL_MIN__ = @as(c_longdouble, 3.36210314311209350626e-4932);
+pub const __LDBL_MANT_DIG__ = @as(c_int, 53);
+pub const __LDBL_MAX_10_EXP__ = @as(c_int, 308);
+pub const __LDBL_MAX_EXP__ = @as(c_int, 1024);
+pub const __LDBL_MAX__ = @as(c_longdouble, 1.7976931348623157e+308);
+pub const __LDBL_MIN_10_EXP__ = -@as(c_int, 307);
+pub const __LDBL_MIN_EXP__ = -@as(c_int, 1021);
+pub const __LDBL_MIN__ = @as(c_longdouble, 2.2250738585072014e-308);
 pub const __POINTER_WIDTH__ = @as(c_int, 64);
-pub const __BIGGEST_ALIGNMENT__ = @as(c_int, 16);
-pub const __WINT_UNSIGNED__ = @as(c_int, 1);
+pub const __BIGGEST_ALIGNMENT__ = @as(c_int, 8);
 pub const __INT8_TYPE__ = i8;
 pub const __INT8_FMTd__ = "hhd";
 pub const __INT8_FMTi__ = "hhi";
@@ -3835,11 +3392,11 @@ pub const __INT32_TYPE__ = c_int;
 pub const __INT32_FMTd__ = "d";
 pub const __INT32_FMTi__ = "i";
 pub const __INT32_C_SUFFIX__ = "";
-pub const __INT64_TYPE__ = c_long;
-pub const __INT64_FMTd__ = "ld";
-pub const __INT64_FMTi__ = "li";
-pub const __INT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `L`");
-// (no file):202:9
+pub const __INT64_TYPE__ = c_longlong;
+pub const __INT64_FMTd__ = "lld";
+pub const __INT64_FMTi__ = "lli";
+pub const __INT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `LL`");
+// (no file):203:9
 pub const __UINT8_TYPE__ = u8;
 pub const __UINT8_FMTo__ = "hho";
 pub const __UINT8_FMTu__ = "hhu";
@@ -3862,18 +3419,18 @@ pub const __UINT32_FMTu__ = "u";
 pub const __UINT32_FMTx__ = "x";
 pub const __UINT32_FMTX__ = "X";
 pub const __UINT32_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `U`");
-// (no file):224:9
+// (no file):225:9
 pub const __UINT32_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 4294967295, .decimal);
 pub const __INT32_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal);
-pub const __UINT64_TYPE__ = c_ulong;
-pub const __UINT64_FMTo__ = "lo";
-pub const __UINT64_FMTu__ = "lu";
-pub const __UINT64_FMTx__ = "lx";
-pub const __UINT64_FMTX__ = "lX";
-pub const __UINT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `UL`");
-// (no file):232:9
-pub const __UINT64_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_ulong, 18446744073709551615, .decimal);
-pub const __INT64_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_long, 9223372036854775807, .decimal);
+pub const __UINT64_TYPE__ = c_ulonglong;
+pub const __UINT64_FMTo__ = "llo";
+pub const __UINT64_FMTu__ = "llu";
+pub const __UINT64_FMTx__ = "llx";
+pub const __UINT64_FMTX__ = "llX";
+pub const __UINT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `ULL`");
+// (no file):233:9
+pub const __UINT64_MAX__ = @as(c_ulonglong, 18446744073709551615);
+pub const __INT64_MAX__ = @as(c_longlong, 9223372036854775807);
 pub const __INT_LEAST8_TYPE__ = i8;
 pub const __INT_LEAST8_MAX__ = @as(c_int, 127);
 pub const __INT_LEAST8_WIDTH__ = @as(c_int, 8);
@@ -3907,17 +3464,17 @@ pub const __UINT_LEAST32_FMTo__ = "o";
 pub const __UINT_LEAST32_FMTu__ = "u";
 pub const __UINT_LEAST32_FMTx__ = "x";
 pub const __UINT_LEAST32_FMTX__ = "X";
-pub const __INT_LEAST64_TYPE__ = c_long;
-pub const __INT_LEAST64_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_long, 9223372036854775807, .decimal);
+pub const __INT_LEAST64_TYPE__ = c_longlong;
+pub const __INT_LEAST64_MAX__ = @as(c_longlong, 9223372036854775807);
 pub const __INT_LEAST64_WIDTH__ = @as(c_int, 64);
-pub const __INT_LEAST64_FMTd__ = "ld";
-pub const __INT_LEAST64_FMTi__ = "li";
-pub const __UINT_LEAST64_TYPE__ = c_ulong;
-pub const __UINT_LEAST64_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_ulong, 18446744073709551615, .decimal);
-pub const __UINT_LEAST64_FMTo__ = "lo";
-pub const __UINT_LEAST64_FMTu__ = "lu";
-pub const __UINT_LEAST64_FMTx__ = "lx";
-pub const __UINT_LEAST64_FMTX__ = "lX";
+pub const __INT_LEAST64_FMTd__ = "lld";
+pub const __INT_LEAST64_FMTi__ = "lli";
+pub const __UINT_LEAST64_TYPE__ = c_ulonglong;
+pub const __UINT_LEAST64_MAX__ = @as(c_ulonglong, 18446744073709551615);
+pub const __UINT_LEAST64_FMTo__ = "llo";
+pub const __UINT_LEAST64_FMTu__ = "llu";
+pub const __UINT_LEAST64_FMTx__ = "llx";
+pub const __UINT_LEAST64_FMTX__ = "llX";
 pub const __INT_FAST8_TYPE__ = i8;
 pub const __INT_FAST8_MAX__ = @as(c_int, 127);
 pub const __INT_FAST8_WIDTH__ = @as(c_int, 8);
@@ -3951,18 +3508,20 @@ pub const __UINT_FAST32_FMTo__ = "o";
 pub const __UINT_FAST32_FMTu__ = "u";
 pub const __UINT_FAST32_FMTx__ = "x";
 pub const __UINT_FAST32_FMTX__ = "X";
-pub const __INT_FAST64_TYPE__ = c_long;
-pub const __INT_FAST64_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_long, 9223372036854775807, .decimal);
+pub const __INT_FAST64_TYPE__ = c_longlong;
+pub const __INT_FAST64_MAX__ = @as(c_longlong, 9223372036854775807);
 pub const __INT_FAST64_WIDTH__ = @as(c_int, 64);
-pub const __INT_FAST64_FMTd__ = "ld";
-pub const __INT_FAST64_FMTi__ = "li";
-pub const __UINT_FAST64_TYPE__ = c_ulong;
-pub const __UINT_FAST64_MAX__ = @import("std").zig.c_translation.promoteIntLiteral(c_ulong, 18446744073709551615, .decimal);
-pub const __UINT_FAST64_FMTo__ = "lo";
-pub const __UINT_FAST64_FMTu__ = "lu";
-pub const __UINT_FAST64_FMTx__ = "lx";
-pub const __UINT_FAST64_FMTX__ = "lX";
-pub const __USER_LABEL_PREFIX__ = "";
+pub const __INT_FAST64_FMTd__ = "lld";
+pub const __INT_FAST64_FMTi__ = "lli";
+pub const __UINT_FAST64_TYPE__ = c_ulonglong;
+pub const __UINT_FAST64_MAX__ = @as(c_ulonglong, 18446744073709551615);
+pub const __UINT_FAST64_FMTo__ = "llo";
+pub const __UINT_FAST64_FMTu__ = "llu";
+pub const __UINT_FAST64_FMTx__ = "llx";
+pub const __UINT_FAST64_FMTX__ = "llX";
+pub const __USER_LABEL_PREFIX__ = @compileError("unable to translate macro: undefined identifier `_`");
+// (no file):324:9
+pub const __NO_MATH_ERRNO__ = @as(c_int, 1);
 pub const __FINITE_MATH_ONLY__ = @as(c_int, 0);
 pub const __GNUC_STDC_INLINE__ = @as(c_int, 1);
 pub const __GCC_ATOMIC_TEST_AND_SET_TRUEVAL = @as(c_int, 1);
@@ -3989,75 +3548,113 @@ pub const __GCC_ATOMIC_LONG_LOCK_FREE = @as(c_int, 2);
 pub const __GCC_ATOMIC_LLONG_LOCK_FREE = @as(c_int, 2);
 pub const __GCC_ATOMIC_POINTER_LOCK_FREE = @as(c_int, 2);
 pub const __NO_INLINE__ = @as(c_int, 1);
+pub const __PIC__ = @as(c_int, 2);
+pub const __pic__ = @as(c_int, 2);
 pub const __FLT_RADIX__ = @as(c_int, 2);
 pub const __DECIMAL_DIG__ = __LDBL_DECIMAL_DIG__;
-pub const __ELF__ = @as(c_int, 1);
+pub const __SSP_STRONG__ = @as(c_int, 2);
+pub const __nonnull = @compileError("unable to translate macro: undefined identifier `_Nonnull`");
+// (no file):359:9
+pub const __null_unspecified = @compileError("unable to translate macro: undefined identifier `_Null_unspecified`");
+// (no file):360:9
+pub const __nullable = @compileError("unable to translate macro: undefined identifier `_Nullable`");
+// (no file):361:9
+pub const TARGET_OS_WIN32 = @as(c_int, 0);
+pub const TARGET_OS_WINDOWS = @as(c_int, 0);
+pub const TARGET_OS_LINUX = @as(c_int, 0);
+pub const TARGET_OS_UNIX = @as(c_int, 0);
+pub const TARGET_OS_MAC = @as(c_int, 1);
+pub const TARGET_OS_OSX = @as(c_int, 1);
+pub const TARGET_OS_IPHONE = @as(c_int, 0);
+pub const TARGET_OS_IOS = @as(c_int, 0);
+pub const TARGET_OS_TV = @as(c_int, 0);
+pub const TARGET_OS_WATCH = @as(c_int, 0);
+pub const TARGET_OS_VISION = @as(c_int, 0);
+pub const TARGET_OS_DRIVERKIT = @as(c_int, 0);
+pub const TARGET_OS_MACCATALYST = @as(c_int, 0);
+pub const TARGET_OS_SIMULATOR = @as(c_int, 0);
+pub const TARGET_OS_EMBEDDED = @as(c_int, 0);
+pub const TARGET_OS_NANO = @as(c_int, 0);
+pub const TARGET_IPHONE_SIMULATOR = @as(c_int, 0);
+pub const TARGET_OS_UIKITFORMAC = @as(c_int, 0);
+pub const __AARCH64EL__ = @as(c_int, 1);
+pub const __aarch64__ = @as(c_int, 1);
 pub const __GCC_ASM_FLAG_OUTPUTS__ = @as(c_int, 1);
-pub const __code_model_small__ = @as(c_int, 1);
-pub const __amd64__ = @as(c_int, 1);
-pub const __amd64 = @as(c_int, 1);
-pub const __x86_64 = @as(c_int, 1);
-pub const __x86_64__ = @as(c_int, 1);
-pub const __SEG_GS = @as(c_int, 1);
-pub const __SEG_FS = @as(c_int, 1);
-pub const __seg_gs = @compileError("unable to translate macro: undefined identifier `address_space`");
-// (no file):363:9
-pub const __seg_fs = @compileError("unable to translate macro: undefined identifier `address_space`");
-// (no file):364:9
-pub const __corei7 = @as(c_int, 1);
-pub const __corei7__ = @as(c_int, 1);
-pub const __tune_corei7__ = @as(c_int, 1);
-pub const __REGISTER_PREFIX__ = "";
-pub const __NO_MATH_INLINES = @as(c_int, 1);
-pub const __AES__ = @as(c_int, 1);
-pub const __PCLMUL__ = @as(c_int, 1);
-pub const __LAHF_SAHF__ = @as(c_int, 1);
-pub const __LZCNT__ = @as(c_int, 1);
-pub const __RDRND__ = @as(c_int, 1);
-pub const __FSGSBASE__ = @as(c_int, 1);
-pub const __BMI__ = @as(c_int, 1);
-pub const __BMI2__ = @as(c_int, 1);
-pub const __POPCNT__ = @as(c_int, 1);
-pub const __PRFCHW__ = @as(c_int, 1);
-pub const __RDSEED__ = @as(c_int, 1);
-pub const __ADX__ = @as(c_int, 1);
-pub const __MOVBE__ = @as(c_int, 1);
-pub const __FMA__ = @as(c_int, 1);
-pub const __F16C__ = @as(c_int, 1);
-pub const __FXSR__ = @as(c_int, 1);
-pub const __XSAVE__ = @as(c_int, 1);
-pub const __XSAVEOPT__ = @as(c_int, 1);
-pub const __XSAVEC__ = @as(c_int, 1);
-pub const __XSAVES__ = @as(c_int, 1);
-pub const __CLFLUSHOPT__ = @as(c_int, 1);
-pub const __SGX__ = @as(c_int, 1);
-pub const __INVPCID__ = @as(c_int, 1);
-pub const __CRC32__ = @as(c_int, 1);
-pub const __AVX2__ = @as(c_int, 1);
-pub const __AVX__ = @as(c_int, 1);
-pub const __SSE4_2__ = @as(c_int, 1);
-pub const __SSE4_1__ = @as(c_int, 1);
-pub const __SSSE3__ = @as(c_int, 1);
-pub const __SSE3__ = @as(c_int, 1);
-pub const __SSE2__ = @as(c_int, 1);
-pub const __SSE2_MATH__ = @as(c_int, 1);
-pub const __SSE__ = @as(c_int, 1);
-pub const __SSE_MATH__ = @as(c_int, 1);
-pub const __MMX__ = @as(c_int, 1);
+pub const __AARCH64_CMODEL_SMALL__ = @as(c_int, 1);
+pub const __ARM_ACLE = @as(c_int, 200);
+pub const __ARM_ARCH = @as(c_int, 8);
+pub const __ARM_ARCH_PROFILE = 'A';
+pub const __ARM_64BIT_STATE = @as(c_int, 1);
+pub const __ARM_PCS_AAPCS64 = @as(c_int, 1);
+pub const __ARM_ARCH_ISA_A64 = @as(c_int, 1);
+pub const __ARM_FEATURE_CLZ = @as(c_int, 1);
+pub const __ARM_FEATURE_FMA = @as(c_int, 1);
+pub const __ARM_FEATURE_LDREX = @as(c_int, 0xF);
+pub const __ARM_FEATURE_IDIV = @as(c_int, 1);
+pub const __ARM_FEATURE_DIV = @as(c_int, 1);
+pub const __ARM_FEATURE_NUMERIC_MAXMIN = @as(c_int, 1);
+pub const __ARM_FEATURE_DIRECTED_ROUNDING = @as(c_int, 1);
+pub const __ARM_ALIGN_MAX_STACK_PWR = @as(c_int, 4);
+pub const __ARM_STATE_ZA = @as(c_int, 1);
+pub const __ARM_STATE_ZT0 = @as(c_int, 1);
+pub const __ARM_FP = @as(c_int, 0xE);
+pub const __ARM_FP16_FORMAT_IEEE = @as(c_int, 1);
+pub const __ARM_FP16_ARGS = @as(c_int, 1);
+pub const __ARM_SIZEOF_WCHAR_T = @as(c_int, 4);
+pub const __ARM_SIZEOF_MINIMAL_ENUM = @as(c_int, 4);
+pub const __ARM_NEON = @as(c_int, 1);
+pub const __ARM_NEON_FP = @as(c_int, 0xE);
+pub const __ARM_FEATURE_SME = @as(c_int, 1);
+pub const __ARM_FEATURE_LOCALLY_STREAMING = @as(c_int, 1);
+pub const __ARM_FEATURE_SME2 = @as(c_int, 1);
+pub const __ARM_FEATURE_CRC32 = @as(c_int, 1);
+pub const __ARM_FEATURE_RCPC = @as(c_int, 1);
+pub const __ARM_FEATURE_CRYPTO = @as(c_int, 1);
+pub const __ARM_FEATURE_AES = @as(c_int, 1);
+pub const __ARM_FEATURE_SHA2 = @as(c_int, 1);
+pub const __ARM_FEATURE_SHA3 = @as(c_int, 1);
+pub const __ARM_FEATURE_SHA512 = @as(c_int, 1);
+pub const __ARM_FEATURE_PAUTH = @as(c_int, 1);
+pub const __ARM_FEATURE_BTI = @as(c_int, 1);
+pub const __ARM_FEATURE_UNALIGNED = @as(c_int, 1);
+pub const __ARM_FEATURE_FP16_VECTOR_ARITHMETIC = @as(c_int, 1);
+pub const __ARM_FEATURE_FP16_SCALAR_ARITHMETIC = @as(c_int, 1);
+pub const __ARM_FEATURE_DOTPROD = @as(c_int, 1);
+pub const __ARM_FEATURE_MATMUL_INT8 = @as(c_int, 1);
+pub const __ARM_FEATURE_ATOMICS = @as(c_int, 1);
+pub const __ARM_FEATURE_BF16 = @as(c_int, 1);
+pub const __ARM_FEATURE_BF16_VECTOR_ARITHMETIC = @as(c_int, 1);
+pub const __ARM_BF16_FORMAT_ALTERNATIVE = @as(c_int, 1);
+pub const __ARM_FEATURE_BF16_SCALAR_ARITHMETIC = @as(c_int, 1);
+pub const __ARM_FEATURE_FP16_FML = @as(c_int, 1);
+pub const __ARM_FEATURE_FRINT = @as(c_int, 1);
+pub const __ARM_FEATURE_COMPLEX = @as(c_int, 1);
+pub const __ARM_FEATURE_JCVT = @as(c_int, 1);
+pub const __ARM_FEATURE_QRDMX = @as(c_int, 1);
 pub const __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 = @as(c_int, 1);
 pub const __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 = @as(c_int, 1);
 pub const __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 = @as(c_int, 1);
 pub const __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 = @as(c_int, 1);
 pub const __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 = @as(c_int, 1);
-pub const __SIZEOF_FLOAT128__ = @as(c_int, 16);
-pub const unix = @as(c_int, 1);
-pub const __unix = @as(c_int, 1);
-pub const __unix__ = @as(c_int, 1);
-pub const linux = @as(c_int, 1);
-pub const __linux = @as(c_int, 1);
-pub const __linux__ = @as(c_int, 1);
-pub const __gnu_linux__ = @as(c_int, 1);
-pub const __FLOAT128__ = @as(c_int, 1);
+pub const __FP_FAST_FMA = @as(c_int, 1);
+pub const __FP_FAST_FMAF = @as(c_int, 1);
+pub const __AARCH64_SIMD__ = @as(c_int, 1);
+pub const __ARM64_ARCH_8__ = @as(c_int, 1);
+pub const __ARM_NEON__ = @as(c_int, 1);
+pub const __REGISTER_PREFIX__ = "";
+pub const __arm64 = @as(c_int, 1);
+pub const __arm64__ = @as(c_int, 1);
+pub const __APPLE_CC__ = @as(c_int, 6000);
+pub const __APPLE__ = @as(c_int, 1);
+pub const __STDC_NO_THREADS__ = @as(c_int, 1);
+pub const __weak = @compileError("unable to translate macro: undefined identifier `objc_gc`");
+// (no file):450:9
+pub const __strong = "";
+pub const __unsafe_unretained = "";
+pub const __DYNAMIC__ = @as(c_int, 1);
+pub const __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 150300, .decimal);
+pub const __ENVIRONMENT_OS_VERSION_MIN_REQUIRED__ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 150300, .decimal);
+pub const __MACH__ = @as(c_int, 1);
 pub const __STDC__ = @as(c_int, 1);
 pub const __STDC_HOSTED__ = @as(c_int, 1);
 pub const __STDC_VERSION__ = @as(c_long, 201710);
@@ -4067,55 +3664,48 @@ pub const __STDC_EMBED_NOT_FOUND__ = @as(c_int, 0);
 pub const __STDC_EMBED_FOUND__ = @as(c_int, 1);
 pub const __STDC_EMBED_EMPTY__ = @as(c_int, 2);
 pub const _DEBUG = @as(c_int, 1);
-pub const target = @compileError("unable to translate macro: undefined identifier `xtensa`");
-// (no file):429:9
-pub const __xtensa = @as(c_int, 1);
-pub const __XTENSA__ = @as(c_int, 1);
-pub const cpu_esp32s3 = @as(c_int, 1);
-pub const CONFIG_IDF_TARGET_ESP32S3 = @as(c_int, 1);
+pub const target = @compileError("unable to translate macro: undefined identifier `riscv32`");
+// (no file):467:9
+pub const mcpu = @compileError("unable to translate macro: undefined identifier `esp32s3`");
+// (no file):468:9
+pub const __riscv = @as(c_int, 1);
+pub const cpu_generic_rv32 = @compileError("unable to translate macro: undefined identifier `m`");
+// (no file):471:9
+pub const CONFIG_IDF_TARGET_ESP32C6 = @as(c_int, 1);
 pub const __COUNTER__ = @as(c_int, 0);
 pub const IRAM_ATTR = "";
 pub const _SECTION_ATTR_IMPL = @compileError("unable to translate C expr: unexpected token ''");
-// (no file):436:9
+// (no file):475:9
 pub const SOC_MMU_PAGE_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000, .hex);
-pub const LWIP_NO_UNISTD_H = @compileError("unable to translate macro: undefined identifier `D__XTENSA__`");
-// (no file):438:9
+pub const LWIP_NO_UNISTD_H = @compileError("unable to translate macro: undefined identifier `D__riscv`");
+// (no file):477:9
 pub const __GCC_HAVE_DWARF2_CFI_ASM = @as(c_int, 1);
 pub const __ESP_ATTR_H__ = "";
-pub const CONFIG_SOC_MPU_MIN_REGION_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const CONFIG_SOC_MPU_REGIONS_MAX_NUM = @as(c_int, 8);
 pub const CONFIG_SOC_ADC_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_DEDICATED_GPIO_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_UART_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_PCNT_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_PHY_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_WIFI_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_TWAI_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_GDMA_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_AHB_GDMA_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_GPTIMER_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_LCDCAM_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_LCDCAM_I80_LCD_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_LCDCAM_RGB_LCD_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_PCNT_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_MCPWM_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_DEDICATED_GPIO_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_CACHE_SUPPORT_WRAP = @as(c_int, 1);
-pub const CONFIG_SOC_ULP_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_ULP_FSM_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_RISCV_COPROC_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_TWAI_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ETM_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_PARLIO_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_BT_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_USB_OTG_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_USB_SERIAL_JTAG_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_CCOMP_TIMER_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_IEEE802154_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_ASYNC_MEMCPY_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_USB_SERIAL_JTAG_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_TEMP_SENSOR_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_PHY_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_WIFI_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SUPPORTS_SECURE_DL_MODE = @as(c_int, 1);
+pub const CONFIG_SOC_ULP_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_LP_CORE_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_KEY_PURPOSE_FIELD = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_SDMMC_HOST_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_RTC_FAST_MEM_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_RTC_SLOW_MEM_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_RTC_MEM_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_PSRAM_DMA_CAPABLE = @as(c_int, 1);
-pub const CONFIG_SOC_XT_WDT_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_RMT_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SDM_SUPPORTED = @as(c_int, 1);
@@ -4124,137 +3714,168 @@ pub const CONFIG_SOC_LEDC_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SYSTIMER_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SUPPORT_COEXISTENCE = @as(c_int, 1);
-pub const CONFIG_SOC_TEMP_SENSOR_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_AES_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_MPI_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SHA_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_HMAC_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_DIG_SIGN_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ECC_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_FLASH_ENC_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SECURE_BOOT_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_MEMPROT_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_TOUCH_SENSOR_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_SDIO_SLAVE_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_BOD_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_APM_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_PMU_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_PAU_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_LP_TIMER_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_LP_AON_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_LP_PERIPHERALS_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_LP_I2C_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ULP_LP_UART_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_CLK_TREE_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_MPU_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ASSIST_DEBUG_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_WDT_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_SPI_FLASH_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_RNG_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_LIGHT_SLEEP_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_DEEP_SLEEP_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_LP_PERIPH_SHARE_INTERRUPT = @as(c_int, 1);
+pub const CONFIG_SOC_MODEM_CLOCK_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_PM_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_XTAL_SUPPORT_40M = @as(c_int, 1);
-pub const CONFIG_SOC_APPCPU_HAS_CLOCK_GATING_BUG = @as(c_int, 1);
-pub const CONFIG_SOC_ADC_RTC_CTRL_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_AES_SUPPORT_DMA = @as(c_int, 1);
+pub const CONFIG_SOC_AES_GDMA = @as(c_int, 1);
+pub const CONFIG_SOC_AES_SUPPORT_AES_128 = @as(c_int, 1);
+pub const CONFIG_SOC_AES_SUPPORT_AES_256 = @as(c_int, 1);
 pub const CONFIG_SOC_ADC_DIG_CTRL_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_ADC_ARBITER_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_ADC_DIG_IIR_FILTER_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_ADC_MONITOR_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_ADC_DMA_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_ADC_PERIPH_NUM = @as(c_int, 2);
-pub const CONFIG_SOC_ADC_MAX_CHANNEL_NUM = @as(c_int, 10);
+pub const CONFIG_SOC_ADC_PERIPH_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_ADC_MAX_CHANNEL_NUM = @as(c_int, 7);
 pub const CONFIG_SOC_ADC_ATTEN_NUM = @as(c_int, 4);
-pub const CONFIG_SOC_ADC_DIGI_CONTROLLER_NUM = @as(c_int, 2);
-pub const CONFIG_SOC_ADC_PATT_LEN_MAX = @as(c_int, 24);
-pub const CONFIG_SOC_ADC_DIGI_MIN_BITWIDTH = @as(c_int, 12);
+pub const CONFIG_SOC_ADC_DIGI_CONTROLLER_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_ADC_PATT_LEN_MAX = @as(c_int, 8);
 pub const CONFIG_SOC_ADC_DIGI_MAX_BITWIDTH = @as(c_int, 12);
-pub const CONFIG_SOC_ADC_DIGI_RESULT_BYTES = @as(c_int, 4);
-pub const CONFIG_SOC_ADC_DIGI_DATA_BYTES_PER_CONV = @as(c_int, 4);
+pub const CONFIG_SOC_ADC_DIGI_MIN_BITWIDTH = @as(c_int, 12);
 pub const CONFIG_SOC_ADC_DIGI_IIR_FILTER_NUM = @as(c_int, 2);
 pub const CONFIG_SOC_ADC_DIGI_MONITOR_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_ADC_DIGI_RESULT_BYTES = @as(c_int, 4);
+pub const CONFIG_SOC_ADC_DIGI_DATA_BYTES_PER_CONV = @as(c_int, 4);
 pub const CONFIG_SOC_ADC_SAMPLE_FREQ_THRES_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 83333, .decimal);
 pub const CONFIG_SOC_ADC_SAMPLE_FREQ_THRES_LOW = @as(c_int, 611);
 pub const CONFIG_SOC_ADC_RTC_MIN_BITWIDTH = @as(c_int, 12);
 pub const CONFIG_SOC_ADC_RTC_MAX_BITWIDTH = @as(c_int, 12);
 pub const CONFIG_SOC_ADC_CALIBRATION_V1_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_ADC_SELF_HW_CALI_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ADC_CALIB_CHAN_COMPENS_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ADC_TEMPERATURE_SHARE_INTR = @as(c_int, 1);
 pub const CONFIG_SOC_ADC_SHARED_POWER = @as(c_int, 1);
-pub const CONFIG_SOC_APB_BACKUP_DMA = @as(c_int, 1);
 pub const CONFIG_SOC_BROWNOUT_RESET_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_CACHE_WRITEBACK_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_SHARED_IDCACHE_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_CACHE_FREEZE_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_CPU_CORES_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_CPU_CORES_NUM = @as(c_int, 1);
 pub const CONFIG_SOC_CPU_INTR_NUM = @as(c_int, 32);
-pub const CONFIG_SOC_CPU_HAS_FPU = @as(c_int, 1);
-pub const CONFIG_SOC_HP_CPU_HAS_MULTIPLE_CORES = @as(c_int, 1);
-pub const CONFIG_SOC_CPU_BREAKPOINTS_NUM = @as(c_int, 2);
-pub const CONFIG_SOC_CPU_WATCHPOINTS_NUM = @as(c_int, 2);
-pub const CONFIG_SOC_CPU_WATCHPOINT_MAX_REGION_SIZE = @as(c_int, 64);
-pub const CONFIG_SOC_DS_SIGNATURE_MAX_BIT_LEN = @as(c_int, 4096);
+pub const CONFIG_SOC_CPU_HAS_FLEXIBLE_INTC = @as(c_int, 1);
+pub const CONFIG_SOC_INT_PLIC_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_CPU_HAS_CSR_PC = @as(c_int, 1);
+pub const CONFIG_SOC_CPU_BREAKPOINTS_NUM = @as(c_int, 4);
+pub const CONFIG_SOC_CPU_WATCHPOINTS_NUM = @as(c_int, 4);
+pub const CONFIG_SOC_CPU_WATCHPOINT_MAX_REGION_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const CONFIG_SOC_CPU_HAS_PMA = @as(c_int, 1);
+pub const CONFIG_SOC_CPU_IDRAM_SPLIT_USING_PMP = @as(c_int, 1);
+pub const CONFIG_SOC_CPU_PMP_REGION_GRANULARITY = @as(c_int, 4);
+pub const CONFIG_SOC_DS_SIGNATURE_MAX_BIT_LEN = @as(c_int, 3072);
 pub const CONFIG_SOC_DS_KEY_PARAM_MD_IV_LENGTH = @as(c_int, 16);
 pub const CONFIG_SOC_DS_KEY_CHECK_MAX_WAIT_US = @as(c_int, 1100);
 pub const CONFIG_SOC_AHB_GDMA_VERSION = @as(c_int, 1);
 pub const CONFIG_SOC_GDMA_NUM_GROUPS_MAX = @as(c_int, 1);
-pub const CONFIG_SOC_GDMA_PAIRS_PER_GROUP = @as(c_int, 5);
-pub const CONFIG_SOC_GDMA_PAIRS_PER_GROUP_MAX = @as(c_int, 5);
-pub const CONFIG_SOC_AHB_GDMA_SUPPORT_PSRAM = @as(c_int, 1);
+pub const CONFIG_SOC_GDMA_PAIRS_PER_GROUP_MAX = @as(c_int, 3);
+pub const CONFIG_SOC_GDMA_SUPPORT_ETM = @as(c_int, 1);
+pub const CONFIG_SOC_GDMA_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_ETM_GROUPS = @as(c_int, 1);
+pub const CONFIG_SOC_ETM_CHANNELS_PER_GROUP = @as(c_int, 50);
+pub const CONFIG_SOC_ETM_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const CONFIG_SOC_GPIO_PORT = @as(c_int, 1);
-pub const CONFIG_SOC_GPIO_PIN_COUNT = @as(c_int, 49);
+pub const CONFIG_SOC_GPIO_PIN_COUNT = @as(c_int, 31);
 pub const CONFIG_SOC_GPIO_SUPPORT_PIN_GLITCH_FILTER = @as(c_int, 1);
-pub const CONFIG_SOC_GPIO_FILTER_CLK_SUPPORT_APB = @as(c_int, 1);
+pub const CONFIG_SOC_GPIO_FLEX_GLITCH_FILTER_NUM = @as(c_int, 8);
+pub const CONFIG_SOC_GPIO_SUPPORT_ETM = @as(c_int, 1);
 pub const CONFIG_SOC_GPIO_SUPPORT_RTC_INDEPENDENT = @as(c_int, 1);
+pub const CONFIG_SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP = @as(c_int, 1);
+pub const CONFIG_SOC_LP_IO_CLOCK_IS_INDEPENDENT = @as(c_int, 1);
+pub const CONFIG_SOC_GPIO_IN_RANGE_MAX = @as(c_int, 30);
+pub const CONFIG_SOC_GPIO_OUT_RANGE_MAX = @as(c_int, 30);
+pub const CONFIG_SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK = @as(c_int, 0);
+pub const CONFIG_SOC_GPIO_DEEP_SLEEP_WAKE_SUPPORTED_PIN_CNT = @as(c_int, 8);
+pub const CONFIG_SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000000007FFFFF00, .hex);
 pub const CONFIG_SOC_GPIO_SUPPORT_FORCE_HOLD = @as(c_int, 1);
-pub const CONFIG_SOC_GPIO_VALID_GPIO_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x1FFFFFFFFFFFF, .hex);
-pub const CONFIG_SOC_GPIO_IN_RANGE_MAX = @as(c_int, 48);
-pub const CONFIG_SOC_GPIO_OUT_RANGE_MAX = @as(c_int, 48);
-pub const CONFIG_SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0001FFFFFC000000, .hex);
-pub const CONFIG_SOC_GPIO_CLOCKOUT_BY_IO_MUX = @as(c_int, 1);
-pub const CONFIG_SOC_GPIO_CLOCKOUT_CHANNEL_NUM = @as(c_int, 3);
 pub const CONFIG_SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP = @as(c_int, 1);
+pub const CONFIG_SOC_GPIO_SUPPORT_HOLD_SINGLE_IO_IN_DSLP = @as(c_int, 1);
+pub const CONFIG_SOC_GPIO_CLOCKOUT_BY_GPIO_MATRIX = @as(c_int, 1);
+pub const CONFIG_SOC_CLOCKOUT_HAS_SOURCE_GATE = @as(c_int, 1);
+pub const CONFIG_SOC_GPIO_CLOCKOUT_CHANNEL_NUM = @as(c_int, 3);
+pub const CONFIG_SOC_RTCIO_PIN_COUNT = @as(c_int, 8);
+pub const CONFIG_SOC_RTCIO_INPUT_OUTPUT_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_RTCIO_HOLD_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_RTCIO_WAKE_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_DEDIC_GPIO_OUT_CHANNELS_NUM = @as(c_int, 8);
 pub const CONFIG_SOC_DEDIC_GPIO_IN_CHANNELS_NUM = @as(c_int, 8);
-pub const CONFIG_SOC_DEDIC_GPIO_OUT_AUTO_ENABLE = @as(c_int, 1);
+pub const CONFIG_SOC_DEDIC_PERIPH_ALWAYS_ENABLE = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_NUM = @as(c_int, 2);
-pub const CONFIG_SOC_HP_I2C_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_HP_I2C_NUM = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_FIFO_LEN = @as(c_int, 32);
 pub const CONFIG_SOC_I2C_CMD_REG_NUM = @as(c_int, 8);
 pub const CONFIG_SOC_I2C_SUPPORT_SLAVE = @as(c_int, 1);
+pub const CONFIG_SOC_I2C_SUPPORT_HW_FSM_RST = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SUPPORT_HW_CLR_BUS = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SUPPORT_XTAL = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SUPPORT_RTC = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SUPPORT_10BIT_ADDR = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SLAVE_SUPPORT_BROADCAST = @as(c_int, 1);
-pub const CONFIG_SOC_I2C_SLAVE_SUPPORT_I2CRAM_ACCESS = @as(c_int, 1);
 pub const CONFIG_SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE = @as(c_int, 1);
-pub const CONFIG_SOC_I2S_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_I2C_SLAVE_SUPPORT_I2CRAM_ACCESS = @as(c_int, 1);
+pub const CONFIG_SOC_I2C_SLAVE_SUPPORT_SLAVE_UNMATCH = @as(c_int, 1);
+pub const CONFIG_SOC_I2C_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_LP_I2C_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_LP_I2C_FIFO_LEN = @as(c_int, 16);
+pub const CONFIG_SOC_I2S_NUM = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_HW_VERSION_2 = @as(c_int, 1);
+pub const CONFIG_SOC_I2S_SUPPORTS_ETM = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_SUPPORTS_XTAL = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_SUPPORTS_PLL_F160M = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_SUPPORTS_PCM = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_SUPPORTS_PDM = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_SUPPORTS_PDM_TX = @as(c_int, 1);
 pub const CONFIG_SOC_I2S_PDM_MAX_TX_LINES = @as(c_int, 2);
-pub const CONFIG_SOC_I2S_SUPPORTS_PDM_RX = @as(c_int, 1);
-pub const CONFIG_SOC_I2S_PDM_MAX_RX_LINES = @as(c_int, 4);
 pub const CONFIG_SOC_I2S_SUPPORTS_TDM = @as(c_int, 1);
-pub const CONFIG_SOC_LEDC_SUPPORT_APB_CLOCK = @as(c_int, 1);
+pub const CONFIG_SOC_I2S_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_LEDC_SUPPORT_PLL_DIV_CLOCK = @as(c_int, 1);
 pub const CONFIG_SOC_LEDC_SUPPORT_XTAL_CLOCK = @as(c_int, 1);
 pub const CONFIG_SOC_LEDC_TIMER_NUM = @as(c_int, 4);
-pub const CONFIG_SOC_LEDC_CHANNEL_NUM = @as(c_int, 8);
-pub const CONFIG_SOC_LEDC_TIMER_BIT_WIDTH = @as(c_int, 14);
+pub const CONFIG_SOC_LEDC_CHANNEL_NUM = @as(c_int, 6);
+pub const CONFIG_SOC_LEDC_TIMER_BIT_WIDTH = @as(c_int, 20);
 pub const CONFIG_SOC_LEDC_SUPPORT_FADE_STOP = @as(c_int, 1);
-pub const CONFIG_SOC_MCPWM_GROUPS = @as(c_int, 2);
-pub const CONFIG_SOC_MCPWM_TIMERS_PER_GROUP = @as(c_int, 3);
-pub const CONFIG_SOC_MCPWM_OPERATORS_PER_GROUP = @as(c_int, 3);
-pub const CONFIG_SOC_MCPWM_COMPARATORS_PER_OPERATOR = @as(c_int, 2);
-pub const CONFIG_SOC_MCPWM_GENERATORS_PER_OPERATOR = @as(c_int, 2);
-pub const CONFIG_SOC_MCPWM_TRIGGERS_PER_OPERATOR = @as(c_int, 2);
-pub const CONFIG_SOC_MCPWM_GPIO_FAULTS_PER_GROUP = @as(c_int, 3);
-pub const CONFIG_SOC_MCPWM_CAPTURE_TIMERS_PER_GROUP = @as(c_int, 1);
-pub const CONFIG_SOC_MCPWM_CAPTURE_CHANNELS_PER_TIMER = @as(c_int, 3);
-pub const CONFIG_SOC_MCPWM_GPIO_SYNCHROS_PER_GROUP = @as(c_int, 3);
-pub const CONFIG_SOC_MCPWM_SWSYNC_CAN_PROPAGATE = @as(c_int, 1);
-pub const CONFIG_SOC_MMU_LINEAR_ADDRESS_REGION_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_LEDC_GAMMA_CURVE_FADE_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_LEDC_GAMMA_CURVE_FADE_RANGE_MAX = @as(c_int, 16);
+pub const CONFIG_SOC_LEDC_FADE_PARAMS_BIT_WIDTH = @as(c_int, 10);
+pub const CONFIG_SOC_LEDC_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_MMU_PAGE_SIZE_CONFIGURABLE = @as(c_int, 1);
+pub const CONFIG_SOC_MMU_PAGE_SIZE_8KB_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_MMU_PERIPH_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_MMU_LINEAR_ADDRESS_REGION_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_MMU_DI_VADDR_SHARED = @as(c_int, 1);
+pub const CONFIG_SOC_MPU_MIN_REGION_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
+pub const CONFIG_SOC_MPU_REGIONS_MAX_NUM = @as(c_int, 8);
 pub const CONFIG_SOC_PCNT_GROUPS = @as(c_int, 1);
 pub const CONFIG_SOC_PCNT_UNITS_PER_GROUP = @as(c_int, 4);
 pub const CONFIG_SOC_PCNT_CHANNELS_PER_UNIT = @as(c_int, 2);
 pub const CONFIG_SOC_PCNT_THRES_POINT_PER_UNIT = @as(c_int, 2);
+pub const CONFIG_SOC_PCNT_SUPPORT_RUNTIME_THRES_UPDATE = @as(c_int, 1);
+pub const CONFIG_SOC_PCNT_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const CONFIG_SOC_RMT_GROUPS = @as(c_int, 1);
-pub const CONFIG_SOC_RMT_TX_CANDIDATES_PER_GROUP = @as(c_int, 4);
-pub const CONFIG_SOC_RMT_RX_CANDIDATES_PER_GROUP = @as(c_int, 4);
-pub const CONFIG_SOC_RMT_CHANNELS_PER_GROUP = @as(c_int, 8);
+pub const CONFIG_SOC_RMT_TX_CANDIDATES_PER_GROUP = @as(c_int, 2);
+pub const CONFIG_SOC_RMT_RX_CANDIDATES_PER_GROUP = @as(c_int, 2);
+pub const CONFIG_SOC_RMT_CHANNELS_PER_GROUP = @as(c_int, 4);
 pub const CONFIG_SOC_RMT_MEM_WORDS_PER_CHANNEL = @as(c_int, 48);
 pub const CONFIG_SOC_RMT_SUPPORT_RX_PINGPONG = @as(c_int, 1);
 pub const CONFIG_SOC_RMT_SUPPORT_RX_DEMODULATION = @as(c_int, 1);
@@ -4265,89 +3886,31 @@ pub const CONFIG_SOC_RMT_SUPPORT_TX_SYNCHRO = @as(c_int, 1);
 pub const CONFIG_SOC_RMT_SUPPORT_TX_CARRIER_DATA_ONLY = @as(c_int, 1);
 pub const CONFIG_SOC_RMT_SUPPORT_XTAL = @as(c_int, 1);
 pub const CONFIG_SOC_RMT_SUPPORT_RC_FAST = @as(c_int, 1);
-pub const CONFIG_SOC_RMT_SUPPORT_APB = @as(c_int, 1);
-pub const CONFIG_SOC_RMT_SUPPORT_DMA = @as(c_int, 1);
-pub const CONFIG_SOC_LCD_I80_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_LCD_RGB_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_LCD_I80_BUSES = @as(c_int, 1);
-pub const CONFIG_SOC_LCD_RGB_PANELS = @as(c_int, 1);
-pub const CONFIG_SOC_LCD_I80_BUS_WIDTH = @as(c_int, 16);
-pub const CONFIG_SOC_LCD_RGB_DATA_WIDTH = @as(c_int, 16);
-pub const CONFIG_SOC_LCD_SUPPORT_RGB_YUV_CONV = @as(c_int, 1);
-pub const CONFIG_SOC_LCDCAM_I80_NUM_BUSES = @as(c_int, 1);
-pub const CONFIG_SOC_LCDCAM_I80_BUS_WIDTH = @as(c_int, 16);
-pub const CONFIG_SOC_LCDCAM_RGB_NUM_PANELS = @as(c_int, 1);
-pub const CONFIG_SOC_LCDCAM_RGB_DATA_WIDTH = @as(c_int, 16);
-pub const CONFIG_SOC_RTC_CNTL_CPU_PD_DMA_BUS_WIDTH = @as(c_int, 128);
-pub const CONFIG_SOC_RTC_CNTL_CPU_PD_REG_FILE_NUM = @as(c_int, 549);
-pub const CONFIG_SOC_RTC_CNTL_TAGMEM_PD_DMA_BUS_WIDTH = @as(c_int, 128);
-pub const CONFIG_SOC_RTCIO_PIN_COUNT = @as(c_int, 22);
-pub const CONFIG_SOC_RTCIO_INPUT_OUTPUT_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_RTCIO_HOLD_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_RTCIO_WAKE_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_SDM_GROUPS = @as(c_int, 1);
-pub const CONFIG_SOC_SDM_CHANNELS_PER_GROUP = @as(c_int, 8);
-pub const CONFIG_SOC_SDM_CLK_SUPPORT_APB = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_PERIPH_NUM = @as(c_int, 3);
-pub const CONFIG_SOC_SPI_MAX_CS_NUM = @as(c_int, 6);
-pub const CONFIG_SOC_SPI_MAXIMUM_BUFFER_SIZE = @as(c_int, 64);
-pub const CONFIG_SOC_SPI_SUPPORT_DDRCLK = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SLAVE_SUPPORT_SEG_TRANS = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SUPPORT_CD_SIG = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SUPPORT_CONTINUOUS_TRANS = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SUPPORT_SLAVE_HD_VER2 = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SUPPORT_CLK_APB = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SUPPORT_CLK_XTAL = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_PERIPH_SUPPORT_CONTROL_DUMMY_OUT = @as(c_int, 1);
-pub const CONFIG_SOC_MEMSPI_IS_INDEPENDENT = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MAX_PRE_DIVIDER = @as(c_int, 16);
-pub const CONFIG_SOC_SPI_SUPPORT_OCT = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SCT_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SCT_REG_NUM = @as(c_int, 14);
-pub const CONFIG_SOC_SPI_SCT_BUFFER_NUM_MAX = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_SCT_CONF_BITLEN_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FFFA, .hex);
-pub const CONFIG_SOC_MEMSPI_SRC_FREQ_120M = @as(c_int, 1);
-pub const CONFIG_SOC_MEMSPI_SRC_FREQ_80M_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_MEMSPI_SRC_FREQ_40M_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_MEMSPI_SRC_FREQ_20M_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_SPIRAM_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_SPIRAM_XIP_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_SYSTIMER_COUNTER_NUM = @as(c_int, 2);
-pub const CONFIG_SOC_SYSTIMER_ALARM_NUM = @as(c_int, 3);
-pub const CONFIG_SOC_SYSTIMER_BIT_WIDTH_LO = @as(c_int, 32);
-pub const CONFIG_SOC_SYSTIMER_BIT_WIDTH_HI = @as(c_int, 20);
-pub const CONFIG_SOC_SYSTIMER_FIXED_DIVIDER = @as(c_int, 1);
-pub const CONFIG_SOC_SYSTIMER_INT_LEVEL = @as(c_int, 1);
-pub const CONFIG_SOC_SYSTIMER_ALARM_MISS_COMPENSATE = @as(c_int, 1);
-pub const CONFIG_SOC_TIMER_GROUPS = @as(c_int, 2);
-pub const CONFIG_SOC_TIMER_GROUP_TIMERS_PER_GROUP = @as(c_int, 2);
-pub const CONFIG_SOC_TIMER_GROUP_COUNTER_BIT_WIDTH = @as(c_int, 54);
-pub const CONFIG_SOC_TIMER_GROUP_SUPPORT_XTAL = @as(c_int, 1);
-pub const CONFIG_SOC_TIMER_GROUP_SUPPORT_APB = @as(c_int, 1);
-pub const CONFIG_SOC_TIMER_GROUP_TOTAL_TIMERS = @as(c_int, 4);
-pub const CONFIG_SOC_TOUCH_SENSOR_VERSION = @as(c_int, 2);
-pub const CONFIG_SOC_TOUCH_SENSOR_NUM = @as(c_int, 15);
-pub const CONFIG_SOC_TOUCH_SUPPORT_SLEEP_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_TOUCH_SUPPORT_WATERPROOF = @as(c_int, 1);
-pub const CONFIG_SOC_TOUCH_SUPPORT_PROX_SENSING = @as(c_int, 1);
-pub const CONFIG_SOC_TOUCH_PROXIMITY_CHANNEL_NUM = @as(c_int, 3);
-pub const CONFIG_SOC_TOUCH_PROXIMITY_MEAS_DONE_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_TOUCH_SAMPLE_CFG_NUM = @as(c_int, 1);
-pub const CONFIG_SOC_TWAI_CONTROLLER_NUM = @as(c_int, 1);
-pub const CONFIG_SOC_TWAI_CLK_SUPPORT_APB = @as(c_int, 1);
-pub const CONFIG_SOC_TWAI_BRP_MIN = @as(c_int, 2);
-pub const CONFIG_SOC_TWAI_BRP_MAX = @as(c_int, 16384);
-pub const CONFIG_SOC_TWAI_SUPPORTS_RX_STATUS = @as(c_int, 1);
-pub const CONFIG_SOC_UART_NUM = @as(c_int, 3);
-pub const CONFIG_SOC_UART_HP_NUM = @as(c_int, 3);
-pub const CONFIG_SOC_UART_FIFO_LEN = @as(c_int, 128);
-pub const CONFIG_SOC_UART_BITRATE_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 5000000, .decimal);
-pub const CONFIG_SOC_UART_SUPPORT_FSM_TX_WAIT_SEND = @as(c_int, 1);
-pub const CONFIG_SOC_UART_SUPPORT_WAKEUP_INT = @as(c_int, 1);
-pub const CONFIG_SOC_UART_SUPPORT_APB_CLK = @as(c_int, 1);
-pub const CONFIG_SOC_UART_SUPPORT_RTC_CLK = @as(c_int, 1);
-pub const CONFIG_SOC_UART_SUPPORT_XTAL_CLK = @as(c_int, 1);
-pub const CONFIG_SOC_USB_OTG_PERIPH_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_RMT_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_MCPWM_GROUPS = @as(c_int, 1);
+pub const CONFIG_SOC_MCPWM_TIMERS_PER_GROUP = @as(c_int, 3);
+pub const CONFIG_SOC_MCPWM_OPERATORS_PER_GROUP = @as(c_int, 3);
+pub const CONFIG_SOC_MCPWM_COMPARATORS_PER_OPERATOR = @as(c_int, 2);
+pub const CONFIG_SOC_MCPWM_GENERATORS_PER_OPERATOR = @as(c_int, 2);
+pub const CONFIG_SOC_MCPWM_TRIGGERS_PER_OPERATOR = @as(c_int, 2);
+pub const CONFIG_SOC_MCPWM_GPIO_FAULTS_PER_GROUP = @as(c_int, 3);
+pub const CONFIG_SOC_MCPWM_CAPTURE_TIMERS_PER_GROUP = @as(c_int, 1);
+pub const CONFIG_SOC_MCPWM_CAPTURE_CHANNELS_PER_TIMER = @as(c_int, 3);
+pub const CONFIG_SOC_MCPWM_GPIO_SYNCHROS_PER_GROUP = @as(c_int, 3);
+pub const CONFIG_SOC_MCPWM_SWSYNC_CAN_PROPAGATE = @as(c_int, 1);
+pub const CONFIG_SOC_MCPWM_SUPPORT_ETM = @as(c_int, 1);
+pub const CONFIG_SOC_MCPWM_CAPTURE_CLK_FROM_GROUP = @as(c_int, 1);
+pub const CONFIG_SOC_MCPWM_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_PARLIO_GROUPS = @as(c_int, 1);
+pub const CONFIG_SOC_PARLIO_TX_UNITS_PER_GROUP = @as(c_int, 1);
+pub const CONFIG_SOC_PARLIO_RX_UNITS_PER_GROUP = @as(c_int, 1);
+pub const CONFIG_SOC_PARLIO_TX_UNIT_MAX_DATA_WIDTH = @as(c_int, 16);
+pub const CONFIG_SOC_PARLIO_RX_UNIT_MAX_DATA_WIDTH = @as(c_int, 16);
+pub const CONFIG_SOC_PARLIO_TX_RX_SHARE_INTERRUPT = @as(c_int, 1);
+pub const CONFIG_SOC_PARLIO_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_MPI_MEM_BLOCKS_NUM = @as(c_int, 4);
+pub const CONFIG_SOC_MPI_OPERATIONS_NUM = @as(c_int, 3);
+pub const CONFIG_SOC_RSA_MAX_BIT_LEN = @as(c_int, 3072);
 pub const CONFIG_SOC_SHA_DMA_MAX_BUFFER_SIZE = @as(c_int, 3968);
 pub const CONFIG_SOC_SHA_SUPPORT_DMA = @as(c_int, 1);
 pub const CONFIG_SOC_SHA_SUPPORT_RESUME = @as(c_int, 1);
@@ -4355,103 +3918,170 @@ pub const CONFIG_SOC_SHA_GDMA = @as(c_int, 1);
 pub const CONFIG_SOC_SHA_SUPPORT_SHA1 = @as(c_int, 1);
 pub const CONFIG_SOC_SHA_SUPPORT_SHA224 = @as(c_int, 1);
 pub const CONFIG_SOC_SHA_SUPPORT_SHA256 = @as(c_int, 1);
-pub const CONFIG_SOC_SHA_SUPPORT_SHA384 = @as(c_int, 1);
-pub const CONFIG_SOC_SHA_SUPPORT_SHA512 = @as(c_int, 1);
-pub const CONFIG_SOC_SHA_SUPPORT_SHA512_224 = @as(c_int, 1);
-pub const CONFIG_SOC_SHA_SUPPORT_SHA512_256 = @as(c_int, 1);
-pub const CONFIG_SOC_SHA_SUPPORT_SHA512_T = @as(c_int, 1);
-pub const CONFIG_SOC_MPI_MEM_BLOCKS_NUM = @as(c_int, 4);
-pub const CONFIG_SOC_MPI_OPERATIONS_NUM = @as(c_int, 3);
-pub const CONFIG_SOC_RSA_MAX_BIT_LEN = @as(c_int, 4096);
-pub const CONFIG_SOC_AES_SUPPORT_DMA = @as(c_int, 1);
-pub const CONFIG_SOC_AES_GDMA = @as(c_int, 1);
-pub const CONFIG_SOC_AES_SUPPORT_AES_128 = @as(c_int, 1);
-pub const CONFIG_SOC_AES_SUPPORT_AES_256 = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_EXT0_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_EXT1_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_EXT_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_WIFI_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_BT_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_TOUCH_SENSOR_WAKEUP = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_CPU_PD = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_TAGMEM_PD = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_RTC_PERIPH_PD = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_RC_FAST_PD = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_VDDSDIO_PD = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_MAC_BB_PD = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_MODEM_PD = @as(c_int, 1);
-pub const CONFIG_SOC_CONFIGURABLE_VDDSDIO_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_PM_SUPPORT_DEEPSLEEP_CHECK_STUB_ONLY = @as(c_int, 1);
-pub const CONFIG_SOC_PM_CPU_RETENTION_BY_RTCCNTL = @as(c_int, 1);
-pub const CONFIG_SOC_PM_MODEM_RETENTION_BY_BACKUPDMA = @as(c_int, 1);
-pub const CONFIG_SOC_PM_MODEM_PD_BY_SW = @as(c_int, 1);
-pub const CONFIG_SOC_CLK_RC_FAST_D256_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_RTC_SLOW_CLK_SUPPORT_RC_FAST_D256 = @as(c_int, 1);
-pub const CONFIG_SOC_CLK_RC_FAST_SUPPORT_CALIBRATION = @as(c_int, 1);
-pub const CONFIG_SOC_CLK_XTAL32K_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_SDM_GROUPS = @as(c_int, 1);
+pub const CONFIG_SOC_SDM_CHANNELS_PER_GROUP = @as(c_int, 4);
+pub const CONFIG_SOC_SDM_CLK_SUPPORT_PLL_F80M = @as(c_int, 1);
+pub const CONFIG_SOC_SDM_CLK_SUPPORT_XTAL = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_PERIPH_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_SPI_MAX_CS_NUM = @as(c_int, 6);
+pub const CONFIG_SOC_SPI_MAXIMUM_BUFFER_SIZE = @as(c_int, 64);
+pub const CONFIG_SOC_SPI_SUPPORT_DDRCLK = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SLAVE_SUPPORT_SEG_TRANS = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_CD_SIG = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_CONTINUOUS_TRANS = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_SLAVE_HD_VER2 = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_CLK_XTAL = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_CLK_PLL_F80M = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SUPPORT_CLK_RC_FAST = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SCT_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SCT_REG_NUM = @as(c_int, 14);
+pub const CONFIG_SOC_SPI_SCT_BUFFER_NUM_MAX = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_SCT_CONF_BITLEN_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FFFA, .hex);
+pub const CONFIG_SOC_MEMSPI_IS_INDEPENDENT = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MAX_PRE_DIVIDER = @as(c_int, 16);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_WAIT_IDLE = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_SUSPEND = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_RESUME = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_IDLE_INTR = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_SW_SUSPEND = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_CHECK_SUS = @as(c_int, 1);
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_WRAP = @as(c_int, 1);
+pub const CONFIG_SOC_MEMSPI_SRC_FREQ_80M_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_MEMSPI_SRC_FREQ_40M_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_MEMSPI_SRC_FREQ_20M_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_SYSTIMER_COUNTER_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_SYSTIMER_ALARM_NUM = @as(c_int, 3);
+pub const CONFIG_SOC_SYSTIMER_BIT_WIDTH_LO = @as(c_int, 32);
+pub const CONFIG_SOC_SYSTIMER_BIT_WIDTH_HI = @as(c_int, 20);
+pub const CONFIG_SOC_SYSTIMER_FIXED_DIVIDER = @as(c_int, 1);
+pub const CONFIG_SOC_SYSTIMER_SUPPORT_RC_FAST = @as(c_int, 1);
+pub const CONFIG_SOC_SYSTIMER_INT_LEVEL = @as(c_int, 1);
+pub const CONFIG_SOC_SYSTIMER_ALARM_MISS_COMPENSATE = @as(c_int, 1);
+pub const CONFIG_SOC_SYSTIMER_SUPPORT_ETM = @as(c_int, 1);
+pub const CONFIG_SOC_LP_TIMER_BIT_WIDTH_LO = @as(c_int, 32);
+pub const CONFIG_SOC_LP_TIMER_BIT_WIDTH_HI = @as(c_int, 16);
+pub const CONFIG_SOC_TIMER_GROUPS = @as(c_int, 2);
+pub const CONFIG_SOC_TIMER_GROUP_TIMERS_PER_GROUP = @as(c_int, 1);
+pub const CONFIG_SOC_TIMER_GROUP_COUNTER_BIT_WIDTH = @as(c_int, 54);
+pub const CONFIG_SOC_TIMER_GROUP_SUPPORT_XTAL = @as(c_int, 1);
+pub const CONFIG_SOC_TIMER_GROUP_SUPPORT_RC_FAST = @as(c_int, 1);
+pub const CONFIG_SOC_TIMER_GROUP_TOTAL_TIMERS = @as(c_int, 2);
+pub const CONFIG_SOC_TIMER_SUPPORT_ETM = @as(c_int, 1);
+pub const CONFIG_SOC_TIMER_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_MWDT_SUPPORT_XTAL = @as(c_int, 1);
+pub const CONFIG_SOC_MWDT_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_TWAI_CONTROLLER_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_TWAI_CLK_SUPPORT_XTAL = @as(c_int, 1);
+pub const CONFIG_SOC_TWAI_BRP_MIN = @as(c_int, 2);
+pub const CONFIG_SOC_TWAI_BRP_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 32768, .decimal);
+pub const CONFIG_SOC_TWAI_SUPPORTS_RX_STATUS = @as(c_int, 1);
+pub const CONFIG_SOC_TWAI_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_DIS_DOWNLOAD_ICACHE = @as(c_int, 1);
-pub const CONFIG_SOC_EFUSE_DIS_DOWNLOAD_DCACHE = @as(c_int, 1);
-pub const CONFIG_SOC_EFUSE_HARD_DIS_JTAG = @as(c_int, 1);
+pub const CONFIG_SOC_EFUSE_DIS_PAD_JTAG = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_DIS_USB_JTAG = @as(c_int, 1);
-pub const CONFIG_SOC_EFUSE_SOFT_DIS_JTAG = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_DIS_DIRECT_BOOT = @as(c_int, 1);
+pub const CONFIG_SOC_EFUSE_SOFT_DIS_JTAG = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_DIS_ICACHE = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_BLOCK9_KEY_PURPOSE_QUIRK = @as(c_int, 1);
 pub const CONFIG_SOC_SECURE_BOOT_V2_RSA = @as(c_int, 1);
+pub const CONFIG_SOC_SECURE_BOOT_V2_ECC = @as(c_int, 1);
 pub const CONFIG_SOC_EFUSE_SECURE_BOOT_KEY_DIGESTS = @as(c_int, 3);
 pub const CONFIG_SOC_EFUSE_REVOKE_BOOT_KEY_DIGESTS = @as(c_int, 1);
 pub const CONFIG_SOC_SUPPORT_SECURE_BOOT_REVOKE_KEY = @as(c_int, 1);
 pub const CONFIG_SOC_FLASH_ENCRYPTED_XTS_AES_BLOCK_MAX = @as(c_int, 64);
 pub const CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES = @as(c_int, 1);
-pub const CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_OPTIONS = @as(c_int, 1);
 pub const CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128 = @as(c_int, 1);
-pub const CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_256 = @as(c_int, 1);
-pub const CONFIG_SOC_MEMPROT_CPU_PREFETCH_PAD_SIZE = @as(c_int, 16);
-pub const CONFIG_SOC_MEMPROT_MEM_ALIGN_SIZE = @as(c_int, 256);
-pub const CONFIG_SOC_PHY_DIG_REGS_MEM_SIZE = @as(c_int, 21);
-pub const CONFIG_SOC_MAC_BB_PD_MEM_SIZE = @as(c_int, 192);
-pub const CONFIG_SOC_WIFI_LIGHT_SLEEP_CLK_WIDTH = @as(c_int, 12);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_WAIT_IDLE = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_SUSPEND = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_RESUME = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_SW_SUSPEND = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_OPI_MODE = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_TIMING_TUNING = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_CONFIG_GPIO_BY_EFUSE = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_WRAP = @as(c_int, 1);
-pub const CONFIG_SOC_MEMSPI_TIMING_TUNING_BY_MSPI_DELAY = @as(c_int, 1);
-pub const CONFIG_SOC_MEMSPI_CORE_CLK_SHARED_WITH_PSRAM = @as(c_int, 1);
-pub const CONFIG_SOC_SPI_MEM_SUPPORT_CACHE_32BIT_ADDR_MAP = @as(c_int, 1);
+pub const CONFIG_SOC_APM_CTRL_FILTER_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_APM_LP_APM0_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_CRYPTO_DPA_PROTECTION_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_UART_NUM = @as(c_int, 3);
+pub const CONFIG_SOC_UART_HP_NUM = @as(c_int, 2);
+pub const CONFIG_SOC_UART_LP_NUM = @as(c_int, 1);
+pub const CONFIG_SOC_UART_FIFO_LEN = @as(c_int, 128);
+pub const CONFIG_SOC_LP_UART_FIFO_LEN = @as(c_int, 16);
+pub const CONFIG_SOC_UART_BITRATE_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 5000000, .decimal);
+pub const CONFIG_SOC_UART_SUPPORT_PLL_F80M_CLK = @as(c_int, 1);
+pub const CONFIG_SOC_UART_SUPPORT_RTC_CLK = @as(c_int, 1);
+pub const CONFIG_SOC_UART_SUPPORT_XTAL_CLK = @as(c_int, 1);
+pub const CONFIG_SOC_UART_SUPPORT_WAKEUP_INT = @as(c_int, 1);
+pub const CONFIG_SOC_UART_HAS_LP_UART = @as(c_int, 1);
+pub const CONFIG_SOC_UART_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_UART_SUPPORT_FSM_TX_WAIT_SEND = @as(c_int, 1);
 pub const CONFIG_SOC_COEX_HW_PTI = @as(c_int, 1);
-pub const CONFIG_SOC_EXTERNAL_COEX_LEADER_TX_LINE = @as(c_int, 1);
-pub const CONFIG_SOC_SDMMC_USE_GPIO_MATRIX = @as(c_int, 1);
-pub const CONFIG_SOC_SDMMC_NUM_SLOTS = @as(c_int, 2);
-pub const CONFIG_SOC_SDMMC_SUPPORT_XTAL_CLOCK = @as(c_int, 1);
-pub const CONFIG_SOC_SDMMC_DELAY_PHASE_NUM = @as(c_int, 4);
+pub const CONFIG_SOC_EXTERNAL_COEX_ADVANCE = @as(c_int, 1);
+pub const CONFIG_SOC_PHY_DIG_REGS_MEM_SIZE = @as(c_int, 21);
+pub const CONFIG_SOC_WIFI_LIGHT_SLEEP_CLK_WIDTH = @as(c_int, 12);
+pub const CONFIG_SOC_PM_SUPPORT_WIFI_WAKEUP = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_BEACON_WAKEUP = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_BT_WAKEUP = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_EXT1_WAKEUP = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_EXT1_WAKEUP_MODE_PER_PIN = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_CPU_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_MODEM_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_XTAL32K_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_RC32K_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_RC_FAST_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_VDDSDIO_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_TOP_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_HP_AON_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_MAC_BB_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_RTC_PERIPH_PD = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_PMU_MODEM_STATE = @as(c_int, 1);
+pub const CONFIG_SOC_PM_SUPPORT_DEEPSLEEP_CHECK_STUB_ONLY = @as(c_int, 1);
+pub const CONFIG_SOC_PM_CPU_RETENTION_BY_SW = @as(c_int, 1);
+pub const CONFIG_SOC_PM_MODEM_RETENTION_BY_REGDMA = @as(c_int, 1);
+pub const CONFIG_SOC_PM_RETENTION_HAS_CLOCK_BUG = @as(c_int, 1);
+pub const CONFIG_SOC_EXT_MEM_CACHE_TAG_IN_CPU_DOMAIN = @as(c_int, 1);
+pub const CONFIG_SOC_PM_PAU_LINK_NUM = @as(c_int, 4);
+pub const CONFIG_SOC_PM_PAU_REGDMA_LINK_MULTI_ADDR = @as(c_int, 1);
+pub const CONFIG_SOC_PM_PAU_REGDMA_LINK_WIFIMAC = @as(c_int, 1);
+pub const CONFIG_SOC_PM_PAU_REGDMA_UPDATE_CACHE_BEFORE_WAIT_COMPARE = @as(c_int, 1);
+pub const CONFIG_SOC_PM_RETENTION_MODULE_NUM = @as(c_int, 32);
+pub const CONFIG_SOC_CLK_RC_FAST_SUPPORT_CALIBRATION = @as(c_int, 1);
+pub const CONFIG_SOC_MODEM_CLOCK_IS_INDEPENDENT = @as(c_int, 1);
+pub const CONFIG_SOC_CLK_XTAL32K_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_CLK_OSC_SLOW_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_CLK_RC32K_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_RCC_IS_INDEPENDENT = @as(c_int, 1);
 pub const CONFIG_SOC_TEMPERATURE_SENSOR_SUPPORT_FAST_RC = @as(c_int, 1);
+pub const CONFIG_SOC_TEMPERATURE_SENSOR_SUPPORT_XTAL = @as(c_int, 1);
+pub const CONFIG_SOC_TEMPERATURE_SENSOR_INTR_SUPPORT = @as(c_int, 1);
+pub const CONFIG_SOC_TEMPERATURE_SENSOR_SUPPORT_ETM = @as(c_int, 1);
+pub const CONFIG_SOC_TEMPERATURE_SENSOR_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const CONFIG_SOC_TEMPERATURE_SENSOR_UNDER_PD_TOP_DOMAIN = @as(c_int, 1);
+pub const CONFIG_SOC_RNG_CLOCK_IS_INDEPENDENT = @as(c_int, 1);
 pub const CONFIG_SOC_WIFI_HW_TSF = @as(c_int, 1);
 pub const CONFIG_SOC_WIFI_FTM_SUPPORT = @as(c_int, 1);
 pub const CONFIG_SOC_WIFI_GCMP_SUPPORT = @as(c_int, 1);
 pub const CONFIG_SOC_WIFI_WAPI_SUPPORT = @as(c_int, 1);
 pub const CONFIG_SOC_WIFI_CSI_SUPPORT = @as(c_int, 1);
 pub const CONFIG_SOC_WIFI_MESH_SUPPORT = @as(c_int, 1);
-pub const CONFIG_SOC_WIFI_SUPPORT_VARIABLE_BEACON_WINDOW = @as(c_int, 1);
-pub const CONFIG_SOC_WIFI_PHY_NEEDS_USB_WORKAROUND = @as(c_int, 1);
+pub const CONFIG_SOC_WIFI_HE_SUPPORT = @as(c_int, 1);
+pub const CONFIG_SOC_WIFI_MAC_VERSION_NUM = @as(c_int, 2);
 pub const CONFIG_SOC_BLE_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_BLE_MESH_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_ESP_NIMBLE_CONTROLLER = @as(c_int, 1);
 pub const CONFIG_SOC_BLE_50_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_BLE_DEVICE_PRIVACY_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_BLE_POWER_CONTROL_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SOC_BLE_PERIODIC_ADV_ENH_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SOC_BLUFI_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SOC_ULP_HAS_ADC = @as(c_int, 1);
+pub const CONFIG_SOC_BLE_MULTI_CONN_OPTIMIZATION = @as(c_int, 1);
+pub const CONFIG_SOC_BLE_USE_WIFI_PWR_CLK_WORKAROUND = @as(c_int, 1);
 pub const CONFIG_SOC_PHY_COMBO_MODULE = @as(c_int, 1);
+pub const CONFIG_SOC_CAPS_NO_RESET_BY_ANA_BOD = @as(c_int, 1);
+pub const CONFIG_SOC_LP_CORE_SINGLE_INTERRUPT_VECTOR = @as(c_int, 1);
+pub const CONFIG_SOC_LP_CORE_SUPPORT_ETM = @as(c_int, 1);
+pub const CONFIG_SOC_DEBUG_HAVE_OCD_STUB_BINS = @as(c_int, 1);
 pub const CONFIG_IDF_CMAKE = @as(c_int, 1);
 pub const CONFIG_IDF_TOOLCHAIN = "gcc";
 pub const CONFIG_IDF_TOOLCHAIN_GCC = @as(c_int, 1);
-pub const CONFIG_IDF_TARGET_ARCH_XTENSA = @as(c_int, 1);
-pub const CONFIG_IDF_TARGET_ARCH = "xtensa";
-pub const CONFIG_IDF_TARGET = "esp32s3";
+pub const CONFIG_IDF_TARGET_ARCH_RISCV = @as(c_int, 1);
+pub const CONFIG_IDF_TARGET_ARCH = "riscv";
+pub const CONFIG_IDF_TARGET = "esp32c6";
 pub const CONFIG_IDF_INIT_VERSION = "5.4.0";
-pub const CONFIG_IDF_FIRMWARE_CHIP_ID = @as(c_int, 0x0009);
+pub const CONFIG_IDF_FIRMWARE_CHIP_ID = @as(c_int, 0x000D);
 pub const CONFIG_APP_BUILD_TYPE_APP_2NDBOOT = @as(c_int, 1);
 pub const CONFIG_APP_BUILD_GENERATE_BINARIES = @as(c_int, 1);
 pub const CONFIG_APP_BUILD_BOOTLOADER = @as(c_int, 1);
@@ -4464,46 +4094,44 @@ pub const CONFIG_BOOTLOADER_LOG_LEVEL_INFO = @as(c_int, 1);
 pub const CONFIG_BOOTLOADER_LOG_LEVEL = @as(c_int, 3);
 pub const CONFIG_BOOTLOADER_LOG_TIMESTAMP_SOURCE_CPU_TICKS = @as(c_int, 1);
 pub const CONFIG_BOOTLOADER_FLASH_XMC_SUPPORT = @as(c_int, 1);
-pub const CONFIG_BOOTLOADER_VDDSDIO_BOOST_1_9V = @as(c_int, 1);
 pub const CONFIG_BOOTLOADER_REGION_PROTECTION_ENABLE = @as(c_int, 1);
 pub const CONFIG_BOOTLOADER_WDT_ENABLE = @as(c_int, 1);
 pub const CONFIG_BOOTLOADER_WDT_TIME_MS = @as(c_int, 9000);
 pub const CONFIG_BOOTLOADER_RESERVE_RTC_SIZE = @as(c_int, 0x0);
 pub const CONFIG_SECURE_BOOT_V2_RSA_SUPPORTED = @as(c_int, 1);
+pub const CONFIG_SECURE_BOOT_V2_ECC_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_SECURE_BOOT_V2_PREFERRED = @as(c_int, 1);
 pub const CONFIG_SECURE_ROM_DL_MODE_ENABLED = @as(c_int, 1);
 pub const CONFIG_APP_COMPILE_TIME_DATE = @as(c_int, 1);
 pub const CONFIG_APP_RETRIEVE_LEN_ELF_SHA = @as(c_int, 9);
 pub const CONFIG_ESP_ROM_HAS_CRC_LE = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_CRC_BE = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_MZ_CRC32 = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_JPEG_DECODE = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_UART_CLK_IS_XTAL = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_USB_SERIAL_DEVICE_NUM = @as(c_int, 3);
 pub const CONFIG_ESP_ROM_HAS_RETARGETABLE_LOCKING = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_USB_OTG_NUM = @as(c_int, 3);
-pub const CONFIG_ESP_ROM_USB_SERIAL_DEVICE_NUM = @as(c_int, 4);
-pub const CONFIG_ESP_ROM_HAS_ERASE_0_REGION_BUG = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_ENCRYPTED_WRITES_USING_LEGACY_DRV = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_GET_CLK_FREQ = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_HAS_RVFPLIB = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_HAL_WDT = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_NEEDS_SWSETUP_WORKAROUND = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_HAS_HAL_SYSTIMER = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_HAS_HEAP_TLSF = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_TLSF_CHECK_PATCH = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_MULTI_HEAP_WALK_PATCH = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_LAYOUT_TABLE = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_SPI_FLASH = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_ETS_PRINTF_BUG = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_HAS_REGI2C_BUG = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_NEWLIB = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_NEWLIB_NANO_FORMAT = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_NEWLIB_32BIT_TIME = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_HAS_NEWLIB_NORMAL_FORMAT = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_REV0_HAS_NO_ECDSA_INTERFACE = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_WDT_INIT_PATCH = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_NEEDS_SET_CACHE_MMU_SIZE = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_RAM_APP_NEEDS_MMU_INIT = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_FLASH_COUNT_PAGES_BUG = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_CACHE_SUSPEND_WAITI_BUG = @as(c_int, 1);
-pub const CONFIG_ESP_ROM_HAS_CACHE_WRITEBACK_BUG = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_SW_FLOAT = @as(c_int, 1);
+pub const CONFIG_ESP_ROM_USB_OTG_NUM = -@as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_VERSION = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_SUPPORT_DEEP_SLEEP_WAKEUP_STUB = @as(c_int, 1);
 pub const CONFIG_ESP_ROM_HAS_OUTPUT_PUTC_FUNC = @as(c_int, 1);
 pub const CONFIG_BOOT_ROM_LOG_ALWAYS_ON = @as(c_int, 1);
-pub const CONFIG_ESPTOOLPY_FLASH_MODE_AUTO_DETECT = @as(c_int, 1);
 pub const CONFIG_ESPTOOLPY_FLASHMODE_DIO = @as(c_int, 1);
 pub const CONFIG_ESPTOOLPY_FLASH_SAMPLE_MODE_STR = @as(c_int, 1);
 pub const CONFIG_ESPTOOLPY_FLASHMODE = "dio";
@@ -4524,7 +4152,7 @@ pub const CONFIG_PARTITION_TABLE_MD5 = @as(c_int, 1);
 pub const CONFIG_COMPILER_OPTIMIZATION_DEBUG = @as(c_int, 1);
 pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE = @as(c_int, 1);
 pub const CONFIG_COMPILER_ASSERT_NDEBUG_EVALUATE = @as(c_int, 1);
-pub const CONFIG_COMPILER_FLOAT_LIB_FROM_GCCLIB = @as(c_int, 1);
+pub const CONFIG_COMPILER_FLOAT_LIB_FROM_RVFPLIB = @as(c_int, 1);
 pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL = @as(c_int, 2);
 pub const CONFIG_COMPILER_HIDE_PATHS_MACROS = @as(c_int, 1);
 pub const CONFIG_COMPILER_STACK_CHECK_MODE_NONE = @as(c_int, 1);
@@ -4537,11 +4165,11 @@ pub const CONFIG_APPTRACE_DEST_UART_NONE = @as(c_int, 1);
 pub const CONFIG_APPTRACE_UART_TASK_PRIO = @as(c_int, 1);
 pub const CONFIG_APPTRACE_LOCK_ENABLE = @as(c_int, 1);
 pub const CONFIG_BT_ALARM_MAX_NUM = @as(c_int, 50);
-pub const CONFIG_TWAI_ERRATA_FIX_LISTEN_ONLY_DOM = @as(c_int, 1);
 pub const CONFIG_EFUSE_MAX_BLK_LEN = @as(c_int, 256);
 pub const CONFIG_ESP_TLS_USING_MBEDTLS = @as(c_int, 1);
 pub const CONFIG_ESP_TLS_USE_DS_PERIPHERAL = @as(c_int, 1);
 pub const CONFIG_ESP_COEX_ENABLED = @as(c_int, 1);
+pub const CONFIG_ESP_COEX_SW_COEXIST_ENABLE = @as(c_int, 1);
 pub const CONFIG_ESP_ERR_TO_NAME_LOOKUP = @as(c_int, 1);
 pub const CONFIG_GPTIMER_ISR_HANDLER_IN_IRAM = @as(c_int, 1);
 pub const CONFIG_SPI_MASTER_ISR_IN_IRAM = @as(c_int, 1);
@@ -4563,26 +4191,25 @@ pub const CONFIG_HTTPD_PURGE_BUF_LEN = @as(c_int, 32);
 pub const CONFIG_HTTPD_SERVER_EVENT_POST_TIMEOUT = @as(c_int, 2000);
 pub const CONFIG_ESP_HTTPS_OTA_EVENT_POST_TIMEOUT = @as(c_int, 2000);
 pub const CONFIG_ESP_HTTPS_SERVER_EVENT_POST_TIMEOUT = @as(c_int, 2000);
-pub const CONFIG_ESP32S3_REV_MIN_0 = @as(c_int, 1);
-pub const CONFIG_ESP32S3_REV_MIN_FULL = @as(c_int, 0);
+pub const CONFIG_ESP32C6_REV_MIN_0 = @as(c_int, 1);
+pub const CONFIG_ESP32C6_REV_MIN_FULL = @as(c_int, 0);
 pub const CONFIG_ESP_REV_MIN_FULL = @as(c_int, 0);
-pub const CONFIG_ESP32S3_REV_MAX_FULL = @as(c_int, 99);
+pub const CONFIG_ESP32C6_REV_MAX_FULL = @as(c_int, 99);
 pub const CONFIG_ESP_REV_MAX_FULL = @as(c_int, 99);
 pub const CONFIG_ESP_EFUSE_BLOCK_REV_MIN_FULL = @as(c_int, 0);
-pub const CONFIG_ESP_EFUSE_BLOCK_REV_MAX_FULL = @as(c_int, 199);
+pub const CONFIG_ESP_EFUSE_BLOCK_REV_MAX_FULL = @as(c_int, 99);
 pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_WIFI_STA = @as(c_int, 1);
 pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_WIFI_AP = @as(c_int, 1);
 pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_BT = @as(c_int, 1);
 pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_ETH = @as(c_int, 1);
+pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_IEEE802154 = @as(c_int, 1);
 pub const CONFIG_ESP_MAC_UNIVERSAL_MAC_ADDRESSES_FOUR = @as(c_int, 1);
 pub const CONFIG_ESP_MAC_UNIVERSAL_MAC_ADDRESSES = @as(c_int, 4);
-pub const CONFIG_ESP32S3_UNIVERSAL_MAC_ADDRESSES_FOUR = @as(c_int, 1);
-pub const CONFIG_ESP32S3_UNIVERSAL_MAC_ADDRESSES = @as(c_int, 4);
+pub const CONFIG_ESP32C6_UNIVERSAL_MAC_ADDRESSES_FOUR = @as(c_int, 1);
+pub const CONFIG_ESP32C6_UNIVERSAL_MAC_ADDRESSES = @as(c_int, 4);
 pub const CONFIG_ESP_SLEEP_FLASH_LEAKAGE_WORKAROUND = @as(c_int, 1);
-pub const CONFIG_ESP_SLEEP_MSPI_NEED_ALL_IO_PU = @as(c_int, 1);
-pub const CONFIG_ESP_SLEEP_RTC_BUS_ISO_WORKAROUND = @as(c_int, 1);
 pub const CONFIG_ESP_SLEEP_GPIO_RESET_WORKAROUND = @as(c_int, 1);
-pub const CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY = @as(c_int, 2000);
+pub const CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY = @as(c_int, 0);
 pub const CONFIG_ESP_SLEEP_GPIO_ENABLE_INTERNAL_RESISTORS = @as(c_int, 1);
 pub const CONFIG_RTC_CLK_SRC_INT_RC = @as(c_int, 1);
 pub const CONFIG_RTC_CLK_CAL_CYCLES = @as(c_int, 1024);
@@ -4599,32 +4226,21 @@ pub const CONFIG_ESP_PHY_ENABLED = @as(c_int, 1);
 pub const CONFIG_ESP_PHY_CALIBRATION_AND_DATA_STORAGE = @as(c_int, 1);
 pub const CONFIG_ESP_PHY_MAX_WIFI_TX_POWER = @as(c_int, 20);
 pub const CONFIG_ESP_PHY_MAX_TX_POWER = @as(c_int, 20);
-pub const CONFIG_ESP_PHY_ENABLE_USB = @as(c_int, 1);
 pub const CONFIG_ESP_PHY_RF_CAL_PARTIAL = @as(c_int, 1);
 pub const CONFIG_ESP_PHY_CALIBRATION_MODE = @as(c_int, 0);
+pub const CONFIG_PM_SLP_DEFAULT_PARAMS_OPT = @as(c_int, 1);
 pub const CONFIG_PM_POWER_DOWN_CPU_IN_LIGHT_SLEEP = @as(c_int, 1);
-pub const CONFIG_PM_RESTORE_CACHE_TAGMEM_AFTER_LIGHT_SLEEP = @as(c_int, 1);
+pub const CONFIG_ESP_CRYPTO_DPA_PROTECTION_AT_STARTUP = @as(c_int, 1);
+pub const CONFIG_ESP_CRYPTO_DPA_PROTECTION_LEVEL_LOW = @as(c_int, 1);
+pub const CONFIG_ESP_CRYPTO_DPA_PROTECTION_LEVEL = @as(c_int, 1);
 pub const CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160 = @as(c_int, 1);
 pub const CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ = @as(c_int, 160);
-pub const CONFIG_ESP32S3_INSTRUCTION_CACHE_16KB = @as(c_int, 1);
-pub const CONFIG_ESP32S3_INSTRUCTION_CACHE_SIZE = @as(c_int, 0x4000);
-pub const CONFIG_ESP32S3_INSTRUCTION_CACHE_8WAYS = @as(c_int, 1);
-pub const CONFIG_ESP32S3_ICACHE_ASSOCIATED_WAYS = @as(c_int, 8);
-pub const CONFIG_ESP32S3_INSTRUCTION_CACHE_LINE_32B = @as(c_int, 1);
-pub const CONFIG_ESP32S3_INSTRUCTION_CACHE_LINE_SIZE = @as(c_int, 32);
-pub const CONFIG_ESP32S3_DATA_CACHE_32KB = @as(c_int, 1);
-pub const CONFIG_ESP32S3_DATA_CACHE_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000, .hex);
-pub const CONFIG_ESP32S3_DATA_CACHE_8WAYS = @as(c_int, 1);
-pub const CONFIG_ESP32S3_DCACHE_ASSOCIATED_WAYS = @as(c_int, 8);
-pub const CONFIG_ESP32S3_DATA_CACHE_LINE_32B = @as(c_int, 1);
-pub const CONFIG_ESP32S3_DATA_CACHE_LINE_SIZE = @as(c_int, 32);
-pub const CONFIG_ESP32S3_TRACEMEM_RESERVE_DRAM = @as(c_int, 0x0);
 pub const CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT = @as(c_int, 1);
 pub const CONFIG_ESP_SYSTEM_PANIC_REBOOT_DELAY_SECONDS = @as(c_int, 0);
+pub const CONFIG_ESP_SYSTEM_SINGLE_CORE_MODE = @as(c_int, 1);
 pub const CONFIG_ESP_SYSTEM_RTC_FAST_MEM_AS_HEAP_DEPCHECK = @as(c_int, 1);
 pub const CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP = @as(c_int, 1);
-pub const CONFIG_ESP_SYSTEM_MEMPROT_FEATURE = @as(c_int, 1);
-pub const CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK = @as(c_int, 1);
+pub const CONFIG_ESP_SYSTEM_PMP_IDRAM_SPLIT = @as(c_int, 1);
 pub const CONFIG_ESP_SYSTEM_EVENT_QUEUE_SIZE = @as(c_int, 32);
 pub const CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE = @as(c_int, 2304);
 pub const CONFIG_ESP_MAIN_TASK_STACK_SIZE = @as(c_int, 3584);
@@ -4640,22 +4256,20 @@ pub const CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM = @as(c_int, 0);
 pub const CONFIG_ESP_CONSOLE_UART_BAUDRATE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 115200, .decimal);
 pub const CONFIG_ESP_INT_WDT = @as(c_int, 1);
 pub const CONFIG_ESP_INT_WDT_TIMEOUT_MS = @as(c_int, 300);
-pub const CONFIG_ESP_INT_WDT_CHECK_CPU1 = @as(c_int, 1);
 pub const CONFIG_ESP_TASK_WDT_EN = @as(c_int, 1);
 pub const CONFIG_ESP_TASK_WDT_INIT = @as(c_int, 1);
 pub const CONFIG_ESP_TASK_WDT_TIMEOUT_S = @as(c_int, 5);
 pub const CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0 = @as(c_int, 1);
-pub const CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1 = @as(c_int, 1);
 pub const CONFIG_ESP_DEBUG_OCDAWARE = @as(c_int, 1);
 pub const CONFIG_ESP_SYSTEM_CHECK_INT_LEVEL_4 = @as(c_int, 1);
 pub const CONFIG_ESP_BROWNOUT_DET = @as(c_int, 1);
 pub const CONFIG_ESP_BROWNOUT_DET_LVL_SEL_7 = @as(c_int, 1);
 pub const CONFIG_ESP_BROWNOUT_DET_LVL = @as(c_int, 7);
 pub const CONFIG_ESP_SYSTEM_BROWNOUT_INTR = @as(c_int, 1);
+pub const CONFIG_ESP_SYSTEM_HW_STACK_GUARD = @as(c_int, 1);
 pub const CONFIG_ESP_SYSTEM_BBPLL_RECALIB = @as(c_int, 1);
-pub const CONFIG_ESP_IPC_TASK_STACK_SIZE = @as(c_int, 1280);
-pub const CONFIG_ESP_IPC_USES_CALLERS_PRIORITY = @as(c_int, 1);
-pub const CONFIG_ESP_IPC_ISR_ENABLE = @as(c_int, 1);
+pub const CONFIG_ESP_SYSTEM_HW_PC_RECORD = @as(c_int, 1);
+pub const CONFIG_ESP_IPC_TASK_STACK_SIZE = @as(c_int, 1024);
 pub const CONFIG_ESP_TIME_FUNCS_USE_RTC_TIMER = @as(c_int, 1);
 pub const CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER = @as(c_int, 1);
 pub const CONFIG_ESP_TIMER_TASK_STACK_SIZE = @as(c_int, 3584);
@@ -4678,15 +4292,16 @@ pub const CONFIG_ESP_WIFI_TX_BA_WIN = @as(c_int, 6);
 pub const CONFIG_ESP_WIFI_AMPDU_RX_ENABLED = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_RX_BA_WIN = @as(c_int, 6);
 pub const CONFIG_ESP_WIFI_NVS_ENABLED = @as(c_int, 1);
-pub const CONFIG_ESP_WIFI_TASK_PINNED_TO_CORE_0 = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_SOFTAP_BEACON_MAX_LEN = @as(c_int, 752);
 pub const CONFIG_ESP_WIFI_MGMT_SBUF_NUM = @as(c_int, 32);
 pub const CONFIG_ESP_WIFI_IRAM_OPT = @as(c_int, 1);
+pub const CONFIG_ESP_WIFI_EXTRA_IRAM_OPT = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_RX_IRAM_OPT = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_ENABLE_WPA3_SAE = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_ENABLE_SAE_PK = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_ENABLE_WPA3_OWE_STA = @as(c_int, 1);
+pub const CONFIG_ESP_WIFI_SLP_IRAM_OPT = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_SLP_DEFAULT_MIN_ACTIVE_TIME = @as(c_int, 50);
 pub const CONFIG_ESP_WIFI_SLP_DEFAULT_MAX_ACTIVE_TIME = @as(c_int, 10);
 pub const CONFIG_ESP_WIFI_SLP_DEFAULT_WAIT_BROADCAST_DATA_TIME = @as(c_int, 15);
@@ -4696,6 +4311,7 @@ pub const CONFIG_ESP_WIFI_SOFTAP_SUPPORT = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM = @as(c_int, 7);
 pub const CONFIG_ESP_WIFI_MBEDTLS_CRYPTO = @as(c_int, 1);
 pub const CONFIG_ESP_WIFI_MBEDTLS_TLS_CLIENT = @as(c_int, 1);
+pub const CONFIG_ESP_WIFI_TX_HETB_QUEUE_NUM = @as(c_int, 3);
 pub const CONFIG_ESP_WIFI_ENTERPRISE_SUPPORT = @as(c_int, 1);
 pub const CONFIG_ESP_COREDUMP_ENABLE_TO_NONE = @as(c_int, 1);
 pub const CONFIG_FATFS_VOLUME_COUNT = @as(c_int, 2);
@@ -4709,7 +4325,9 @@ pub const CONFIG_FATFS_PER_FILE_CACHE = @as(c_int, 1);
 pub const CONFIG_FATFS_USE_STRFUNC_NONE = @as(c_int, 1);
 pub const CONFIG_FATFS_VFS_FSTAT_BLKSIZE = @as(c_int, 0);
 pub const CONFIG_FATFS_LINK_LOCK = @as(c_int, 1);
+pub const CONFIG_FREERTOS_UNICORE = @as(c_int, 1);
 pub const CONFIG_FREERTOS_HZ = @as(c_int, 100);
+pub const CONFIG_FREERTOS_OPTIMIZED_SCHEDULER = @as(c_int, 1);
 pub const CONFIG_FREERTOS_CHECK_STACKOVERFLOW_CANARY = @as(c_int, 1);
 pub const CONFIG_FREERTOS_THREAD_LOCAL_STORAGE_POINTERS = @as(c_int, 1);
 pub const CONFIG_FREERTOS_IDLE_TASK_STACKSIZE = @as(c_int, 1536);
@@ -4737,14 +4355,22 @@ pub const CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION = @as(c_int, 1);
 pub const CONFIG_FREERTOS_DEBUG_OCDAWARE = @as(c_int, 1);
 pub const CONFIG_FREERTOS_ENABLE_TASK_SNAPSHOT = @as(c_int, 1);
 pub const CONFIG_FREERTOS_PLACE_SNAPSHOT_FUNS_INTO_FLASH = @as(c_int, 1);
-pub const CONFIG_FREERTOS_NUMBER_OF_CORES = @as(c_int, 2);
+pub const CONFIG_FREERTOS_NUMBER_OF_CORES = @as(c_int, 1);
 pub const CONFIG_HAL_ASSERTION_EQUALS_SYSTEM = @as(c_int, 1);
 pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL = @as(c_int, 2);
+pub const CONFIG_HAL_SYSTIMER_USE_ROM_IMPL = @as(c_int, 1);
 pub const CONFIG_HAL_WDT_USE_ROM_IMPL = @as(c_int, 1);
 pub const CONFIG_HAL_SPI_MASTER_FUNC_IN_IRAM = @as(c_int, 1);
 pub const CONFIG_HAL_SPI_SLAVE_FUNC_IN_IRAM = @as(c_int, 1);
 pub const CONFIG_HEAP_POISONING_DISABLED = @as(c_int, 1);
 pub const CONFIG_HEAP_TRACING_OFF = @as(c_int, 1);
+pub const CONFIG_HEAP_TLSF_USE_ROM_IMPL = @as(c_int, 1);
+pub const CONFIG_IEEE802154_ENABLED = @as(c_int, 1);
+pub const CONFIG_IEEE802154_RX_BUFFER_SIZE = @as(c_int, 20);
+pub const CONFIG_IEEE802154_CCA_ED = @as(c_int, 1);
+pub const CONFIG_IEEE802154_CCA_MODE = @as(c_int, 1);
+pub const CONFIG_IEEE802154_CCA_THRESHOLD = -@as(c_int, 60);
+pub const CONFIG_IEEE802154_PENDING_TABLE_SIZE = @as(c_int, 20);
 pub const CONFIG_LOG_DEFAULT_LEVEL_INFO = @as(c_int, 1);
 pub const CONFIG_LOG_DEFAULT_LEVEL = @as(c_int, 3);
 pub const CONFIG_LOG_MAXIMUM_EQUALS_DEFAULT = @as(c_int, 1);
@@ -4848,9 +4474,12 @@ pub const CONFIG_MBEDTLS_AES_USE_INTERRUPT = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_AES_INTERRUPT_LEVEL = @as(c_int, 0);
 pub const CONFIG_MBEDTLS_GCM_SUPPORT_NON_AES_CIPHER = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_HARDWARE_MPI = @as(c_int, 1);
+pub const CONFIG_MBEDTLS_LARGE_KEY_SOFTWARE_MPI = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_MPI_USE_INTERRUPT = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_MPI_INTERRUPT_LEVEL = @as(c_int, 0);
 pub const CONFIG_MBEDTLS_HARDWARE_SHA = @as(c_int, 1);
+pub const CONFIG_MBEDTLS_HARDWARE_ECC = @as(c_int, 1);
+pub const CONFIG_MBEDTLS_ECC_OTHER_CURVES_SOFT_FALLBACK = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_ROM_MD5 = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_HAVE_TIME = @as(c_int, 1);
 pub const CONFIG_MBEDTLS_ECDSA_DETERMINISTIC = @as(c_int, 1);
@@ -4910,17 +4539,13 @@ pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_2 = @as(c_int, 1);
 pub const CONFIG_PTHREAD_TASK_PRIO_DEFAULT = @as(c_int, 5);
 pub const CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT = @as(c_int, 3072);
 pub const CONFIG_PTHREAD_STACK_MIN = @as(c_int, 768);
-pub const CONFIG_PTHREAD_DEFAULT_CORE_NO_AFFINITY = @as(c_int, 1);
 pub const CONFIG_PTHREAD_TASK_CORE_DEFAULT = -@as(c_int, 1);
 pub const CONFIG_PTHREAD_TASK_NAME_DEFAULT = "pthread";
-pub const CONFIG_MMU_PAGE_SIZE_64KB = @as(c_int, 1);
-pub const CONFIG_MMU_PAGE_MODE = "64KB";
-pub const CONFIG_MMU_PAGE_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex);
+pub const CONFIG_MMU_PAGE_SIZE_32KB = @as(c_int, 1);
+pub const CONFIG_MMU_PAGE_MODE = "32KB";
+pub const CONFIG_MMU_PAGE_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000, .hex);
 pub const CONFIG_SPI_FLASH_BROWNOUT_RESET_XMC = @as(c_int, 1);
 pub const CONFIG_SPI_FLASH_BROWNOUT_RESET = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_HPM_AUTO = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_HPM_ON = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_HPM_DC_AUTO = @as(c_int, 1);
 pub const CONFIG_SPI_FLASH_SUSPEND_TSUS_VAL_US = @as(c_int, 50);
 pub const CONFIG_SPI_FLASH_ROM_DRIVER_PATCH = @as(c_int, 1);
 pub const CONFIG_SPI_FLASH_DANGEROUS_WRITE_ABORTS = @as(c_int, 1);
@@ -4929,19 +4554,6 @@ pub const CONFIG_SPI_FLASH_ERASE_YIELD_DURATION_MS = @as(c_int, 20);
 pub const CONFIG_SPI_FLASH_ERASE_YIELD_TICKS = @as(c_int, 1);
 pub const CONFIG_SPI_FLASH_WRITE_CHUNK_SIZE = @as(c_int, 8192);
 pub const CONFIG_SPI_FLASH_VENDOR_XMC_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_VENDOR_GD_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_VENDOR_ISSI_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_VENDOR_MXIC_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_VENDOR_WINBOND_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_VENDOR_BOYA_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_VENDOR_TH_SUPPORTED = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_GD_CHIP = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_TH_CHIP = @as(c_int, 1);
-pub const CONFIG_SPI_FLASH_SUPPORT_MXIC_OPI_CHIP = @as(c_int, 1);
 pub const CONFIG_SPI_FLASH_ENABLE_ENCRYPTED_READ_WRITE = @as(c_int, 1);
 pub const CONFIG_SPIFFS_MAX_PARTITIONS = @as(c_int, 3);
 pub const CONFIG_SPIFFS_CACHE = @as(c_int, 1);
@@ -4959,13 +4571,6 @@ pub const CONFIG_WS_BUFFER_SIZE = @as(c_int, 1024);
 pub const CONFIG_UNITY_ENABLE_FLOAT = @as(c_int, 1);
 pub const CONFIG_UNITY_ENABLE_DOUBLE = @as(c_int, 1);
 pub const CONFIG_UNITY_ENABLE_IDF_TEST_RUNNER = @as(c_int, 1);
-pub const CONFIG_USB_HOST_CONTROL_TRANSFER_MAX_SIZE = @as(c_int, 256);
-pub const CONFIG_USB_HOST_HW_BUFFER_BIAS_BALANCED = @as(c_int, 1);
-pub const CONFIG_USB_HOST_DEBOUNCE_DELAY_MS = @as(c_int, 250);
-pub const CONFIG_USB_HOST_RESET_HOLD_MS = @as(c_int, 30);
-pub const CONFIG_USB_HOST_RESET_RECOVERY_MS = @as(c_int, 30);
-pub const CONFIG_USB_HOST_SET_ADDR_RECOVERY_MS = @as(c_int, 10);
-pub const CONFIG_USB_OTG_SUPPORTED = @as(c_int, 1);
 pub const CONFIG_VFS_SUPPORT_IO = @as(c_int, 1);
 pub const CONFIG_VFS_SUPPORT_DIR = @as(c_int, 1);
 pub const CONFIG_VFS_SUPPORT_SELECT = @as(c_int, 1);
@@ -4988,20 +4593,8 @@ pub const CONFIG_CONSOLE_UART = CONFIG_ESP_CONSOLE_UART;
 pub const CONFIG_CONSOLE_UART_BAUDRATE = CONFIG_ESP_CONSOLE_UART_BAUDRATE;
 pub const CONFIG_CONSOLE_UART_DEFAULT = CONFIG_ESP_CONSOLE_UART_DEFAULT;
 pub const CONFIG_CONSOLE_UART_NUM = CONFIG_ESP_CONSOLE_UART_NUM;
-pub const CONFIG_ESP32S3_BROWNOUT_DET = CONFIG_ESP_BROWNOUT_DET;
-pub const CONFIG_ESP32S3_BROWNOUT_DET_LVL = CONFIG_ESP_BROWNOUT_DET_LVL;
-pub const CONFIG_ESP32S3_BROWNOUT_DET_LVL_SEL_7 = CONFIG_ESP_BROWNOUT_DET_LVL_SEL_7;
-pub const CONFIG_ESP32S3_DEBUG_OCDAWARE = CONFIG_ESP_DEBUG_OCDAWARE;
-pub const CONFIG_ESP32S3_DEEP_SLEEP_WAKEUP_DELAY = CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY;
-pub const CONFIG_ESP32S3_DEFAULT_CPU_FREQ_160 = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160;
-pub const CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ;
-pub const CONFIG_ESP32S3_RTC_CLK_CAL_CYCLES = CONFIG_RTC_CLK_CAL_CYCLES;
-pub const CONFIG_ESP32S3_RTC_CLK_SRC_INT_RC = CONFIG_RTC_CLK_SRC_INT_RC;
-pub const CONFIG_ESP32S3_TIME_SYSCALL_USE_RTC_FRC1 = CONFIG_NEWLIB_TIME_SYSCALL_USE_RTC_HRT;
-pub const CONFIG_ESP32S3_TIME_SYSCALL_USE_RTC_SYSTIMER = CONFIG_NEWLIB_TIME_SYSCALL_USE_RTC_HRT;
 pub const CONFIG_ESP32_APPTRACE_DEST_NONE = CONFIG_APPTRACE_DEST_NONE;
 pub const CONFIG_ESP32_APPTRACE_LOCK_ENABLE = CONFIG_APPTRACE_LOCK_ENABLE;
-pub const CONFIG_ESP32_DEFAULT_PTHREAD_CORE_NO_AFFINITY = CONFIG_PTHREAD_DEFAULT_CORE_NO_AFFINITY;
 pub const CONFIG_ESP32_ENABLE_COREDUMP_TO_NONE = CONFIG_ESP_COREDUMP_ENABLE_TO_NONE;
 pub const CONFIG_ESP32_PHY_CALIBRATION_AND_DATA_STORAGE = CONFIG_ESP_PHY_CALIBRATION_AND_DATA_STORAGE;
 pub const CONFIG_ESP32_PHY_MAX_TX_POWER = CONFIG_ESP_PHY_MAX_TX_POWER;
@@ -5026,19 +4619,18 @@ pub const CONFIG_ESP32_WIFI_RX_BA_WIN = CONFIG_ESP_WIFI_RX_BA_WIN;
 pub const CONFIG_ESP32_WIFI_RX_IRAM_OPT = CONFIG_ESP_WIFI_RX_IRAM_OPT;
 pub const CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN = CONFIG_ESP_WIFI_SOFTAP_BEACON_MAX_LEN;
 pub const CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM = CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM;
-pub const CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_0 = CONFIG_ESP_WIFI_TASK_PINNED_TO_CORE_0;
+pub const CONFIG_ESP32_WIFI_SW_COEXIST_ENABLE = CONFIG_ESP_COEX_SW_COEXIST_ENABLE;
 pub const CONFIG_ESP32_WIFI_TX_BA_WIN = CONFIG_ESP_WIFI_TX_BA_WIN;
 pub const CONFIG_ESP32_WIFI_TX_BUFFER_TYPE = CONFIG_ESP_WIFI_TX_BUFFER_TYPE;
 pub const CONFIG_ESP_GRATUITOUS_ARP = CONFIG_LWIP_ESP_GRATUITOUS_ARP;
-pub const CONFIG_ESP_SLEEP_DEEP_SLEEP_WAKEUP_DELAY = CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY;
 pub const CONFIG_ESP_SYSTEM_PM_POWER_DOWN_CPU = CONFIG_PM_POWER_DOWN_CPU_IN_LIGHT_SLEEP;
 pub const CONFIG_ESP_TASK_WDT = CONFIG_ESP_TASK_WDT_INIT;
+pub const CONFIG_ESP_WIFI_SW_COEXIST_ENABLE = CONFIG_ESP_COEX_SW_COEXIST_ENABLE;
 pub const CONFIG_FLASHMODE_DIO = CONFIG_ESPTOOLPY_FLASHMODE_DIO;
 pub const CONFIG_GARP_TMR_INTERVAL = CONFIG_LWIP_GARP_TMR_INTERVAL;
 pub const CONFIG_GDBSTUB_MAX_TASKS = CONFIG_ESP_GDBSTUB_MAX_TASKS;
 pub const CONFIG_GDBSTUB_SUPPORT_TASKS = CONFIG_ESP_GDBSTUB_SUPPORT_TASKS;
 pub const CONFIG_INT_WDT = CONFIG_ESP_INT_WDT;
-pub const CONFIG_INT_WDT_CHECK_CPU1 = CONFIG_ESP_INT_WDT_CHECK_CPU1;
 pub const CONFIG_INT_WDT_TIMEOUT_MS = CONFIG_ESP_INT_WDT_TIMEOUT_MS;
 pub const CONFIG_IPC_TASK_STACK_SIZE = CONFIG_ESP_IPC_TASK_STACK_SIZE;
 pub const CONFIG_LOG_BOOTLOADER_LEVEL = CONFIG_BOOTLOADER_LOG_LEVEL;
@@ -5048,7 +4640,6 @@ pub const CONFIG_MONITOR_BAUD = CONFIG_ESPTOOLPY_MONITOR_BAUD;
 pub const CONFIG_OPTIMIZATION_ASSERTIONS_ENABLED = CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE;
 pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL = CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL;
 pub const CONFIG_OPTIMIZATION_LEVEL_DEBUG = CONFIG_COMPILER_OPTIMIZATION_DEBUG;
-pub const CONFIG_PM_POWER_DOWN_TAGMEM_IN_LIGHT_SLEEP = CONFIG_PM_RESTORE_CACHE_TAGMEM_AFTER_LIGHT_SLEEP;
 pub const CONFIG_POST_EVENTS_FROM_IRAM_ISR = CONFIG_ESP_EVENT_POST_FROM_IRAM_ISR;
 pub const CONFIG_POST_EVENTS_FROM_ISR = CONFIG_ESP_EVENT_POST_FROM_ISR;
 pub const CONFIG_SEMIHOSTFS_MAX_MOUNT_POINTS = CONFIG_VFS_SEMIHOSTFS_MAX_MOUNT_POINTS;
@@ -5056,11 +4647,11 @@ pub const CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_ABORTS = CONFIG_SPI_FLASH_D
 pub const CONFIG_STACK_CHECK_NONE = CONFIG_COMPILER_STACK_CHECK_MODE_NONE;
 pub const CONFIG_SUPPORT_TERMIOS = CONFIG_VFS_SUPPORT_TERMIOS;
 pub const CONFIG_SUPPRESS_SELECT_DEBUG_OUTPUT = CONFIG_VFS_SUPPRESS_SELECT_DEBUG_OUTPUT;
+pub const CONFIG_SW_COEXIST_ENABLE = CONFIG_ESP_COEX_SW_COEXIST_ENABLE;
 pub const CONFIG_SYSTEM_EVENT_QUEUE_SIZE = CONFIG_ESP_SYSTEM_EVENT_QUEUE_SIZE;
 pub const CONFIG_SYSTEM_EVENT_TASK_STACK_SIZE = CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE;
 pub const CONFIG_TASK_WDT = CONFIG_ESP_TASK_WDT_INIT;
 pub const CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU0 = CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0;
-pub const CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU1 = CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1;
 pub const CONFIG_TASK_WDT_TIMEOUT_S = CONFIG_ESP_TASK_WDT_TIMEOUT_S;
 pub const CONFIG_TCPIP_RECVMBOX_SIZE = CONFIG_LWIP_TCPIP_RECVMBOX_SIZE;
 pub const CONFIG_TCPIP_TASK_AFFINITY = CONFIG_LWIP_TCPIP_TASK_AFFINITY;
@@ -5087,20 +4678,20 @@ pub const DRAM_ATTR = _SECTION_ATTR_IMPL(".dram1", __COUNTER__);
 pub const TCM_IRAM_ATTR = _SECTION_ATTR_IMPL(".tcm.text", __COUNTER__);
 pub const TCM_DRAM_ATTR = _SECTION_ATTR_IMPL(".tcm.data", __COUNTER__);
 pub const IRAM_8BIT_ACCESSIBLE = @compileError("unable to translate macro: undefined identifier `CONFIG_IDF_TARGET_ESP32`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:35:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:35:9
 pub const COREDUMP_IRAM_DATA_ATTR = COREDUMP_DRAM_ATTR;
 pub const IRAM_DATA_ATTR = "";
 pub const IRAM_BSS_ATTR = "";
 pub const WORD_ALIGNED_ATTR = @compileError("unable to translate macro: undefined identifier `aligned`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:58:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:58:9
 pub const DMA_ATTR = WORD_ALIGNED_ATTR ++ DRAM_ATTR;
 pub const DRAM_DMA_ALIGNED_ATTR = WORD_ALIGNED_ATTR ++ DRAM_ATTR;
 pub const PACKED_ATTR = @compileError("unable to translate macro: undefined identifier `packed`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:71:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:71:9
 pub const FORCE_INLINE_ATTR = @compileError("unable to translate macro: undefined identifier `always_inline`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:74:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:74:9
 pub const DRAM_STR = @compileError("unable to translate macro: undefined identifier `__c`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:78:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:78:9
 pub const RTC_DATA_ATTR = _SECTION_ATTR_IMPL(".rtc.data", __COUNTER__);
 pub const RTC_NOINIT_ATTR = _SECTION_ATTR_IMPL(".rtc_noinit", __COUNTER__);
 pub const RTC_RODATA_ATTR = _SECTION_ATTR_IMPL(".rtc.rodata", __COUNTER__);
@@ -5111,21 +4702,21 @@ pub const RTC_FAST_ATTR = _SECTION_ATTR_IMPL(".rtc.force_fast", __COUNTER__);
 pub const COREDUMP_RTC_FAST_ATTR = _SECTION_ATTR_IMPL(".rtc.fast.coredump", __COUNTER__);
 pub const EXT_RAM_BSS_ATTR = "";
 pub const EXT_RAM_ATTR = @compileError("unable to translate macro: undefined identifier `_Pragma`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:133:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:133:9
 pub const __NOINIT_ATTR = _SECTION_ATTR_IMPL(".noinit", __COUNTER__);
 pub const EXT_RAM_NOINIT_ATTR = __NOINIT_ATTR;
 pub const COREDUMP_DRAM_ATTR = _SECTION_ATTR_IMPL(".dram2.coredump", __COUNTER__);
 pub const NOINLINE_ATTR = @compileError("unable to translate macro: undefined identifier `noinline`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:153:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:153:9
 pub const FLAG_ATTR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:177:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:177:9
 pub const _COUNTER_STRINGIFY = @compileError("unable to translate C expr: unexpected token '#'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:189:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:189:9
 pub const IDF_DEPRECATED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:202:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_attr.h:202:9
 pub const __ASSERT_FUNC = "??";
 pub const HAL_ASSERT = @compileError("unable to translate macro: undefined identifier `__FILE__`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/platform_port/include/hal/assert.h:39:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/platform_port/include/hal/assert.h:39:9
 pub const _ESP_NETIF_TYPES_H_ = "";
 pub const __STDBOOL_H = "";
 pub const __bool_true_false_are_defined = @as(c_int, 1);
@@ -5172,7 +4763,7 @@ pub const _POSIX_CLOCK_SELECTION = @as(c_long, 200112);
 pub const _UNIX98_THREAD_MUTEX_ATTRIBUTES = @as(c_int, 1);
 pub const _POSIX_READER_WRITER_LOCKS = @as(c_long, 200112);
 pub const __EXP = @compileError("unable to translate macro: undefined identifier `__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/machine/_default_types.h:15:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/machine/_default_types.h:15:9
 pub const __have_longlong64 = @as(c_int, 1);
 pub const __have_long64 = @as(c_int, 1);
 pub const ___int8_t_defined = @as(c_int, 1);
@@ -5185,7 +4776,7 @@ pub const ___int_least32_t_defined = @as(c_int, 1);
 pub const ___int_least64_t_defined = @as(c_int, 1);
 pub const _SYS__INTSUP_H = "";
 pub const __STDINT_EXP = @compileError("unable to translate macro: undefined identifier `__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/_intsup.h:16:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/_intsup.h:16:9
 pub const signed = @as(c_int, 0);
 pub const unsigned = @as(c_int, 0);
 pub const char = @as(c_int, 0);
@@ -5198,15 +4789,15 @@ pub const _INTPTR_EQ_LONG = "";
 pub const __INT8 = "hh";
 pub const __INT16 = "h";
 pub const __INT32 = "";
-pub const __INT64 = "l";
+pub const __INT64 = "ll";
 pub const __FAST8 = "hh";
 pub const __FAST16 = "h";
 pub const __FAST32 = "";
-pub const __FAST64 = "l";
+pub const __FAST64 = "ll";
 pub const __LEAST8 = "hh";
 pub const __LEAST16 = "h";
 pub const __LEAST32 = "";
-pub const __LEAST64 = "l";
+pub const __LEAST64 = "ll";
 pub const _SYS__STDINT_H = "";
 pub const _INT8_T_DECLARED = "";
 pub const _UINT8_T_DECLARED = "";
@@ -5309,9 +4900,9 @@ pub const UINT64_C = @import("std").zig.c_translation.Macros.UL_SUFFIX;
 pub const INTMAX_C = @import("std").zig.c_translation.Macros.L_SUFFIX;
 pub const UINTMAX_C = @import("std").zig.c_translation.Macros.UL_SUFFIX;
 pub const ESP_EVENT_DECLARE_BASE = @compileError("unable to translate C expr: unexpected token 'extern'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_event/include/esp_event_base.h:16:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_event/include/esp_event_base.h:16:9
 pub const ESP_EVENT_DEFINE_BASE = @compileError("unable to translate C expr: unexpected token 'const'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_event/include/esp_event_base.h:17:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_event/include/esp_event_base.h:17:9
 pub const ESP_EVENT_ANY_BASE = NULL;
 pub const ESP_EVENT_ANY_ID = -@as(c_int, 1);
 pub const _STDIO_H_ = "";
@@ -5324,7 +4915,6 @@ pub const _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL = @as(c_int, 1);
 pub const _HAVE_INITFINI_ARRAY = @as(c_int, 1);
 pub const _HAVE_LONG_DOUBLE = @as(c_int, 1);
 pub const _ICONV_ENABLED = @as(c_int, 1);
-pub const _LDBL_EQ_DBL = @as(c_int, 1);
 pub const _MB_LEN_MAX = @as(c_int, 1);
 pub const _NANO_MALLOC = @as(c_int, 1);
 pub const _REENT_CHECK_VERIFY = @as(c_int, 1);
@@ -5338,9 +4928,13 @@ pub const _WANT_REENT_SMALL = @as(c_int, 1);
 pub const _WANT_USE_GDTOA = @as(c_int, 1);
 pub const __SYS_CONFIG_H__ = "";
 pub const __IEEE_LITTLE_ENDIAN = "";
+pub const __OBSOLETE_MATH_DEFAULT = @as(c_int, 0);
 pub const _SUPPORTS_ERREXCEPT = "";
-pub const __OBSOLETE_MATH_DEFAULT = @as(c_int, 1);
+pub const __DOUBLE_TYPE = f64;
+pub const __FLOAT_TYPE = f32;
 pub const __OBSOLETE_MATH = __OBSOLETE_MATH_DEFAULT;
+pub const MALLOC_ALIGNMENT = @as(c_int, 16);
+pub const _READ_WRITE_RETURN_TYPE = _ssize_t;
 pub const __BUFSIZ__ = @as(c_int, 128);
 pub const __DYNAMIC_REENT__ = "";
 pub const _REENT_SMALL = "";
@@ -5348,7 +4942,6 @@ pub const _POINTER_INT = c_long;
 pub const __RAND_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x7fffffff, .hex);
 pub const __EXPORT = "";
 pub const __IMPORT = "";
-pub const _READ_WRITE_RETURN_TYPE = c_int;
 pub const _READ_WRITE_BUFSIZE_TYPE = c_int;
 pub const _USE_GDTOA = "";
 pub const _REENT_BACKWARD_BINARY_COMPAT = "";
@@ -5356,15 +4949,15 @@ pub const _BEGIN_STD_C = "";
 pub const _END_STD_C = "";
 pub const _NOTHROW = "";
 pub const _LONG_DOUBLE = @compileError("unable to translate: TODO long double");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h:37:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/_ansi.h:37:9
 pub const _ATTRIBUTE = @compileError("unable to translate C expr: unexpected token '__attribute__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h:43:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/_ansi.h:43:9
 pub const _ELIDABLE_INLINE = @compileError("unable to translate C expr: unexpected token 'static'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h:69:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/_ansi.h:69:9
 pub const _NOINLINE = @compileError("unable to translate macro: undefined identifier `__noinline__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h:73:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/_ansi.h:73:9
 pub const _NOINLINE_STATIC = @compileError("unable to translate C expr: unexpected token 'static'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h:74:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/_ansi.h:74:9
 pub const _FSTDIO = "";
 pub const __need_size_t = "";
 pub const __need_NULL = "";
@@ -5376,19 +4969,21 @@ pub inline fn __PMT(args: anytype) @TypeOf(args) {
     return args;
 }
 pub const __DOTS = @compileError("unable to translate C expr: unexpected token ','");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:50:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:50:9
 pub const __THROW = "";
-pub const __ASMNAME = @compileError("unable to translate C expr: unexpected token ')'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:54:10
+pub inline fn __ASMNAME(cname: anytype) @TypeOf(__XSTRING(__USER_LABEL_PREFIX__) ++ cname) {
+    _ = &cname;
+    return __XSTRING(__USER_LABEL_PREFIX__) ++ cname;
+}
 pub const __ptr_t = ?*anyopaque;
 pub const __long_double_t = @compileError("unable to translate: TODO long double");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:58:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:58:9
 pub const __attribute_malloc__ = "";
 pub const __attribute_pure__ = "";
 pub const __attribute_format_strfmon__ = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:62:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:62:9
 pub const __flexarr = @compileError("unable to translate C expr: unexpected token '['");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:63:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:63:9
 pub const __bounded = "";
 pub const __unbounded = "";
 pub const __ptrvalue = "";
@@ -5405,7 +5000,7 @@ pub const __GNUCLIKE_BUILTIN_STDARG = @as(c_int, 1);
 pub const __GNUCLIKE_BUILTIN_VAALIST = @as(c_int, 1);
 pub const __GNUC_VA_LIST_COMPATIBILITY = @as(c_int, 1);
 pub const __compiler_membar = @compileError("unable to translate C expr: unexpected token '__asm'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:130:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:130:9
 pub const __GNUCLIKE_BUILTIN_NEXT_ARG = @as(c_int, 1);
 pub const __GNUCLIKE_MATH_BUILTIN_RELOPS = "";
 pub const __GNUCLIKE_BUILTIN_MEMCPY = @as(c_int, 1);
@@ -5421,72 +5016,70 @@ pub inline fn __P(protos: anytype) @TypeOf(protos) {
     return protos;
 }
 pub const __CONCAT1 = @compileError("unable to translate C expr: unexpected token '##'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:165:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:165:9
 pub inline fn __CONCAT(x: anytype, y: anytype) @TypeOf(__CONCAT1(x, y)) {
     _ = &x;
     _ = &y;
     return __CONCAT1(x, y);
 }
 pub const __STRING = @compileError("unable to translate C expr: unexpected token '#'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:167:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:167:9
 pub inline fn __XSTRING(x: anytype) @TypeOf(__STRING(x)) {
     _ = &x;
     return __STRING(x);
 }
 pub const __const = @compileError("unable to translate C expr: unexpected token 'const'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:170:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:170:9
 pub const __signed = c_int;
 pub const __volatile = @compileError("unable to translate C expr: unexpected token 'volatile'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:172:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:172:9
 pub const __weak_symbol = @compileError("unable to translate macro: undefined identifier `__weak__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:217:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:217:9
 pub const __dead2 = @compileError("unable to translate macro: undefined identifier `__noreturn__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:230:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:230:9
 pub const __pure2 = @compileError("unable to translate C expr: unexpected token '__attribute__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:231:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:231:9
 pub const __unused = @compileError("unable to translate macro: undefined identifier `__unused__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:232:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:232:9
 pub const __used = @compileError("unable to translate macro: undefined identifier `__used__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:233:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:233:9
 pub const __packed = @compileError("unable to translate macro: undefined identifier `__packed__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:234:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:234:9
 pub const __aligned = @compileError("unable to translate macro: undefined identifier `__aligned__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:235:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:235:9
 pub const __section = @compileError("unable to translate macro: undefined identifier `__section__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:236:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:236:9
 pub const __alloc_size = @compileError("unable to translate macro: undefined identifier `__alloc_size__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:239:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:239:9
 pub const __alloc_size2 = @compileError("unable to translate macro: undefined identifier `__alloc_size__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:240:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:240:9
 pub const __alloc_align = @compileError("unable to translate macro: undefined identifier `__alloc_align__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:246:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:246:9
 pub const __generic = @compileError("unable to translate C expr: unexpected token '_Generic'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:335:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:335:9
 pub const __min_size = @compileError("unable to translate C expr: unexpected token 'static'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:353:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:353:9
 pub const __malloc_like = @compileError("unable to translate macro: undefined identifier `__malloc__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:359:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:359:9
 pub const __pure = @compileError("unable to translate macro: undefined identifier `__pure__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:360:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:360:9
 pub const __always_inline = @compileError("unable to translate macro: undefined identifier `__always_inline__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:367:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:367:9
 pub const __noinline = @compileError("unable to translate macro: undefined identifier `__noinline__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:373:9
-pub const __nonnull = @compileError("unable to translate macro: undefined identifier `__nonnull__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:379:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:373:9
 pub const __nonnull_all = @compileError("unable to translate macro: undefined identifier `__nonnull__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:380:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:380:9
 pub const __fastcall = @compileError("unable to translate macro: undefined identifier `__fastcall__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:387:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:387:9
 pub const __result_use_check = @compileError("unable to translate macro: undefined identifier `__warn_unused_result__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:388:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:388:9
 pub const __returns_twice = @compileError("unable to translate macro: undefined identifier `__returns_twice__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:395:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:395:9
 pub inline fn __unreachable() @TypeOf(__builtin_unreachable()) {
     return __builtin_unreachable();
 }
 pub const __restrict = @compileError("unable to translate C expr: unexpected token 'restrict'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:421:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:421:9
 pub inline fn __predict_true(exp: anytype) @TypeOf(__builtin_expect(exp, @as(c_int, 1))) {
     _ = &exp;
     return __builtin_expect(exp, @as(c_int, 1));
@@ -5496,11 +5089,11 @@ pub inline fn __predict_false(exp: anytype) @TypeOf(__builtin_expect(exp, @as(c_
     return __builtin_expect(exp, @as(c_int, 0));
 }
 pub const __null_sentinel = @compileError("unable to translate macro: undefined identifier `__sentinel__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:462:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:462:9
 pub const __exported = @compileError("unable to translate macro: undefined identifier `__visibility__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:463:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:463:9
 pub const __hidden = @compileError("unable to translate macro: undefined identifier `__visibility__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:466:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:466:9
 pub inline fn __offsetof(@"type": anytype, field: anytype) @TypeOf(offsetof(@"type", field)) {
     _ = &@"type";
     _ = &field;
@@ -5513,95 +5106,91 @@ pub inline fn __rangeof(@"type": anytype, start: anytype, end: anytype) @TypeOf(
     return __offsetof(@"type", end) - __offsetof(@"type", start);
 }
 pub const __containerof = @compileError("unable to translate macro: undefined identifier `__x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:487:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:487:9
 pub const __printflike = @compileError("unable to translate macro: undefined identifier `__format__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:509:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:509:9
 pub const __scanflike = @compileError("unable to translate macro: undefined identifier `__format__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:511:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:511:9
 pub const __format_arg = @compileError("unable to translate macro: undefined identifier `__format_arg__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:513:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:513:9
 pub const __strfmonlike = @compileError("unable to translate macro: undefined identifier `__format__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:514:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:514:9
 pub const __strftimelike = @compileError("unable to translate macro: undefined identifier `__format__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:516:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:516:9
 pub const __printf0like = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:526:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:526:9
 pub const __strong_reference = @compileError("unable to translate macro: undefined identifier `__alias__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:530:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:530:9
 pub const __weak_reference = @compileError("unable to translate C expr: unexpected token '__asm__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:534:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:560:9
 pub const __warn_references = @compileError("unable to translate C expr: unexpected token '__asm__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:537:9
-pub const __sym_compat = @compileError("unable to translate C expr: unexpected token '__asm__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:541:9
-pub const __sym_default = @compileError("unable to translate C expr: unexpected token '__asm__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:543:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:563:9
 pub const __FBSDID = @compileError("unable to translate macro: undefined identifier `__hack`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:578:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:578:9
 pub const __RCSID = @compileError("unable to translate macro: undefined identifier `__hack`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:582:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:582:9
 pub const __RCSID_SOURCE = @compileError("unable to translate macro: undefined identifier `__hack`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:586:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:586:9
 pub const __SCCSID = @compileError("unable to translate macro: undefined identifier `__hack`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:590:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:590:9
 pub const __COPYRIGHT = @compileError("unable to translate macro: undefined identifier `__hack`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:594:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:594:9
 pub const __DECONST = @compileError("unable to translate C expr: unexpected token 'const'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:598:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:598:9
 pub const __DEVOLATILE = @compileError("unable to translate C expr: unexpected token 'volatile'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:602:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:602:9
 pub const __DEQUALIFY = @compileError("unable to translate C expr: unexpected token 'const'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:606:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:606:9
 pub const __NULLABILITY_PRAGMA_PUSH = @compileError("unable to translate macro: undefined identifier `_Pragma`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:619:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:619:9
 pub const __NULLABILITY_PRAGMA_POP = @compileError("unable to translate macro: undefined identifier `_Pragma`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:621:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:621:9
 pub const __arg_type_tag = @compileError("unable to translate macro: undefined identifier `__argument_with_type_tag__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:633:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:633:9
 pub const __datatype_type_tag = @compileError("unable to translate macro: undefined identifier `__type_tag_for_datatype__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:635:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:635:9
 pub const __lock_annotate = @compileError("unable to translate C expr: unexpected token '__attribute__'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:655:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:655:9
 pub const __lockable = @compileError("unable to translate macro: undefined identifier `lockable`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:663:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:663:9
 pub const __locks_exclusive = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:666:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:666:9
 pub const __locks_shared = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:668:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:668:9
 pub const __trylocks_exclusive = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:672:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:672:9
 pub const __trylocks_shared = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:674:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:674:9
 pub const __unlocks = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:678:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:678:9
 pub const __asserts_exclusive = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:681:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:681:9
 pub const __asserts_shared = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:683:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:683:9
 pub const __requires_exclusive = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:687:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:687:9
 pub const __requires_shared = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:689:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:689:9
 pub const __requires_unlocked = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:691:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:691:9
 pub const __no_lock_analysis = @compileError("unable to translate macro: undefined identifier `no_thread_safety_analysis`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:695:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:695:9
 pub const __nosanitizeaddress = @compileError("unable to translate macro: undefined identifier `no_sanitize`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:707:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:707:9
 pub const __nosanitizememory = @compileError("unable to translate macro: undefined identifier `no_sanitize`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:708:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:708:9
 pub const __nosanitizethread = @compileError("unable to translate macro: undefined identifier `no_sanitize`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:710:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:710:9
 pub const __guarded_by = @compileError("unable to translate macro: undefined identifier `guarded_by`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:718:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:718:9
 pub const __pt_guarded_by = @compileError("unable to translate macro: undefined identifier `pt_guarded_by`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:719:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:719:9
 pub const __align_up = @compileError("unable to translate macro: undefined identifier `__builtin_align_up`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:736:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:736:9
 pub const __align_down = @compileError("unable to translate macro: undefined identifier `__builtin_align_down`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:737:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:737:9
 pub const __is_aligned = @compileError("unable to translate macro: undefined identifier `__builtin_is_aligned`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h:738:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/cdefs.h:738:9
 pub const __need_ptrdiff_t = "";
 pub const __need_wchar_t = "";
 pub const __need_max_align_t = "";
@@ -5611,7 +5200,7 @@ pub const _PTRDIFF_T = "";
 pub const _WCHAR_T = "";
 pub const __CLANG_MAX_ALIGN_T_DEFINED = "";
 pub const offsetof = @compileError("unable to translate C expr: unexpected token 'an identifier'");
-// /home/joseph/Documents/zig-esp-idf-sample-github/build/zig-relsafe-espressif-x86_64-linux-musl-baseline/lib/include/__stddef_offsetof.h:16:9
+// /Users/josephmontanez_1/Downloads/zig-macos-aarch64-0.14.0-dev.3036+7ac110ac2/lib/include/__stddef_offsetof.h:16:9
 pub const __need___va_list = "";
 pub const __GNUC_VA_LIST = "";
 pub const _VA_LIST_DEFINED = "";
@@ -5637,7 +5226,7 @@ pub const __Long = c_int;
 pub const __SYS_LOCK_H__ = "";
 pub const _LOCK_RECURSIVE_T = _LOCK_T;
 pub const __LOCK_INIT = @compileError("unable to translate macro: undefined identifier `__lock_`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/lock.h:37:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/lock.h:37:9
 pub inline fn __LOCK_INIT_RECURSIVE(class: anytype, lock: anytype) @TypeOf(__LOCK_INIT(class, lock)) {
     _ = &class;
     _ = &lock;
@@ -5685,9 +5274,9 @@ pub inline fn __lock_release_recursive(lock: anytype) @TypeOf(__retarget_lock_re
 }
 pub const _ATEXIT_SIZE = @as(c_int, 32);
 pub const _ATEXIT_INIT = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:96:10
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:96:10
 pub const _REENT_SMALL_CHECK_INIT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:145:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:145:9
 pub const _RAND48_SEED_0 = @as(c_int, 0x330e);
 pub const _RAND48_SEED_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xabcd, .hex);
 pub const _RAND48_SEED_2 = @as(c_int, 0x1234);
@@ -5699,24 +5288,24 @@ pub const _REENT_EMERGENCY_SIZE = @as(c_int, 25);
 pub const _REENT_ASCTIME_SIZE = @as(c_int, 26);
 pub const _REENT_SIGNAL_SIZE = @as(c_int, 24);
 pub const _REENT_INIT_RESERVED_0 = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:323:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:323:9
 pub const _REENT_INIT_RESERVED_1 = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:324:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:324:9
 pub const _REENT_INIT_RESERVED_2 = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:325:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:325:9
 pub const _REENT_INIT_RESERVED_6_7 = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:326:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:326:9
 pub const _REENT_INIT_RESERVED_8 = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:327:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:327:9
 pub const _REENT_INIT = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:424:10
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:424:10
 pub const _REENT_INIT_PTR_ZEROED = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:450:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:450:9
 pub const _STDLIB_H_ = "";
 pub const _MACHSTDLIB_H_ = "";
 pub const _NEWLIB_ALLOCA_H = "";
 pub const alloca = @compileError("unable to translate macro: undefined identifier `__builtin_alloca`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/alloca.h:16:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/alloca.h:16:9
 pub const __compar_fn_t_defined = "";
 pub const EXIT_FAILURE = @as(c_int, 1);
 pub const EXIT_SUCCESS = @as(c_int, 0);
@@ -5724,35 +5313,35 @@ pub const RAND_MAX = __RAND_MAX;
 pub const MB_CUR_MAX = __locale_mb_cur_max();
 pub const strtodf = strtof;
 pub const assert = @compileError("unable to translate macro: undefined identifier `__FILE__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/assert.h:16:10
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/assert.h:16:10
 pub const static_assert = @compileError("unable to translate C expr: unexpected token '_Static_assert'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/assert.h:45:10
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/assert.h:45:10
 pub const __FILENAME__ = @compileError("unable to translate macro: undefined identifier `__builtin_strrchr`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/newlib/platform_include/assert.h:29:9
 pub const __reent_assert = @compileError("unable to translate macro: undefined identifier `__FILE__`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:459:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:459:9
 pub const _REENT_CHECK = @compileError("unable to translate macro: undefined identifier `_r`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:469:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:469:9
 pub const _REENT_CHECK_TM = @compileError("unable to translate macro: undefined identifier `_localtime_buf`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:478:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:478:9
 pub const _REENT_CHECK_ASCTIME_BUF = @compileError("unable to translate macro: undefined identifier `_asctime_buf`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:482:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:482:9
 pub const _REENT_INIT_RAND48 = @compileError("unable to translate macro: undefined identifier `_r`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:487:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:487:9
 pub const _REENT_CHECK_RAND48 = @compileError("unable to translate macro: undefined identifier `_r48`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:498:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:498:9
 pub const _REENT_INIT_MP = @compileError("unable to translate macro: undefined identifier `_r`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:501:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:501:9
 pub const _REENT_CHECK_MP = @compileError("unable to translate macro: undefined identifier `_mp`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:507:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:507:9
 pub const _REENT_CHECK_EMERGENCY = @compileError("unable to translate macro: undefined identifier `_emergency`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:510:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:510:9
 pub const _REENT_INIT_MISC = @compileError("unable to translate macro: undefined identifier `_r`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:513:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:513:9
 pub const _REENT_CHECK_MISC = @compileError("unable to translate macro: undefined identifier `_misc`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:535:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:535:9
 pub const _REENT_CHECK_SIGNAL_BUF = @compileError("unable to translate macro: undefined identifier `_signal_buf`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:538:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:538:9
 pub inline fn _REENT_SIGNGAM(ptr: anytype) @TypeOf(ptr.*._gamma_signgam) {
     _ = &ptr;
     return ptr.*._gamma_signgam;
@@ -5890,7 +5479,7 @@ pub inline fn _REENT_STDERR(_ptr: anytype) @TypeOf(_ptr.*._stderr) {
     return _ptr.*._stderr;
 }
 pub const _REENT_INIT_PTR = @compileError("unable to translate macro: undefined identifier `memset`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:751:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:751:9
 pub const __ATTRIBUTE_IMPURE_PTR__ = "";
 pub const __ATTRIBUTE_IMPURE_DATA__ = "";
 pub const _REENT = __getreent();
@@ -5898,7 +5487,7 @@ pub inline fn _REENT_IS_NULL(_ptr: anytype) @TypeOf(_ptr == NULL) {
     _ = &_ptr;
     return _ptr == NULL;
 }
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h:786:9: warning: macro '_GLOBAL_REENT' contains a runtime value, translated to function
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys/reent.h:786:9: warning: macro '_GLOBAL_REENT' contains a runtime value, translated to function
 pub inline fn _GLOBAL_REENT() @TypeOf(&_impure_data) {
     return &_impure_data;
 }
@@ -5972,7 +5561,7 @@ pub inline fn fwopen(__cookie: anytype, __fn: anytype) @TypeOf(funopen(__cookie,
     return funopen(__cookie, NULL, __fn, NULL, NULL);
 }
 pub const __sgetc_raw_r = @compileError("TODO unary inc/dec expr");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/stdio.h:658:15
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/stdio.h:658:15
 pub inline fn __sgetc_r(__ptr: anytype, __p: anytype) @TypeOf(__sgetc_raw_r(__ptr, __p)) {
     _ = &__ptr;
     _ = &__p;
@@ -5987,13 +5576,13 @@ pub inline fn __sferror(p: anytype) c_int {
     return @import("std").zig.c_translation.cast(c_int, (p.*._flags & __SERR) != @as(c_int, 0));
 }
 pub const __sclearerr = @compileError("unable to translate C expr: expected ')' instead got '&='");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/stdio.h:725:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/stdio.h:725:9
 pub inline fn __sfileno(p: anytype) @TypeOf(p.*._file) {
     _ = &p;
     return p.*._file;
 }
 pub const fast_putc = @compileError("TODO unary inc/dec expr");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/stdio.h:778:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/stdio.h:778:9
 pub const L_ctermid = @as(c_int, 16);
 pub inline fn likely(x: anytype) @TypeOf(x) {
     _ = &x;
@@ -6004,21 +5593,21 @@ pub inline fn unlikely(x: anytype) @TypeOf(x) {
     return x;
 }
 pub const ESP_COMPILER_DESIGNATED_INIT_AGGREGATE_TYPE_STR = @compileError("unable to translate C expr: unexpected token '.'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:52:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:52:9
 pub const ESP_COMPILER_DESIGNATED_INIT_AGGREGATE_TYPE_EMPTY = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:53:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:53:9
 pub const __COMPILER_PRAGMA__ = @compileError("unable to translate macro: undefined identifier `_Pragma`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:56:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:56:9
 pub inline fn _COMPILER_PRAGMA_(string: anytype) @TypeOf(__COMPILER_PRAGMA__(string)) {
     _ = &string;
     return __COMPILER_PRAGMA__(string);
 }
 pub const ESP_COMPILER_DIAGNOSTIC_PUSH_IGNORE = @compileError("unable to translate C expr: expected ')' instead got 'warning'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:60:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:60:9
 pub const ESP_COMPILER_DIAGNOSTIC_POP = @compileError("unable to translate C expr: expected ')' instead got 'warning'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:64:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:64:9
 pub const ESP_STATIC_ANALYZER_CHECK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:81:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_compiler.h:81:9
 pub const ESP_OK = @as(c_int, 0);
 pub const ESP_FAIL = -@as(c_int, 1);
 pub const ESP_ERR_NO_MEM = @as(c_int, 0x101);
@@ -6040,9 +5629,9 @@ pub const ESP_ERR_FLASH_BASE = @as(c_int, 0x6000);
 pub const ESP_ERR_HW_CRYPTO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xc000, .hex);
 pub const ESP_ERR_MEMPROT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xd000, .hex);
 pub const ESP_ERROR_CHECK = @compileError("unable to translate macro: undefined identifier `err_rc_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_err.h:115:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_err.h:115:9
 pub const ESP_ERROR_CHECK_WITHOUT_ABORT = @compileError("unable to translate macro: undefined identifier `err_rc_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_err.h:135:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_err.h:135:9
 pub const _ESP_NETIF_IP_ADDR_H_ = "";
 pub const __MACHINE_ENDIAN_H__ = "";
 pub const _LITTLE_ENDIAN = @as(c_int, 1234);
@@ -6128,7 +5717,7 @@ pub inline fn ESP_IP6_ADDR_BLOCK8(ip6addr: anytype) u16 {
 }
 pub const IPSTR = "%d.%d.%d.%d";
 pub const esp_ip4_addr_get_byte = @compileError("unable to translate C expr: unexpected token 'const'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:43:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:43:9
 pub inline fn esp_ip4_addr1(ipaddr: anytype) @TypeOf(esp_ip4_addr_get_byte(ipaddr, @as(c_int, 0))) {
     _ = &ipaddr;
     return esp_ip4_addr_get_byte(ipaddr, @as(c_int, 0));
@@ -6202,12 +5791,12 @@ pub inline fn ESP_IP4TOADDR(a: anytype, b: anytype, c: anytype, d: anytype) @Typ
     return esp_netif_htonl(ESP_IP4TOUINT32(a, b, c, d));
 }
 pub const ESP_IP4ADDR_INIT = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:82:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:82:9
 pub const ESP_IP6ADDR_INIT = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:83:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:83:9
 pub const IP4ADDR_STRLEN_MAX = @as(c_int, 16);
 pub const ESP_IP_IS_ANY = @compileError("unable to translate macro: undefined identifier `ip4_addr_isany_val`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:90:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_ip_addr.h:90:9
 pub const ESP_ERR_ESP_NETIF_BASE = @as(c_int, 0x5000);
 pub const ESP_ERR_ESP_NETIF_INVALID_PARAMS = ESP_ERR_ESP_NETIF_BASE + @as(c_int, 0x01);
 pub const ESP_ERR_ESP_NETIF_IF_NOT_READY = ESP_ERR_ESP_NETIF_BASE + @as(c_int, 0x02);
@@ -6232,2362 +5821,29 @@ pub const STACK_OVERHEAD_OPTIMIZATION = @as(c_int, 0);
 pub const STACK_OVERHEAD_APPTRACE = @as(c_int, 0);
 pub const STACK_OVERHEAD_WATCHPOINT = @as(c_int, 0);
 pub const configSTACK_OVERHEAD_TOTAL = ((STACK_OVERHEAD_CHECKER + STACK_OVERHEAD_OPTIMIZATION) + STACK_OVERHEAD_APPTRACE) + STACK_OVERHEAD_WATCHPOINT;
-pub const XTENSA_CONFIG_H = "";
-pub const XTENSA_HAL_H = "";
-pub const XTHAL_RELEASE_MAJOR = @as(c_int, 12000);
-pub const XTHAL_RELEASE_MINOR = @as(c_int, 9);
-pub const XTHAL_RELEASE_NAME = "12.0.9";
-pub const XTHAL_REL_12 = @as(c_int, 1);
-pub const XTHAL_REL_12_0 = @as(c_int, 1);
-pub const XTHAL_REL_12_0_9 = @as(c_int, 1);
-pub const XTHAL_MAJOR_REV = XTHAL_RELEASE_MAJOR;
-pub const XTHAL_MINOR_REV = XTHAL_RELEASE_MINOR;
-pub inline fn XTHAL_REL_GE(maja: anytype, mina: anytype, majb: anytype, minb: anytype) @TypeOf((maja > majb) or ((maja == majb) and (mina >= minb))) {
-    _ = &maja;
-    _ = &mina;
-    _ = &majb;
-    _ = &minb;
-    return (maja > majb) or ((maja == majb) and (mina >= minb));
-}
-pub inline fn XTHAL_REL_GT(maja: anytype, mina: anytype, majb: anytype, minb: anytype) @TypeOf((maja > majb) or ((maja == majb) and (mina > minb))) {
-    _ = &maja;
-    _ = &mina;
-    _ = &majb;
-    _ = &minb;
-    return (maja > majb) or ((maja == majb) and (mina > minb));
-}
-pub inline fn XTHAL_REL_LE(maja: anytype, mina: anytype, majb: anytype, minb: anytype) @TypeOf((maja < majb) or ((maja == majb) and (mina <= minb))) {
-    _ = &maja;
-    _ = &mina;
-    _ = &majb;
-    _ = &minb;
-    return (maja < majb) or ((maja == majb) and (mina <= minb));
-}
-pub inline fn XTHAL_REL_LT(maja: anytype, mina: anytype, majb: anytype, minb: anytype) @TypeOf((maja < majb) or ((maja == majb) and (mina < minb))) {
-    _ = &maja;
-    _ = &mina;
-    _ = &majb;
-    _ = &minb;
-    return (maja < majb) or ((maja == majb) and (mina < minb));
-}
-pub inline fn XTHAL_REL_EQ(maja: anytype, mina: anytype, majb: anytype, minb: anytype) @TypeOf((maja == majb) and (mina == minb)) {
-    _ = &maja;
-    _ = &mina;
-    _ = &majb;
-    _ = &minb;
-    return (maja == majb) and (mina == minb);
-}
-pub const XTHAL_MAYBE = -@as(c_int, 1);
-pub inline fn XTHAL_FUZZY_AND(a: anytype, b: anytype) @TypeOf(if ((a == @as(c_int, 0)) or (b == @as(c_int, 0))) @as(c_int, 0) else if ((a == @as(c_int, 1)) and (b == @as(c_int, 1))) @as(c_int, 1) else XTHAL_MAYBE) {
-    _ = &a;
-    _ = &b;
-    return if ((a == @as(c_int, 0)) or (b == @as(c_int, 0))) @as(c_int, 0) else if ((a == @as(c_int, 1)) and (b == @as(c_int, 1))) @as(c_int, 1) else XTHAL_MAYBE;
-}
-pub inline fn XTHAL_FUZZY_OR(a: anytype, b: anytype) @TypeOf(if ((a == @as(c_int, 1)) or (b == @as(c_int, 1))) @as(c_int, 1) else if ((a == @as(c_int, 0)) and (b == @as(c_int, 0))) @as(c_int, 0) else XTHAL_MAYBE) {
-    _ = &a;
-    _ = &b;
-    return if ((a == @as(c_int, 1)) or (b == @as(c_int, 1))) @as(c_int, 1) else if ((a == @as(c_int, 0)) and (b == @as(c_int, 0))) @as(c_int, 0) else XTHAL_MAYBE;
-}
-pub inline fn XTHAL_FUZZY_NOT(a: anytype) @TypeOf(if ((a == @as(c_int, 0)) or (a == @as(c_int, 1))) @as(c_int, 1) - a else XTHAL_MAYBE) {
-    _ = &a;
-    return if ((a == @as(c_int, 0)) or (a == @as(c_int, 1))) @as(c_int, 1) - a else XTHAL_MAYBE;
-}
-pub const XTHAL_MAX_CPS = @as(c_int, 8);
-pub const XTHAL_LITTLEENDIAN = @as(c_int, 0);
-pub const XTHAL_BIGENDIAN = @as(c_int, 1);
-pub const XTHAL_PREFETCH_ENABLE = -@as(c_int, 1);
-pub const XTHAL_PREFETCH_DISABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFF0000, .hex);
-pub inline fn XTHAL_DCACHE_PREFETCH(n: anytype) @TypeOf(@import("std").zig.c_translation.promoteIntLiteral(c_int, 0x800F0000, .hex) + (n & @as(c_int, 0xF))) {
-    _ = &n;
-    return @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x800F0000, .hex) + (n & @as(c_int, 0xF));
-}
-pub const XTHAL_DCACHE_PREFETCH_OFF = XTHAL_DCACHE_PREFETCH(@as(c_int, 0));
-pub const XTHAL_DCACHE_PREFETCH_LOW = XTHAL_DCACHE_PREFETCH(@as(c_int, 4));
-pub const XTHAL_DCACHE_PREFETCH_MEDIUM = XTHAL_DCACHE_PREFETCH(@as(c_int, 5));
-pub const XTHAL_DCACHE_PREFETCH_HIGH = XTHAL_DCACHE_PREFETCH(@as(c_int, 8));
-pub const XTHAL_DCACHE_PREFETCH_L1_OFF = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x90000000, .hex);
-pub const XTHAL_DCACHE_PREFETCH_L1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x90001000, .hex);
-pub inline fn XTHAL_ICACHE_PREFETCH(n: anytype) @TypeOf(@import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80F00000, .hex) + ((n & @as(c_int, 0xF)) << @as(c_int, 4))) {
-    _ = &n;
-    return @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80F00000, .hex) + ((n & @as(c_int, 0xF)) << @as(c_int, 4));
-}
-pub const XTHAL_ICACHE_PREFETCH_OFF = XTHAL_ICACHE_PREFETCH(@as(c_int, 0));
-pub const XTHAL_ICACHE_PREFETCH_LOW = XTHAL_ICACHE_PREFETCH(@as(c_int, 4));
-pub const XTHAL_ICACHE_PREFETCH_MEDIUM = XTHAL_ICACHE_PREFETCH(@as(c_int, 5));
-pub const XTHAL_ICACHE_PREFETCH_HIGH = XTHAL_ICACHE_PREFETCH(@as(c_int, 8));
-pub const XTHAL_ICACHE_PREFETCH_L1_OFF = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XTHAL_ICACHE_PREFETCH_L1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0002000, .hex);
-pub inline fn _XTHAL_PREFETCH_BLOCKS(n: anytype) @TypeOf(if (n < @as(c_int, 0)) @as(c_int, 0) else if (n < @as(c_int, 5)) n else if (n < @as(c_int, 15)) (n >> @as(c_int, 1)) + @as(c_int, 2) else @as(c_int, 9)) {
-    _ = &n;
-    return if (n < @as(c_int, 0)) @as(c_int, 0) else if (n < @as(c_int, 5)) n else if (n < @as(c_int, 15)) (n >> @as(c_int, 1)) + @as(c_int, 2) else @as(c_int, 9);
-}
-pub inline fn XTHAL_PREFETCH_BLOCKS(n: anytype) @TypeOf(@as(c_ulonglong, 0x0000000F80000000) + (@import("std").zig.c_translation.cast(c_ulonglong, _XTHAL_PREFETCH_BLOCKS(n)) << @as(c_int, 48))) {
-    _ = &n;
-    return @as(c_ulonglong, 0x0000000F80000000) + (@import("std").zig.c_translation.cast(c_ulonglong, _XTHAL_PREFETCH_BLOCKS(n)) << @as(c_int, 48));
-}
-pub const xthal_set_cache_prefetch_nw = @compileError("unable to translate macro: undefined identifier `xthal_set_cache_prefetch_long_nw`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/hal.h:339:9
-pub const XTHAL_DISASM_BUFSIZE = @as(c_int, 80);
-pub const XTHAL_DISASM_OPT_ADDR = @as(c_int, 0x0001);
-pub const XTHAL_DISASM_OPT_OPHEX = @as(c_int, 0x0002);
-pub const XTHAL_DISASM_OPT_OPCODE = @as(c_int, 0x0004);
-pub const XTHAL_DISASM_OPT_PARMS = @as(c_int, 0x0008);
-pub const XTHAL_DISASM_OPT_ALL = @as(c_int, 0x0FFF);
-pub const XTHAL_MAX_INTERRUPTS = @as(c_int, 32);
-pub const XTHAL_MAX_INTLEVELS = @as(c_int, 16);
-pub const XTHAL_MAX_TIMERS = @as(c_int, 4);
-pub const XTHAL_INTTYPE_UNCONFIGURED = @as(c_int, 0);
-pub const XTHAL_INTTYPE_SOFTWARE = @as(c_int, 1);
-pub const XTHAL_INTTYPE_EXTERN_EDGE = @as(c_int, 2);
-pub const XTHAL_INTTYPE_EXTERN_LEVEL = @as(c_int, 3);
-pub const XTHAL_INTTYPE_TIMER = @as(c_int, 4);
-pub const XTHAL_INTTYPE_NMI = @as(c_int, 5);
-pub const XTHAL_INTTYPE_WRITE_ERROR = @as(c_int, 6);
-pub const XTHAL_INTTYPE_PROFILING = @as(c_int, 7);
-pub const XTHAL_INTTYPE_IDMA_DONE = @as(c_int, 8);
-pub const XTHAL_INTTYPE_IDMA_ERR = @as(c_int, 9);
-pub const XTHAL_INTTYPE_GS_ERR = @as(c_int, 10);
-pub const XTHAL_INTTYPE_SG_ERR = @as(c_int, 10);
-pub const XTHAL_MAX_INTTYPES = @as(c_int, 11);
-pub const XTHAL_TIMER_UNCONFIGURED = -@as(c_int, 1);
-pub const XTHAL_TIMER_UNASSIGNED = XTHAL_TIMER_UNCONFIGURED;
-pub const XTHAL_MEMEP_PARITY = @as(c_int, 1);
-pub const XTHAL_MEMEP_ECC = @as(c_int, 2);
-pub const XTHAL_MEMEP_F_LOCAL = @as(c_int, 0);
-pub const XTHAL_MEMEP_F_DCACHE_DATA = @as(c_int, 4);
-pub const XTHAL_MEMEP_F_DCACHE_TAG = @as(c_int, 5);
-pub const XTHAL_MEMEP_F_ICACHE_DATA = @as(c_int, 6);
-pub const XTHAL_MEMEP_F_ICACHE_TAG = @as(c_int, 7);
-pub const XTHAL_MEMEP_F_CORRECTABLE = @as(c_int, 16);
-pub const XTHAL_AMB_EXCEPTION = @as(c_int, 0);
-pub const XTHAL_AMB_HITCACHE = @as(c_int, 1);
-pub const XTHAL_AMB_ALLOCATE = @as(c_int, 2);
-pub const XTHAL_AMB_WRITETHRU = @as(c_int, 3);
-pub const XTHAL_AMB_ISOLATE = @as(c_int, 4);
-pub const XTHAL_AMB_GUARD = @as(c_int, 5);
-pub const XTHAL_AMB_COHERENT = @as(c_int, 6);
-pub const XTHAL_AM_EXCEPTION = @as(c_int, 1) << XTHAL_AMB_EXCEPTION;
-pub const XTHAL_AM_HITCACHE = @as(c_int, 1) << XTHAL_AMB_HITCACHE;
-pub const XTHAL_AM_ALLOCATE = @as(c_int, 1) << XTHAL_AMB_ALLOCATE;
-pub const XTHAL_AM_WRITETHRU = @as(c_int, 1) << XTHAL_AMB_WRITETHRU;
-pub const XTHAL_AM_ISOLATE = @as(c_int, 1) << XTHAL_AMB_ISOLATE;
-pub const XTHAL_AM_GUARD = @as(c_int, 1) << XTHAL_AMB_GUARD;
-pub const XTHAL_AM_COHERENT = @as(c_int, 1) << XTHAL_AMB_COHERENT;
-pub const XTHAL_FAM_EXCEPTION = @as(c_int, 0x001);
-pub const XTHAL_FAM_BYPASS = @as(c_int, 0x000);
-pub const XTHAL_FAM_CACHED = @as(c_int, 0x006);
-pub const XTHAL_LAM_EXCEPTION = @as(c_int, 0x001);
-pub const XTHAL_LAM_ISOLATE = @as(c_int, 0x012);
-pub const XTHAL_LAM_BYPASS = @as(c_int, 0x000);
-pub const XTHAL_LAM_BYPASSG = @as(c_int, 0x020);
-pub const XTHAL_LAM_CACHED_NOALLOC = @as(c_int, 0x002);
-pub const XTHAL_LAM_NACACHED = XTHAL_LAM_CACHED_NOALLOC;
-pub const XTHAL_LAM_NACACHEDG = @as(c_int, 0x022);
-pub const XTHAL_LAM_CACHED = @as(c_int, 0x006);
-pub const XTHAL_LAM_COHCACHED = @as(c_int, 0x046);
-pub const XTHAL_SAM_EXCEPTION = @as(c_int, 0x001);
-pub const XTHAL_SAM_ISOLATE = @as(c_int, 0x032);
-pub const XTHAL_SAM_BYPASS = @as(c_int, 0x028);
-pub const XTHAL_SAM_WRITETHRU = @as(c_int, 0x02A);
-pub const XTHAL_SAM_WRITEBACK = @as(c_int, 0x026);
-pub const XTHAL_SAM_WRITEBACK_NOALLOC = @as(c_int, 0x022);
-pub const XTHAL_SAM_COHWRITEBACK = @as(c_int, 0x066);
-pub const XTHAL_PAM_BYPASS = @as(c_int, 0x000);
-pub const XTHAL_PAM_BYPASS_BUF = @as(c_int, 0x010);
-pub const XTHAL_PAM_CACHED_NOALLOC = @as(c_int, 0x030);
-pub const XTHAL_PAM_WRITETHRU = @as(c_int, 0x0B0);
-pub const XTHAL_PAM_WRITEBACK_NOALLOC = @as(c_int, 0x0F0);
-pub const XTHAL_PAM_WRITEBACK = @as(c_int, 0x1F0);
-pub const xthal_get_intread = xthal_get_interrupt;
-pub const XTHAL_CAFLAG_EXPAND = @as(c_int, 0x000100);
-pub const XTHAL_CAFLAG_EXACT = @as(c_int, 0x000200);
-pub const XTHAL_CAFLAG_NO_PARTIAL = @as(c_int, 0x000400);
-pub const XTHAL_CAFLAG_NO_AUTO_WB = @as(c_int, 0x000800);
-pub const XTHAL_CAFLAG_NO_AUTO_INV = @as(c_int, 0x001000);
-pub const XTHAL_SUCCESS = @as(c_int, 0);
-pub const XTHAL_NO_REGIONS_COVERED = -@as(c_int, 1);
-pub const XTHAL_INEXACT = -@as(c_int, 2);
-pub const XTHAL_INVALID_ADDRESS = -@as(c_int, 3);
-pub const XTHAL_UNSUPPORTED = -@as(c_int, 4);
-pub const XTHAL_ADDRESS_MISALIGNED = -@as(c_int, 5);
-pub const XTHAL_NO_MAPPING = -@as(c_int, 6);
-pub const XTHAL_BAD_ACCESS_RIGHTS = -@as(c_int, 7);
-pub const XTHAL_BAD_MEMORY_TYPE = -@as(c_int, 8);
-pub const XTHAL_MAP_NOT_ALIGNED = -@as(c_int, 9);
-pub const XTHAL_OUT_OF_ENTRIES = -@as(c_int, 10);
-pub const XTHAL_OUT_OF_ORDER_MAP = -@as(c_int, 11);
-pub const XTHAL_INVALID = -@as(c_int, 12);
-pub const XTHAL_ZERO_SIZED_REGION = -@as(c_int, 13);
-pub const XTHAL_INVALID_ADDRESS_RANGE = -@as(c_int, 14);
-pub const XCHAL_SUCCESS = XTHAL_SUCCESS;
-pub const XCHAL_ADDRESS_MISALIGNED = XTHAL_ADDRESS_MISALIGNED;
-pub const XCHAL_INEXACT = XTHAL_INEXACT;
-pub const XCHAL_INVALID_ADDRESS = XTHAL_INVALID_ADDRESS;
-pub const XCHAL_UNSUPPORTED_ON_THIS_ARCH = XTHAL_UNSUPPORTED;
-pub const XCHAL_NO_PAGES_MAPPED = XTHAL_NO_REGIONS_COVERED;
-pub const XTHAL_AR_NONE = @as(c_int, 0);
-pub const XTHAL_AR_R = @as(c_int, 4);
-pub const XTHAL_AR_RX = @as(c_int, 5);
-pub const XTHAL_AR_RW = @as(c_int, 6);
-pub const XTHAL_AR_RWX = @as(c_int, 7);
-pub const XTHAL_AR_Ww = @as(c_int, 8);
-pub const XTHAL_AR_RWrwx = @as(c_int, 9);
-pub const XTHAL_AR_RWr = @as(c_int, 10);
-pub const XTHAL_AR_RWXrx = @as(c_int, 11);
-pub const XTHAL_AR_Rr = @as(c_int, 12);
-pub const XTHAL_AR_RXrx = @as(c_int, 13);
-pub const XTHAL_AR_RWrw = @as(c_int, 14);
-pub const XTHAL_AR_RWXrwx = @as(c_int, 15);
-pub const XTHAL_AR_WIDTH = @as(c_int, 4);
-pub const XTHAL_MPU_USE_EXISTING_ACCESS_RIGHTS = @as(c_int, 0x00002000);
-pub const XTHAL_MPU_USE_EXISTING_MEMORY_TYPE = @as(c_int, 0x00004000);
-pub const XTHAL_MEM_DEVICE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00008000, .hex);
-pub const XTHAL_MEM_NON_CACHEABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00090000, .hex);
-pub const XTHAL_MEM_WRITETHRU_NOALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00080000, .hex);
-pub const XTHAL_MEM_WRITETHRU = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00040000, .hex);
-pub const XTHAL_MEM_WRITETHRU_WRITEALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00060000, .hex);
-pub const XTHAL_MEM_WRITEBACK_NOALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00050000, .hex);
-pub const XTHAL_MEM_WRITEBACK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00070000, .hex);
-pub const XTHAL_MEM_INTERRUPTIBLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x08000000, .hex);
-pub const XTHAL_MEM_BUFFERABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x01000000, .hex);
-pub const XTHAL_MEM_NON_SHAREABLE = @as(c_int, 0x00000000);
-pub const XTHAL_MEM_INNER_SHAREABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x02000000, .hex);
-pub const XTHAL_MEM_OUTER_SHAREABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x04000000, .hex);
-pub const XTHAL_MEM_SYSTEM_SHAREABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x06000000, .hex);
-pub inline fn XTHAL_MEM_PROC_CACHE(system_1: anytype, processor: anytype) @TypeOf(((system_1 & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000f0000, .hex)) | ((processor & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000f0000, .hex)) << @as(c_int, 4))) | ((system_1 & XTHAL_MEM_DEVICE) | (processor & XTHAL_MEM_DEVICE))) {
-    _ = &system_1;
-    _ = &processor;
-    return ((system_1 & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000f0000, .hex)) | ((processor & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000f0000, .hex)) << @as(c_int, 4))) | ((system_1 & XTHAL_MEM_DEVICE) | (processor & XTHAL_MEM_DEVICE));
-}
-pub inline fn XTHAL_ENCODE_MEMORY_TYPE(x: anytype) @TypeOf(if (x & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xffffe000, .hex)) if (_XTHAL_MEM_IS_DEVICE(x)) _XTHAL_ENCODE_DEVICE(x) else if (_XTHAL_IS_SYSTEM_NONCACHEABLE(x)) _XTHAL_ENCODE_SYSTEM_NONCACHEABLE(x) else _XTHAL_ENCODE_SYSTEM_CACHEABLE(x) else x) {
-    _ = &x;
-    return if (x & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xffffe000, .hex)) if (_XTHAL_MEM_IS_DEVICE(x)) _XTHAL_ENCODE_DEVICE(x) else if (_XTHAL_IS_SYSTEM_NONCACHEABLE(x)) _XTHAL_ENCODE_SYSTEM_NONCACHEABLE(x) else _XTHAL_ENCODE_SYSTEM_CACHEABLE(x) else x;
-}
-pub const XTHAL_MPU_ENTRY = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/hal.h:1172:9
-pub inline fn XTHAL_MPU_ENTRY_GET_VSTARTADDR(x: anytype) @TypeOf(x.as & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xffffffe0, .hex)) {
-    _ = &x;
-    return x.as & @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xffffffe0, .hex);
-}
-pub const XTHAL_MPU_ENTRY_SET_VSTARTADDR = @compileError("unable to translate C expr: unexpected token '='");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/hal.h:1181:9
-pub inline fn XTHAL_MPU_ENTRY_GET_VALID(x: anytype) @TypeOf(x.as & @as(c_int, 0x1)) {
-    _ = &x;
-    return x.as & @as(c_int, 0x1);
-}
-pub const XTHAL_MPU_ENTRY_SET_VALID = @compileError("unable to translate C expr: unexpected token '='");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/hal.h:1186:9
-pub inline fn XTHAL_MPU_ENTRY_GET_ACCESS(x: anytype) @TypeOf((x.at >> @as(c_int, 8)) & @as(c_int, 0xf)) {
-    _ = &x;
-    return (x.at >> @as(c_int, 8)) & @as(c_int, 0xf);
-}
-pub const XTHAL_MPU_ENTRY_SET_ACCESS = @compileError("unable to translate C expr: expected ')' instead got '='");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/hal.h:1190:9
-pub inline fn XTHAL_MPU_ENTRY_GET_MEMORY_TYPE(x: anytype) @TypeOf((x.at >> @as(c_int, 12)) & @as(c_int, 0x1ff)) {
-    _ = &x;
-    return (x.at >> @as(c_int, 12)) & @as(c_int, 0x1ff);
-}
-pub const XTHAL_MPU_ENTRY_SET_MEMORY_TYPE = @compileError("unable to translate C expr: expected ')' instead got '='");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/hal.h:1195:9
-pub const _XTHAL_SYSTEM_CACHE_BITS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000f0000, .hex);
-pub const _XTHAL_LOCAL_CACHE_BITS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00f00000, .hex);
-pub const _XTHAL_MEM_SYSTEM_RWC_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00070000, .hex);
-pub const _XTHAL_MEM_LOCAL_RWC_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00700000, .hex);
-pub const _XTHAL_SHIFT_RWC = @as(c_int, 16);
-pub inline fn _XTHAL_MEM_ANY_SHAREABLE(x: anytype) @TypeOf(if (x & XTHAL_MEM_SYSTEM_SHAREABLE) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &x;
-    return if (x & XTHAL_MEM_SYSTEM_SHAREABLE) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn _XTHAL_MEM_INNER_SHAREABLE(x: anytype) @TypeOf(if ((x & XTHAL_MEM_SYSTEM_SHAREABLE) == XTHAL_MEM_INNER_SHAREABLE) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &x;
-    return if ((x & XTHAL_MEM_SYSTEM_SHAREABLE) == XTHAL_MEM_INNER_SHAREABLE) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn _XTHAL_MEM_IS_BUFFERABLE(x: anytype) @TypeOf(if (x & XTHAL_MEM_BUFFERABLE) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &x;
-    return if (x & XTHAL_MEM_BUFFERABLE) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn _XTHAL_MEM_IS_DEVICE(x: anytype) @TypeOf(if (x & XTHAL_MEM_DEVICE) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &x;
-    return if (x & XTHAL_MEM_DEVICE) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn _XTHAL_NON_CACHEABLE_DOMAIN(x: anytype) @TypeOf(if ((_XTHAL_MEM_IS_DEVICE(x) != 0) or (_XTHAL_MEM_ANY_SHAREABLE(x) != 0)) @as(c_int, 0x3) else @as(c_int, 0)) {
-    _ = &x;
-    return if ((_XTHAL_MEM_IS_DEVICE(x) != 0) or (_XTHAL_MEM_ANY_SHAREABLE(x) != 0)) @as(c_int, 0x3) else @as(c_int, 0);
-}
-pub inline fn _XTHAL_CACHEABLE_DOMAIN(x: anytype) @TypeOf(if (_XTHAL_MEM_ANY_SHAREABLE(x)) @as(c_int, 0x3) else @as(c_int, 0x1)) {
-    _ = &x;
-    return if (_XTHAL_MEM_ANY_SHAREABLE(x)) @as(c_int, 0x3) else @as(c_int, 0x1);
-}
-pub inline fn _XTHAL_MEM_CACHE_MASK(x: anytype) @TypeOf(x & _XTHAL_SYSTEM_CACHE_BITS) {
-    _ = &x;
-    return x & _XTHAL_SYSTEM_CACHE_BITS;
-}
-pub inline fn _XTHAL_IS_SYSTEM_NONCACHEABLE(x: anytype) @TypeOf(if ((_XTHAL_MEM_CACHE_MASK(x) & XTHAL_MEM_NON_CACHEABLE) == XTHAL_MEM_NON_CACHEABLE) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &x;
-    return if ((_XTHAL_MEM_CACHE_MASK(x) & XTHAL_MEM_NON_CACHEABLE) == XTHAL_MEM_NON_CACHEABLE) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn _XTHAL_ENCODE_DEVICE(x: anytype) @TypeOf((((if (x & XTHAL_MEM_INTERRUPTIBLE) @as(c_int, 1) else @as(c_int, 0)) << @as(c_int, 3)) | (_XTHAL_NON_CACHEABLE_DOMAIN(x) << @as(c_int, 1))) | _XTHAL_MEM_IS_BUFFERABLE(x)) {
-    _ = &x;
-    return (((if (x & XTHAL_MEM_INTERRUPTIBLE) @as(c_int, 1) else @as(c_int, 0)) << @as(c_int, 3)) | (_XTHAL_NON_CACHEABLE_DOMAIN(x) << @as(c_int, 1))) | _XTHAL_MEM_IS_BUFFERABLE(x);
-}
-pub inline fn _XTHAL_ENCODE_SYSTEM_NONCACHEABLE(x: anytype) @TypeOf((@as(c_int, 0x18) | (_XTHAL_NON_CACHEABLE_DOMAIN(x) << @as(c_int, 1))) | _XTHAL_MEM_IS_BUFFERABLE(x)) {
-    _ = &x;
-    return (@as(c_int, 0x18) | (_XTHAL_NON_CACHEABLE_DOMAIN(x) << @as(c_int, 1))) | _XTHAL_MEM_IS_BUFFERABLE(x);
-}
-pub inline fn _XTHAL_ENCODE_SYSTEM_CACHEABLE(x: anytype) @TypeOf((if (if ((((x & _XTHAL_LOCAL_CACHE_BITS) >> @as(c_int, 4)) & XTHAL_MEM_NON_CACHEABLE) == XTHAL_MEM_NON_CACHEABLE) @as(c_int, 1) else @as(c_int, 0)) _XTHAL_CACHEABLE_DOMAIN(x) << @as(c_int, 4) else _XTHAL_ENCODE_SYSTEM_CACHEABLE_LOCAL_CACHEABLE(x)) | ((_XTHAL_MEM_INNER_SHAREABLE(x) << @as(c_int, 3)) | ((_XTHAL_MEM_CACHE_MASK(x) & _XTHAL_MEM_SYSTEM_RWC_MASK) >> _XTHAL_SHIFT_RWC))) {
-    _ = &x;
-    return (if (if ((((x & _XTHAL_LOCAL_CACHE_BITS) >> @as(c_int, 4)) & XTHAL_MEM_NON_CACHEABLE) == XTHAL_MEM_NON_CACHEABLE) @as(c_int, 1) else @as(c_int, 0)) _XTHAL_CACHEABLE_DOMAIN(x) << @as(c_int, 4) else _XTHAL_ENCODE_SYSTEM_CACHEABLE_LOCAL_CACHEABLE(x)) | ((_XTHAL_MEM_INNER_SHAREABLE(x) << @as(c_int, 3)) | ((_XTHAL_MEM_CACHE_MASK(x) & _XTHAL_MEM_SYSTEM_RWC_MASK) >> _XTHAL_SHIFT_RWC));
-}
-pub inline fn _XTHAL_ENCODE_SYSTEM_CACHEABLE_LOCAL_CACHEABLE(x: anytype) @TypeOf((_XTHAL_CACHEABLE_DOMAIN(x) << @as(c_int, 7)) | (((if (x & _XTHAL_LOCAL_CACHE_BITS) x & _XTHAL_LOCAL_CACHE_BITS else _XTHAL_MEM_CACHE_MASK(x) << @as(c_int, 4)) & _XTHAL_MEM_LOCAL_RWC_MASK) >> _XTHAL_SHIFT_RWC)) {
-    _ = &x;
-    return (_XTHAL_CACHEABLE_DOMAIN(x) << @as(c_int, 7)) | (((if (x & _XTHAL_LOCAL_CACHE_BITS) x & _XTHAL_LOCAL_CACHE_BITS else _XTHAL_MEM_CACHE_MASK(x) << @as(c_int, 4)) & _XTHAL_MEM_LOCAL_RWC_MASK) >> _XTHAL_SHIFT_RWC);
-}
-pub const XTHAL_MEM_NON_CACHED = XTHAL_MEM_NON_CACHEABLE;
-pub const XTHAL_MEM_NON_SHARED = XTHAL_MEM_NON_SHAREABLE;
-pub const XTHAL_MEM_INNER_SHARED = XTHAL_MEM_INNER_SHAREABLE;
-pub const XTHAL_MEM_OUTER_SHARED = XTHAL_MEM_OUTER_SHAREABLE;
-pub const XTHAL_MEM_SYSTEM_SHARED = XTHAL_MEM_SYSTEM_SHAREABLE;
-pub const XTHAL_MEM_SW_SHAREABLE = @as(c_int, 0);
-pub inline fn xthal_is_cached(memoryType: anytype) @TypeOf(xthal_is_cacheable(memoryType)) {
-    _ = &memoryType;
-    return xthal_is_cacheable(memoryType);
-}
-pub const XTENSA_CONFIG_CORE_H = "";
-pub const XTENSA_VERSIONS_H = "";
-pub const XTENSA_HWVERSION_T1020_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102000, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1020_0 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1020_0 = @as(c_int, 2);
-pub const XTENSA_HWVERSION_T1020_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102001, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1020_1 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1020_1 = @as(c_int, 3);
-pub const XTENSA_HWVERSION_T1020_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102002, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1020_2 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1020_2 = @as(c_int, 4);
-pub const XTENSA_HWVERSION_T1020_2B = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102002, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1020_2B = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1020_2B = @as(c_int, 5);
-pub const XTENSA_HWVERSION_T1020_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102003, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1020_3 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1020_3 = @as(c_int, 6);
-pub const XTENSA_HWVERSION_T1020_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102004, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1020_4 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1020_4 = @as(c_int, 7);
-pub const XTENSA_HWVERSION_T1030_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103000, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1030_0 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1030_0 = @as(c_int, 9);
-pub const XTENSA_HWVERSION_T1030_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103001, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1030_1 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1030_1 = @as(c_int, 10);
-pub const XTENSA_HWVERSION_T1030_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103002, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1030_2 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1030_2 = @as(c_int, 11);
-pub const XTENSA_HWVERSION_T1030_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103003, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1030_3 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1030_3 = @as(c_int, 12);
-pub const XTENSA_HWVERSION_T1040_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104000, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1040_0 = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1040_0 = @as(c_int, 15);
-pub const XTENSA_HWVERSION_T1040_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104001, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1040_1 = @as(c_int, 1);
-pub const XTENSA_HWCIDVERS_T1040_1 = @as(c_int, 32);
-pub const XTENSA_HWVERSION_T1040_1P = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104001, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1040_1P = @as(c_int, 10);
-pub const XTENSA_HWCIDVERS_T1040_1P = @as(c_int, 16);
-pub const XTENSA_HWVERSION_T1040_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104002, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1040_2 = @as(c_int, 1);
-pub const XTENSA_HWCIDVERS_T1040_2 = @as(c_int, 33);
-pub const XTENSA_HWVERSION_T1040_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104003, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1040_3 = @as(c_int, 1);
-pub const XTENSA_HWCIDVERS_T1040_3 = @as(c_int, 34);
-pub const XTENSA_HWVERSION_T1050_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105000, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1050_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_T1050_0 = @as(c_int, 1);
-pub const XTENSA_HWVERSION_T1050_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105001, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1050_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_T1050_1 = @as(c_int, 2);
-pub const XTENSA_HWVERSION_T1050_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105002, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1050_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_T1050_2 = @as(c_int, 4);
-pub const XTENSA_HWVERSION_T1050_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105003, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1050_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_T1050_3 = @as(c_int, 6);
-pub const XTENSA_HWVERSION_T1050_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105004, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1050_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_T1050_4 = @as(c_int, 7);
-pub const XTENSA_HWVERSION_T1050_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105005, .decimal);
-pub const XTENSA_HWCIDSCHEME_T1050_5 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_T1050_5 = @as(c_int, 8);
-pub const XTENSA_HWVERSION_RA_2004_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2004_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2004_1 = @as(c_int, 3);
-pub const XTENSA_HWVERSION_RA_2005_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2005_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2005_1 = @as(c_int, 20);
-pub const XTENSA_HWVERSION_RA_2005_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2005_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2005_2 = @as(c_int, 21);
-pub const XTENSA_HWVERSION_RA_2005_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2005_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2005_3 = @as(c_int, 22);
-pub const XTENSA_HWVERSION_RA_2006_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210004, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2006_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2006_4 = @as(c_int, 23);
-pub const XTENSA_HWVERSION_RA_2006_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210005, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2006_5 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2006_5 = @as(c_int, 24);
-pub const XTENSA_HWVERSION_RA_2006_6 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210006, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2006_6 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2006_6 = @as(c_int, 25);
-pub const XTENSA_HWVERSION_RA_2007_7 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210007, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2007_7 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2007_7 = @as(c_int, 26);
-pub const XTENSA_HWVERSION_RA_2008_8 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 210008, .decimal);
-pub const XTENSA_HWCIDSCHEME_RA_2008_8 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RA_2008_8 = @as(c_int, 27);
-pub const XTENSA_HWVERSION_RB_2006_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 220000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2006_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2006_0 = @as(c_int, 48);
-pub const XTENSA_HWVERSION_RB_2007_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 220001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2007_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2007_1 = @as(c_int, 49);
-pub const XTENSA_HWVERSION_RB_2007_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 221000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2007_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2007_2 = @as(c_int, 52);
-pub const XTENSA_HWVERSION_RB_2008_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 221001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2008_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2008_3 = @as(c_int, 53);
-pub const XTENSA_HWVERSION_RB_2008_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 221002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2008_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2008_4 = @as(c_int, 54);
-pub const XTENSA_HWVERSION_RB_2009_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 221003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2009_5 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2009_5 = @as(c_int, 55);
-pub const XTENSA_HWVERSION_RB_2007_2_MP = @import("std").zig.c_translation.promoteIntLiteral(c_int, 221100, .decimal);
-pub const XTENSA_HWCIDSCHEME_RB_2007_2_MP = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RB_2007_2_MP = @as(c_int, 64);
-pub const XTENSA_HWVERSION_RC_2009_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 230000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RC_2009_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RC_2009_0 = @as(c_int, 65);
-pub const XTENSA_HWVERSION_RC_2010_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 230001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RC_2010_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RC_2010_1 = @as(c_int, 66);
-pub const XTENSA_HWVERSION_RC_2010_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 230002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RC_2010_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RC_2010_2 = @as(c_int, 67);
-pub const XTENSA_HWVERSION_RC_2011_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 230003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RC_2011_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RC_2011_3 = @as(c_int, 68);
-pub const XTENSA_HWVERSION_RD_2010_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 240000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RD_2010_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RD_2010_0 = @as(c_int, 80);
-pub const XTENSA_HWVERSION_RD_2011_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 240001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RD_2011_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RD_2011_1 = @as(c_int, 81);
-pub const XTENSA_HWVERSION_RD_2011_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 240002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RD_2011_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RD_2011_2 = @as(c_int, 82);
-pub const XTENSA_HWVERSION_RD_2011_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 240003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RD_2011_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RD_2011_3 = @as(c_int, 83);
-pub const XTENSA_HWVERSION_RD_2012_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 240004, .decimal);
-pub const XTENSA_HWCIDSCHEME_RD_2012_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RD_2012_4 = @as(c_int, 84);
-pub const XTENSA_HWVERSION_RD_2012_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 240005, .decimal);
-pub const XTENSA_HWCIDSCHEME_RD_2012_5 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RD_2012_5 = @as(c_int, 85);
-pub const XTENSA_HWVERSION_RE_2012_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2012_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2012_0 = @as(c_int, 96);
-pub const XTENSA_HWVERSION_RE_2012_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2012_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2012_1 = @as(c_int, 97);
-pub const XTENSA_HWVERSION_RE_2013_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2013_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2013_2 = @as(c_int, 98);
-pub const XTENSA_HWVERSION_RE_2013_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2013_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2013_3 = @as(c_int, 99);
-pub const XTENSA_HWVERSION_RE_2013_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250004, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2013_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2013_4 = @as(c_int, 100);
-pub const XTENSA_HWVERSION_RE_2014_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250005, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2014_5 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2014_5 = @as(c_int, 101);
-pub const XTENSA_HWVERSION_RE_2015_6 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 250006, .decimal);
-pub const XTENSA_HWCIDSCHEME_RE_2015_6 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RE_2015_6 = @as(c_int, 102);
-pub const XTENSA_HWVERSION_RF_2014_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 260000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RF_2014_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RF_2014_0 = @as(c_int, 112);
-pub const XTENSA_HWVERSION_RF_2014_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 260001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RF_2014_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RF_2014_1 = @as(c_int, 113);
-pub const XTENSA_HWVERSION_RF_2015_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 260002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RF_2015_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RF_2015_2 = @as(c_int, 114);
-pub const XTENSA_HWVERSION_RF_2015_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 260003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RF_2015_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RF_2015_3 = @as(c_int, 115);
-pub const XTENSA_HWVERSION_RF_2016_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 260004, .decimal);
-pub const XTENSA_HWCIDSCHEME_RF_2016_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RF_2016_4 = @as(c_int, 116);
-pub const XTENSA_HWVERSION_RG_2015_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2015_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2015_0 = @as(c_int, 128);
-pub const XTENSA_HWVERSION_RG_2015_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270001, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2015_1 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2015_1 = @as(c_int, 129);
-pub const XTENSA_HWVERSION_RG_2015_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270002, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2015_2 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2015_2 = @as(c_int, 130);
-pub const XTENSA_HWVERSION_RG_2016_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270003, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2016_3 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2016_3 = @as(c_int, 131);
-pub const XTENSA_HWVERSION_RG_2016_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270004, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2016_4 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2016_4 = @as(c_int, 132);
-pub const XTENSA_HWVERSION_RG_2017_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270005, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2017_5 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2017_5 = @as(c_int, 133);
-pub const XTENSA_HWVERSION_RG_2017_6 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270006, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2017_6 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2017_6 = @as(c_int, 134);
-pub const XTENSA_HWVERSION_RG_2017_7 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270007, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2017_7 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2017_7 = @as(c_int, 135);
-pub const XTENSA_HWVERSION_RG_2017_8 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270008, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2017_8 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2017_8 = @as(c_int, 136);
-pub const XTENSA_HWVERSION_RG_2018_9 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270009, .decimal);
-pub const XTENSA_HWCIDSCHEME_RG_2018_9 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RG_2018_9 = @as(c_int, 137);
-pub const XTENSA_HWVERSION_RH_2016_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 280000, .decimal);
-pub const XTENSA_HWCIDSCHEME_RH_2016_0 = @as(c_int, 1100);
-pub const XTENSA_HWCIDVERS_RH_2016_0 = @as(c_int, 144);
-pub const XTENSA_SWVERSION_T1020_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102000, .decimal);
-pub const XTENSA_SWVERSION_T1020_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102001, .decimal);
-pub const XTENSA_SWVERSION_T1020_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102002, .decimal);
-pub const XTENSA_SWVERSION_T1020_2B = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102002, .decimal);
-pub const XTENSA_SWVERSION_T1020_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102003, .decimal);
-pub const XTENSA_SWVERSION_T1020_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 102004, .decimal);
-pub const XTENSA_SWVERSION_T1030_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103000, .decimal);
-pub const XTENSA_SWVERSION_T1030_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103001, .decimal);
-pub const XTENSA_SWVERSION_T1030_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103002, .decimal);
-pub const XTENSA_SWVERSION_T1030_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 103003, .decimal);
-pub const XTENSA_SWVERSION_T1040_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104000, .decimal);
-pub const XTENSA_SWVERSION_T1040_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104001, .decimal);
-pub const XTENSA_SWVERSION_T1040_1P = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104001, .decimal);
-pub const XTENSA_SWVERSION_T1040_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104002, .decimal);
-pub const XTENSA_SWVERSION_T1040_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 104003, .decimal);
-pub const XTENSA_SWVERSION_T1050_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105000, .decimal);
-pub const XTENSA_SWVERSION_T1050_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105001, .decimal);
-pub const XTENSA_SWVERSION_T1050_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105002, .decimal);
-pub const XTENSA_SWVERSION_T1050_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105003, .decimal);
-pub const XTENSA_SWVERSION_T1050_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105004, .decimal);
-pub const XTENSA_SWVERSION_T1050_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 105005, .decimal);
-pub const XTENSA_SWVERSION_RA_2004_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600000, .decimal);
-pub const XTENSA_SWVERSION_RA_2005_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600001, .decimal);
-pub const XTENSA_SWVERSION_RA_2005_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600002, .decimal);
-pub const XTENSA_SWVERSION_RA_2005_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600003, .decimal);
-pub const XTENSA_SWVERSION_RA_2006_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600004, .decimal);
-pub const XTENSA_SWVERSION_RA_2006_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600005, .decimal);
-pub const XTENSA_SWVERSION_RA_2006_6 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600006, .decimal);
-pub const XTENSA_SWVERSION_RA_2007_7 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600007, .decimal);
-pub const XTENSA_SWVERSION_RA_2008_8 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 600008, .decimal);
-pub const XTENSA_SWVERSION_RB_2006_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 700000, .decimal);
-pub const XTENSA_SWVERSION_RB_2007_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 700001, .decimal);
-pub const XTENSA_SWVERSION_RB_2007_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 701000, .decimal);
-pub const XTENSA_SWVERSION_RB_2008_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 701001, .decimal);
-pub const XTENSA_SWVERSION_RB_2008_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 701002, .decimal);
-pub const XTENSA_SWVERSION_RB_2009_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 701003, .decimal);
-pub const XTENSA_SWVERSION_RB_2007_2_MP = @import("std").zig.c_translation.promoteIntLiteral(c_int, 701100, .decimal);
-pub const XTENSA_SWVERSION_RC_2009_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 800000, .decimal);
-pub const XTENSA_SWVERSION_RC_2010_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 800001, .decimal);
-pub const XTENSA_SWVERSION_RC_2010_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 800002, .decimal);
-pub const XTENSA_SWVERSION_RC_2011_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 800003, .decimal);
-pub const XTENSA_SWVERSION_RD_2010_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 900000, .decimal);
-pub const XTENSA_SWVERSION_RD_2011_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 900001, .decimal);
-pub const XTENSA_SWVERSION_RD_2011_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 900002, .decimal);
-pub const XTENSA_SWVERSION_RD_2011_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 900003, .decimal);
-pub const XTENSA_SWVERSION_RD_2012_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 900004, .decimal);
-pub const XTENSA_SWVERSION_RD_2012_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 900005, .decimal);
-pub const XTENSA_SWVERSION_RE_2012_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
-pub const XTENSA_SWVERSION_RE_2012_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000001, .decimal);
-pub const XTENSA_SWVERSION_RE_2013_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000002, .decimal);
-pub const XTENSA_SWVERSION_RE_2013_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000003, .decimal);
-pub const XTENSA_SWVERSION_RE_2013_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000004, .decimal);
-pub const XTENSA_SWVERSION_RE_2014_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000005, .decimal);
-pub const XTENSA_SWVERSION_RE_2015_6 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000006, .decimal);
-pub const XTENSA_SWVERSION_RF_2014_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1100000, .decimal);
-pub const XTENSA_SWVERSION_RF_2014_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1100001, .decimal);
-pub const XTENSA_SWVERSION_RF_2015_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1100002, .decimal);
-pub const XTENSA_SWVERSION_RF_2015_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1100003, .decimal);
-pub const XTENSA_SWVERSION_RF_2016_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1100004, .decimal);
-pub const XTENSA_SWVERSION_RG_2015_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200000, .decimal);
-pub const XTENSA_SWVERSION_RG_2015_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200001, .decimal);
-pub const XTENSA_SWVERSION_RG_2015_2 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200002, .decimal);
-pub const XTENSA_SWVERSION_RG_2016_3 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200003, .decimal);
-pub const XTENSA_SWVERSION_RG_2016_4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200004, .decimal);
-pub const XTENSA_SWVERSION_RG_2017_5 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200005, .decimal);
-pub const XTENSA_SWVERSION_RG_2017_6 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200006, .decimal);
-pub const XTENSA_SWVERSION_RG_2017_7 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200007, .decimal);
-pub const XTENSA_SWVERSION_RG_2017_8 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200008, .decimal);
-pub const XTENSA_SWVERSION_RG_2018_9 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200009, .decimal);
-pub const XTENSA_SWVERSION_RH_2016_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1300000, .decimal);
-pub const XTENSA_SWVERSION_T1040_1_PREHOTFIX = XTENSA_SWVERSION_T1040_1P;
-pub const XTENSA_SWVERSION_6_0_0 = XTENSA_SWVERSION_RA_2004_1;
-pub const XTENSA_SWVERSION_6_0_1 = XTENSA_SWVERSION_RA_2005_1;
-pub const XTENSA_SWVERSION_6_0_2 = XTENSA_SWVERSION_RA_2005_2;
-pub const XTENSA_SWVERSION_6_0_3 = XTENSA_SWVERSION_RA_2005_3;
-pub const XTENSA_SWVERSION_6_0_4 = XTENSA_SWVERSION_RA_2006_4;
-pub const XTENSA_SWVERSION_6_0_5 = XTENSA_SWVERSION_RA_2006_5;
-pub const XTENSA_SWVERSION_6_0_6 = XTENSA_SWVERSION_RA_2006_6;
-pub const XTENSA_SWVERSION_6_0_7 = XTENSA_SWVERSION_RA_2007_7;
-pub const XTENSA_SWVERSION_6_0_8 = XTENSA_SWVERSION_RA_2008_8;
-pub const XTENSA_SWVERSION_7_0_0 = XTENSA_SWVERSION_RB_2006_0;
-pub const XTENSA_SWVERSION_7_0_1 = XTENSA_SWVERSION_RB_2007_1;
-pub const XTENSA_SWVERSION_7_1_0 = XTENSA_SWVERSION_RB_2007_2;
-pub const XTENSA_SWVERSION_7_1_1 = XTENSA_SWVERSION_RB_2008_3;
-pub const XTENSA_SWVERSION_7_1_2 = XTENSA_SWVERSION_RB_2008_4;
-pub const XTENSA_SWVERSION_7_1_3 = XTENSA_SWVERSION_RB_2009_5;
-pub const XTENSA_SWVERSION_7_1_8_MP = XTENSA_SWVERSION_RB_2007_2_MP;
-pub const XTENSA_SWVERSION_8_0_0 = XTENSA_SWVERSION_RC_2009_0;
-pub const XTENSA_SWVERSION_8_0_1 = XTENSA_SWVERSION_RC_2010_1;
-pub const XTENSA_SWVERSION_8_0_2 = XTENSA_SWVERSION_RC_2010_2;
-pub const XTENSA_SWVERSION_8_0_3 = XTENSA_SWVERSION_RC_2011_3;
-pub const XTENSA_SWVERSION_9_0_0 = XTENSA_SWVERSION_RD_2010_0;
-pub const XTENSA_SWVERSION_9_0_1 = XTENSA_SWVERSION_RD_2011_1;
-pub const XTENSA_SWVERSION_9_0_2 = XTENSA_SWVERSION_RD_2011_2;
-pub const XTENSA_SWVERSION_9_0_3 = XTENSA_SWVERSION_RD_2011_3;
-pub const XTENSA_SWVERSION_9_0_4 = XTENSA_SWVERSION_RD_2012_4;
-pub const XTENSA_SWVERSION_9_0_5 = XTENSA_SWVERSION_RD_2012_5;
-pub const XTENSA_SWVERSION_10_0_0 = XTENSA_SWVERSION_RE_2012_0;
-pub const XTENSA_SWVERSION_10_0_1 = XTENSA_SWVERSION_RE_2012_1;
-pub const XTENSA_SWVERSION_10_0_2 = XTENSA_SWVERSION_RE_2013_2;
-pub const XTENSA_SWVERSION_10_0_3 = XTENSA_SWVERSION_RE_2013_3;
-pub const XTENSA_SWVERSION_10_0_4 = XTENSA_SWVERSION_RE_2013_4;
-pub const XTENSA_SWVERSION_10_0_5 = XTENSA_SWVERSION_RE_2014_5;
-pub const XTENSA_SWVERSION_10_0_6 = XTENSA_SWVERSION_RE_2015_6;
-pub const XTENSA_SWVERSION_11_0_0 = XTENSA_SWVERSION_RF_2014_0;
-pub const XTENSA_SWVERSION_11_0_1 = XTENSA_SWVERSION_RF_2014_1;
-pub const XTENSA_SWVERSION_11_0_2 = XTENSA_SWVERSION_RF_2015_2;
-pub const XTENSA_SWVERSION_11_0_3 = XTENSA_SWVERSION_RF_2015_3;
-pub const XTENSA_SWVERSION_11_0_4 = XTENSA_SWVERSION_RF_2016_4;
-pub const XTENSA_SWVERSION_12_0_0 = XTENSA_SWVERSION_RG_2015_0;
-pub const XTENSA_SWVERSION_12_0_1 = XTENSA_SWVERSION_RG_2015_1;
-pub const XTENSA_SWVERSION_12_0_2 = XTENSA_SWVERSION_RG_2015_2;
-pub const XTENSA_SWVERSION_12_0_3 = XTENSA_SWVERSION_RG_2016_3;
-pub const XTENSA_SWVERSION_12_0_4 = XTENSA_SWVERSION_RG_2016_4;
-pub const XTENSA_SWVERSION_12_0_5 = XTENSA_SWVERSION_RG_2017_5;
-pub const XTENSA_SWVERSION_12_0_6 = XTENSA_SWVERSION_RG_2017_6;
-pub const XTENSA_SWVERSION_12_0_7 = XTENSA_SWVERSION_RG_2017_7;
-pub const XTENSA_SWVERSION_12_0_8 = XTENSA_SWVERSION_RG_2017_8;
-pub const XTENSA_SWVERSION_12_0_9 = XTENSA_SWVERSION_RG_2018_9;
-pub const XTENSA_SWVERSION_13_0_0 = XTENSA_SWVERSION_RH_2016_0;
-pub const XTENSA_RELEASE_NAME = "RG-2018.9";
-pub const XTENSA_RELEASE_CANONICAL_NAME = "RG-2018.9";
-pub const XTENSA_SWVERSION = XTENSA_SWVERSION_RG_2018_9;
-pub const XTENSA_SWVERSION_NAME = "12.0.9";
-pub const XTENSA_SWVERSION_NAME_IDENT = @compileError("invalid number suffix: '_0_9'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtensa-versions.h:390:9
-pub const XTENSA_SWVERSION_CANONICAL_NAME = "12.0.9";
-pub const XTENSA_SWVERSION_MAJORMID_NAME = "12.0";
-pub const XTENSA_SWVERSION_MAJOR_NAME = "12";
-pub const XTENSA_SWVERSION_LICENSE_NAME = "12.0";
-pub const _XTENSA_CORE_CONFIGURATION_H = "";
-pub const XCHAL_HAVE_BE = @as(c_int, 0);
-pub const XCHAL_HAVE_WINDOWED = @as(c_int, 1);
-pub const XCHAL_NUM_AREGS = @as(c_int, 64);
-pub const XCHAL_NUM_AREGS_LOG2 = @as(c_int, 6);
-pub const XCHAL_MAX_INSTRUCTION_SIZE = @as(c_int, 4);
-pub const XCHAL_HAVE_DEBUG = @as(c_int, 1);
-pub const XCHAL_HAVE_DENSITY = @as(c_int, 1);
-pub const XCHAL_HAVE_LOOPS = @as(c_int, 1);
-pub const XCHAL_LOOP_BUFFER_SIZE = @as(c_int, 256);
-pub const XCHAL_HAVE_NSA = @as(c_int, 1);
-pub const XCHAL_HAVE_MINMAX = @as(c_int, 1);
-pub const XCHAL_HAVE_SEXT = @as(c_int, 1);
-pub const XCHAL_HAVE_DEPBITS = @as(c_int, 0);
-pub const XCHAL_HAVE_CLAMPS = @as(c_int, 1);
-pub const XCHAL_HAVE_MUL16 = @as(c_int, 1);
-pub const XCHAL_HAVE_MUL32 = @as(c_int, 1);
-pub const XCHAL_HAVE_MUL32_HIGH = @as(c_int, 1);
-pub const XCHAL_HAVE_DIV32 = @as(c_int, 1);
-pub const XCHAL_HAVE_L32R = @as(c_int, 1);
-pub const XCHAL_HAVE_ABSOLUTE_LITERALS = @as(c_int, 0);
-pub const XCHAL_HAVE_CONST16 = @as(c_int, 0);
-pub const XCHAL_HAVE_ADDX = @as(c_int, 1);
-pub const XCHAL_HAVE_EXCLUSIVE = @as(c_int, 0);
-pub const XCHAL_HAVE_WIDE_BRANCHES = @as(c_int, 0);
-pub const XCHAL_HAVE_PREDICTED_BRANCHES = @as(c_int, 0);
-pub const XCHAL_HAVE_CALL4AND12 = @as(c_int, 1);
-pub const XCHAL_HAVE_ABS = @as(c_int, 1);
-pub const XCHAL_HAVE_RELEASE_SYNC = @as(c_int, 1);
-pub const XCHAL_HAVE_S32C1I = @as(c_int, 1);
-pub const XCHAL_HAVE_SPECULATION = @as(c_int, 0);
-pub const XCHAL_HAVE_FULL_RESET = @as(c_int, 1);
-pub const XCHAL_NUM_CONTEXTS = @as(c_int, 1);
-pub const XCHAL_NUM_MISC_REGS = @as(c_int, 4);
-pub const XCHAL_HAVE_TAP_MASTER = @as(c_int, 0);
-pub const XCHAL_HAVE_PRID = @as(c_int, 1);
-pub const XCHAL_HAVE_EXTERN_REGS = @as(c_int, 1);
-pub const XCHAL_HAVE_MX = @as(c_int, 0);
-pub const XCHAL_HAVE_MP_INTERRUPTS = @as(c_int, 0);
-pub const XCHAL_HAVE_MP_RUNSTALL = @as(c_int, 0);
-pub const XCHAL_HAVE_PSO = @as(c_int, 0);
-pub const XCHAL_HAVE_PSO_CDM = @as(c_int, 0);
-pub const XCHAL_HAVE_PSO_FULL_RETENTION = @as(c_int, 0);
-pub const XCHAL_HAVE_THREADPTR = @as(c_int, 1);
-pub const XCHAL_HAVE_BOOLEANS = @as(c_int, 1);
-pub const XCHAL_HAVE_CP = @as(c_int, 1);
-pub const XCHAL_CP_MAXCFG = @as(c_int, 8);
-pub const XCHAL_HAVE_MAC16 = @as(c_int, 1);
-pub const XCHAL_HAVE_FUSION = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_FP = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_LOW_POWER = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_AES = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_CONVENC = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_LFSR_CRC = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_BITOPS = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_AVS = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_16BIT_BASEBAND = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_VITERBI = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSION_SOFTDEMAP = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFIPRO = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI5 = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI5_NN_MAC = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI5_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI5_HP_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI4 = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI4_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI3 = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI3_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI3Z = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI3Z_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI2 = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI2EP = @as(c_int, 0);
-pub const XCHAL_HAVE_HIFI_MINI = @as(c_int, 0);
-pub const XCHAL_HAVE_VECTORFPU2005 = @as(c_int, 0);
-pub const XCHAL_HAVE_USER_DPFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_USER_SPFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_FP = @as(c_int, 1);
-pub const XCHAL_HAVE_FP_DIV = @as(c_int, 1);
-pub const XCHAL_HAVE_FP_RECIP = @as(c_int, 1);
-pub const XCHAL_HAVE_FP_SQRT = @as(c_int, 1);
-pub const XCHAL_HAVE_FP_RSQRT = @as(c_int, 1);
-pub const XCHAL_HAVE_DFP = @as(c_int, 0);
-pub const XCHAL_HAVE_DFP_DIV = @as(c_int, 0);
-pub const XCHAL_HAVE_DFP_RECIP = @as(c_int, 0);
-pub const XCHAL_HAVE_DFP_SQRT = @as(c_int, 0);
-pub const XCHAL_HAVE_DFP_RSQRT = @as(c_int, 0);
-pub const XCHAL_HAVE_DFP_ACCEL = @as(c_int, 0);
-pub const XCHAL_HAVE_DFP_accel = XCHAL_HAVE_DFP_ACCEL;
-pub const XCHAL_HAVE_DFPU_SINGLE_ONLY = @as(c_int, 1);
-pub const XCHAL_HAVE_DFPU_SINGLE_DOUBLE = @as(c_int, 0);
-pub const XCHAL_HAVE_VECTRA1 = @as(c_int, 0);
-pub const XCHAL_HAVE_VECTRALX = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSIONG = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSIONG3 = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSIONG6 = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSIONG_SP_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_FUSIONG_DP_VFPU = @as(c_int, 0);
-pub const XCHAL_FUSIONG_SIMD32 = @as(c_int, 0);
-pub const XCHAL_HAVE_PDX = @as(c_int, 0);
-pub const XCHAL_PDX_SIMD32 = @as(c_int, 0);
-pub const XCHAL_HAVE_PDX4 = @as(c_int, 0);
-pub const XCHAL_HAVE_PDX8 = @as(c_int, 0);
-pub const XCHAL_HAVE_PDX16 = @as(c_int, 0);
-pub const XCHAL_HAVE_CONNXD2 = @as(c_int, 0);
-pub const XCHAL_HAVE_CONNXD2_DUALLSFLIX = @as(c_int, 0);
-pub const XCHAL_HAVE_BBE16 = @as(c_int, 0);
-pub const XCHAL_HAVE_BBE16_RSQRT = @as(c_int, 0);
-pub const XCHAL_HAVE_BBE16_VECDIV = @as(c_int, 0);
-pub const XCHAL_HAVE_BBE16_DESPREAD = @as(c_int, 0);
-pub const XCHAL_HAVE_BBENEP = @as(c_int, 0);
-pub const XCHAL_HAVE_BBENEP_SP_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_BSP3 = @as(c_int, 0);
-pub const XCHAL_HAVE_BSP3_TRANSPOSE = @as(c_int, 0);
-pub const XCHAL_HAVE_SSP16 = @as(c_int, 0);
-pub const XCHAL_HAVE_SSP16_VITERBI = @as(c_int, 0);
-pub const XCHAL_HAVE_TURBO16 = @as(c_int, 0);
-pub const XCHAL_HAVE_BBP16 = @as(c_int, 0);
-pub const XCHAL_HAVE_FLIX3 = @as(c_int, 0);
-pub const XCHAL_HAVE_GRIVPEP = @as(c_int, 0);
-pub const XCHAL_HAVE_GRIVPEP_HISTOGRAM = @as(c_int, 0);
-pub const XCHAL_HAVE_VISION = @as(c_int, 0);
-pub const XCHAL_VISION_SIMD16 = @as(c_int, 0);
-pub const XCHAL_VISION_TYPE = @as(c_int, 0);
-pub const XCHAL_VISION_QUAD_MAC_TYPE = @as(c_int, 0);
-pub const XCHAL_HAVE_VISION_HISTOGRAM = @as(c_int, 0);
-pub const XCHAL_HAVE_VISION_SP_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_VISION_HP_VFPU = @as(c_int, 0);
-pub const XCHAL_HAVE_VISIONC = @as(c_int, 0);
-pub const XCHAL_NUM_LOADSTORE_UNITS = @as(c_int, 1);
-pub const XCHAL_NUM_WRITEBUFFER_ENTRIES = @as(c_int, 4);
-pub const XCHAL_INST_FETCH_WIDTH = @as(c_int, 4);
-pub const XCHAL_DATA_WIDTH = @as(c_int, 16);
-pub const XCHAL_DATA_PIPE_DELAY = @as(c_int, 1);
-pub const XCHAL_CLOCK_GATING_GLOBAL = @as(c_int, 1);
-pub const XCHAL_CLOCK_GATING_FUNCUNIT = @as(c_int, 1);
-pub const XCHAL_UNALIGNED_LOAD_EXCEPTION = @as(c_int, 0);
-pub const XCHAL_UNALIGNED_STORE_EXCEPTION = @as(c_int, 0);
-pub const XCHAL_UNALIGNED_LOAD_HW = @as(c_int, 1);
-pub const XCHAL_UNALIGNED_STORE_HW = @as(c_int, 1);
-pub const XCHAL_SW_VERSION = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1200012, .decimal);
-pub const XCHAL_CORE_ID = "LX7_ESP32_S3_MP";
-pub const XCHAL_BUILD_UNIQUE_ID = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00090F1F, .hex);
-pub const XCHAL_HW_CONFIGID0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC2F0FFFE, .hex);
-pub const XCHAL_HW_CONFIGID1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x23090F1F, .hex);
-pub const XCHAL_HW_VERSION_NAME = "LX7.0.12";
-pub const XCHAL_HW_VERSION_MAJOR = @as(c_int, 2700);
-pub const XCHAL_HW_VERSION_MINOR = @as(c_int, 12);
-pub const XCHAL_HW_VERSION = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270012, .decimal);
-pub const XCHAL_HW_REL_LX7 = @as(c_int, 1);
-pub const XCHAL_HW_REL_LX7_0 = @as(c_int, 1);
-pub const XCHAL_HW_REL_LX7_0_12 = @as(c_int, 1);
-pub const XCHAL_HW_CONFIGID_RELIABLE = @as(c_int, 1);
-pub const XCHAL_HW_MIN_VERSION_MAJOR = @as(c_int, 2700);
-pub const XCHAL_HW_MIN_VERSION_MINOR = @as(c_int, 12);
-pub const XCHAL_HW_MIN_VERSION = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270012, .decimal);
-pub const XCHAL_HW_MAX_VERSION_MAJOR = @as(c_int, 2700);
-pub const XCHAL_HW_MAX_VERSION_MINOR = @as(c_int, 12);
-pub const XCHAL_HW_MAX_VERSION = @import("std").zig.c_translation.promoteIntLiteral(c_int, 270012, .decimal);
-pub const XCHAL_ICACHE_LINESIZE = @as(c_int, 4);
-pub const XCHAL_DCACHE_LINESIZE = @as(c_int, 16);
-pub const XCHAL_ICACHE_LINEWIDTH = @as(c_int, 2);
-pub const XCHAL_DCACHE_LINEWIDTH = @as(c_int, 4);
-pub const XCHAL_ICACHE_SIZE = @as(c_int, 0);
-pub const XCHAL_DCACHE_SIZE = @as(c_int, 0);
-pub const XCHAL_DCACHE_IS_WRITEBACK = @as(c_int, 0);
-pub const XCHAL_DCACHE_IS_COHERENT = @as(c_int, 0);
-pub const XCHAL_HAVE_PREFETCH = @as(c_int, 0);
-pub const XCHAL_HAVE_PREFETCH_L1 = @as(c_int, 0);
-pub const XCHAL_PREFETCH_CASTOUT_LINES = @as(c_int, 0);
-pub const XCHAL_PREFETCH_ENTRIES = @as(c_int, 0);
-pub const XCHAL_PREFETCH_BLOCK_ENTRIES = @as(c_int, 0);
-pub const XCHAL_HAVE_CACHE_BLOCKOPS = @as(c_int, 0);
-pub const XCHAL_HAVE_ICACHE_TEST = @as(c_int, 0);
-pub const XCHAL_HAVE_DCACHE_TEST = @as(c_int, 0);
-pub const XCHAL_HAVE_ICACHE_DYN_WAYS = @as(c_int, 0);
-pub const XCHAL_HAVE_DCACHE_DYN_WAYS = @as(c_int, 0);
-pub const XCHAL_HAVE_PIF = @as(c_int, 1);
-pub const XCHAL_HAVE_AXI = @as(c_int, 0);
-pub const XCHAL_HAVE_AXI_ECC = @as(c_int, 0);
-pub const XCHAL_HAVE_ACELITE = @as(c_int, 0);
-pub const XCHAL_HAVE_PIF_WR_RESP = @as(c_int, 0);
-pub const XCHAL_HAVE_PIF_REQ_ATTR = @as(c_int, 1);
-pub const XCHAL_ICACHE_SETWIDTH = @as(c_int, 0);
-pub const XCHAL_DCACHE_SETWIDTH = @as(c_int, 0);
-pub const XCHAL_ICACHE_WAYS = @as(c_int, 1);
-pub const XCHAL_DCACHE_WAYS = @as(c_int, 1);
-pub const XCHAL_ICACHE_LINE_LOCKABLE = @as(c_int, 0);
-pub const XCHAL_DCACHE_LINE_LOCKABLE = @as(c_int, 0);
-pub const XCHAL_ICACHE_ECC_PARITY = @as(c_int, 0);
-pub const XCHAL_DCACHE_ECC_PARITY = @as(c_int, 0);
-pub const XCHAL_ICACHE_ECC_WIDTH = @as(c_int, 1);
-pub const XCHAL_DCACHE_ECC_WIDTH = @as(c_int, 1);
-pub const XCHAL_ICACHE_ACCESS_SIZE = @as(c_int, 1);
-pub const XCHAL_DCACHE_ACCESS_SIZE = @as(c_int, 1);
-pub const XCHAL_DCACHE_BANKS = @as(c_int, 0);
-pub const XCHAL_CA_BITS = @as(c_int, 4);
-pub const XCHAL_NUM_INSTROM = @as(c_int, 0);
-pub const XCHAL_NUM_INSTRAM = @as(c_int, 1);
-pub const XCHAL_NUM_DATAROM = @as(c_int, 0);
-pub const XCHAL_NUM_DATARAM = @as(c_int, 1);
-pub const XCHAL_NUM_URAM = @as(c_int, 0);
-pub const XCHAL_NUM_XLMI = @as(c_int, 0);
-pub const XCHAL_INSTRAM0_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_INSTRAM0_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_INSTRAM0_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 67108864, .decimal);
-pub const XCHAL_INSTRAM0_ECC_PARITY = @as(c_int, 0);
-pub const XCHAL_HAVE_INSTRAM0 = @as(c_int, 1);
-pub const XCHAL_INSTRAM0_HAVE_IDMA = @as(c_int, 0);
-pub const XCHAL_DATARAM0_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3C000000, .hex);
-pub const XCHAL_DATARAM0_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3C000000, .hex);
-pub const XCHAL_DATARAM0_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 67108864, .decimal);
-pub const XCHAL_DATARAM0_ECC_PARITY = @as(c_int, 0);
-pub const XCHAL_DATARAM0_BANKS = @as(c_int, 1);
-pub const XCHAL_HAVE_DATARAM0 = @as(c_int, 1);
-pub const XCHAL_DATARAM0_HAVE_IDMA = @as(c_int, 0);
-pub const XCHAL_HAVE_IDMA = @as(c_int, 0);
-pub const XCHAL_HAVE_IDMA_TRANSPOSE = @as(c_int, 0);
-pub const XCHAL_HAVE_IMEM_LOADSTORE = @as(c_int, 1);
-pub const XCHAL_HAVE_INTERRUPTS = @as(c_int, 1);
-pub const XCHAL_HAVE_HIGHPRI_INTERRUPTS = @as(c_int, 1);
-pub const XCHAL_HAVE_NMI = @as(c_int, 1);
-pub const XCHAL_HAVE_CCOUNT = @as(c_int, 1);
-pub const XCHAL_NUM_TIMERS = @as(c_int, 3);
-pub const XCHAL_NUM_INTERRUPTS = @as(c_int, 32);
-pub const XCHAL_NUM_INTERRUPTS_LOG2 = @as(c_int, 5);
-pub const XCHAL_NUM_EXTINTERRUPTS = @as(c_int, 26);
-pub const XCHAL_NUM_INTLEVELS = @as(c_int, 6);
-pub const XCHAL_EXCM_LEVEL = @as(c_int, 3);
-pub const XCHAL_INTLEVEL1_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000637FF, .hex);
-pub const XCHAL_INTLEVEL2_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00380000, .hex);
-pub const XCHAL_INTLEVEL3_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x28C08800, .hex);
-pub const XCHAL_INTLEVEL4_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x53000000, .hex);
-pub const XCHAL_INTLEVEL5_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x84010000, .hex);
-pub const XCHAL_INTLEVEL6_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL7_MASK = @as(c_int, 0x00004000);
-pub const XCHAL_INTLEVEL1_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000637FF, .hex);
-pub const XCHAL_INTLEVEL2_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x003E37FF, .hex);
-pub const XCHAL_INTLEVEL3_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x28FEBFFF, .hex);
-pub const XCHAL_INTLEVEL4_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x7BFEBFFF, .hex);
-pub const XCHAL_INTLEVEL5_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFBFFF, .hex);
-pub const XCHAL_INTLEVEL6_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFBFFF, .hex);
-pub const XCHAL_INTLEVEL7_ANDBELOW_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
-pub const XCHAL_INT0_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT1_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT2_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT3_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT4_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT5_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT6_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT7_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT8_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT9_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT10_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT11_LEVEL = @as(c_int, 3);
-pub const XCHAL_INT12_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT13_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT14_LEVEL = @as(c_int, 7);
-pub const XCHAL_INT15_LEVEL = @as(c_int, 3);
-pub const XCHAL_INT16_LEVEL = @as(c_int, 5);
-pub const XCHAL_INT17_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT18_LEVEL = @as(c_int, 1);
-pub const XCHAL_INT19_LEVEL = @as(c_int, 2);
-pub const XCHAL_INT20_LEVEL = @as(c_int, 2);
-pub const XCHAL_INT21_LEVEL = @as(c_int, 2);
-pub const XCHAL_INT22_LEVEL = @as(c_int, 3);
-pub const XCHAL_INT23_LEVEL = @as(c_int, 3);
-pub const XCHAL_INT24_LEVEL = @as(c_int, 4);
-pub const XCHAL_INT25_LEVEL = @as(c_int, 4);
-pub const XCHAL_INT26_LEVEL = @as(c_int, 5);
-pub const XCHAL_INT27_LEVEL = @as(c_int, 3);
-pub const XCHAL_INT28_LEVEL = @as(c_int, 4);
-pub const XCHAL_INT29_LEVEL = @as(c_int, 3);
-pub const XCHAL_INT30_LEVEL = @as(c_int, 4);
-pub const XCHAL_INT31_LEVEL = @as(c_int, 5);
-pub const XCHAL_DEBUGLEVEL = @as(c_int, 6);
-pub const XCHAL_HAVE_DEBUG_EXTERN_INT = @as(c_int, 1);
-pub const XCHAL_NMILEVEL = @as(c_int, 7);
-pub const XCHAL_INT0_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT1_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT2_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT3_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT4_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT5_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT6_TYPE = XTHAL_INTTYPE_TIMER;
-pub const XCHAL_INT7_TYPE = XTHAL_INTTYPE_SOFTWARE;
-pub const XCHAL_INT8_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT9_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT10_TYPE = XTHAL_INTTYPE_EXTERN_EDGE;
-pub const XCHAL_INT11_TYPE = XTHAL_INTTYPE_PROFILING;
-pub const XCHAL_INT12_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT13_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT14_TYPE = XTHAL_INTTYPE_NMI;
-pub const XCHAL_INT15_TYPE = XTHAL_INTTYPE_TIMER;
-pub const XCHAL_INT16_TYPE = XTHAL_INTTYPE_TIMER;
-pub const XCHAL_INT17_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT18_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT19_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT20_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT21_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT22_TYPE = XTHAL_INTTYPE_EXTERN_EDGE;
-pub const XCHAL_INT23_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT24_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT25_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT26_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT27_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INT28_TYPE = XTHAL_INTTYPE_EXTERN_EDGE;
-pub const XCHAL_INT29_TYPE = XTHAL_INTTYPE_SOFTWARE;
-pub const XCHAL_INT30_TYPE = XTHAL_INTTYPE_EXTERN_EDGE;
-pub const XCHAL_INT31_TYPE = XTHAL_INTTYPE_EXTERN_LEVEL;
-pub const XCHAL_INTTYPE_MASK_UNCONFIGURED = @as(c_int, 0x00000000);
-pub const XCHAL_INTTYPE_MASK_SOFTWARE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000080, .hex);
-pub const XCHAL_INTTYPE_MASK_EXTERN_EDGE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50400400, .hex);
-pub const XCHAL_INTTYPE_MASK_EXTERN_LEVEL = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8FBE333F, .hex);
-pub const XCHAL_INTTYPE_MASK_TIMER = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00018040, .hex);
-pub const XCHAL_INTTYPE_MASK_NMI = @as(c_int, 0x00004000);
-pub const XCHAL_INTTYPE_MASK_WRITE_ERROR = @as(c_int, 0x00000000);
-pub const XCHAL_INTTYPE_MASK_PROFILING = @as(c_int, 0x00000800);
-pub const XCHAL_INTTYPE_MASK_IDMA_DONE = @as(c_int, 0x00000000);
-pub const XCHAL_INTTYPE_MASK_IDMA_ERR = @as(c_int, 0x00000000);
-pub const XCHAL_INTTYPE_MASK_GS_ERR = @as(c_int, 0x00000000);
-pub const XCHAL_TIMER0_INTERRUPT = @as(c_int, 6);
-pub const XCHAL_TIMER1_INTERRUPT = @as(c_int, 15);
-pub const XCHAL_TIMER2_INTERRUPT = @as(c_int, 16);
-pub const XCHAL_TIMER3_INTERRUPT = XTHAL_TIMER_UNCONFIGURED;
-pub const XCHAL_NMI_INTERRUPT = @as(c_int, 14);
-pub const XCHAL_PROFILING_INTERRUPT = @as(c_int, 11);
-pub const XCHAL_INTLEVEL7_NUM = @as(c_int, 14);
-pub const XCHAL_EXTINT0_NUM = @as(c_int, 0);
-pub const XCHAL_EXTINT1_NUM = @as(c_int, 1);
-pub const XCHAL_EXTINT2_NUM = @as(c_int, 2);
-pub const XCHAL_EXTINT3_NUM = @as(c_int, 3);
-pub const XCHAL_EXTINT4_NUM = @as(c_int, 4);
-pub const XCHAL_EXTINT5_NUM = @as(c_int, 5);
-pub const XCHAL_EXTINT6_NUM = @as(c_int, 8);
-pub const XCHAL_EXTINT7_NUM = @as(c_int, 9);
-pub const XCHAL_EXTINT8_NUM = @as(c_int, 10);
-pub const XCHAL_EXTINT9_NUM = @as(c_int, 12);
-pub const XCHAL_EXTINT10_NUM = @as(c_int, 13);
-pub const XCHAL_EXTINT11_NUM = @as(c_int, 14);
-pub const XCHAL_EXTINT12_NUM = @as(c_int, 17);
-pub const XCHAL_EXTINT13_NUM = @as(c_int, 18);
-pub const XCHAL_EXTINT14_NUM = @as(c_int, 19);
-pub const XCHAL_EXTINT15_NUM = @as(c_int, 20);
-pub const XCHAL_EXTINT16_NUM = @as(c_int, 21);
-pub const XCHAL_EXTINT17_NUM = @as(c_int, 22);
-pub const XCHAL_EXTINT18_NUM = @as(c_int, 23);
-pub const XCHAL_EXTINT19_NUM = @as(c_int, 24);
-pub const XCHAL_EXTINT20_NUM = @as(c_int, 25);
-pub const XCHAL_EXTINT21_NUM = @as(c_int, 26);
-pub const XCHAL_EXTINT22_NUM = @as(c_int, 27);
-pub const XCHAL_EXTINT23_NUM = @as(c_int, 28);
-pub const XCHAL_EXTINT24_NUM = @as(c_int, 30);
-pub const XCHAL_EXTINT25_NUM = @as(c_int, 31);
-pub const XCHAL_INT0_EXTNUM = @as(c_int, 0);
-pub const XCHAL_INT1_EXTNUM = @as(c_int, 1);
-pub const XCHAL_INT2_EXTNUM = @as(c_int, 2);
-pub const XCHAL_INT3_EXTNUM = @as(c_int, 3);
-pub const XCHAL_INT4_EXTNUM = @as(c_int, 4);
-pub const XCHAL_INT5_EXTNUM = @as(c_int, 5);
-pub const XCHAL_INT8_EXTNUM = @as(c_int, 6);
-pub const XCHAL_INT9_EXTNUM = @as(c_int, 7);
-pub const XCHAL_INT10_EXTNUM = @as(c_int, 8);
-pub const XCHAL_INT12_EXTNUM = @as(c_int, 9);
-pub const XCHAL_INT13_EXTNUM = @as(c_int, 10);
-pub const XCHAL_INT14_EXTNUM = @as(c_int, 11);
-pub const XCHAL_INT17_EXTNUM = @as(c_int, 12);
-pub const XCHAL_INT18_EXTNUM = @as(c_int, 13);
-pub const XCHAL_INT19_EXTNUM = @as(c_int, 14);
-pub const XCHAL_INT20_EXTNUM = @as(c_int, 15);
-pub const XCHAL_INT21_EXTNUM = @as(c_int, 16);
-pub const XCHAL_INT22_EXTNUM = @as(c_int, 17);
-pub const XCHAL_INT23_EXTNUM = @as(c_int, 18);
-pub const XCHAL_INT24_EXTNUM = @as(c_int, 19);
-pub const XCHAL_INT25_EXTNUM = @as(c_int, 20);
-pub const XCHAL_INT26_EXTNUM = @as(c_int, 21);
-pub const XCHAL_INT27_EXTNUM = @as(c_int, 22);
-pub const XCHAL_INT28_EXTNUM = @as(c_int, 23);
-pub const XCHAL_INT30_EXTNUM = @as(c_int, 24);
-pub const XCHAL_INT31_EXTNUM = @as(c_int, 25);
-pub const XCHAL_XEA_VERSION = @as(c_int, 2);
-pub const XCHAL_HAVE_XEA1 = @as(c_int, 0);
-pub const XCHAL_HAVE_XEA2 = @as(c_int, 1);
-pub const XCHAL_HAVE_XEAX = @as(c_int, 0);
-pub const XCHAL_HAVE_EXCEPTIONS = @as(c_int, 1);
-pub const XCHAL_HAVE_HALT = @as(c_int, 0);
-pub const XCHAL_HAVE_BOOTLOADER = @as(c_int, 0);
-pub const XCHAL_HAVE_MEM_ECC_PARITY = @as(c_int, 0);
-pub const XCHAL_HAVE_VECTOR_SELECT = @as(c_int, 1);
-pub const XCHAL_HAVE_VECBASE = @as(c_int, 1);
-pub const XCHAL_VECBASE_RESET_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_VECBASE_RESET_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_RESET_VECBASE_OVERLAP = @as(c_int, 0);
-pub const XCHAL_RESET_VECTOR0_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
-pub const XCHAL_RESET_VECTOR0_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
-pub const XCHAL_RESET_VECTOR1_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000400, .hex);
-pub const XCHAL_RESET_VECTOR1_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000400, .hex);
-pub const XCHAL_RESET_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000400, .hex);
-pub const XCHAL_RESET_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000400, .hex);
-pub const XCHAL_USER_VECOFS = @as(c_int, 0x00000340);
-pub const XCHAL_USER_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000340, .hex);
-pub const XCHAL_USER_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000340, .hex);
-pub const XCHAL_KERNEL_VECOFS = @as(c_int, 0x00000300);
-pub const XCHAL_KERNEL_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000300, .hex);
-pub const XCHAL_KERNEL_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000300, .hex);
-pub const XCHAL_DOUBLEEXC_VECOFS = @as(c_int, 0x000003C0);
-pub const XCHAL_DOUBLEEXC_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x400003C0, .hex);
-pub const XCHAL_DOUBLEEXC_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x400003C0, .hex);
-pub const XCHAL_WINDOW_OF4_VECOFS = @as(c_int, 0x00000000);
-pub const XCHAL_WINDOW_UF4_VECOFS = @as(c_int, 0x00000040);
-pub const XCHAL_WINDOW_OF8_VECOFS = @as(c_int, 0x00000080);
-pub const XCHAL_WINDOW_UF8_VECOFS = @as(c_int, 0x000000C0);
-pub const XCHAL_WINDOW_OF12_VECOFS = @as(c_int, 0x00000100);
-pub const XCHAL_WINDOW_UF12_VECOFS = @as(c_int, 0x00000140);
-pub const XCHAL_WINDOW_VECTORS_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_WINDOW_VECTORS_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_INTLEVEL2_VECOFS = @as(c_int, 0x00000180);
-pub const XCHAL_INTLEVEL2_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000180, .hex);
-pub const XCHAL_INTLEVEL2_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000180, .hex);
-pub const XCHAL_INTLEVEL3_VECOFS = @as(c_int, 0x000001C0);
-pub const XCHAL_INTLEVEL3_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x400001C0, .hex);
-pub const XCHAL_INTLEVEL3_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x400001C0, .hex);
-pub const XCHAL_INTLEVEL4_VECOFS = @as(c_int, 0x00000200);
-pub const XCHAL_INTLEVEL4_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000200, .hex);
-pub const XCHAL_INTLEVEL4_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000200, .hex);
-pub const XCHAL_INTLEVEL5_VECOFS = @as(c_int, 0x00000240);
-pub const XCHAL_INTLEVEL5_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000240, .hex);
-pub const XCHAL_INTLEVEL5_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000240, .hex);
-pub const XCHAL_INTLEVEL6_VECOFS = @as(c_int, 0x00000280);
-pub const XCHAL_INTLEVEL6_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000280, .hex);
-pub const XCHAL_INTLEVEL6_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000280, .hex);
-pub const XCHAL_DEBUG_VECOFS = XCHAL_INTLEVEL6_VECOFS;
-pub const XCHAL_DEBUG_VECTOR_VADDR = XCHAL_INTLEVEL6_VECTOR_VADDR;
-pub const XCHAL_DEBUG_VECTOR_PADDR = XCHAL_INTLEVEL6_VECTOR_PADDR;
-pub const XCHAL_NMI_VECOFS = @as(c_int, 0x000002C0);
-pub const XCHAL_NMI_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x400002C0, .hex);
-pub const XCHAL_NMI_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x400002C0, .hex);
-pub const XCHAL_INTLEVEL7_VECOFS = XCHAL_NMI_VECOFS;
-pub const XCHAL_INTLEVEL7_VECTOR_VADDR = XCHAL_NMI_VECTOR_VADDR;
-pub const XCHAL_INTLEVEL7_VECTOR_PADDR = XCHAL_NMI_VECTOR_PADDR;
-pub const XCHAL_HAVE_DEBUG_ERI = @as(c_int, 1);
-pub const XCHAL_HAVE_DEBUG_APB = @as(c_int, 0);
-pub const XCHAL_HAVE_DEBUG_JTAG = @as(c_int, 1);
-pub const XCHAL_HAVE_OCD = @as(c_int, 1);
-pub const XCHAL_NUM_IBREAK = @as(c_int, 2);
-pub const XCHAL_NUM_DBREAK = @as(c_int, 2);
-pub const XCHAL_HAVE_OCD_DIR_ARRAY = @as(c_int, 0);
-pub const XCHAL_HAVE_OCD_LS32DDR = @as(c_int, 1);
-pub const XCHAL_HAVE_TRAX = @as(c_int, 1);
-pub const XCHAL_TRAX_MEM_SIZE = @as(c_int, 16384);
-pub const XCHAL_TRAX_MEM_SHAREABLE = @as(c_int, 1);
-pub const XCHAL_TRAX_ATB_WIDTH = @as(c_int, 0);
-pub const XCHAL_TRAX_TIME_WIDTH = @as(c_int, 0);
-pub const XCHAL_NUM_PERF_COUNTERS = @as(c_int, 2);
-pub const XCHAL_HAVE_TLBS = @as(c_int, 1);
-pub const XCHAL_HAVE_SPANNING_WAY = @as(c_int, 1);
-pub const XCHAL_SPANNING_WAY = @as(c_int, 0);
-pub const XCHAL_HAVE_IDENTITY_MAP = @as(c_int, 1);
-pub const XCHAL_HAVE_CACHEATTR = @as(c_int, 0);
-pub const XCHAL_HAVE_MIMIC_CACHEATTR = @as(c_int, 1);
-pub const XCHAL_HAVE_XLT_CACHEATTR = @as(c_int, 0);
-pub const XCHAL_HAVE_PTP_MMU = @as(c_int, 0);
-pub const XCHAL_MMU_ASID_BITS = @as(c_int, 0);
-pub const XCHAL_MMU_RINGS = @as(c_int, 1);
-pub const XCHAL_MMU_RING_BITS = @as(c_int, 0);
-pub const XCHAL_HAVE_MPU = @as(c_int, 0);
-pub const XCHAL_MPU_ENTRIES = @as(c_int, 0);
-pub const XCHAL_MPU_ALIGN_REQ = @as(c_int, 1);
-pub const XCHAL_MPU_BACKGROUND_ENTRIES = @as(c_int, 0);
-pub const XCHAL_MPU_BG_CACHEADRDIS = @as(c_int, 0);
-pub const XCHAL_MPU_ALIGN_BITS = @as(c_int, 0);
-pub const XCHAL_MPU_ALIGN = @as(c_int, 0);
-pub const XTENSA_CONFIG_CORE_MATMAP_H = "";
-pub const XCHAL_FCA_LIST = XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_BYPASS ++ XCHAL_SEP ++ XTHAL_FAM_BYPASS ++ XCHAL_SEP ++ XTHAL_FAM_BYPASS ++ XCHAL_SEP ++ XTHAL_FAM_BYPASS ++ XCHAL_SEP ++ XTHAL_FAM_BYPASS ++ XCHAL_SEP ++ XTHAL_FAM_BYPASS ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_FAM_EXCEPTION;
-pub const XCHAL_LCA_LIST = XTHAL_LAM_BYPASSG ++ XCHAL_SEP ++ XTHAL_LAM_BYPASSG ++ XCHAL_SEP ++ XTHAL_LAM_BYPASSG ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_BYPASSG ++ XCHAL_SEP ++ XTHAL_LAM_BYPASSG ++ XCHAL_SEP ++ XTHAL_LAM_BYPASSG ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_LAM_EXCEPTION;
-pub const XCHAL_SCA_LIST = XTHAL_SAM_BYPASS ++ XCHAL_SEP ++ XTHAL_SAM_BYPASS ++ XCHAL_SEP ++ XTHAL_SAM_BYPASS ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_BYPASS ++ XCHAL_SEP ++ XTHAL_SAM_BYPASS ++ XCHAL_SEP ++ XTHAL_SAM_BYPASS ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION ++ XCHAL_SEP ++ XTHAL_SAM_EXCEPTION;
-pub const XCHAL_CA_R = @as(c_int, 0xC0) | @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_CA_RX = @as(c_int, 0xD0) | @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_CA_RW = @as(c_int, 0xE0) | @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_CA_RWX = @as(c_int, 0xF0) | @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_CA_BYPASS = @as(c_int, 2);
-pub const XCHAL_CA_BYPASSBUF = @as(c_int, 6);
-pub const XCHAL_CA_WRITETHRU = @as(c_int, 1);
-pub const XCHAL_CA_WRITEBACK = @as(c_int, 2);
-pub const XCHAL_HAVE_CA_WRITEBACK_NOALLOC = @as(c_int, 0);
-pub const XCHAL_CA_WRITEBACK_NOALLOC = @as(c_int, 2);
-pub const XCHAL_CA_BYPASS_RW = @as(c_int, 0);
-pub const XCHAL_CA_WRITETHRU_RW = @as(c_int, 0);
-pub const XCHAL_CA_WRITEBACK_RW = @as(c_int, 0);
-pub const XCHAL_CA_WRITEBACK_NOALLOC_RW = @as(c_int, 0);
-pub const XCHAL_CA_ILLEGAL = @as(c_int, 15);
-pub const XCHAL_CA_ISOLATE = @as(c_int, 0);
-pub const XCHAL_MMU_ASID_INVALID = @as(c_int, 0);
-pub const XCHAL_MMU_ASID_KERNEL = @as(c_int, 0);
-pub const XCHAL_MMU_SR_BITS = @as(c_int, 0);
-pub const XCHAL_MMU_CA_BITS = @as(c_int, 4);
-pub const XCHAL_MMU_MAX_PTE_PAGE_SIZE = @as(c_int, 29);
-pub const XCHAL_MMU_MIN_PTE_PAGE_SIZE = @as(c_int, 29);
-pub const XCHAL_ITLB_WAY_BITS = @as(c_int, 0);
-pub const XCHAL_ITLB_WAYS = @as(c_int, 1);
-pub const XCHAL_ITLB_ARF_WAYS = @as(c_int, 0);
-pub const XCHAL_ITLB_SETS = @as(c_int, 1);
-pub const XCHAL_ITLB_WAY0_SET = @as(c_int, 0);
-pub const XCHAL_ITLB_ARF_SETS = @as(c_int, 0);
-pub const XCHAL_ITLB_MINWIRED_SETS = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_WAY = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_WAYS = @as(c_int, 1);
-pub const XCHAL_ITLB_SET0_ENTRIES_LOG2 = @as(c_int, 3);
-pub const XCHAL_ITLB_SET0_ENTRIES = @as(c_int, 8);
-pub const XCHAL_ITLB_SET0_ARF = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_PAGESIZES = @as(c_int, 1);
-pub const XCHAL_ITLB_SET0_PAGESZ_BITS = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_PAGESZ_LOG2_MIN = @as(c_int, 29);
-pub const XCHAL_ITLB_SET0_PAGESZ_LOG2_MAX = @as(c_int, 29);
-pub const XCHAL_ITLB_SET0_PAGESZ_LOG2_LIST = @as(c_int, 29);
-pub const XCHAL_ITLB_SET0_ASID_CONSTMASK = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_VPN_CONSTMASK = @as(c_int, 0x00000000);
-pub const XCHAL_ITLB_SET0_PPN_CONSTMASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xE0000000, .hex);
-pub const XCHAL_ITLB_SET0_CA_CONSTMASK = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_ASID_RESET = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_VPN_RESET = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_PPN_RESET = @as(c_int, 0);
-pub const XCHAL_ITLB_SET0_CA_RESET = @as(c_int, 1);
-pub const XCHAL_ITLB_SET0_E0_VPN_CONST = @as(c_int, 0x00000000);
-pub const XCHAL_ITLB_SET0_E1_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XCHAL_ITLB_SET0_E2_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_ITLB_SET0_E3_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XCHAL_ITLB_SET0_E4_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
-pub const XCHAL_ITLB_SET0_E5_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XCHAL_ITLB_SET0_E6_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XCHAL_ITLB_SET0_E7_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xE0000000, .hex);
-pub const XCHAL_ITLB_SET0_E0_PPN_CONST = @as(c_int, 0x00000000);
-pub const XCHAL_ITLB_SET0_E1_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XCHAL_ITLB_SET0_E2_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_ITLB_SET0_E3_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XCHAL_ITLB_SET0_E4_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
-pub const XCHAL_ITLB_SET0_E5_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XCHAL_ITLB_SET0_E6_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XCHAL_ITLB_SET0_E7_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xE0000000, .hex);
-pub const XCHAL_ITLB_SET0_E0_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E1_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E2_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E3_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E4_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E5_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E6_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_ITLB_SET0_E7_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_WAY_BITS = @as(c_int, 0);
-pub const XCHAL_DTLB_WAYS = @as(c_int, 1);
-pub const XCHAL_DTLB_ARF_WAYS = @as(c_int, 0);
-pub const XCHAL_DTLB_SETS = @as(c_int, 1);
-pub const XCHAL_DTLB_WAY0_SET = @as(c_int, 0);
-pub const XCHAL_DTLB_ARF_SETS = @as(c_int, 0);
-pub const XCHAL_DTLB_MINWIRED_SETS = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_WAY = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_WAYS = @as(c_int, 1);
-pub const XCHAL_DTLB_SET0_ENTRIES_LOG2 = @as(c_int, 3);
-pub const XCHAL_DTLB_SET0_ENTRIES = @as(c_int, 8);
-pub const XCHAL_DTLB_SET0_ARF = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_PAGESIZES = @as(c_int, 1);
-pub const XCHAL_DTLB_SET0_PAGESZ_BITS = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_PAGESZ_LOG2_MIN = @as(c_int, 29);
-pub const XCHAL_DTLB_SET0_PAGESZ_LOG2_MAX = @as(c_int, 29);
-pub const XCHAL_DTLB_SET0_PAGESZ_LOG2_LIST = @as(c_int, 29);
-pub const XCHAL_DTLB_SET0_ASID_CONSTMASK = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_VPN_CONSTMASK = @as(c_int, 0x00000000);
-pub const XCHAL_DTLB_SET0_PPN_CONSTMASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xE0000000, .hex);
-pub const XCHAL_DTLB_SET0_CA_CONSTMASK = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_ASID_RESET = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_VPN_RESET = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_PPN_RESET = @as(c_int, 0);
-pub const XCHAL_DTLB_SET0_CA_RESET = @as(c_int, 1);
-pub const XCHAL_DTLB_SET0_E0_VPN_CONST = @as(c_int, 0x00000000);
-pub const XCHAL_DTLB_SET0_E1_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XCHAL_DTLB_SET0_E2_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_DTLB_SET0_E3_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XCHAL_DTLB_SET0_E4_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
-pub const XCHAL_DTLB_SET0_E5_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XCHAL_DTLB_SET0_E6_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XCHAL_DTLB_SET0_E7_VPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xE0000000, .hex);
-pub const XCHAL_DTLB_SET0_E0_PPN_CONST = @as(c_int, 0x00000000);
-pub const XCHAL_DTLB_SET0_E1_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XCHAL_DTLB_SET0_E2_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_DTLB_SET0_E3_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XCHAL_DTLB_SET0_E4_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
-pub const XCHAL_DTLB_SET0_E5_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XCHAL_DTLB_SET0_E6_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XCHAL_DTLB_SET0_E7_PPN_CONST = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xE0000000, .hex);
-pub const XCHAL_DTLB_SET0_E0_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E1_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E2_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E3_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E4_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E5_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E6_CA_RESET = @as(c_int, 0x02);
-pub const XCHAL_DTLB_SET0_E7_CA_RESET = @as(c_int, 0x02);
-pub const _XTENSA_CORE_TIE_H = "";
-pub const XCHAL_CP_NUM = @as(c_int, 2);
-pub const XCHAL_CP_MAX = @as(c_int, 4);
-pub const XCHAL_CP_MASK = @as(c_int, 0x09);
-pub const XCHAL_CP_PORT_MASK = @as(c_int, 0x00);
-pub const XCHAL_CP0_NAME = "FPU";
-pub const XCHAL_CP0_IDENT = @compileError("unable to translate macro: undefined identifier `FPU`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:42:9
-pub const XCHAL_CP0_SA_SIZE = @as(c_int, 72);
-pub const XCHAL_CP0_SA_ALIGN = @as(c_int, 4);
-pub const XCHAL_CP_ID_FPU = @as(c_int, 0);
-pub const XCHAL_CP3_NAME = "cop_ai";
-pub const XCHAL_CP3_IDENT = @compileError("unable to translate macro: undefined identifier `cop_ai`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:47:9
-pub const XCHAL_CP3_SA_SIZE = @as(c_int, 208);
-pub const XCHAL_CP3_SA_ALIGN = @as(c_int, 16);
-pub const XCHAL_CP_ID_COP_AI = @as(c_int, 3);
-pub const XCHAL_CP1_SA_SIZE = @as(c_int, 0);
-pub const XCHAL_CP1_SA_ALIGN = @as(c_int, 1);
-pub const XCHAL_CP2_SA_SIZE = @as(c_int, 0);
-pub const XCHAL_CP2_SA_ALIGN = @as(c_int, 1);
-pub const XCHAL_CP4_SA_SIZE = @as(c_int, 0);
-pub const XCHAL_CP4_SA_ALIGN = @as(c_int, 1);
-pub const XCHAL_CP5_SA_SIZE = @as(c_int, 0);
-pub const XCHAL_CP5_SA_ALIGN = @as(c_int, 1);
-pub const XCHAL_CP6_SA_SIZE = @as(c_int, 0);
-pub const XCHAL_CP6_SA_ALIGN = @as(c_int, 1);
-pub const XCHAL_CP7_SA_SIZE = @as(c_int, 0);
-pub const XCHAL_CP7_SA_ALIGN = @as(c_int, 1);
-pub const XCHAL_NCP_SA_SIZE = @as(c_int, 36);
-pub const XCHAL_NCP_SA_ALIGN = @as(c_int, 4);
-pub const XCHAL_TOTAL_SA_SIZE = @as(c_int, 336);
-pub const XCHAL_TOTAL_SA_ALIGN = @as(c_int, 16);
-pub const XCHAL_NCP_SA_NUM = @as(c_int, 9);
-pub const XCHAL_NCP_SA_LIST = @compileError("unable to translate macro: undefined identifier `XCHAL_SA_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:115:9
-pub const XCHAL_CP0_SA_NUM = @as(c_int, 18);
-pub const XCHAL_CP0_SA_LIST = @compileError("unable to translate macro: undefined identifier `XCHAL_SA_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:127:9
-pub const XCHAL_CP1_SA_NUM = @as(c_int, 0);
-pub const XCHAL_CP1_SA_LIST = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:148:9
-pub const XCHAL_CP2_SA_NUM = @as(c_int, 0);
-pub const XCHAL_CP2_SA_LIST = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:151:9
-pub const XCHAL_CP3_SA_NUM = @as(c_int, 26);
-pub const XCHAL_CP3_SA_LIST = @compileError("unable to translate macro: undefined identifier `XCHAL_SA_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:154:9
-pub const XCHAL_CP4_SA_NUM = @as(c_int, 0);
-pub const XCHAL_CP4_SA_LIST = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:183:9
-pub const XCHAL_CP5_SA_NUM = @as(c_int, 0);
-pub const XCHAL_CP5_SA_LIST = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:186:9
-pub const XCHAL_CP6_SA_NUM = @as(c_int, 0);
-pub const XCHAL_CP6_SA_LIST = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:189:9
-pub const XCHAL_CP7_SA_NUM = @as(c_int, 0);
-pub const XCHAL_CP7_SA_LIST = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/tie.h:192:9
-pub const XCHAL_OP0_FORMAT_LENGTHS = blk: {
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    break :blk @as(c_int, 4);
-};
-pub const XCHAL_BYTE0_FORMAT_LENGTHS = blk: {
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 4);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 3);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 2);
-    _ = @as(c_int, 4);
-    break :blk @as(c_int, 4);
-};
-pub const XCHAL_SEP = @compileError("unable to translate C expr: unexpected token ','");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:79:9
-pub const XCHAL_SEP2 = @compileError("unable to translate C expr: unexpected token '}'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:83:9
-pub const XCHAL_MAYHAVE_ERRATUM_XEA1KWIN = (XCHAL_HAVE_XEA1 != 0) and ((XCHAL_HW_RELEASE_AT_OR_BELOW(@as(c_int, 1040), @as(c_int, 2)) != @as(c_int, 0)) or (XCHAL_HW_RELEASE_AT(@as(c_int, 1050), @as(c_int, 0)) != 0));
-pub const XCHAL_ERRATUM_453 = @as(c_int, 0);
-pub const XCHAL_ERRATUM_497 = @as(c_int, 0);
-pub const XCHAL_ERRATUM_572 = @as(c_int, 1);
-pub const XCHAL_HAVE_LE = @as(c_int, 1);
-pub const XCHAL_MEMORY_ORDER = XTHAL_LITTLEENDIAN;
-pub const _XCHAL_INTLEVEL_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_INTLEVEL`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:165:9
-pub inline fn XCHAL_INTLEVEL_MASK(n: anytype) @TypeOf(_XCHAL_INTLEVEL_MASK(n)) {
-    _ = &n;
-    return _XCHAL_INTLEVEL_MASK(n);
-}
-pub const _XCHAL_INTLEVEL_ANDBELOWMASK = @compileError("unable to translate macro: undefined identifier `XCHAL_INTLEVEL`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:167:9
-pub inline fn XCHAL_INTLEVEL_ANDBELOW_MASK(n: anytype) @TypeOf(_XCHAL_INTLEVEL_ANDBELOWMASK(n)) {
-    _ = &n;
-    return _XCHAL_INTLEVEL_ANDBELOWMASK(n);
-}
-pub const _XCHAL_INTLEVEL_NUM = @compileError("unable to translate macro: undefined identifier `XCHAL_INTLEVEL`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:169:9
-pub inline fn XCHAL_INTLEVEL_NUM(n: anytype) @TypeOf(_XCHAL_INTLEVEL_NUM(n)) {
-    _ = &n;
-    return _XCHAL_INTLEVEL_NUM(n);
-}
-pub const _XCHAL_INT_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_INT`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:171:9
-pub inline fn XCHAL_INT_LEVEL(n: anytype) @TypeOf(_XCHAL_INT_LEVEL(n)) {
-    _ = &n;
-    return _XCHAL_INT_LEVEL(n);
-}
-pub const _XCHAL_INT_TYPE = @compileError("unable to translate macro: undefined identifier `XCHAL_INT`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:173:9
-pub inline fn XCHAL_INT_TYPE(n: anytype) @TypeOf(_XCHAL_INT_TYPE(n)) {
-    _ = &n;
-    return _XCHAL_INT_TYPE(n);
-}
-pub const _XCHAL_TIMER_INTERRUPT = @compileError("unable to translate macro: undefined identifier `XCHAL_TIMER`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:175:9
-pub inline fn XCHAL_TIMER_INTERRUPT(n: anytype) @TypeOf(_XCHAL_TIMER_INTERRUPT(n)) {
-    _ = &n;
-    return _XCHAL_TIMER_INTERRUPT(n);
-}
-pub const XCHAL_HAVE_HIGHLEVEL_INTERRUPTS = XCHAL_HAVE_HIGHPRI_INTERRUPTS;
-pub const XCHAL_NUM_LOWPRI_LEVELS = @as(c_int, 1);
-pub const XCHAL_FIRST_HIGHPRI_LEVEL = XCHAL_NUM_LOWPRI_LEVELS + @as(c_int, 1);
-pub const XCHAL_INTLEVEL0_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL8_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL9_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL10_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL11_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL12_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL13_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL14_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL15_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL_MASKS = XCHAL_INTLEVEL0_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL1_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL2_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL3_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL4_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL5_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL6_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL7_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL8_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL9_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL10_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL11_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL12_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL13_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL14_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL15_MASK;
-pub const XCHAL_INTLEVEL0_ANDBELOW_MASK = @as(c_int, 0x00000000);
-pub const XCHAL_INTLEVEL8_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL9_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL10_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL11_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL12_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL13_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL14_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_INTLEVEL15_ANDBELOW_MASK = XCHAL_INTLEVEL7_ANDBELOW_MASK;
-pub const XCHAL_LOWPRI_MASK = XCHAL_INTLEVEL1_ANDBELOW_MASK;
-pub const XCHAL_EXCM_MASK = XCHAL_INTLEVEL_ANDBELOW_MASK(XCHAL_EXCM_LEVEL);
-pub const XCHAL_INTLEVEL_ANDBELOW_MASKS = XCHAL_INTLEVEL0_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL1_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL2_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL3_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL4_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL5_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL6_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL7_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL8_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL9_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL10_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL11_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL12_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL13_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL14_ANDBELOW_MASK ++ XCHAL_SEP ++ XCHAL_INTLEVEL15_ANDBELOW_MASK;
-pub const XCHAL_INT_LEVELS = XCHAL_INT0_LEVEL ++ XCHAL_SEP ++ XCHAL_INT1_LEVEL ++ XCHAL_SEP ++ XCHAL_INT2_LEVEL ++ XCHAL_SEP ++ XCHAL_INT3_LEVEL ++ XCHAL_SEP ++ XCHAL_INT4_LEVEL ++ XCHAL_SEP ++ XCHAL_INT5_LEVEL ++ XCHAL_SEP ++ XCHAL_INT6_LEVEL ++ XCHAL_SEP ++ XCHAL_INT7_LEVEL ++ XCHAL_SEP ++ XCHAL_INT8_LEVEL ++ XCHAL_SEP ++ XCHAL_INT9_LEVEL ++ XCHAL_SEP ++ XCHAL_INT10_LEVEL ++ XCHAL_SEP ++ XCHAL_INT11_LEVEL ++ XCHAL_SEP ++ XCHAL_INT12_LEVEL ++ XCHAL_SEP ++ XCHAL_INT13_LEVEL ++ XCHAL_SEP ++ XCHAL_INT14_LEVEL ++ XCHAL_SEP ++ XCHAL_INT15_LEVEL ++ XCHAL_SEP ++ XCHAL_INT16_LEVEL ++ XCHAL_SEP ++ XCHAL_INT17_LEVEL ++ XCHAL_SEP ++ XCHAL_INT18_LEVEL ++ XCHAL_SEP ++ XCHAL_INT19_LEVEL ++ XCHAL_SEP ++ XCHAL_INT20_LEVEL ++ XCHAL_SEP ++ XCHAL_INT21_LEVEL ++ XCHAL_SEP ++ XCHAL_INT22_LEVEL ++ XCHAL_SEP ++ XCHAL_INT23_LEVEL ++ XCHAL_SEP ++ XCHAL_INT24_LEVEL ++ XCHAL_SEP ++ XCHAL_INT25_LEVEL ++ XCHAL_SEP ++ XCHAL_INT26_LEVEL ++ XCHAL_SEP ++ XCHAL_INT27_LEVEL ++ XCHAL_SEP ++ XCHAL_INT28_LEVEL ++ XCHAL_SEP ++ XCHAL_INT29_LEVEL ++ XCHAL_SEP ++ XCHAL_INT30_LEVEL ++ XCHAL_SEP ++ XCHAL_INT31_LEVEL;
-pub const XCHAL_INT_TYPES = XCHAL_INT0_TYPE ++ XCHAL_SEP ++ XCHAL_INT1_TYPE ++ XCHAL_SEP ++ XCHAL_INT2_TYPE ++ XCHAL_SEP ++ XCHAL_INT3_TYPE ++ XCHAL_SEP ++ XCHAL_INT4_TYPE ++ XCHAL_SEP ++ XCHAL_INT5_TYPE ++ XCHAL_SEP ++ XCHAL_INT6_TYPE ++ XCHAL_SEP ++ XCHAL_INT7_TYPE ++ XCHAL_SEP ++ XCHAL_INT8_TYPE ++ XCHAL_SEP ++ XCHAL_INT9_TYPE ++ XCHAL_SEP ++ XCHAL_INT10_TYPE ++ XCHAL_SEP ++ XCHAL_INT11_TYPE ++ XCHAL_SEP ++ XCHAL_INT12_TYPE ++ XCHAL_SEP ++ XCHAL_INT13_TYPE ++ XCHAL_SEP ++ XCHAL_INT14_TYPE ++ XCHAL_SEP ++ XCHAL_INT15_TYPE ++ XCHAL_SEP ++ XCHAL_INT16_TYPE ++ XCHAL_SEP ++ XCHAL_INT17_TYPE ++ XCHAL_SEP ++ XCHAL_INT18_TYPE ++ XCHAL_SEP ++ XCHAL_INT19_TYPE ++ XCHAL_SEP ++ XCHAL_INT20_TYPE ++ XCHAL_SEP ++ XCHAL_INT21_TYPE ++ XCHAL_SEP ++ XCHAL_INT22_TYPE ++ XCHAL_SEP ++ XCHAL_INT23_TYPE ++ XCHAL_SEP ++ XCHAL_INT24_TYPE ++ XCHAL_SEP ++ XCHAL_INT25_TYPE ++ XCHAL_SEP ++ XCHAL_INT26_TYPE ++ XCHAL_SEP ++ XCHAL_INT27_TYPE ++ XCHAL_SEP ++ XCHAL_INT28_TYPE ++ XCHAL_SEP ++ XCHAL_INT29_TYPE ++ XCHAL_SEP ++ XCHAL_INT30_TYPE ++ XCHAL_SEP ++ XCHAL_INT31_TYPE;
-pub const XCHAL_INTTYPE_MASKS = XCHAL_INTTYPE_MASK_UNCONFIGURED ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_SOFTWARE ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_EXTERN_EDGE ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_EXTERN_LEVEL ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_TIMER ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_NMI ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_WRITE_ERROR ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_IDMA_DONE ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_IDMA_ERR ++ XCHAL_SEP ++ XCHAL_INTTYPE_MASK_GS_ERR;
-pub const XCHAL_INTCLEARABLE_MASK = (XCHAL_INTTYPE_MASK_SOFTWARE + XCHAL_INTTYPE_MASK_EXTERN_EDGE) + XCHAL_INTTYPE_MASK_WRITE_ERROR;
-pub const XCHAL_INTSETTABLE_MASK = XCHAL_INTTYPE_MASK_SOFTWARE;
-pub const XCHAL_TIMER_INTERRUPTS = XCHAL_TIMER0_INTERRUPT ++ XCHAL_SEP ++ XCHAL_TIMER1_INTERRUPT ++ XCHAL_SEP ++ XCHAL_TIMER2_INTERRUPT ++ XCHAL_SEP ++ XCHAL_TIMER3_INTERRUPT;
-pub const XCHAL_EXTINT0_MASK = @as(c_int, 1) << XCHAL_EXTINT0_NUM;
-pub const XCHAL_EXTINT0_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT0_NUM);
-pub const XCHAL_EXTINT1_MASK = @as(c_int, 1) << XCHAL_EXTINT1_NUM;
-pub const XCHAL_EXTINT1_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT1_NUM);
-pub const XCHAL_EXTINT2_MASK = @as(c_int, 1) << XCHAL_EXTINT2_NUM;
-pub const XCHAL_EXTINT2_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT2_NUM);
-pub const XCHAL_EXTINT3_MASK = @as(c_int, 1) << XCHAL_EXTINT3_NUM;
-pub const XCHAL_EXTINT3_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT3_NUM);
-pub const XCHAL_EXTINT4_MASK = @as(c_int, 1) << XCHAL_EXTINT4_NUM;
-pub const XCHAL_EXTINT4_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT4_NUM);
-pub const XCHAL_EXTINT5_MASK = @as(c_int, 1) << XCHAL_EXTINT5_NUM;
-pub const XCHAL_EXTINT5_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT5_NUM);
-pub const XCHAL_EXTINT6_MASK = @as(c_int, 1) << XCHAL_EXTINT6_NUM;
-pub const XCHAL_EXTINT6_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT6_NUM);
-pub const XCHAL_EXTINT7_MASK = @as(c_int, 1) << XCHAL_EXTINT7_NUM;
-pub const XCHAL_EXTINT7_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT7_NUM);
-pub const XCHAL_EXTINT8_MASK = @as(c_int, 1) << XCHAL_EXTINT8_NUM;
-pub const XCHAL_EXTINT8_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT8_NUM);
-pub const XCHAL_EXTINT9_MASK = @as(c_int, 1) << XCHAL_EXTINT9_NUM;
-pub const XCHAL_EXTINT9_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT9_NUM);
-pub const XCHAL_EXTINT10_MASK = @as(c_int, 1) << XCHAL_EXTINT10_NUM;
-pub const XCHAL_EXTINT10_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT10_NUM);
-pub const XCHAL_EXTINT11_MASK = @as(c_int, 1) << XCHAL_EXTINT11_NUM;
-pub const XCHAL_EXTINT11_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT11_NUM);
-pub const XCHAL_EXTINT12_MASK = @as(c_int, 1) << XCHAL_EXTINT12_NUM;
-pub const XCHAL_EXTINT12_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT12_NUM);
-pub const XCHAL_EXTINT13_MASK = @as(c_int, 1) << XCHAL_EXTINT13_NUM;
-pub const XCHAL_EXTINT13_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT13_NUM);
-pub const XCHAL_EXTINT14_MASK = @as(c_int, 1) << XCHAL_EXTINT14_NUM;
-pub const XCHAL_EXTINT14_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT14_NUM);
-pub const XCHAL_EXTINT15_MASK = @as(c_int, 1) << XCHAL_EXTINT15_NUM;
-pub const XCHAL_EXTINT15_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT15_NUM);
-pub const XCHAL_EXTINT16_MASK = @as(c_int, 1) << XCHAL_EXTINT16_NUM;
-pub const XCHAL_EXTINT16_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT16_NUM);
-pub const XCHAL_EXTINT17_MASK = @as(c_int, 1) << XCHAL_EXTINT17_NUM;
-pub const XCHAL_EXTINT17_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT17_NUM);
-pub const XCHAL_EXTINT18_MASK = @as(c_int, 1) << XCHAL_EXTINT18_NUM;
-pub const XCHAL_EXTINT18_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT18_NUM);
-pub const XCHAL_EXTINT19_MASK = @as(c_int, 1) << XCHAL_EXTINT19_NUM;
-pub const XCHAL_EXTINT19_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT19_NUM);
-pub const XCHAL_EXTINT20_MASK = @as(c_int, 1) << XCHAL_EXTINT20_NUM;
-pub const XCHAL_EXTINT20_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT20_NUM);
-pub const XCHAL_EXTINT21_MASK = @as(c_int, 1) << XCHAL_EXTINT21_NUM;
-pub const XCHAL_EXTINT21_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT21_NUM);
-pub const XCHAL_EXTINT22_MASK = @as(c_int, 1) << XCHAL_EXTINT22_NUM;
-pub const XCHAL_EXTINT22_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT22_NUM);
-pub const XCHAL_EXTINT23_MASK = @as(c_int, 1) << XCHAL_EXTINT23_NUM;
-pub const XCHAL_EXTINT23_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT23_NUM);
-pub const XCHAL_EXTINT24_MASK = @as(c_int, 1) << XCHAL_EXTINT24_NUM;
-pub const XCHAL_EXTINT24_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT24_NUM);
-pub const XCHAL_EXTINT25_MASK = @as(c_int, 1) << XCHAL_EXTINT25_NUM;
-pub const XCHAL_EXTINT25_LEVEL = XCHAL_INT_LEVEL(XCHAL_EXTINT25_NUM);
-pub const XCHAL_EXTINT26_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT26_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:535:9
-pub const XCHAL_EXTINT26_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT26_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:536:9
-pub const XCHAL_EXTINT27_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT27_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:537:9
-pub const XCHAL_EXTINT27_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT27_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:538:9
-pub const XCHAL_EXTINT28_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT28_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:539:9
-pub const XCHAL_EXTINT28_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT28_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:540:9
-pub const XCHAL_EXTINT29_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT29_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:541:9
-pub const XCHAL_EXTINT29_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT29_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:542:9
-pub const XCHAL_EXTINT30_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT30_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:543:9
-pub const XCHAL_EXTINT30_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT30_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:544:9
-pub const XCHAL_EXTINT31_MASK = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT31_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:545:9
-pub const XCHAL_EXTINT31_LEVEL = @compileError("unable to translate macro: undefined identifier `XCHAL_EXTINT31_NUM`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:546:9
-pub const XCHAL_HAVE_OLD_EXC_ARCH = XCHAL_HAVE_XEA1;
-pub const XCHAL_HAVE_EXCM = XCHAL_HAVE_XEA2;
-pub const XCHAL_PROGRAMEXC_VECTOR_VADDR = XCHAL_USER_VECTOR_VADDR;
-pub const XCHAL_USEREXC_VECTOR_VADDR = XCHAL_USER_VECTOR_VADDR;
-pub const XCHAL_PROGRAMEXC_VECTOR_PADDR = XCHAL_USER_VECTOR_PADDR;
-pub const XCHAL_USEREXC_VECTOR_PADDR = XCHAL_USER_VECTOR_PADDR;
-pub const XCHAL_STACKEDEXC_VECTOR_VADDR = XCHAL_KERNEL_VECTOR_VADDR;
-pub const XCHAL_KERNELEXC_VECTOR_VADDR = XCHAL_KERNEL_VECTOR_VADDR;
-pub const XCHAL_STACKEDEXC_VECTOR_PADDR = XCHAL_KERNEL_VECTOR_PADDR;
-pub const XCHAL_KERNELEXC_VECTOR_PADDR = XCHAL_KERNEL_VECTOR_PADDR;
-pub const _XCHAL_INTLEVEL_VECTOR_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INTLEVEL`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:582:9
-pub inline fn XCHAL_INTLEVEL_VECTOR_VADDR(n: anytype) @TypeOf(_XCHAL_INTLEVEL_VECTOR_VADDR(n)) {
-    _ = &n;
-    return _XCHAL_INTLEVEL_VECTOR_VADDR(n);
-}
-pub const XCHAL_EXCCAUSE_ILLEGAL_INSTRUCTION = @as(c_int, 0);
-pub const XCHAL_EXCCAUSE_SYSTEM_CALL = @as(c_int, 1);
-pub const XCHAL_EXCCAUSE_INSTRUCTION_FETCH_ERROR = @as(c_int, 2);
-pub const XCHAL_EXCCAUSE_LOAD_STORE_ERROR = @as(c_int, 3);
-pub const XCHAL_EXCCAUSE_LEVEL1_INTERRUPT = @as(c_int, 4);
-pub const XCHAL_EXCCAUSE_ALLOCA = @as(c_int, 5);
-pub const XCHAL_EXCCAUSE_INTEGER_DIVIDE_BY_ZERO = @as(c_int, 6);
-pub const XCHAL_EXCCAUSE_SPECULATION = @as(c_int, 7);
-pub const XCHAL_EXCCAUSE_PRIVILEGED = @as(c_int, 8);
-pub const XCHAL_EXCCAUSE_UNALIGNED = @as(c_int, 9);
-pub const XCHAL_EXCCAUSE_ITLB_MISS = @as(c_int, 16);
-pub const XCHAL_EXCCAUSE_ITLB_MULTIHIT = @as(c_int, 17);
-pub const XCHAL_EXCCAUSE_ITLB_PRIVILEGE = @as(c_int, 18);
-pub const XCHAL_EXCCAUSE_ITLB_SIZE_RESTRICTION = @as(c_int, 19);
-pub const XCHAL_EXCCAUSE_FETCH_CACHE_ATTRIBUTE = @as(c_int, 20);
-pub const XCHAL_EXCCAUSE_DTLB_MISS = @as(c_int, 24);
-pub const XCHAL_EXCCAUSE_DTLB_MULTIHIT = @as(c_int, 25);
-pub const XCHAL_EXCCAUSE_DTLB_PRIVILEGE = @as(c_int, 26);
-pub const XCHAL_EXCCAUSE_DTLB_SIZE_RESTRICTION = @as(c_int, 27);
-pub const XCHAL_EXCCAUSE_LOAD_CACHE_ATTRIBUTE = @as(c_int, 28);
-pub const XCHAL_EXCCAUSE_STORE_CACHE_ATTRIBUTE = @as(c_int, 29);
-pub const XCHAL_EXCCAUSE_COPROCESSOR0_DISABLED = @as(c_int, 32);
-pub const XCHAL_EXCCAUSE_COPROCESSOR1_DISABLED = @as(c_int, 33);
-pub const XCHAL_EXCCAUSE_COPROCESSOR2_DISABLED = @as(c_int, 34);
-pub const XCHAL_EXCCAUSE_COPROCESSOR3_DISABLED = @as(c_int, 35);
-pub const XCHAL_EXCCAUSE_COPROCESSOR4_DISABLED = @as(c_int, 36);
-pub const XCHAL_EXCCAUSE_COPROCESSOR5_DISABLED = @as(c_int, 37);
-pub const XCHAL_EXCCAUSE_COPROCESSOR6_DISABLED = @as(c_int, 38);
-pub const XCHAL_EXCCAUSE_COPROCESSOR7_DISABLED = @as(c_int, 39);
-pub const XCHAL_DBREAKC_VALIDMASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC000003F, .hex);
-pub const XCHAL_DBREAKC_MASK_BITS = @as(c_int, 6);
-pub const XCHAL_DBREAKC_MASK_NUM = @as(c_int, 64);
-pub const XCHAL_DBREAKC_MASK_SHIFT = @as(c_int, 0);
-pub const XCHAL_DBREAKC_MASK_MASK = @as(c_int, 0x0000003F);
-pub const XCHAL_DBREAKC_LOADBREAK_BITS = @as(c_int, 1);
-pub const XCHAL_DBREAKC_LOADBREAK_NUM = @as(c_int, 2);
-pub const XCHAL_DBREAKC_LOADBREAK_SHIFT = @as(c_int, 30);
-pub const XCHAL_DBREAKC_LOADBREAK_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const XCHAL_DBREAKC_STOREBREAK_BITS = @as(c_int, 1);
-pub const XCHAL_DBREAKC_STOREBREAK_NUM = @as(c_int, 2);
-pub const XCHAL_DBREAKC_STOREBREAK_SHIFT = @as(c_int, 31);
-pub const XCHAL_DBREAKC_STOREBREAK_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
-pub const XCHAL_PS_VALIDMASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00070F3F, .hex);
-pub const XCHAL_PS_INTLEVEL_BITS = @as(c_int, 4);
-pub const XCHAL_PS_INTLEVEL_NUM = @as(c_int, 16);
-pub const XCHAL_PS_INTLEVEL_SHIFT = @as(c_int, 0);
-pub const XCHAL_PS_INTLEVEL_MASK = @as(c_int, 0x0000000F);
-pub const XCHAL_PS_EXCM_BITS = @as(c_int, 1);
-pub const XCHAL_PS_EXCM_NUM = @as(c_int, 2);
-pub const XCHAL_PS_EXCM_SHIFT = @as(c_int, 4);
-pub const XCHAL_PS_EXCM_MASK = @as(c_int, 0x00000010);
-pub const XCHAL_PS_UM_BITS = @as(c_int, 1);
-pub const XCHAL_PS_UM_NUM = @as(c_int, 2);
-pub const XCHAL_PS_UM_SHIFT = @as(c_int, 5);
-pub const XCHAL_PS_UM_MASK = @as(c_int, 0x00000020);
-pub const XCHAL_PS_RING_BITS = @as(c_int, 2);
-pub const XCHAL_PS_RING_NUM = @as(c_int, 4);
-pub const XCHAL_PS_RING_SHIFT = @as(c_int, 6);
-pub const XCHAL_PS_RING_MASK = @as(c_int, 0x000000C0);
-pub const XCHAL_PS_OWB_BITS = @as(c_int, 4);
-pub const XCHAL_PS_OWB_NUM = @as(c_int, 16);
-pub const XCHAL_PS_OWB_SHIFT = @as(c_int, 8);
-pub const XCHAL_PS_OWB_MASK = @as(c_int, 0x00000F00);
-pub const XCHAL_PS_CALLINC_BITS = @as(c_int, 2);
-pub const XCHAL_PS_CALLINC_NUM = @as(c_int, 4);
-pub const XCHAL_PS_CALLINC_SHIFT = @as(c_int, 16);
-pub const XCHAL_PS_CALLINC_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00030000, .hex);
-pub const XCHAL_PS_WOE_BITS = @as(c_int, 1);
-pub const XCHAL_PS_WOE_NUM = @as(c_int, 2);
-pub const XCHAL_PS_WOE_SHIFT = @as(c_int, 18);
-pub const XCHAL_PS_WOE_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00040000, .hex);
-pub const XCHAL_EXCCAUSE_VALIDMASK = @as(c_int, 0x0000003F);
-pub const XCHAL_EXCCAUSE_BITS = @as(c_int, 6);
-pub const XCHAL_EXCCAUSE_NUM = @as(c_int, 64);
-pub const XCHAL_EXCCAUSE_SHIFT = @as(c_int, 0);
-pub const XCHAL_EXCCAUSE_MASK = @as(c_int, 0x0000003F);
-pub const XCHAL_DEBUGCAUSE_VALIDMASK = @as(c_int, 0x0000003F);
-pub const XCHAL_DEBUGCAUSE_ICOUNT_BITS = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_ICOUNT_NUM = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_ICOUNT_SHIFT = @as(c_int, 0);
-pub const XCHAL_DEBUGCAUSE_ICOUNT_MASK = @as(c_int, 0x00000001);
-pub const XCHAL_DEBUGCAUSE_IBREAK_BITS = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_IBREAK_NUM = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_IBREAK_SHIFT = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_IBREAK_MASK = @as(c_int, 0x00000002);
-pub const XCHAL_DEBUGCAUSE_DBREAK_BITS = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_DBREAK_NUM = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_DBREAK_SHIFT = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_DBREAK_MASK = @as(c_int, 0x00000004);
-pub const XCHAL_DEBUGCAUSE_BREAK_BITS = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_BREAK_NUM = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_BREAK_SHIFT = @as(c_int, 3);
-pub const XCHAL_DEBUGCAUSE_BREAK_MASK = @as(c_int, 0x00000008);
-pub const XCHAL_DEBUGCAUSE_BREAKN_BITS = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_BREAKN_NUM = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_BREAKN_SHIFT = @as(c_int, 4);
-pub const XCHAL_DEBUGCAUSE_BREAKN_MASK = @as(c_int, 0x00000010);
-pub const XCHAL_DEBUGCAUSE_DEBUGINT_BITS = @as(c_int, 1);
-pub const XCHAL_DEBUGCAUSE_DEBUGINT_NUM = @as(c_int, 2);
-pub const XCHAL_DEBUGCAUSE_DEBUGINT_SHIFT = @as(c_int, 5);
-pub const XCHAL_DEBUGCAUSE_DEBUGINT_MASK = @as(c_int, 0x00000020);
-pub const XCHAL_NUM_IROM = XCHAL_NUM_INSTROM;
-pub const XCHAL_NUM_IRAM = XCHAL_NUM_INSTRAM;
-pub const XCHAL_NUM_DROM = XCHAL_NUM_DATAROM;
-pub const XCHAL_NUM_DRAM = XCHAL_NUM_DATARAM;
-pub const XCHAL_IROM0_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTROM0_VADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:741:9
-pub const XCHAL_IROM0_PADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTROM0_PADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:742:9
-pub const XCHAL_IROM0_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTROM0_SIZE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:743:9
-pub const XCHAL_IROM1_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTROM1_VADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:744:9
-pub const XCHAL_IROM1_PADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTROM1_PADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:745:9
-pub const XCHAL_IROM1_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTROM1_SIZE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:746:9
-pub const XCHAL_IRAM0_VADDR = XCHAL_INSTRAM0_VADDR;
-pub const XCHAL_IRAM0_PADDR = XCHAL_INSTRAM0_PADDR;
-pub const XCHAL_IRAM0_SIZE = XCHAL_INSTRAM0_SIZE;
-pub const XCHAL_IRAM1_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTRAM1_VADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:750:9
-pub const XCHAL_IRAM1_PADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTRAM1_PADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:751:9
-pub const XCHAL_IRAM1_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_INSTRAM1_SIZE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:752:9
-pub const XCHAL_DROM0_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_DATAROM0_VADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:753:9
-pub const XCHAL_DROM0_PADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_DATAROM0_PADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:754:9
-pub const XCHAL_DROM0_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_DATAROM0_SIZE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:755:9
-pub const XCHAL_DROM1_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_DATAROM1_VADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:756:9
-pub const XCHAL_DROM1_PADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_DATAROM1_PADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:757:9
-pub const XCHAL_DROM1_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_DATAROM1_SIZE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:758:9
-pub const XCHAL_DRAM0_VADDR = XCHAL_DATARAM0_VADDR;
-pub const XCHAL_DRAM0_PADDR = XCHAL_DATARAM0_PADDR;
-pub const XCHAL_DRAM0_SIZE = XCHAL_DATARAM0_SIZE;
-pub const XCHAL_DRAM1_VADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_DATARAM1_VADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:762:9
-pub const XCHAL_DRAM1_PADDR = @compileError("unable to translate macro: undefined identifier `XCHAL_DATARAM1_PADDR`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:763:9
-pub const XCHAL_DRAM1_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_DATARAM1_SIZE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:764:9
-pub const XCHAL_CACHE_PREFCTL_DEFAULT = @as(c_int, 0x01044);
-pub const XCHAL_CACHE_LINEWIDTH_MAX = XCHAL_DCACHE_LINEWIDTH;
-pub const XCHAL_CACHE_LINESIZE_MAX = XCHAL_DCACHE_LINESIZE;
-pub const XCHAL_ICACHE_SETSIZE = @as(c_int, 1) << XCHAL_ICACHE_SETWIDTH;
-pub const XCHAL_DCACHE_SETSIZE = @as(c_int, 1) << XCHAL_DCACHE_SETWIDTH;
-pub const XCHAL_CACHE_SETWIDTH_MAX = XCHAL_DCACHE_SETWIDTH;
-pub const XCHAL_CACHE_SETSIZE_MAX = XCHAL_DCACHE_SETSIZE;
-pub const XCHAL_ICACHE_TAG_V_SHIFT = @as(c_int, 0);
-pub const XCHAL_ICACHE_TAG_V = @as(c_int, 0x1);
-pub const XCHAL_ICACHE_TAG_F_SHIFT = @as(c_int, 0);
-pub const XCHAL_ICACHE_TAG_F = @as(c_int, 0);
-pub const XCHAL_ICACHE_TAG_L_SHIFT = XCHAL_ICACHE_TAG_F_SHIFT;
-pub const XCHAL_ICACHE_TAG_L = @as(c_int, 0);
-pub const XCHAL_DCACHE_TAG_V_SHIFT = @as(c_int, 0);
-pub const XCHAL_DCACHE_TAG_V = @as(c_int, 0x1);
-pub const XCHAL_DCACHE_TAG_F_SHIFT = @as(c_int, 0);
-pub const XCHAL_DCACHE_TAG_F = @as(c_int, 0);
-pub const XCHAL_DCACHE_TAG_D_SHIFT = XCHAL_DCACHE_TAG_F_SHIFT;
-pub const XCHAL_DCACHE_TAG_D = @as(c_int, 0);
-pub const XCHAL_DCACHE_TAG_L_SHIFT = XCHAL_DCACHE_TAG_D_SHIFT;
-pub const XCHAL_DCACHE_TAG_L = @as(c_int, 0);
-pub const XCHAL_USE_MEMCTL = ((((XCHAL_LOOP_BUFFER_SIZE > @as(c_int, 0)) or (XCHAL_DCACHE_IS_COHERENT != 0)) or (XCHAL_HAVE_ICACHE_DYN_WAYS != 0)) or (XCHAL_HAVE_DCACHE_DYN_WAYS != 0)) and (XCHAL_HW_MIN_VERSION >= XTENSA_HWVERSION_RE_2012_0);
-pub const _MEMCTL_SNOOP_EN = @as(c_int, 0x00);
-pub const _MEMCTL_L0IBUF_EN = @as(c_int, 0x01);
-pub const XCHAL_CACHE_MEMCTL_DEFAULT = @as(c_int, 0x00000000) | _MEMCTL_L0IBUF_EN;
-pub const XCHAL_SNOOP_LB_MEMCTL_DEFAULT = _MEMCTL_SNOOP_EN | _MEMCTL_L0IBUF_EN;
-pub const _XCHAL_ITLB_SET = @compileError("unable to translate C expr: unexpected token '##'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:890:9
-pub const XCHAL_ITLB_SET = @compileError("unable to translate macro: undefined identifier `_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:891:9
-pub const _XCHAL_ITLB_SET_E = @compileError("unable to translate macro: undefined identifier `_E`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:892:9
-pub const XCHAL_ITLB_SET_E = @compileError("unable to translate macro: undefined identifier `_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:893:9
-pub const _XCHAL_DTLB_SET = @compileError("unable to translate C expr: unexpected token '##'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:894:9
-pub const XCHAL_DTLB_SET = @compileError("unable to translate macro: undefined identifier `_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:895:9
-pub const _XCHAL_DTLB_SET_E = @compileError("unable to translate macro: undefined identifier `_E`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:896:9
-pub const XCHAL_DTLB_SET_E = @compileError("unable to translate macro: undefined identifier `_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:897:9
-pub const XCHAL_ITLB_ARF_ENTRIES = @compileError("unable to translate macro: undefined identifier `XCHAL_ITLB_ARF_ENTRIES_LOG2`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:904:9
-pub const XCHAL_DTLB_ARF_ENTRIES = @compileError("unable to translate macro: undefined identifier `XCHAL_DTLB_ARF_ENTRIES_LOG2`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:905:9
-pub const XCHAL_ALIGN_MAX = XCHAL_DATA_WIDTH;
-pub const XCHAL_HW_RELEASE_MAJOR = XCHAL_HW_VERSION_MAJOR;
-pub const XCHAL_HW_RELEASE_MINOR = XCHAL_HW_VERSION_MINOR;
-pub const XCHAL_HW_RELEASE_NAME = XCHAL_HW_VERSION_NAME;
-pub const XCHAL_EXTRA_SA_SIZE = XCHAL_NCP_SA_SIZE;
-pub const XCHAL_EXTRA_SA_ALIGN = XCHAL_NCP_SA_ALIGN;
-pub const XCHAL_CPEXTRA_SA_SIZE = XCHAL_TOTAL_SA_SIZE;
-pub const XCHAL_CPEXTRA_SA_ALIGN = XCHAL_TOTAL_SA_ALIGN;
-pub const XCHAL_CP1_NAME = @as(c_int, 0);
-pub const XCHAL_CP1_SA_CONTENTS_LIBDB_NUM = @as(c_int, 0);
-pub const XCHAL_CP1_SA_CONTENTS_LIBDB = "";
-pub const XCHAL_CP2_NAME = @as(c_int, 0);
-pub const XCHAL_CP2_SA_CONTENTS_LIBDB_NUM = @as(c_int, 0);
-pub const XCHAL_CP2_SA_CONTENTS_LIBDB = "";
-pub const XCHAL_CP4_NAME = @as(c_int, 0);
-pub const XCHAL_CP4_SA_CONTENTS_LIBDB_NUM = @as(c_int, 0);
-pub const XCHAL_CP4_SA_CONTENTS_LIBDB = "";
-pub const XCHAL_CP5_NAME = @as(c_int, 0);
-pub const XCHAL_CP5_SA_CONTENTS_LIBDB_NUM = @as(c_int, 0);
-pub const XCHAL_CP5_SA_CONTENTS_LIBDB = "";
-pub const XCHAL_CP6_NAME = @as(c_int, 0);
-pub const XCHAL_CP6_SA_CONTENTS_LIBDB_NUM = @as(c_int, 0);
-pub const XCHAL_CP6_SA_CONTENTS_LIBDB = "";
-pub const XCHAL_CP7_NAME = @as(c_int, 0);
-pub const XCHAL_CP7_SA_CONTENTS_LIBDB_NUM = @as(c_int, 0);
-pub const XCHAL_CP7_SA_CONTENTS_LIBDB = "";
-pub const _XCHAL_CP_SA_SIZE = @compileError("unable to translate macro: undefined identifier `XCHAL_CP`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:1326:9
-pub inline fn XCHAL_CP_SA_SIZE(n: anytype) @TypeOf(_XCHAL_CP_SA_SIZE(n)) {
-    _ = &n;
-    return _XCHAL_CP_SA_SIZE(n);
-}
-pub const _XCHAL_CP_SA_ALIGN = @compileError("unable to translate macro: undefined identifier `XCHAL_CP`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:1328:9
-pub inline fn XCHAL_CP_SA_ALIGN(n: anytype) @TypeOf(_XCHAL_CP_SA_ALIGN(n)) {
-    _ = &n;
-    return _XCHAL_CP_SA_ALIGN(n);
-}
-pub const XCHAL_CPEXTRA_SA_SIZE_TOR2 = XCHAL_CPEXTRA_SA_SIZE;
-pub const _XCJOIN = @compileError("unable to translate C expr: unexpected token '##'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/esp32s3/include/xtensa/config/core.h:1336:10
-pub inline fn XCJOIN(a: anytype, b: anytype) @TypeOf(_XCJOIN(a, b)) {
-    _ = &a;
-    _ = &b;
-    return _XCJOIN(a, b);
-}
-pub const XCHAL_INST_ILLN = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xF06D, .hex);
-pub const XCHAL_INST_ILLN_BYTE0 = @as(c_int, 0x6D);
-pub const XCHAL_INST_ILLN_BYTE1 = @as(c_int, 0xF0);
-pub const XTHAL_INST_ILL = @as(c_int, 0x000000);
-pub inline fn XCHAL_HW_RELEASE_AT_OR_BELOW(major: anytype, minor: anytype) @TypeOf(if (XTHAL_REL_LE(XCHAL_HW_VERSION_MAJOR, XCHAL_HW_VERSION_MINOR, major, minor)) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &major;
-    _ = &minor;
-    return if (XTHAL_REL_LE(XCHAL_HW_VERSION_MAJOR, XCHAL_HW_VERSION_MINOR, major, minor)) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn XCHAL_HW_RELEASE_AT_OR_ABOVE(major: anytype, minor: anytype) @TypeOf(if (XTHAL_REL_GE(XCHAL_HW_VERSION_MAJOR, XCHAL_HW_VERSION_MINOR, major, minor)) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &major;
-    _ = &minor;
-    return if (XTHAL_REL_GE(XCHAL_HW_VERSION_MAJOR, XCHAL_HW_VERSION_MINOR, major, minor)) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn XCHAL_HW_RELEASE_AT(major: anytype, minor: anytype) @TypeOf(if (XTHAL_REL_EQ(XCHAL_HW_VERSION_MAJOR, XCHAL_HW_VERSION_MINOR, major, minor)) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &major;
-    _ = &minor;
-    return if (XTHAL_REL_EQ(XCHAL_HW_VERSION_MAJOR, XCHAL_HW_VERSION_MINOR, major, minor)) @as(c_int, 1) else @as(c_int, 0);
-}
-pub inline fn XCHAL_HW_RELEASE_MAJOR_AT(major: anytype) @TypeOf(if (XCHAL_HW_VERSION_MAJOR == major) @as(c_int, 1) else @as(c_int, 0)) {
-    _ = &major;
-    return if (XCHAL_HW_VERSION_MAJOR == major) @as(c_int, 1) else @as(c_int, 0);
-}
-pub const XTENSA_CONFIG_SYSTEM_H = "";
-pub const XSHAL_USE_ABSOLUTE_LITERALS = @as(c_int, 0);
-pub const XSHAL_HAVE_TEXT_SECTION_LITERALS = @as(c_int, 1);
-pub const XSHAL_ABI = XTHAL_ABI_WINDOWED;
-pub const XTHAL_ABI_WINDOWED = @as(c_int, 0);
-pub const XTHAL_ABI_CALL0 = @as(c_int, 1);
-pub const XSHAL_CLIB = XTHAL_CLIB_NEWLIB;
-pub const XTHAL_CLIB_NEWLIB = @as(c_int, 0);
-pub const XTHAL_CLIB_UCLIBC = @as(c_int, 1);
-pub const XTHAL_CLIB_XCLIB = @as(c_int, 2);
-pub const XSHAL_USE_FLOATING_POINT = @as(c_int, 1);
-pub const XSHAL_FLOATING_POINT_ABI = @as(c_int, 0);
-pub const XSHAL_FUNC_SAFETY_ENABLED = @as(c_int, 0);
-pub const XSHAL_IOBLOCK_CACHED_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x70000000, .hex);
-pub const XSHAL_IOBLOCK_CACHED_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x70000000, .hex);
-pub const XSHAL_IOBLOCK_CACHED_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0E000000, .hex);
-pub const XSHAL_IOBLOCK_BYPASS_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x90000000, .hex);
-pub const XSHAL_IOBLOCK_BYPASS_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x90000000, .hex);
-pub const XSHAL_IOBLOCK_BYPASS_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0E000000, .hex);
-pub const XSHAL_ROM_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
-pub const XSHAL_ROM_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
-pub const XSHAL_ROM_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x01000000, .hex);
-pub const XSHAL_ROM_AVAIL_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
-pub const XSHAL_ROM_AVAIL_VSIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x01000000, .hex);
-pub const XSHAL_RAM_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XSHAL_RAM_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XSHAL_RAM_VSIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XSHAL_RAM_PSIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XSHAL_RAM_SIZE = XSHAL_RAM_PSIZE;
-pub const XSHAL_RAM_AVAIL_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const XSHAL_RAM_AVAIL_VSIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XSHAL_RAM_BYPASS_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XSHAL_RAM_BYPASS_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xA0000000, .hex);
-pub const XSHAL_RAM_BYPASS_PSIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XSHAL_SIMIO_CACHED_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XSHAL_SIMIO_BYPASS_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XSHAL_SIMIO_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
-pub const XSHAL_SIMIO_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
-pub const XSHAL_MAGIC_EXIT = @as(c_int, 0x0);
-pub const XSHAL_CACHEATTR_BYPASS = XSHAL_XT2000_CACHEATTR_BYPASS;
-pub const XSHAL_CACHEATTR_DEFAULT = XSHAL_XT2000_CACHEATTR_DEFAULT;
-pub const XSHAL_ALLVALID_CACHEATTR_WRITEBACK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x22221112, .hex);
-pub const XSHAL_ALLVALID_CACHEATTR_WRITEALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x22221112, .hex);
-pub const XSHAL_ALLVALID_CACHEATTR_WRITETHRU = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x22221112, .hex);
-pub const XSHAL_ALLVALID_CACHEATTR_BYPASS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x22222222, .hex);
-pub const XSHAL_ALLVALID_CACHEATTR_DEFAULT = XSHAL_ALLVALID_CACHEATTR_WRITEBACK;
-pub const XSHAL_STRICT_CACHEATTR_WRITEBACK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFF111F, .hex);
-pub const XSHAL_STRICT_CACHEATTR_WRITEALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFF111F, .hex);
-pub const XSHAL_STRICT_CACHEATTR_WRITETHRU = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFF111F, .hex);
-pub const XSHAL_STRICT_CACHEATTR_BYPASS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFF222F, .hex);
-pub const XSHAL_STRICT_CACHEATTR_DEFAULT = XSHAL_STRICT_CACHEATTR_WRITEBACK;
-pub const XSHAL_TRAPNULL_CACHEATTR_WRITEBACK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x2222111F, .hex);
-pub const XSHAL_TRAPNULL_CACHEATTR_WRITEALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x2222111F, .hex);
-pub const XSHAL_TRAPNULL_CACHEATTR_WRITETHRU = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x2222111F, .hex);
-pub const XSHAL_TRAPNULL_CACHEATTR_BYPASS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x2222222F, .hex);
-pub const XSHAL_TRAPNULL_CACHEATTR_DEFAULT = XSHAL_TRAPNULL_CACHEATTR_WRITEBACK;
-pub const XSHAL_ISS_CACHEATTR_WRITEBACK = XSHAL_TRAPNULL_CACHEATTR_WRITEBACK;
-pub const XSHAL_ISS_CACHEATTR_WRITEALLOC = XSHAL_TRAPNULL_CACHEATTR_WRITEALLOC;
-pub const XSHAL_ISS_CACHEATTR_WRITETHRU = XSHAL_TRAPNULL_CACHEATTR_WRITETHRU;
-pub const XSHAL_ISS_CACHEATTR_BYPASS = XSHAL_TRAPNULL_CACHEATTR_BYPASS;
-pub const XSHAL_ISS_CACHEATTR_DEFAULT = XSHAL_TRAPNULL_CACHEATTR_WRITEBACK;
-pub const XSHAL_ISS_PIPE_REGIONS = @as(c_int, 0);
-pub const XSHAL_ISS_SDRAM_REGIONS = @as(c_int, 0);
-pub const XSHAL_XT2000_CACHEATTR_WRITEBACK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFF22111F, .hex);
-pub const XSHAL_XT2000_CACHEATTR_WRITEALLOC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFF22111F, .hex);
-pub const XSHAL_XT2000_CACHEATTR_WRITETHRU = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFF22111F, .hex);
-pub const XSHAL_XT2000_CACHEATTR_BYPASS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFF22222F, .hex);
-pub const XSHAL_XT2000_CACHEATTR_DEFAULT = XSHAL_XT2000_CACHEATTR_WRITEBACK;
-pub const XSHAL_XT2000_PIPE_REGIONS = @as(c_int, 0x00000000);
-pub const XSHAL_XT2000_SDRAM_REGIONS = @as(c_int, 0x00000440);
-pub const XSHAL_VECTORS_PACKED = @as(c_int, 0);
-pub const XSHAL_STATIC_VECTOR_SELECT = @as(c_int, 1);
-pub const XSHAL_RESET_VECTOR_VADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000400, .hex);
-pub const XSHAL_RESET_VECTOR_PADDR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000400, .hex);
-pub const XSHAL_RESET_VECTOR_SIZE = @as(c_int, 0x00000300);
-pub const XSHAL_RESET_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_USER_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_USER_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_PROGRAMEXC_VECTOR_SIZE = XSHAL_USER_VECTOR_SIZE;
-pub const XSHAL_USEREXC_VECTOR_SIZE = XSHAL_USER_VECTOR_SIZE;
-pub const XSHAL_KERNEL_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_KERNEL_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_STACKEDEXC_VECTOR_SIZE = XSHAL_KERNEL_VECTOR_SIZE;
-pub const XSHAL_KERNELEXC_VECTOR_SIZE = XSHAL_KERNEL_VECTOR_SIZE;
-pub const XSHAL_DOUBLEEXC_VECTOR_SIZE = @as(c_int, 0x00000040);
-pub const XSHAL_DOUBLEEXC_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_WINDOW_VECTORS_SIZE = @as(c_int, 0x00000178);
-pub const XSHAL_WINDOW_VECTORS_ISROM = @as(c_int, 0);
-pub const XSHAL_INTLEVEL2_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_INTLEVEL2_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_INTLEVEL3_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_INTLEVEL3_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_INTLEVEL4_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_INTLEVEL4_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_INTLEVEL5_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_INTLEVEL5_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_INTLEVEL6_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_INTLEVEL6_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_DEBUG_VECTOR_SIZE = XSHAL_INTLEVEL6_VECTOR_SIZE;
-pub const XSHAL_DEBUG_VECTOR_ISROM = XSHAL_INTLEVEL6_VECTOR_ISROM;
-pub const XSHAL_NMI_VECTOR_SIZE = @as(c_int, 0x00000038);
-pub const XSHAL_NMI_VECTOR_ISROM = @as(c_int, 0);
-pub const XSHAL_INTLEVEL7_VECTOR_SIZE = XSHAL_NMI_VECTOR_SIZE;
-pub const XTENSA_CONTEXT_H = "";
-pub const XTENSA_COREBITS_H = "";
-pub const EXCCAUSE_EXCCAUSE_SHIFT = @as(c_int, 0);
-pub const EXCCAUSE_EXCCAUSE_MASK = @as(c_int, 0x3F);
-pub const EXCCAUSE_ILLEGAL = @as(c_int, 0);
-pub const EXCCAUSE_SYSCALL = @as(c_int, 1);
-pub const EXCCAUSE_INSTR_ERROR = @as(c_int, 2);
-pub const EXCCAUSE_IFETCHERROR = @as(c_int, 2);
-pub const EXCCAUSE_LOAD_STORE_ERROR = @as(c_int, 3);
-pub const EXCCAUSE_LOADSTOREERROR = @as(c_int, 3);
-pub const EXCCAUSE_LEVEL1_INTERRUPT = @as(c_int, 4);
-pub const EXCCAUSE_LEVEL1INTERRUPT = @as(c_int, 4);
-pub const EXCCAUSE_ALLOCA = @as(c_int, 5);
-pub const EXCCAUSE_DIVIDE_BY_ZERO = @as(c_int, 6);
-pub const EXCCAUSE_SPECULATION = @as(c_int, 7);
-pub const EXCCAUSE_PC_ERROR = @as(c_int, 7);
-pub const EXCCAUSE_PRIVILEGED = @as(c_int, 8);
-pub const EXCCAUSE_UNALIGNED = @as(c_int, 9);
-pub const EXCCAUSE_EXTREG_PRIVILEGE = @as(c_int, 10);
-pub const EXCCAUSE_EXCLUSIVE_ERROR = @as(c_int, 11);
-pub const EXCCAUSE_INSTR_DATA_ERROR = @as(c_int, 12);
-pub const EXCCAUSE_LOAD_STORE_DATA_ERROR = @as(c_int, 13);
-pub const EXCCAUSE_INSTR_ADDR_ERROR = @as(c_int, 14);
-pub const EXCCAUSE_LOAD_STORE_ADDR_ERROR = @as(c_int, 15);
-pub const EXCCAUSE_ITLB_MISS = @as(c_int, 16);
-pub const EXCCAUSE_ITLB_MULTIHIT = @as(c_int, 17);
-pub const EXCCAUSE_INSTR_RING = @as(c_int, 18);
-pub const EXCCAUSE_INSTR_PROHIBITED = @as(c_int, 20);
-pub const EXCCAUSE_DTLB_MISS = @as(c_int, 24);
-pub const EXCCAUSE_DTLB_MULTIHIT = @as(c_int, 25);
-pub const EXCCAUSE_LOAD_STORE_RING = @as(c_int, 26);
-pub const EXCCAUSE_LOAD_PROHIBITED = @as(c_int, 28);
-pub const EXCCAUSE_STORE_PROHIBITED = @as(c_int, 29);
-pub inline fn EXCCAUSE_CP_DISABLED(n: anytype) @TypeOf(@as(c_int, 32) + n) {
-    _ = &n;
-    return @as(c_int, 32) + n;
-}
-pub const EXCCAUSE_CP0_DISABLED = @as(c_int, 32);
-pub const EXCCAUSE_CP1_DISABLED = @as(c_int, 33);
-pub const EXCCAUSE_CP2_DISABLED = @as(c_int, 34);
-pub const EXCCAUSE_CP3_DISABLED = @as(c_int, 35);
-pub const EXCCAUSE_CP4_DISABLED = @as(c_int, 36);
-pub const EXCCAUSE_CP5_DISABLED = @as(c_int, 37);
-pub const EXCCAUSE_CP6_DISABLED = @as(c_int, 38);
-pub const EXCCAUSE_CP7_DISABLED = @as(c_int, 39);
-pub const PS_WOE_SHIFT = @as(c_int, 18);
-pub const PS_WOE_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00040000, .hex);
-pub const PS_WOE = PS_WOE_MASK;
-pub const PS_CALLINC_SHIFT = @as(c_int, 16);
-pub const PS_CALLINC_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00030000, .hex);
-pub inline fn PS_CALLINC(n: anytype) @TypeOf((n & @as(c_int, 3)) << PS_CALLINC_SHIFT) {
-    _ = &n;
-    return (n & @as(c_int, 3)) << PS_CALLINC_SHIFT;
-}
-pub const PS_OWB_SHIFT = @as(c_int, 8);
-pub const PS_OWB_MASK = @as(c_int, 0x00000F00);
-pub inline fn PS_OWB(n: anytype) @TypeOf((n & @as(c_int, 15)) << PS_OWB_SHIFT) {
-    _ = &n;
-    return (n & @as(c_int, 15)) << PS_OWB_SHIFT;
-}
-pub const PS_RING_SHIFT = @as(c_int, 6);
-pub const PS_RING_MASK = @as(c_int, 0x000000C0);
-pub inline fn PS_RING(n: anytype) @TypeOf((n & @as(c_int, 3)) << PS_RING_SHIFT) {
-    _ = &n;
-    return (n & @as(c_int, 3)) << PS_RING_SHIFT;
-}
-pub const PS_UM_SHIFT = @as(c_int, 5);
-pub const PS_UM_MASK = @as(c_int, 0x00000020);
-pub const PS_UM = PS_UM_MASK;
-pub const PS_EXCM_SHIFT = @as(c_int, 4);
-pub const PS_EXCM_MASK = @as(c_int, 0x00000010);
-pub const PS_EXCM = PS_EXCM_MASK;
-pub const PS_INTLEVEL_SHIFT = @as(c_int, 0);
-pub const PS_INTLEVEL_MASK = @as(c_int, 0x0000000F);
-pub inline fn PS_INTLEVEL(n: anytype) @TypeOf(n & PS_INTLEVEL_MASK) {
-    _ = &n;
-    return n & PS_INTLEVEL_MASK;
-}
-pub const PS_WOE_ABI = PS_WOE;
-pub const PS_WOECALL4_ABI = PS_WOE | PS_CALLINC(@as(c_int, 1));
-pub const PS_PROGSTACK_SHIFT = PS_UM_SHIFT;
-pub const PS_PROGSTACK_MASK = PS_UM_MASK;
-pub const PS_PROG_SHIFT = PS_UM_SHIFT;
-pub const PS_PROG_MASK = PS_UM_MASK;
-pub const PS_PROG = PS_UM;
-pub const DBREAKC_MASK_SHIFT = @as(c_int, 0);
-pub const DBREAKC_MASK_MASK = @as(c_int, 0x0000003F);
-pub const DBREAKC_LOADBREAK_SHIFT = @as(c_int, 30);
-pub const DBREAKC_LOADBREAK_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const DBREAKC_STOREBREAK_SHIFT = @as(c_int, 31);
-pub const DBREAKC_STOREBREAK_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
-pub const DEBUGCAUSE_DEBUGINT_SHIFT = @as(c_int, 5);
-pub const DEBUGCAUSE_DEBUGINT_MASK = @as(c_int, 0x20);
-pub const DEBUGCAUSE_BREAKN_SHIFT = @as(c_int, 4);
-pub const DEBUGCAUSE_BREAKN_MASK = @as(c_int, 0x10);
-pub const DEBUGCAUSE_BREAK_SHIFT = @as(c_int, 3);
-pub const DEBUGCAUSE_BREAK_MASK = @as(c_int, 0x08);
-pub const DEBUGCAUSE_DBREAK_SHIFT = @as(c_int, 2);
-pub const DEBUGCAUSE_DBREAK_MASK = @as(c_int, 0x04);
-pub const DEBUGCAUSE_IBREAK_SHIFT = @as(c_int, 1);
-pub const DEBUGCAUSE_IBREAK_MASK = @as(c_int, 0x02);
-pub const DEBUGCAUSE_ICOUNT_SHIFT = @as(c_int, 0);
-pub const DEBUGCAUSE_ICOUNT_MASK = @as(c_int, 0x01);
-pub const MESR_MEME = @as(c_int, 0x00000001);
-pub const MESR_MEME_SHIFT = @as(c_int, 0);
-pub const MESR_DME = @as(c_int, 0x00000002);
-pub const MESR_DME_SHIFT = @as(c_int, 1);
-pub const MESR_RCE = @as(c_int, 0x00000010);
-pub const MESR_RCE_SHIFT = @as(c_int, 4);
-pub const MESR_LCE = "";
-pub const MESR_LCE_SHIFT = @compileError("unable to translate C expr: unexpected token '?'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/corebits.h:156:9
-pub const MESR_LCE_L = "";
-pub const MESR_ERRENAB = @as(c_int, 0x00000100);
-pub const MESR_ERRENAB_SHIFT = @as(c_int, 8);
-pub const MESR_ERRTEST = @as(c_int, 0x00000200);
-pub const MESR_ERRTEST_SHIFT = @as(c_int, 9);
-pub const MESR_DATEXC = @as(c_int, 0x00000400);
-pub const MESR_DATEXC_SHIFT = @as(c_int, 10);
-pub const MESR_INSEXC = @as(c_int, 0x00000800);
-pub const MESR_INSEXC_SHIFT = @as(c_int, 11);
-pub const MESR_WAYNUM_SHIFT = @as(c_int, 16);
-pub const MESR_ACCTYPE_SHIFT = @as(c_int, 20);
-pub const MESR_MEMTYPE_SHIFT = @as(c_int, 24);
-pub const MESR_ERRTYPE_SHIFT = @as(c_int, 30);
-pub const MEMCTL_SNOOP_EN_SHIFT = @as(c_int, 1);
-pub const MEMCTL_SNOOP_EN = @as(c_int, 0x02);
-pub const MEMCTL_L0IBUF_EN_SHIFT = @as(c_int, 0);
-pub const MEMCTL_L0IBUF_EN = @as(c_int, 0x01);
-pub const MEMCTL_INV_EN_SHIFT = @as(c_int, 23);
-pub const MEMCTL_INV_EN = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00800000, .hex);
-pub const MEMCTL_DCWU_SHIFT = @as(c_int, 8);
-pub const MEMCTL_DCWU_BITS = @as(c_int, 5);
-pub const MEMCTL_DCWA_SHIFT = @as(c_int, 13);
-pub const MEMCTL_DCWA_BITS = @as(c_int, 5);
-pub const MEMCTL_ICWU_SHIFT = @as(c_int, 18);
-pub const MEMCTL_ICWU_BITS = @as(c_int, 5);
-pub const MEMCTL_DCWU_MASK = @as(c_int, 0x00001F00);
-pub const MEMCTL_DCWA_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0003E000, .hex);
-pub const MEMCTL_ICWU_MASK = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x007C0000, .hex);
-pub const MEMCTL_DCWU_CLR_MASK = ~MEMCTL_DCWU_MASK;
-pub const MEMCTL_DCWA_CLR_MASK = ~MEMCTL_DCWA_MASK;
-pub const MEMCTL_ICWU_CLR_MASK = ~MEMCTL_ICWU_MASK;
-pub const MEMCTL_DCW_CLR_MASK = MEMCTL_DCWU_CLR_MASK | MEMCTL_DCWA_CLR_MASK;
-pub const MEMCTL_IDCW_CLR_MASK = MEMCTL_DCW_CLR_MASK | MEMCTL_ICWU_CLR_MASK;
-pub const _XTRUNTIME_FRAMES_H_ = "";
-pub const STRUCT_BEGIN = @compileError("unable to translate C expr: unexpected token 'typedef'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime-frames.h:53:9
-pub const STRUCT_FIELD = @compileError("unable to translate C expr: unexpected token ';'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime-frames.h:54:9
-pub const STRUCT_AFIELD = @compileError("unable to translate C expr: unexpected token ';'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime-frames.h:55:9
-pub const STRUCT_AFIELD_A = @compileError("unable to translate macro: undefined identifier `aligned`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime-frames.h:56:9
-pub const STRUCT_END = @compileError("unable to translate C expr: unexpected token '}'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime-frames.h:57:9
-pub const CALL0_ABI = @as(c_int, 0);
-pub const ALIGNPAD = (((@as(c_int, 3) + (XCHAL_HAVE_LOOPS * @as(c_int, 1))) + (XCHAL_HAVE_MAC16 * @as(c_int, 2))) + (CALL0_ABI * @as(c_int, 1))) & @as(c_int, 3);
-pub const KERNELSTACKSIZE = @as(c_int, 1024);
-pub inline fn ALIGNUP(n: anytype, val: anytype) @TypeOf(((val + n) - @as(c_int, 1)) & -n) {
-    _ = &n;
-    _ = &val;
-    return ((val + n) - @as(c_int, 1)) & -n;
-}
-pub const XT_STK_NEXT1 = @import("std").zig.c_translation.sizeof(XtExcFrame);
-pub const XT_STK_EXTRA = ALIGNUP(XCHAL_EXTRA_SA_ALIGN, XT_STK_NEXT1);
-pub const XT_STK_NEXT2 = XT_STK_EXTRA + XCHAL_EXTRA_SA_SIZE;
-pub const XT_STK_FRMSZ = ALIGNUP(@as(c_int, 0x10), XT_STK_NEXT2) + @as(c_int, 0x20);
-pub const XT_SOL_FRMSZ = @compileError("unable to translate macro: undefined identifier `XtSolFrameSize`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa_context.h:260:9
-pub const XT_CP0_SA = @as(c_int, 0);
-pub const XT_CP1_SA = ALIGNUP(XCHAL_CP1_SA_ALIGN, XT_CP0_SA + XCHAL_CP0_SA_SIZE);
-pub const XT_CP2_SA = ALIGNUP(XCHAL_CP2_SA_ALIGN, XT_CP1_SA + XCHAL_CP1_SA_SIZE);
-pub const XT_CP3_SA = ALIGNUP(XCHAL_CP3_SA_ALIGN, XT_CP2_SA + XCHAL_CP2_SA_SIZE);
-pub const XT_CP4_SA = ALIGNUP(XCHAL_CP4_SA_ALIGN, XT_CP3_SA + XCHAL_CP3_SA_SIZE);
-pub const XT_CP5_SA = ALIGNUP(XCHAL_CP5_SA_ALIGN, XT_CP4_SA + XCHAL_CP4_SA_SIZE);
-pub const XT_CP6_SA = ALIGNUP(XCHAL_CP6_SA_ALIGN, XT_CP5_SA + XCHAL_CP5_SA_SIZE);
-pub const XT_CP7_SA = ALIGNUP(XCHAL_CP7_SA_ALIGN, XT_CP6_SA + XCHAL_CP6_SA_SIZE);
-pub const XT_CP_SA_SIZE = ALIGNUP(@as(c_int, 16), XT_CP7_SA + XCHAL_CP7_SA_SIZE);
-pub const XT_CPENABLE = @as(c_int, 0);
-pub const XT_CPSTORED = @as(c_int, 2);
-pub const XT_CP_CS_ST = @as(c_int, 4);
-pub const XT_CP_ASA = @as(c_int, 8);
-pub const XT_CP_SIZE = (@as(c_int, 12) + XT_CP_SA_SIZE) + XCHAL_TOTAL_SA_ALIGN;
-pub const CORE_ID_REGVAL_PRO = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xCDCD, .hex);
-pub const CORE_ID_REGVAL_APP = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xABAB, .hex);
-pub const CORE_ID_PRO = CORE_ID_REGVAL_PRO;
-pub const CORE_ID_APP = CORE_ID_REGVAL_APP;
-pub const STK_INTEXC_EXTRA = @as(c_int, 0);
-pub const XT_USE_THREAD_SAFE_CLIB = @as(c_int, 1);
-pub const XT_HAVE_THREAD_SAFE_CLIB = @as(c_int, 1);
-pub const XT_CLIB_CONTEXT_AREA_SIZE = (@import("std").zig.c_translation.sizeof(struct__reent) + @as(c_int, 15)) + -@as(c_int, 16);
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa_config.h:142:15: warning: macro 'XT_CLIB_GLOBAL_PTR' contains a runtime value, translated to function
-pub inline fn XT_CLIB_GLOBAL_PTR() @TypeOf(_impure_ptr) {
-    return _impure_ptr;
-}
-pub const XT_XTRA_SIZE = ((XT_STK_FRMSZ + STK_INTEXC_EXTRA) + @as(c_int, 0x20)) + XT_CP_SIZE;
-pub const XT_USER_SIZE = @as(c_int, 0x400);
-pub const XT_STACK_MIN_SIZE = @import("std").zig.c_translation.MacroArithmetic.div(XT_XTRA_SIZE + XT_USER_SIZE, @import("std").zig.c_translation.sizeof(u8));
-pub const XT_STACK_EXTRA = XT_XTRA_SIZE;
-pub const XT_STACK_EXTRA_CLIB = XT_XTRA_SIZE + XT_CLIB_CONTEXT_AREA_SIZE;
-pub const configXT_SIMULATOR = @as(c_int, 0);
-pub const configXT_BOARD = @as(c_int, 1);
-pub const configXT_INTEXC_HOOKS = @as(c_int, 0);
-pub const configBENCHMARK = @as(c_int, 0);
-pub const configUSE_PORT_OPTIMISED_TASK_SELECTION = @as(c_int, 0);
+pub const configUSE_PORT_OPTIMISED_TASK_SELECTION = @as(c_int, 1);
 pub const configMINIMAL_STACK_SIZE = CONFIG_FREERTOS_IDLE_TASK_STACKSIZE + configSTACK_OVERHEAD_TOTAL;
-pub const configMAX_API_CALL_INTERRUPT_PRIORITY = XCHAL_EXCM_LEVEL;
+pub const configMAX_API_CALL_INTERRUPT_PRIORITY = @as(c_int, 0);
 pub const configUSE_NEWLIB_REENTRANT = @as(c_int, 1);
 pub inline fn configINIT_TLS_BLOCK(xTLSBlock: anytype) @TypeOf(esp_reent_init(&xTLSBlock)) {
     _ = &xTLSBlock;
     return esp_reent_init(&xTLSBlock);
 }
 pub const configSET_TLS_BLOCK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/config/xtensa/include/freertos/FreeRTOSConfig_arch.h:76:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/config/riscv/include/freertos/FreeRTOSConfig_arch.h:49:9
 pub inline fn configDEINIT_TLS_BLOCK(xTLSBlock: anytype) @TypeOf(_reclaim_reent(&xTLSBlock)) {
     _ = &xTLSBlock;
     return _reclaim_reent(&xTLSBlock);
 }
 pub const configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H = @as(c_int, 1);
 pub const configTOTAL_HEAP_SIZE = @compileError("unable to translate macro: undefined identifier `_heap_end`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/config/xtensa/include/freertos/FreeRTOSConfig_arch.h:86:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/config/riscv/include/freertos/FreeRTOSConfig_arch.h:59:9
 pub const INCLUDE_xTaskDelayUntil = @as(c_int, 1);
 pub const INCLUDE_uxTaskGetStackHighWaterMark2 = @as(c_int, 1);
-pub const configSTACK_ALIGNMENT = @as(c_int, 16);
-pub const configISR_STACK_SIZE = ((CONFIG_FREERTOS_ISR_STACKSIZE + configSTACK_ALIGNMENT) - @as(c_int, 1)) & ~(configSTACK_ALIGNMENT - @as(c_int, 1));
+pub const configISR_STACK_SIZE = CONFIG_FREERTOS_ISR_STACKSIZE;
 pub const configUSE_PREEMPTION = @as(c_int, 1);
 pub const configUSE_TICKLESS_IDLE = @compileError("unable to translate macro: undefined identifier `CONFIG_FREERTOS_USE_TICKLESS_IDLE`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/config/include/freertos/FreeRTOSConfig.h:87:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/config/include/freertos/FreeRTOSConfig.h:87:9
 pub const configCPU_CLOCK_HZ = CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
 pub const configTICK_RATE_HZ = CONFIG_FREERTOS_HZ;
 pub const configMAX_PRIORITIES = @as(c_int, 25);
@@ -8629,7 +5885,7 @@ pub const configTIMER_TASK_STACK_DEPTH = CONFIG_FREERTOS_TIMER_TASK_STACK_DEPTH;
 pub const configTIMER_SERVICE_TASK_NAME = CONFIG_FREERTOS_TIMER_SERVICE_TASK_NAME;
 pub const configTIMER_SERVICE_TASK_CORE_AFFINITY = CONFIG_FREERTOS_TIMER_SERVICE_TASK_CORE_AFFINITY;
 pub const configLIST_VOLATILE = @compileError("unable to translate C expr: unexpected token 'volatile'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/config/include/freertos/FreeRTOSConfig.h:200:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/config/include/freertos/FreeRTOSConfig.h:200:9
 pub const INCLUDE_vTaskPrioritySet = @as(c_int, 1);
 pub const INCLUDE_uxTaskPriorityGet = @as(c_int, 1);
 pub const INCLUDE_vTaskDelete = @as(c_int, 1);
@@ -8646,7 +5902,7 @@ pub const INCLUDE_xTimerPendFunctionCall = @as(c_int, 1);
 pub const INCLUDE_xTaskGetSchedulerState = @as(c_int, 1);
 pub const INCLUDE_xTaskGetCurrentTaskHandle = @as(c_int, 1);
 pub const configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES = @compileError("unable to translate macro: undefined identifier `CONFIG_FREERTOS_USE_LIST_DATA_INTEGRITY_CHECK_BYTES`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/config/include/freertos/FreeRTOSConfig.h:272:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/config/include/freertos/FreeRTOSConfig.h:272:9
 pub const configTHREAD_LOCAL_STORAGE_DELETE_CALLBACKS = @as(c_int, 1);
 pub const configCHECK_MUTEX_GIVEN_BY_OWNER = @as(c_int, 1);
 pub const portNUM_PROCESSORS = configNUMBER_OF_CORES;
@@ -8715,38 +5971,33 @@ pub const pdLITTLE_ENDIAN = pdFREERTOS_LITTLE_ENDIAN;
 pub const pdBIG_ENDIAN = pdFREERTOS_BIG_ENDIAN;
 pub const PORTABLE_H = "";
 pub const DEPRECATED_DEFINITIONS_H = "";
+pub const PORT_OFFSET_PX_STACK = @as(c_int, 0x30);
+pub const PORT_OFFSET_PX_END_OF_STACK = (PORT_OFFSET_PX_STACK + @as(c_int, 4)) + CONFIG_FREERTOS_MAX_TASK_NAME_LEN;
 pub const SOC_ADC_SUPPORTED = @as(c_int, 1);
+pub const SOC_DEDICATED_GPIO_SUPPORTED = @as(c_int, 1);
 pub const SOC_UART_SUPPORTED = @as(c_int, 1);
-pub const SOC_PCNT_SUPPORTED = @as(c_int, 1);
-pub const SOC_PHY_SUPPORTED = @as(c_int, 1);
-pub const SOC_WIFI_SUPPORTED = @as(c_int, 1);
-pub const SOC_TWAI_SUPPORTED = @as(c_int, 1);
 pub const SOC_GDMA_SUPPORTED = @as(c_int, 1);
 pub const SOC_AHB_GDMA_SUPPORTED = @as(c_int, 1);
 pub const SOC_GPTIMER_SUPPORTED = @as(c_int, 1);
-pub const SOC_LCDCAM_SUPPORTED = @as(c_int, 1);
-pub const SOC_LCDCAM_I80_LCD_SUPPORTED = @as(c_int, 1);
-pub const SOC_LCDCAM_RGB_LCD_SUPPORTED = @as(c_int, 1);
+pub const SOC_PCNT_SUPPORTED = @as(c_int, 1);
 pub const SOC_MCPWM_SUPPORTED = @as(c_int, 1);
-pub const SOC_DEDICATED_GPIO_SUPPORTED = @as(c_int, 1);
-pub const SOC_CACHE_SUPPORT_WRAP = @as(c_int, 1);
-pub const SOC_ULP_SUPPORTED = @as(c_int, 1);
-pub const SOC_ULP_FSM_SUPPORTED = @as(c_int, 1);
-pub const SOC_RISCV_COPROC_SUPPORTED = @as(c_int, 1);
+pub const SOC_TWAI_SUPPORTED = @as(c_int, 1);
+pub const SOC_ETM_SUPPORTED = @as(c_int, 1);
+pub const SOC_PARLIO_SUPPORTED = @as(c_int, 1);
 pub const SOC_BT_SUPPORTED = @as(c_int, 1);
-pub const SOC_USB_OTG_SUPPORTED = @as(c_int, 1);
-pub const SOC_USB_SERIAL_JTAG_SUPPORTED = @as(c_int, 1);
-pub const SOC_CCOMP_TIMER_SUPPORTED = @as(c_int, 1);
+pub const SOC_IEEE802154_SUPPORTED = @as(c_int, 1);
 pub const SOC_ASYNC_MEMCPY_SUPPORTED = @as(c_int, 1);
+pub const SOC_USB_SERIAL_JTAG_SUPPORTED = @as(c_int, 1);
+pub const SOC_TEMP_SENSOR_SUPPORTED = @as(c_int, 1);
+pub const SOC_PHY_SUPPORTED = @as(c_int, 1);
+pub const SOC_WIFI_SUPPORTED = @as(c_int, 1);
 pub const SOC_SUPPORTS_SECURE_DL_MODE = @as(c_int, 1);
+pub const SOC_ULP_SUPPORTED = @as(c_int, 1);
+pub const SOC_LP_CORE_SUPPORTED = @as(c_int, 1);
 pub const SOC_EFUSE_KEY_PURPOSE_FIELD = @as(c_int, 1);
 pub const SOC_EFUSE_SUPPORTED = @as(c_int, 1);
-pub const SOC_SDMMC_HOST_SUPPORTED = @as(c_int, 1);
 pub const SOC_RTC_FAST_MEM_SUPPORTED = @as(c_int, 1);
-pub const SOC_RTC_SLOW_MEM_SUPPORTED = @as(c_int, 1);
 pub const SOC_RTC_MEM_SUPPORTED = @as(c_int, 1);
-pub const SOC_PSRAM_DMA_CAPABLE = @as(c_int, 1);
-pub const SOC_XT_WDT_SUPPORTED = @as(c_int, 1);
 pub const SOC_I2S_SUPPORTED = @as(c_int, 1);
 pub const SOC_RMT_SUPPORTED = @as(c_int, 1);
 pub const SOC_SDM_SUPPORTED = @as(c_int, 1);
@@ -8755,138 +6006,167 @@ pub const SOC_LEDC_SUPPORTED = @as(c_int, 1);
 pub const SOC_I2C_SUPPORTED = @as(c_int, 1);
 pub const SOC_SYSTIMER_SUPPORTED = @as(c_int, 1);
 pub const SOC_SUPPORT_COEXISTENCE = @as(c_int, 1);
-pub const SOC_TEMP_SENSOR_SUPPORTED = @as(c_int, 1);
 pub const SOC_AES_SUPPORTED = @as(c_int, 1);
 pub const SOC_MPI_SUPPORTED = @as(c_int, 1);
 pub const SOC_SHA_SUPPORTED = @as(c_int, 1);
 pub const SOC_HMAC_SUPPORTED = @as(c_int, 1);
 pub const SOC_DIG_SIGN_SUPPORTED = @as(c_int, 1);
+pub const SOC_ECC_SUPPORTED = @as(c_int, 1);
 pub const SOC_FLASH_ENC_SUPPORTED = @as(c_int, 1);
 pub const SOC_SECURE_BOOT_SUPPORTED = @as(c_int, 1);
-pub const SOC_MEMPROT_SUPPORTED = @as(c_int, 1);
-pub const SOC_TOUCH_SENSOR_SUPPORTED = @as(c_int, 1);
+pub const SOC_SDIO_SLAVE_SUPPORTED = @as(c_int, 1);
 pub const SOC_BOD_SUPPORTED = @as(c_int, 1);
+pub const SOC_APM_SUPPORTED = @as(c_int, 1);
+pub const SOC_PMU_SUPPORTED = @as(c_int, 1);
+pub const SOC_PAU_SUPPORTED = @as(c_int, 1);
+pub const SOC_LP_TIMER_SUPPORTED = @as(c_int, 1);
+pub const SOC_LP_AON_SUPPORTED = @as(c_int, 1);
+pub const SOC_LP_PERIPHERALS_SUPPORTED = @as(c_int, 1);
+pub const SOC_LP_I2C_SUPPORTED = @as(c_int, 1);
+pub const SOC_ULP_LP_UART_SUPPORTED = @as(c_int, 1);
 pub const SOC_CLK_TREE_SUPPORTED = @as(c_int, 1);
-pub const SOC_MPU_SUPPORTED = @as(c_int, 1);
+pub const SOC_ASSIST_DEBUG_SUPPORTED = @as(c_int, 1);
 pub const SOC_WDT_SUPPORTED = @as(c_int, 1);
 pub const SOC_SPI_FLASH_SUPPORTED = @as(c_int, 1);
 pub const SOC_RNG_SUPPORTED = @as(c_int, 1);
 pub const SOC_LIGHT_SLEEP_SUPPORTED = @as(c_int, 1);
 pub const SOC_DEEP_SLEEP_SUPPORTED = @as(c_int, 1);
-pub const SOC_LP_PERIPH_SHARE_INTERRUPT = @as(c_int, 1);
+pub const SOC_MODEM_CLOCK_SUPPORTED = @as(c_int, 1);
 pub const SOC_PM_SUPPORTED = @as(c_int, 1);
 pub const SOC_XTAL_SUPPORT_40M = @as(c_int, 1);
-pub const SOC_APPCPU_HAS_CLOCK_GATING_BUG = @as(c_int, 1);
-pub const SOC_ADC_RTC_CTRL_SUPPORTED = @as(c_int, 1);
+pub const SOC_AES_SUPPORT_DMA = @as(c_int, 1);
+pub const SOC_AES_GDMA = @as(c_int, 1);
+pub const SOC_AES_SUPPORT_AES_128 = @as(c_int, 1);
+pub const SOC_AES_SUPPORT_AES_256 = @as(c_int, 1);
 pub const SOC_ADC_DIG_CTRL_SUPPORTED = @as(c_int, 1);
-pub const SOC_ADC_ARBITER_SUPPORTED = @as(c_int, 1);
 pub const SOC_ADC_DIG_IIR_FILTER_SUPPORTED = @as(c_int, 1);
 pub const SOC_ADC_MONITOR_SUPPORTED = @as(c_int, 1);
-pub const SOC_ADC_DMA_SUPPORTED = @as(c_int, 1);
-pub inline fn SOC_ADC_DIG_SUPPORTED_UNIT(UNIT: anytype) @TypeOf(if (UNIT == @as(c_int, 0)) @as(c_int, 1) else @as(c_int, 0)) {
+pub inline fn SOC_ADC_DIG_SUPPORTED_UNIT(UNIT: anytype) @TypeOf(@as(c_int, 1)) {
     _ = &UNIT;
-    return if (UNIT == @as(c_int, 0)) @as(c_int, 1) else @as(c_int, 0);
+    return @as(c_int, 1);
 }
-pub const SOC_ADC_PERIPH_NUM = @as(c_int, 2);
-pub inline fn SOC_ADC_CHANNEL_NUM(PERIPH_NUM: anytype) @TypeOf(@as(c_int, 10)) {
+pub const SOC_ADC_DMA_SUPPORTED = @as(c_int, 1);
+pub const SOC_ADC_PERIPH_NUM = @as(c_uint, 1);
+pub inline fn SOC_ADC_CHANNEL_NUM(PERIPH_NUM: anytype) @TypeOf(@as(c_int, 7)) {
     _ = &PERIPH_NUM;
-    return @as(c_int, 10);
+    return @as(c_int, 7);
 }
-pub const SOC_ADC_MAX_CHANNEL_NUM = @as(c_int, 10);
+pub const SOC_ADC_MAX_CHANNEL_NUM = @as(c_int, 7);
 pub const SOC_ADC_ATTEN_NUM = @as(c_int, 4);
-pub const SOC_ADC_DIGI_CONTROLLER_NUM = @as(c_int, 2);
-pub const SOC_ADC_PATT_LEN_MAX = @as(c_int, 24);
-pub const SOC_ADC_DIGI_MIN_BITWIDTH = @as(c_int, 12);
+pub const SOC_ADC_DIGI_CONTROLLER_NUM = @as(c_uint, 1);
+pub const SOC_ADC_PATT_LEN_MAX = @as(c_int, 8);
 pub const SOC_ADC_DIGI_MAX_BITWIDTH = @as(c_int, 12);
-pub const SOC_ADC_DIGI_RESULT_BYTES = @as(c_int, 4);
-pub const SOC_ADC_DIGI_DATA_BYTES_PER_CONV = @as(c_int, 4);
+pub const SOC_ADC_DIGI_MIN_BITWIDTH = @as(c_int, 12);
 pub const SOC_ADC_DIGI_IIR_FILTER_NUM = @as(c_int, 2);
 pub const SOC_ADC_DIGI_MONITOR_NUM = @as(c_int, 2);
+pub const SOC_ADC_DIGI_RESULT_BYTES = @as(c_int, 4);
+pub const SOC_ADC_DIGI_DATA_BYTES_PER_CONV = @as(c_int, 4);
 pub const SOC_ADC_SAMPLE_FREQ_THRES_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 83333, .decimal);
 pub const SOC_ADC_SAMPLE_FREQ_THRES_LOW = @as(c_int, 611);
 pub const SOC_ADC_RTC_MIN_BITWIDTH = @as(c_int, 12);
 pub const SOC_ADC_RTC_MAX_BITWIDTH = @as(c_int, 12);
 pub const SOC_ADC_CALIBRATION_V1_SUPPORTED = @as(c_int, 1);
 pub const SOC_ADC_SELF_HW_CALI_SUPPORTED = @as(c_int, 1);
+pub const SOC_ADC_CALIB_CHAN_COMPENS_SUPPORTED = @as(c_int, 1);
+pub const SOC_ADC_TEMPERATURE_SHARE_INTR = @as(c_int, 1);
 pub const SOC_ADC_SHARED_POWER = @as(c_int, 1);
-pub const SOC_APB_BACKUP_DMA = @as(c_int, 1);
+pub const SOC_APB_BACKUP_DMA = @as(c_int, 0);
 pub const SOC_BROWNOUT_RESET_SUPPORTED = @as(c_int, 1);
-pub const SOC_CACHE_WRITEBACK_SUPPORTED = @as(c_int, 1);
+pub const SOC_SHARED_IDCACHE_SUPPORTED = @as(c_int, 1);
 pub const SOC_CACHE_FREEZE_SUPPORTED = @as(c_int, 1);
-pub const SOC_CPU_CORES_NUM = @as(c_int, 2);
+pub const SOC_CPU_CORES_NUM = @as(c_uint, 1);
 pub const SOC_CPU_INTR_NUM = @as(c_int, 32);
-pub const SOC_CPU_HAS_FPU = @as(c_int, 1);
-pub const SOC_HP_CPU_HAS_MULTIPLE_CORES = @as(c_int, 1);
-pub const SOC_CPU_BREAKPOINTS_NUM = @as(c_int, 2);
-pub const SOC_CPU_WATCHPOINTS_NUM = @as(c_int, 2);
-pub const SOC_CPU_WATCHPOINT_MAX_REGION_SIZE = @as(c_int, 64);
-pub const SOC_DS_SIGNATURE_MAX_BIT_LEN = @as(c_int, 4096);
+pub const SOC_CPU_HAS_FLEXIBLE_INTC = @as(c_int, 1);
+pub const SOC_INT_PLIC_SUPPORTED = @as(c_int, 1);
+pub const SOC_CPU_HAS_CSR_PC = @as(c_int, 1);
+pub const SOC_CPU_BREAKPOINTS_NUM = @as(c_int, 4);
+pub const SOC_CPU_WATCHPOINTS_NUM = @as(c_int, 4);
+pub const SOC_CPU_WATCHPOINT_MAX_REGION_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const SOC_CPU_HAS_PMA = @as(c_int, 1);
+pub const SOC_CPU_IDRAM_SPLIT_USING_PMP = @as(c_int, 1);
+pub const SOC_CPU_PMP_REGION_GRANULARITY = @as(c_int, 4);
+pub const SOC_DS_SIGNATURE_MAX_BIT_LEN = @as(c_int, 3072);
 pub const SOC_DS_KEY_PARAM_MD_IV_LENGTH = @as(c_int, 16);
 pub const SOC_DS_KEY_CHECK_MAX_WAIT_US = @as(c_int, 1100);
 pub const SOC_AHB_GDMA_VERSION = @as(c_uint, 1);
 pub const SOC_GDMA_NUM_GROUPS_MAX = @as(c_uint, 1);
-pub const SOC_GDMA_PAIRS_PER_GROUP = @as(c_int, 5);
-pub const SOC_GDMA_PAIRS_PER_GROUP_MAX = @as(c_int, 5);
-pub const SOC_AHB_GDMA_SUPPORT_PSRAM = @as(c_int, 1);
+pub const SOC_GDMA_PAIRS_PER_GROUP_MAX = @as(c_int, 3);
+pub const SOC_GDMA_SUPPORT_ETM = @as(c_int, 1);
+pub const SOC_GDMA_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_ETM_GROUPS = @as(c_uint, 1);
+pub const SOC_ETM_CHANNELS_PER_GROUP = @as(c_int, 50);
+pub const SOC_ETM_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const SOC_GPIO_PORT = @as(c_uint, 1);
-pub const SOC_GPIO_PIN_COUNT = @as(c_int, 49);
+pub const SOC_GPIO_PIN_COUNT = @as(c_int, 31);
 pub const SOC_GPIO_SUPPORT_PIN_GLITCH_FILTER = @as(c_int, 1);
-pub const SOC_GPIO_FILTER_CLK_SUPPORT_APB = @as(c_int, 1);
+pub const SOC_GPIO_FLEX_GLITCH_FILTER_NUM = @as(c_int, 8);
+pub const SOC_GPIO_SUPPORT_ETM = @as(c_int, 1);
 pub const SOC_GPIO_SUPPORT_RTC_INDEPENDENT = @as(c_int, 1);
-pub const SOC_GPIO_SUPPORT_FORCE_HOLD = @as(c_int, 1);
-pub const SOC_GPIO_VALID_GPIO_MASK = @as(c_ulonglong, 0x1FFFFFFFFFFFF) & ~((((@as(c_ulonglong, 0) | BIT22) | BIT23) | BIT24) | BIT25);
+pub const SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP = @as(c_int, 1);
+pub const SOC_LP_IO_CLOCK_IS_INDEPENDENT = @as(c_int, 1);
+pub const SOC_GPIO_VALID_GPIO_MASK = (@as(c_uint, 1) << SOC_GPIO_PIN_COUNT) - @as(c_int, 1);
 pub const SOC_GPIO_VALID_OUTPUT_GPIO_MASK = SOC_GPIO_VALID_GPIO_MASK;
-pub const SOC_GPIO_IN_RANGE_MAX = @as(c_int, 48);
-pub const SOC_GPIO_OUT_RANGE_MAX = @as(c_int, 48);
-pub const SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK = @as(c_ulonglong, 0x0001FFFFFC000000);
-pub const SOC_GPIO_CLOCKOUT_BY_IO_MUX = @as(c_int, 1);
-pub const SOC_GPIO_CLOCKOUT_CHANNEL_NUM = @as(c_int, 3);
+pub const SOC_GPIO_IN_RANGE_MAX = @as(c_int, 30);
+pub const SOC_GPIO_OUT_RANGE_MAX = @as(c_int, 30);
+pub const SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK = (((((((@as(c_ulonglong, 0) | BIT0) | BIT1) | BIT2) | BIT3) | BIT4) | BIT5) | BIT6) | BIT7;
+pub const SOC_GPIO_DEEP_SLEEP_WAKE_SUPPORTED_PIN_CNT = @as(c_int, 8);
+pub const SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK = @as(c_ulonglong, 0x000000007FFFFF00);
+pub const SOC_GPIO_SUPPORT_FORCE_HOLD = @as(c_int, 1);
 pub const SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP = @as(c_int, 1);
+pub const SOC_GPIO_SUPPORT_HOLD_SINGLE_IO_IN_DSLP = @as(c_int, 1);
+pub const SOC_GPIO_CLOCKOUT_BY_GPIO_MATRIX = @as(c_int, 1);
+pub const SOC_CLOCKOUT_HAS_SOURCE_GATE = @as(c_int, 1);
+pub const SOC_GPIO_CLOCKOUT_CHANNEL_NUM = @as(c_int, 3);
+pub const SOC_RTCIO_PIN_COUNT = @as(c_int, 8);
+pub const SOC_RTCIO_INPUT_OUTPUT_SUPPORTED = @as(c_int, 1);
+pub const SOC_RTCIO_HOLD_SUPPORTED = @as(c_int, 1);
+pub const SOC_RTCIO_WAKE_SUPPORTED = @as(c_int, 1);
 pub const SOC_DEDIC_GPIO_OUT_CHANNELS_NUM = @as(c_int, 8);
 pub const SOC_DEDIC_GPIO_IN_CHANNELS_NUM = @as(c_int, 8);
-pub const SOC_DEDIC_GPIO_OUT_AUTO_ENABLE = @as(c_int, 1);
+pub const SOC_DEDIC_PERIPH_ALWAYS_ENABLE = @as(c_int, 1);
 pub const SOC_I2C_NUM = @as(c_uint, 2);
-pub const SOC_HP_I2C_NUM = @as(c_uint, 2);
+pub const SOC_HP_I2C_NUM = @as(c_uint, 1);
 pub const SOC_I2C_FIFO_LEN = @as(c_int, 32);
 pub const SOC_I2C_CMD_REG_NUM = @as(c_int, 8);
 pub const SOC_I2C_SUPPORT_SLAVE = @as(c_int, 1);
+pub const SOC_I2C_SUPPORT_HW_FSM_RST = @as(c_int, 1);
 pub const SOC_I2C_SUPPORT_HW_CLR_BUS = @as(c_int, 1);
 pub const SOC_I2C_SUPPORT_XTAL = @as(c_int, 1);
 pub const SOC_I2C_SUPPORT_RTC = @as(c_int, 1);
 pub const SOC_I2C_SUPPORT_10BIT_ADDR = @as(c_int, 1);
 pub const SOC_I2C_SLAVE_SUPPORT_BROADCAST = @as(c_int, 1);
-pub const SOC_I2C_SLAVE_SUPPORT_I2CRAM_ACCESS = @as(c_int, 1);
 pub const SOC_I2C_SLAVE_CAN_GET_STRETCH_CAUSE = @as(c_int, 1);
-pub const SOC_I2S_NUM = @as(c_uint, 2);
+pub const SOC_I2C_SLAVE_SUPPORT_I2CRAM_ACCESS = @as(c_int, 1);
+pub const SOC_I2C_SLAVE_SUPPORT_SLAVE_UNMATCH = @as(c_int, 1);
+pub const SOC_I2C_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_LP_I2C_NUM = @as(c_uint, 1);
+pub const SOC_LP_I2C_FIFO_LEN = @as(c_int, 16);
+pub const SOC_I2S_NUM = @as(c_uint, 1);
 pub const SOC_I2S_HW_VERSION_2 = @as(c_int, 1);
+pub const SOC_I2S_SUPPORTS_ETM = @as(c_int, 1);
 pub const SOC_I2S_SUPPORTS_XTAL = @as(c_int, 1);
 pub const SOC_I2S_SUPPORTS_PLL_F160M = @as(c_int, 1);
 pub const SOC_I2S_SUPPORTS_PCM = @as(c_int, 1);
 pub const SOC_I2S_SUPPORTS_PDM = @as(c_int, 1);
 pub const SOC_I2S_SUPPORTS_PDM_TX = @as(c_int, 1);
 pub const SOC_I2S_PDM_MAX_TX_LINES = @as(c_int, 2);
-pub const SOC_I2S_SUPPORTS_PDM_RX = @as(c_int, 1);
-pub const SOC_I2S_PDM_MAX_RX_LINES = @as(c_int, 4);
 pub const SOC_I2S_SUPPORTS_TDM = @as(c_int, 1);
-pub const SOC_LEDC_SUPPORT_APB_CLOCK = @as(c_int, 1);
+pub const SOC_I2S_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_LEDC_SUPPORT_PLL_DIV_CLOCK = @as(c_int, 1);
 pub const SOC_LEDC_SUPPORT_XTAL_CLOCK = @as(c_int, 1);
 pub const SOC_LEDC_TIMER_NUM = @as(c_int, 4);
-pub const SOC_LEDC_CHANNEL_NUM = @as(c_int, 8);
-pub const SOC_LEDC_TIMER_BIT_WIDTH = @as(c_int, 14);
+pub const SOC_LEDC_CHANNEL_NUM = @as(c_int, 6);
+pub const SOC_LEDC_TIMER_BIT_WIDTH = @as(c_int, 20);
 pub const SOC_LEDC_SUPPORT_FADE_STOP = @as(c_int, 1);
-pub const SOC_MCPWM_GROUPS = @as(c_int, 2);
-pub const SOC_MCPWM_TIMERS_PER_GROUP = @as(c_int, 3);
-pub const SOC_MCPWM_OPERATORS_PER_GROUP = @as(c_int, 3);
-pub const SOC_MCPWM_COMPARATORS_PER_OPERATOR = @as(c_int, 2);
-pub const SOC_MCPWM_GENERATORS_PER_OPERATOR = @as(c_int, 2);
-pub const SOC_MCPWM_TRIGGERS_PER_OPERATOR = @as(c_int, 2);
-pub const SOC_MCPWM_GPIO_FAULTS_PER_GROUP = @as(c_int, 3);
-pub const SOC_MCPWM_CAPTURE_TIMERS_PER_GROUP = @as(c_int, 1);
-pub const SOC_MCPWM_CAPTURE_CHANNELS_PER_TIMER = @as(c_int, 3);
-pub const SOC_MCPWM_GPIO_SYNCHROS_PER_GROUP = @as(c_int, 3);
-pub const SOC_MCPWM_SWSYNC_CAN_PROPAGATE = @as(c_int, 1);
-pub const SOC_MMU_LINEAR_ADDRESS_REGION_NUM = @as(c_uint, 1);
+pub const SOC_LEDC_GAMMA_CURVE_FADE_SUPPORTED = @as(c_int, 1);
+pub const SOC_LEDC_GAMMA_CURVE_FADE_RANGE_MAX = @as(c_int, 16);
+pub const SOC_LEDC_FADE_PARAMS_BIT_WIDTH = @as(c_int, 10);
+pub const SOC_LEDC_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_MMU_PAGE_SIZE_CONFIGURABLE = @as(c_int, 1);
+pub const SOC_MMU_PAGE_SIZE_8KB_SUPPORTED = @as(c_int, 1);
 pub const SOC_MMU_PERIPH_NUM = @as(c_uint, 1);
+pub const SOC_MMU_LINEAR_ADDRESS_REGION_NUM = @as(c_uint, 1);
+pub const SOC_MMU_DI_VADDR_SHARED = @as(c_int, 1);
 pub const SOC_MPU_CONFIGURABLE_REGIONS_SUPPORTED = @as(c_int, 0);
 pub const SOC_MPU_MIN_REGION_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x20000000, .hex);
 pub const SOC_MPU_REGIONS_MAX_NUM = @as(c_int, 8);
@@ -8896,10 +6176,12 @@ pub const SOC_PCNT_GROUPS = @as(c_uint, 1);
 pub const SOC_PCNT_UNITS_PER_GROUP = @as(c_int, 4);
 pub const SOC_PCNT_CHANNELS_PER_UNIT = @as(c_int, 2);
 pub const SOC_PCNT_THRES_POINT_PER_UNIT = @as(c_int, 2);
+pub const SOC_PCNT_SUPPORT_RUNTIME_THRES_UPDATE = @as(c_int, 1);
+pub const SOC_PCNT_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const SOC_RMT_GROUPS = @as(c_uint, 1);
-pub const SOC_RMT_TX_CANDIDATES_PER_GROUP = @as(c_int, 4);
-pub const SOC_RMT_RX_CANDIDATES_PER_GROUP = @as(c_int, 4);
-pub const SOC_RMT_CHANNELS_PER_GROUP = @as(c_int, 8);
+pub const SOC_RMT_TX_CANDIDATES_PER_GROUP = @as(c_int, 2);
+pub const SOC_RMT_RX_CANDIDATES_PER_GROUP = @as(c_int, 2);
+pub const SOC_RMT_CHANNELS_PER_GROUP = @as(c_int, 4);
 pub const SOC_RMT_MEM_WORDS_PER_CHANNEL = @as(c_int, 48);
 pub const SOC_RMT_SUPPORT_RX_PINGPONG = @as(c_int, 1);
 pub const SOC_RMT_SUPPORT_RX_DEMODULATION = @as(c_int, 1);
@@ -8910,37 +6192,46 @@ pub const SOC_RMT_SUPPORT_TX_SYNCHRO = @as(c_int, 1);
 pub const SOC_RMT_SUPPORT_TX_CARRIER_DATA_ONLY = @as(c_int, 1);
 pub const SOC_RMT_SUPPORT_XTAL = @as(c_int, 1);
 pub const SOC_RMT_SUPPORT_RC_FAST = @as(c_int, 1);
-pub const SOC_RMT_SUPPORT_APB = @as(c_int, 1);
-pub const SOC_RMT_SUPPORT_DMA = @as(c_int, 1);
-pub const SOC_LCD_I80_SUPPORTED = @as(c_int, 1);
-pub const SOC_LCD_RGB_SUPPORTED = @as(c_int, 1);
-pub const SOC_LCD_I80_BUSES = @as(c_uint, 1);
-pub const SOC_LCD_RGB_PANELS = @as(c_uint, 1);
-pub const SOC_LCD_I80_BUS_WIDTH = @as(c_int, 16);
-pub const SOC_LCD_RGB_DATA_WIDTH = @as(c_int, 16);
-pub const SOC_LCD_SUPPORT_RGB_YUV_CONV = @as(c_int, 1);
-pub const SOC_LCDCAM_I80_NUM_BUSES = @as(c_uint, 1);
-pub const SOC_LCDCAM_I80_BUS_WIDTH = @as(c_int, 16);
-pub const SOC_LCDCAM_RGB_NUM_PANELS = @as(c_uint, 1);
-pub const SOC_LCDCAM_RGB_DATA_WIDTH = @as(c_int, 16);
-pub const SOC_RTC_CNTL_CPU_PD_DMA_BUS_WIDTH = @as(c_int, 128);
-pub const SOC_RTC_CNTL_CPU_PD_REG_FILE_NUM = @as(c_int, 549);
-pub const SOC_RTC_CNTL_CPU_PD_DMA_ADDR_ALIGN = SOC_RTC_CNTL_CPU_PD_DMA_BUS_WIDTH >> @as(c_int, 3);
-pub const SOC_RTC_CNTL_CPU_PD_DMA_BLOCK_SIZE = SOC_RTC_CNTL_CPU_PD_DMA_BUS_WIDTH >> @as(c_int, 3);
-pub const SOC_RTC_CNTL_CPU_PD_RETENTION_MEM_SIZE = SOC_RTC_CNTL_CPU_PD_REG_FILE_NUM * (SOC_RTC_CNTL_CPU_PD_DMA_BUS_WIDTH >> @as(c_int, 3));
-pub const SOC_RTC_CNTL_TAGMEM_PD_DMA_BUS_WIDTH = @as(c_int, 128);
-pub const SOC_RTC_CNTL_TAGMEM_PD_DMA_ADDR_ALIGN = SOC_RTC_CNTL_TAGMEM_PD_DMA_BUS_WIDTH >> @as(c_int, 3);
-pub const SOC_RTCIO_PIN_COUNT = @as(c_int, 22);
-pub const SOC_RTCIO_INPUT_OUTPUT_SUPPORTED = @as(c_int, 1);
-pub const SOC_RTCIO_HOLD_SUPPORTED = @as(c_int, 1);
-pub const SOC_RTCIO_WAKE_SUPPORTED = @as(c_int, 1);
-pub const SOC_SDM_GROUPS = @as(c_int, 1);
-pub const SOC_SDM_CHANNELS_PER_GROUP = @as(c_int, 8);
-pub const SOC_SDM_CLK_SUPPORT_APB = @as(c_int, 1);
-pub const SOC_SPI_PERIPH_NUM = @as(c_int, 3);
-pub inline fn SOC_SPI_PERIPH_CS_NUM(i: anytype) @TypeOf(if (i == @as(c_int, 0)) @as(c_int, 2) else if (i == @as(c_int, 1)) @as(c_int, 6) else @as(c_int, 3)) {
+pub const SOC_RMT_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_MCPWM_GROUPS = @as(c_uint, 1);
+pub const SOC_MCPWM_TIMERS_PER_GROUP = @as(c_int, 3);
+pub const SOC_MCPWM_OPERATORS_PER_GROUP = @as(c_int, 3);
+pub const SOC_MCPWM_COMPARATORS_PER_OPERATOR = @as(c_int, 2);
+pub const SOC_MCPWM_GENERATORS_PER_OPERATOR = @as(c_int, 2);
+pub const SOC_MCPWM_TRIGGERS_PER_OPERATOR = @as(c_int, 2);
+pub const SOC_MCPWM_GPIO_FAULTS_PER_GROUP = @as(c_int, 3);
+pub const SOC_MCPWM_CAPTURE_TIMERS_PER_GROUP = @as(c_int, 1);
+pub const SOC_MCPWM_CAPTURE_CHANNELS_PER_TIMER = @as(c_int, 3);
+pub const SOC_MCPWM_GPIO_SYNCHROS_PER_GROUP = @as(c_int, 3);
+pub const SOC_MCPWM_SWSYNC_CAN_PROPAGATE = @as(c_int, 1);
+pub const SOC_MCPWM_SUPPORT_ETM = @as(c_int, 1);
+pub const SOC_MCPWM_CAPTURE_CLK_FROM_GROUP = @as(c_int, 1);
+pub const SOC_MCPWM_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_PARLIO_GROUPS = @as(c_uint, 1);
+pub const SOC_PARLIO_TX_UNITS_PER_GROUP = @as(c_uint, 1);
+pub const SOC_PARLIO_RX_UNITS_PER_GROUP = @as(c_uint, 1);
+pub const SOC_PARLIO_TX_UNIT_MAX_DATA_WIDTH = @as(c_int, 16);
+pub const SOC_PARLIO_RX_UNIT_MAX_DATA_WIDTH = @as(c_int, 16);
+pub const SOC_PARLIO_TX_RX_SHARE_INTERRUPT = @as(c_int, 1);
+pub const SOC_PARLIO_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_MPI_MEM_BLOCKS_NUM = @as(c_int, 4);
+pub const SOC_MPI_OPERATIONS_NUM = @as(c_int, 3);
+pub const SOC_RSA_MAX_BIT_LEN = @as(c_int, 3072);
+pub const SOC_SHA_DMA_MAX_BUFFER_SIZE = @as(c_int, 3968);
+pub const SOC_SHA_SUPPORT_DMA = @as(c_int, 1);
+pub const SOC_SHA_SUPPORT_RESUME = @as(c_int, 1);
+pub const SOC_SHA_GDMA = @as(c_int, 1);
+pub const SOC_SHA_SUPPORT_SHA1 = @as(c_int, 1);
+pub const SOC_SHA_SUPPORT_SHA224 = @as(c_int, 1);
+pub const SOC_SHA_SUPPORT_SHA256 = @as(c_int, 1);
+pub const SOC_SDM_GROUPS = @as(c_uint, 1);
+pub const SOC_SDM_CHANNELS_PER_GROUP = @as(c_int, 4);
+pub const SOC_SDM_CLK_SUPPORT_PLL_F80M = @as(c_int, 1);
+pub const SOC_SDM_CLK_SUPPORT_XTAL = @as(c_int, 1);
+pub const SOC_SPI_PERIPH_NUM = @as(c_int, 2);
+pub inline fn SOC_SPI_PERIPH_CS_NUM(i: anytype) @TypeOf(@as(c_int, 6)) {
     _ = &i;
-    return if (i == @as(c_int, 0)) @as(c_int, 2) else if (i == @as(c_int, 1)) @as(c_int, 6) else @as(c_int, 3);
+    return @as(c_int, 6);
 }
 pub const SOC_SPI_MAX_CS_NUM = @as(c_int, 6);
 pub const SOC_SPI_MAXIMUM_BUFFER_SIZE = @as(c_int, 64);
@@ -8949,14 +6240,12 @@ pub const SOC_SPI_SLAVE_SUPPORT_SEG_TRANS = @as(c_int, 1);
 pub const SOC_SPI_SUPPORT_CD_SIG = @as(c_int, 1);
 pub const SOC_SPI_SUPPORT_CONTINUOUS_TRANS = @as(c_int, 1);
 pub const SOC_SPI_SUPPORT_SLAVE_HD_VER2 = @as(c_int, 1);
-pub const SOC_SPI_SUPPORT_CLK_APB = @as(c_int, 1);
+pub const SOC_SPI_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const SOC_SPI_SUPPORT_CLK_XTAL = @as(c_int, 1);
+pub const SOC_SPI_SUPPORT_CLK_PLL_F80M = @as(c_int, 1);
+pub const SOC_SPI_SUPPORT_CLK_RC_FAST = @as(c_int, 1);
 pub const SOC_SPI_PERIPH_SUPPORT_MULTILINE_MODE = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc_caps.h:343:9
-pub const SOC_SPI_PERIPH_SUPPORT_CONTROL_DUMMY_OUT = @as(c_int, 1);
-pub const SOC_MEMSPI_IS_INDEPENDENT = @as(c_int, 1);
-pub const SOC_SPI_MAX_PRE_DIVIDER = @as(c_int, 16);
-pub const SOC_SPI_SUPPORT_OCT = @as(c_int, 1);
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc_caps.h:411:9
 pub const SOC_SPI_SCT_SUPPORTED = @as(c_int, 1);
 pub inline fn SOC_SPI_SCT_SUPPORTED_PERIPH(PERIPH_NUM: anytype) @TypeOf(if (PERIPH_NUM == @as(c_int, 1)) @as(c_int, 1) else @as(c_int, 0)) {
     _ = &PERIPH_NUM;
@@ -8965,279 +6254,148 @@ pub inline fn SOC_SPI_SCT_SUPPORTED_PERIPH(PERIPH_NUM: anytype) @TypeOf(if (PERI
 pub const SOC_SPI_SCT_REG_NUM = @as(c_int, 14);
 pub const SOC_SPI_SCT_BUFFER_NUM_MAX = @as(c_int, 1) + SOC_SPI_SCT_REG_NUM;
 pub const SOC_SPI_SCT_CONF_BITLEN_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FFFA, .hex);
-pub const SOC_MEMSPI_SRC_FREQ_120M = @as(c_int, 1);
+pub const SOC_MEMSPI_IS_INDEPENDENT = @as(c_int, 1);
+pub const SOC_SPI_MAX_PRE_DIVIDER = @as(c_int, 16);
+pub const SOC_SPI_MEM_SUPPORT_AUTO_WAIT_IDLE = @as(c_int, 1);
+pub const SOC_SPI_MEM_SUPPORT_AUTO_SUSPEND = @as(c_int, 1);
+pub const SOC_SPI_MEM_SUPPORT_AUTO_RESUME = @as(c_int, 1);
+pub const SOC_SPI_MEM_SUPPORT_IDLE_INTR = @as(c_int, 1);
+pub const SOC_SPI_MEM_SUPPORT_SW_SUSPEND = @as(c_int, 1);
+pub const SOC_SPI_MEM_SUPPORT_CHECK_SUS = @as(c_int, 1);
+pub const SOC_SPI_MEM_SUPPORT_WRAP = @as(c_int, 1);
 pub const SOC_MEMSPI_SRC_FREQ_80M_SUPPORTED = @as(c_int, 1);
 pub const SOC_MEMSPI_SRC_FREQ_40M_SUPPORTED = @as(c_int, 1);
 pub const SOC_MEMSPI_SRC_FREQ_20M_SUPPORTED = @as(c_int, 1);
-pub const SOC_SPIRAM_SUPPORTED = @as(c_int, 1);
-pub const SOC_SPIRAM_XIP_SUPPORTED = @as(c_int, 1);
 pub const SOC_SYSTIMER_COUNTER_NUM = @as(c_int, 2);
 pub const SOC_SYSTIMER_ALARM_NUM = @as(c_int, 3);
 pub const SOC_SYSTIMER_BIT_WIDTH_LO = @as(c_int, 32);
 pub const SOC_SYSTIMER_BIT_WIDTH_HI = @as(c_int, 20);
 pub const SOC_SYSTIMER_FIXED_DIVIDER = @as(c_int, 1);
+pub const SOC_SYSTIMER_SUPPORT_RC_FAST = @as(c_int, 1);
 pub const SOC_SYSTIMER_INT_LEVEL = @as(c_int, 1);
 pub const SOC_SYSTIMER_ALARM_MISS_COMPENSATE = @as(c_int, 1);
+pub const SOC_SYSTIMER_SUPPORT_ETM = @as(c_int, 1);
+pub const SOC_LP_TIMER_BIT_WIDTH_LO = @as(c_int, 32);
+pub const SOC_LP_TIMER_BIT_WIDTH_HI = @as(c_int, 16);
 pub const SOC_TIMER_GROUPS = @as(c_int, 2);
-pub const SOC_TIMER_GROUP_TIMERS_PER_GROUP = @as(c_int, 2);
+pub const SOC_TIMER_GROUP_TIMERS_PER_GROUP = @as(c_uint, 1);
 pub const SOC_TIMER_GROUP_COUNTER_BIT_WIDTH = @as(c_int, 54);
 pub const SOC_TIMER_GROUP_SUPPORT_XTAL = @as(c_int, 1);
-pub const SOC_TIMER_GROUP_SUPPORT_APB = @as(c_int, 1);
-pub const SOC_TIMER_GROUP_TOTAL_TIMERS = @as(c_int, 4);
-pub const SOC_TOUCH_SENSOR_VERSION = @as(c_int, 2);
-pub const SOC_TOUCH_SENSOR_NUM = @as(c_int, 15);
-pub const SOC_TOUCH_SUPPORT_SLEEP_WAKEUP = @as(c_int, 1);
-pub const SOC_TOUCH_SUPPORT_WATERPROOF = @as(c_int, 1);
-pub const SOC_TOUCH_SUPPORT_PROX_SENSING = @as(c_int, 1);
-pub const SOC_TOUCH_PROXIMITY_CHANNEL_NUM = @as(c_int, 3);
-pub const SOC_TOUCH_PROXIMITY_MEAS_DONE_SUPPORTED = @as(c_int, 1);
-pub const SOC_TOUCH_SAMPLE_CFG_NUM = @as(c_uint, 1);
-pub const SOC_TWAI_CONTROLLER_NUM = @as(c_ulong, 1);
-pub const SOC_TWAI_CLK_SUPPORT_APB = @as(c_int, 1);
+pub const SOC_TIMER_GROUP_SUPPORT_RC_FAST = @as(c_int, 1);
+pub const SOC_TIMER_GROUP_TOTAL_TIMERS = @as(c_int, 2);
+pub const SOC_TIMER_SUPPORT_ETM = @as(c_int, 1);
+pub const SOC_TIMER_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_MWDT_SUPPORT_XTAL = @as(c_int, 1);
+pub const SOC_MWDT_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_TWAI_CONTROLLER_NUM = @as(c_int, 2);
+pub const SOC_TWAI_CLK_SUPPORT_XTAL = @as(c_int, 1);
 pub const SOC_TWAI_BRP_MIN = @as(c_int, 2);
-pub const SOC_TWAI_BRP_MAX = @as(c_int, 16384);
+pub const SOC_TWAI_BRP_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 32768, .decimal);
 pub const SOC_TWAI_SUPPORTS_RX_STATUS = @as(c_int, 1);
-pub const SOC_UART_NUM = @as(c_int, 3);
-pub const SOC_UART_HP_NUM = @as(c_int, 3);
-pub const SOC_UART_FIFO_LEN = @as(c_int, 128);
-pub const SOC_UART_BITRATE_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 5000000, .decimal);
-pub const SOC_UART_SUPPORT_FSM_TX_WAIT_SEND = @as(c_int, 1);
-pub const SOC_UART_SUPPORT_WAKEUP_INT = @as(c_int, 1);
-pub const SOC_UART_SUPPORT_APB_CLK = @as(c_int, 1);
-pub const SOC_UART_SUPPORT_RTC_CLK = @as(c_int, 1);
-pub const SOC_UART_SUPPORT_XTAL_CLK = @as(c_int, 1);
-pub const SOC_USB_OTG_PERIPH_NUM = @as(c_uint, 1);
-pub const SOC_SHA_DMA_MAX_BUFFER_SIZE = @as(c_int, 3968);
-pub const SOC_SHA_SUPPORT_DMA = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_RESUME = @as(c_int, 1);
-pub const SOC_SHA_GDMA = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA1 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA224 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA256 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA384 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA512 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA512_224 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA512_256 = @as(c_int, 1);
-pub const SOC_SHA_SUPPORT_SHA512_T = @as(c_int, 1);
-pub const SOC_MPI_MEM_BLOCKS_NUM = @as(c_int, 4);
-pub const SOC_MPI_OPERATIONS_NUM = @as(c_int, 3);
-pub const SOC_RSA_MAX_BIT_LEN = @as(c_int, 4096);
-pub const SOC_AES_SUPPORT_DMA = @as(c_int, 1);
-pub const SOC_AES_GDMA = @as(c_int, 1);
-pub const SOC_AES_SUPPORT_AES_128 = @as(c_int, 1);
-pub const SOC_AES_SUPPORT_AES_256 = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_EXT0_WAKEUP = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_EXT1_WAKEUP = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_EXT_WAKEUP = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_WIFI_WAKEUP = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_BT_WAKEUP = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_TOUCH_SENSOR_WAKEUP = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_CPU_PD = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_TAGMEM_PD = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_RTC_PERIPH_PD = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_RC_FAST_PD = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_VDDSDIO_PD = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_MAC_BB_PD = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_MODEM_PD = @as(c_int, 1);
-pub const SOC_CONFIGURABLE_VDDSDIO_SUPPORTED = @as(c_int, 1);
-pub const SOC_PM_SUPPORT_DEEPSLEEP_CHECK_STUB_ONLY = @as(c_int, 1);
-pub const SOC_PM_CPU_RETENTION_BY_RTCCNTL = @as(c_int, 1);
-pub const SOC_PM_MODEM_RETENTION_BY_BACKUPDMA = @as(c_int, 1);
-pub const SOC_PM_MODEM_PD_BY_SW = @as(c_int, 1);
-pub const SOC_CLK_RC_FAST_D256_SUPPORTED = @as(c_int, 1);
-pub const SOC_RTC_SLOW_CLK_SUPPORT_RC_FAST_D256 = @as(c_int, 1);
-pub const SOC_CLK_RC_FAST_SUPPORT_CALIBRATION = @as(c_int, 1);
-pub const SOC_CLK_XTAL32K_SUPPORTED = @as(c_int, 1);
+pub const SOC_TWAI_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
 pub const SOC_EFUSE_DIS_DOWNLOAD_ICACHE = @as(c_int, 1);
-pub const SOC_EFUSE_DIS_DOWNLOAD_DCACHE = @as(c_int, 1);
-pub const SOC_EFUSE_HARD_DIS_JTAG = @as(c_int, 1);
+pub const SOC_EFUSE_DIS_PAD_JTAG = @as(c_int, 1);
 pub const SOC_EFUSE_DIS_USB_JTAG = @as(c_int, 1);
-pub const SOC_EFUSE_SOFT_DIS_JTAG = @as(c_int, 1);
 pub const SOC_EFUSE_DIS_DIRECT_BOOT = @as(c_int, 1);
+pub const SOC_EFUSE_SOFT_DIS_JTAG = @as(c_int, 1);
 pub const SOC_EFUSE_DIS_ICACHE = @as(c_int, 1);
 pub const SOC_EFUSE_BLOCK9_KEY_PURPOSE_QUIRK = @as(c_int, 1);
 pub const SOC_SECURE_BOOT_V2_RSA = @as(c_int, 1);
+pub const SOC_SECURE_BOOT_V2_ECC = @as(c_int, 1);
 pub const SOC_EFUSE_SECURE_BOOT_KEY_DIGESTS = @as(c_int, 3);
 pub const SOC_EFUSE_REVOKE_BOOT_KEY_DIGESTS = @as(c_int, 1);
 pub const SOC_SUPPORT_SECURE_BOOT_REVOKE_KEY = @as(c_int, 1);
 pub const SOC_FLASH_ENCRYPTED_XTS_AES_BLOCK_MAX = @as(c_int, 64);
 pub const SOC_FLASH_ENCRYPTION_XTS_AES = @as(c_int, 1);
-pub const SOC_FLASH_ENCRYPTION_XTS_AES_OPTIONS = @as(c_int, 1);
 pub const SOC_FLASH_ENCRYPTION_XTS_AES_128 = @as(c_int, 1);
-pub const SOC_FLASH_ENCRYPTION_XTS_AES_256 = @as(c_int, 1);
-pub const SOC_MEMPROT_CPU_PREFETCH_PAD_SIZE = @as(c_int, 16);
-pub const SOC_MEMPROT_MEM_ALIGN_SIZE = @as(c_int, 256);
-pub const SOC_PHY_DIG_REGS_MEM_SIZE = @as(c_int, 21) * @as(c_int, 4);
-pub const SOC_MAC_BB_PD_MEM_SIZE = @as(c_int, 192) * @as(c_int, 4);
-pub const SOC_WIFI_LIGHT_SLEEP_CLK_WIDTH = @as(c_int, 12);
-pub const SOC_SPI_MEM_SUPPORT_AUTO_WAIT_IDLE = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_AUTO_SUSPEND = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_AUTO_RESUME = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_SW_SUSPEND = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_OPI_MODE = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_TIMING_TUNING = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_CONFIG_GPIO_BY_EFUSE = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_WRAP = @as(c_int, 1);
-pub const SOC_MEMSPI_TIMING_TUNING_BY_MSPI_DELAY = @as(c_int, 1);
-pub const SOC_MEMSPI_CORE_CLK_SHARED_WITH_PSRAM = @as(c_int, 1);
-pub const SOC_SPI_MEM_SUPPORT_CACHE_32BIT_ADDR_MAP = @as(c_int, 1);
+pub const SOC_APM_CTRL_FILTER_SUPPORTED = @as(c_int, 1);
+pub const SOC_APM_LP_APM0_SUPPORTED = @as(c_int, 1);
+pub const SOC_CRYPTO_DPA_PROTECTION_SUPPORTED = @as(c_int, 1);
+pub const SOC_UART_NUM = @as(c_int, 3);
+pub const SOC_UART_HP_NUM = @as(c_int, 2);
+pub const SOC_UART_LP_NUM = @as(c_uint, 1);
+pub const SOC_UART_FIFO_LEN = @as(c_int, 128);
+pub const SOC_LP_UART_FIFO_LEN = @as(c_int, 16);
+pub const SOC_UART_BITRATE_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 5000000, .decimal);
+pub const SOC_UART_SUPPORT_PLL_F80M_CLK = @as(c_int, 1);
+pub const SOC_UART_SUPPORT_RTC_CLK = @as(c_int, 1);
+pub const SOC_UART_SUPPORT_XTAL_CLK = @as(c_int, 1);
+pub const SOC_UART_SUPPORT_WAKEUP_INT = @as(c_int, 1);
+pub const SOC_UART_HAS_LP_UART = @as(c_int, 1);
+pub const SOC_UART_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_UART_SUPPORT_FSM_TX_WAIT_SEND = @as(c_int, 1);
 pub const SOC_COEX_HW_PTI = @as(c_int, 1);
-pub const SOC_EXTERNAL_COEX_ADVANCE = @as(c_int, 0);
-pub const SOC_EXTERNAL_COEX_LEADER_TX_LINE = @as(c_int, 1);
-pub const SOC_SDMMC_USE_GPIO_MATRIX = @as(c_int, 1);
-pub const SOC_SDMMC_NUM_SLOTS = @as(c_int, 2);
-pub const SOC_SDMMC_SUPPORT_XTAL_CLOCK = @as(c_int, 1);
-pub const SOC_SDMMC_DELAY_PHASE_NUM = @as(c_int, 4);
+pub const SOC_EXTERNAL_COEX_ADVANCE = @as(c_int, 1);
+pub const SOC_EXTERNAL_COEX_LEADER_TX_LINE = @as(c_int, 0);
+pub const SOC_PHY_DIG_REGS_MEM_SIZE = @as(c_int, 21) * @as(c_int, 4);
+pub const SOC_WIFI_LIGHT_SLEEP_CLK_WIDTH = @as(c_int, 12);
+pub const SOC_PM_SUPPORT_WIFI_WAKEUP = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_BEACON_WAKEUP = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_BT_WAKEUP = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_EXT1_WAKEUP = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_EXT1_WAKEUP_MODE_PER_PIN = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_CPU_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_MODEM_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_XTAL32K_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_RC32K_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_RC_FAST_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_VDDSDIO_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_TOP_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_HP_AON_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_MAC_BB_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_RTC_PERIPH_PD = @as(c_int, 1);
+pub const SOC_PM_SUPPORT_PMU_MODEM_STATE = @as(c_int, 1);
+pub const MAC_SUPPORT_PMU_MODEM_STATE = SOC_PM_SUPPORT_PMU_MODEM_STATE;
+pub const SOC_PM_SUPPORT_DEEPSLEEP_CHECK_STUB_ONLY = @as(c_int, 1);
+pub const SOC_PM_CPU_RETENTION_BY_SW = @as(c_int, 1);
+pub const SOC_PM_MODEM_RETENTION_BY_REGDMA = @as(c_int, 1);
+pub const SOC_PM_RETENTION_HAS_CLOCK_BUG = @as(c_int, 1);
+pub const SOC_EXT_MEM_CACHE_TAG_IN_CPU_DOMAIN = @as(c_int, 1);
+pub const SOC_PM_PAU_LINK_NUM = @as(c_int, 4);
+pub const SOC_PM_PAU_REGDMA_LINK_MULTI_ADDR = @as(c_int, 1);
+pub const SOC_PM_PAU_REGDMA_LINK_WIFIMAC = @as(c_int, 1);
+pub const SOC_PM_PAU_REGDMA_UPDATE_CACHE_BEFORE_WAIT_COMPARE = @as(c_int, 1);
+pub const SOC_PM_RETENTION_MODULE_NUM = @as(c_int, 32);
+pub const SOC_CLK_RC_FAST_SUPPORT_CALIBRATION = @as(c_int, 1);
+pub const SOC_MODEM_CLOCK_IS_INDEPENDENT = @as(c_int, 1);
+pub const SOC_CLK_XTAL32K_SUPPORTED = @as(c_int, 1);
+pub const SOC_CLK_OSC_SLOW_SUPPORTED = @as(c_int, 1);
+pub const SOC_CLK_RC32K_SUPPORTED = @as(c_int, 1);
+pub const SOC_RCC_IS_INDEPENDENT = @as(c_int, 1);
 pub const SOC_TEMPERATURE_SENSOR_SUPPORT_FAST_RC = @as(c_int, 1);
+pub const SOC_TEMPERATURE_SENSOR_SUPPORT_XTAL = @as(c_int, 1);
+pub const SOC_TEMPERATURE_SENSOR_INTR_SUPPORT = @as(c_int, 1);
+pub const SOC_TEMPERATURE_SENSOR_SUPPORT_ETM = @as(c_int, 1);
+pub const SOC_TEMPERATURE_SENSOR_SUPPORT_SLEEP_RETENTION = @as(c_int, 1);
+pub const SOC_TEMPERATURE_SENSOR_UNDER_PD_TOP_DOMAIN = @as(c_int, 1);
+pub const SOC_RNG_CLOCK_IS_INDEPENDENT = @as(c_int, 1);
 pub const SOC_WIFI_HW_TSF = @as(c_int, 1);
 pub const SOC_WIFI_FTM_SUPPORT = @as(c_int, 1);
 pub const SOC_WIFI_GCMP_SUPPORT = @as(c_int, 1);
 pub const SOC_WIFI_WAPI_SUPPORT = @as(c_int, 1);
 pub const SOC_WIFI_CSI_SUPPORT = @as(c_int, 1);
 pub const SOC_WIFI_MESH_SUPPORT = @as(c_int, 1);
-pub const SOC_WIFI_SUPPORT_VARIABLE_BEACON_WINDOW = @as(c_int, 1);
-pub const SOC_WIFI_PHY_NEEDS_USB_WORKAROUND = @as(c_int, 1);
+pub const SOC_WIFI_HE_SUPPORT = @as(c_int, 1);
+pub const SOC_WIFI_MAC_VERSION_NUM = @as(c_int, 2);
 pub const SOC_BLE_SUPPORTED = @as(c_int, 1);
 pub const SOC_BLE_MESH_SUPPORTED = @as(c_int, 1);
+pub const SOC_ESP_NIMBLE_CONTROLLER = @as(c_int, 1);
 pub const SOC_BLE_50_SUPPORTED = @as(c_int, 1);
 pub const SOC_BLE_DEVICE_PRIVACY_SUPPORTED = @as(c_int, 1);
+pub const SOC_BLE_POWER_CONTROL_SUPPORTED = @as(c_int, 1);
+pub const SOC_BLE_PERIODIC_ADV_ENH_SUPPORTED = @as(c_int, 1);
 pub const SOC_BLUFI_SUPPORTED = @as(c_int, 1);
-pub const SOC_ULP_HAS_ADC = @as(c_int, 1);
+pub const SOC_BLE_MULTI_CONN_OPTIMIZATION = @as(c_int, 1);
+pub const SOC_BLE_USE_WIFI_PWR_CLK_WORKAROUND = @as(c_int, 1);
 pub const SOC_PHY_COMBO_MODULE = @as(c_int, 1);
-pub const __XTENSA_API_H__ = "";
-pub const DSRSET = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10200C, .hex);
-pub const XTENSA_SPECREG_H = "";
-pub const LBEG = @as(c_int, 0);
-pub const LEND = @as(c_int, 1);
-pub const LCOUNT = @as(c_int, 2);
-pub const SAR = @as(c_int, 3);
-pub const BR = @as(c_int, 4);
-pub const SCOMPARE1 = @as(c_int, 12);
-pub const ACCLO = @as(c_int, 16);
-pub const ACCHI = @as(c_int, 17);
-pub const MR_0 = @as(c_int, 32);
-pub const MR_1 = @as(c_int, 33);
-pub const MR_2 = @as(c_int, 34);
-pub const MR_3 = @as(c_int, 35);
-pub const WINDOWBASE = @as(c_int, 72);
-pub const WINDOWSTART = @as(c_int, 73);
-pub const IBREAKENABLE = @as(c_int, 96);
-pub const MEMCTL = @as(c_int, 97);
-pub const ATOMCTL = @as(c_int, 99);
-pub const DDR = @as(c_int, 104);
-pub const IBREAKA_0 = @as(c_int, 128);
-pub const IBREAKA_1 = @as(c_int, 129);
-pub const DBREAKA_0 = @as(c_int, 144);
-pub const DBREAKA_1 = @as(c_int, 145);
-pub const DBREAKC_0 = @as(c_int, 160);
-pub const DBREAKC_1 = @as(c_int, 161);
-pub const CONFIGID0 = @as(c_int, 176);
-pub const EPC_1 = @as(c_int, 177);
-pub const EPC_2 = @as(c_int, 178);
-pub const EPC_3 = @as(c_int, 179);
-pub const EPC_4 = @as(c_int, 180);
-pub const EPC_5 = @as(c_int, 181);
-pub const EPC_6 = @as(c_int, 182);
-pub const EPC_7 = @as(c_int, 183);
-pub const DEPC = @as(c_int, 192);
-pub const EPS_2 = @as(c_int, 194);
-pub const EPS_3 = @as(c_int, 195);
-pub const EPS_4 = @as(c_int, 196);
-pub const EPS_5 = @as(c_int, 197);
-pub const EPS_6 = @as(c_int, 198);
-pub const EPS_7 = @as(c_int, 199);
-pub const CONFIGID1 = @as(c_int, 208);
-pub const EXCSAVE_1 = @as(c_int, 209);
-pub const EXCSAVE_2 = @as(c_int, 210);
-pub const EXCSAVE_3 = @as(c_int, 211);
-pub const EXCSAVE_4 = @as(c_int, 212);
-pub const EXCSAVE_5 = @as(c_int, 213);
-pub const EXCSAVE_6 = @as(c_int, 214);
-pub const EXCSAVE_7 = @as(c_int, 215);
-pub const CPENABLE = @as(c_int, 224);
-pub const INTERRUPT = @as(c_int, 226);
-pub const INTENABLE = @as(c_int, 228);
-pub const PS = @as(c_int, 230);
-pub const VECBASE = @as(c_int, 231);
-pub const EXCCAUSE = @as(c_int, 232);
-pub const DEBUGCAUSE = @as(c_int, 233);
-pub const CCOUNT = @as(c_int, 234);
-pub const PRID = @as(c_int, 235);
-pub const ICOUNT = @as(c_int, 236);
-pub const ICOUNTLEVEL = @as(c_int, 237);
-pub const EXCVADDR = @as(c_int, 238);
-pub const CCOMPARE_0 = @as(c_int, 240);
-pub const CCOMPARE_1 = @as(c_int, 241);
-pub const CCOMPARE_2 = @as(c_int, 242);
-pub const MISC_REG_0 = @as(c_int, 244);
-pub const MISC_REG_1 = @as(c_int, 245);
-pub const MISC_REG_2 = @as(c_int, 246);
-pub const MISC_REG_3 = @as(c_int, 247);
-pub const MR = @as(c_int, 32);
-pub const IBREAKA = @as(c_int, 128);
-pub const DBREAKA = @as(c_int, 144);
-pub const DBREAKC = @as(c_int, 160);
-pub const EPC = @as(c_int, 176);
-pub const EPS = @as(c_int, 192);
-pub const EXCSAVE = @as(c_int, 208);
-pub const CCOMPARE = @as(c_int, 240);
-pub const INTREAD = @as(c_int, 226);
-pub const INTSET = @as(c_int, 226);
-pub const INTCLEAR = @as(c_int, 227);
-pub const XTRUNTIME_H = "";
-pub const _XTOS_CORE_STATE_H_ = "";
-pub const CORE_STATE_SIGNATURE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xB1C5AFED, .hex);
-pub const _XTSTR = @compileError("unable to translate C expr: unexpected token '#'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime.h:34:9
-pub inline fn XTSTR(x: anytype) @TypeOf(_XTSTR(x)) {
-    _ = &x;
-    return _XTSTR(x);
-}
-pub const XTOS_KEEPON_MEM = @as(c_int, 0x00000100);
-pub const XTOS_KEEPON_MEM_SHIFT = @as(c_int, 8);
-pub const XTOS_KEEPON_DEBUG = @as(c_int, 0x00001000);
-pub const XTOS_KEEPON_DEBUG_SHIFT = @as(c_int, 12);
-pub const XTOS_IDMA_NO_WAIT = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00010000, .hex);
-pub const XTOS_IDMA_WAIT_STANDBY = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00020000, .hex);
-pub const XTOS_COREF_PSO = @as(c_int, 0x00000001);
-pub const XTOS_COREF_PSO_SHIFT = @as(c_int, 0);
-pub const _xtos_set_execption_handler = _xtos_set_exception_handler;
-pub const _xtos_set_saved_intenable = _xtos_ints_on;
-pub const _xtos_clear_saved_intenable = _xtos_ints_off;
-pub const XTOS_SET_INTLEVEL = @compileError("unable to translate macro: undefined identifier `__tmp`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime.h:91:10
-pub const XTOS_SET_MIN_INTLEVEL = @compileError("unable to translate macro: undefined identifier `__tmp`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime.h:95:10
-pub const XTOS_RESTORE_INTLEVEL = @compileError("unable to translate macro: undefined identifier `__tmp`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xtensa/xtruntime.h:104:10
-pub inline fn XTOS_RESTORE_JUST_INTLEVEL(restoreval: anytype) @TypeOf(_xtos_set_intlevel(restoreval)) {
-    _ = &restoreval;
-    return _xtos_set_intlevel(restoreval);
-}
-pub const XTOS_ENABLE_INTERRUPTS = XTOS_SET_INTLEVEL(@as(c_int, 0));
-pub const XTOS_DISABLE_LOWPRI_INTERRUPTS = XTOS_SET_INTLEVEL(XCHAL_NUM_LOWPRI_LEVELS);
-pub const XTOS_MASK_LOWPRI_INTERRUPTS = XTOS_SET_MIN_INTLEVEL(XCHAL_NUM_LOWPRI_LEVELS);
-pub const XTOS_DISABLE_EXCM_INTERRUPTS = XTOS_SET_INTLEVEL(XCHAL_EXCM_LEVEL);
-pub const XTOS_MASK_EXCM_INTERRUPTS = XTOS_SET_MIN_INTLEVEL(XCHAL_EXCM_LEVEL);
-pub const XTOS_DISABLE_ALL_INTERRUPTS = XTOS_SET_INTLEVEL(@as(c_int, 15));
-pub const RSR = @compileError("unable to translate C expr: unexpected token 'asm'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:11:9
-pub const WSR = @compileError("unable to translate C expr: unexpected token 'asm'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:12:9
-pub const XSR = @compileError("unable to translate C expr: unexpected token 'asm'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:13:9
-pub const RER = @compileError("unable to translate C expr: unexpected token 'asm'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:15:9
-pub const WITLB = @compileError("unable to translate C expr: unexpected token 'asm'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:17:9
-pub const WDTLB = @compileError("unable to translate C expr: unexpected token 'asm'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:18:9
-pub const EXTRA_SAVE_AREA_SIZE = @as(c_int, 32);
-pub const BASE_SAVE_AREA_SIZE = @as(c_int, 16);
-pub const SAVE_AREA_OFFSET = EXTRA_SAVE_AREA_SIZE + BASE_SAVE_AREA_SIZE;
-pub const BASE_AREA_SP_OFFSET = @as(c_int, 12);
-pub const SET_STACK = @compileError("unable to translate macro: undefined identifier `sp`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/xtensa/include/xt_instr_macros.h:83:9
+pub const SOC_CAPS_NO_RESET_BY_ANA_BOD = @as(c_int, 1);
+pub const SOC_LP_CORE_SINGLE_INTERRUPT_VECTOR = @as(c_int, 1);
+pub const SOC_LP_CORE_SUPPORT_ETM = @as(c_int, 1);
+pub const SOC_DEBUG_HAVE_OCD_STUB_BINS = @as(c_int, 1);
+pub const __ESP_ASSERT_H__ = "";
+pub const ESP_STATIC_ASSERT = static_assert;
+pub const TRY_STATIC_ASSERT = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_assert.h:18:9
 pub const BIT31 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
 pub const BIT30 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
 pub const BIT29 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
@@ -9310,6 +6468,1966 @@ pub inline fn BIT64(nr: anytype) @TypeOf(@as(c_ulonglong, 1) << nr) {
     _ = &nr;
     return @as(c_ulonglong, 1) << nr;
 }
+pub const DR_REG_PLIC_MX_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20001000, .hex);
+pub const DR_REG_PLIC_UX_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20001400, .hex);
+pub const DR_REG_CLINT_M_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20001800, .hex);
+pub const DR_REG_CLINT_U_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20001C00, .hex);
+pub const DR_REG_UART_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
+pub const DR_REG_UART1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60001000, .hex);
+pub const DR_REG_SPI0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60002000, .hex);
+pub const DR_REG_SPI1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60003000, .hex);
+pub const DR_REG_I2C_EXT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60004000, .hex);
+pub const DR_REG_UHCI0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60005000, .hex);
+pub const DR_REG_RMT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60006000, .hex);
+pub const DR_REG_LEDC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60007000, .hex);
+pub const DR_REG_TIMERGROUP0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60008000, .hex);
+pub const DR_REG_TIMERGROUP1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60009000, .hex);
+pub const DR_REG_SYSTIMER_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000A000, .hex);
+pub const DR_REG_TWAI0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000B000, .hex);
+pub const DR_REG_I2S_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000C000, .hex);
+pub const DR_REG_TWAI1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000D000, .hex);
+pub const DR_REG_APB_SARADC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000E000, .hex);
+pub const DR_REG_USB_SERIAL_JTAG_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000F000, .hex);
+pub const DR_REG_INTERRUPT_MATRIX_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60010000, .hex);
+pub const DR_REG_ATOMIC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60011000, .hex);
+pub const DR_REG_PCNT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60012000, .hex);
+pub const DR_REG_SOC_ETM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60013000, .hex);
+pub const DR_REG_MCPWM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60014000, .hex);
+pub const DR_REG_PARL_IO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60015000, .hex);
+pub const DR_REG_HINF_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60016000, .hex);
+pub const DR_REG_SLC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60017000, .hex);
+pub const DR_REG_SLCHOST_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60018000, .hex);
+pub const DR_REG_PVT_MONITOR_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60019000, .hex);
+pub const DR_REG_GDMA_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60080000, .hex);
+pub const DR_REG_SPI2_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60081000, .hex);
+pub const DR_REG_AES_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60088000, .hex);
+pub const DR_REG_SHA_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60089000, .hex);
+pub const DR_REG_RSA_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6008A000, .hex);
+pub const DR_REG_ECC_MULT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6008B000, .hex);
+pub const DR_REG_DS_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6008C000, .hex);
+pub const DR_REG_HMAC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6008D000, .hex);
+pub const DR_REG_IO_MUX_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60090000, .hex);
+pub const DR_REG_GPIO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60091000, .hex);
+pub const DR_REG_GPIO_EXT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60091f00, .hex);
+pub const DR_REG_MEM_MONITOR_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60092000, .hex);
+pub const DR_REG_PAU_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60093000, .hex);
+pub const DR_REG_HP_SYSTEM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60095000, .hex);
+pub const DR_REG_PCR_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60096000, .hex);
+pub const DR_REG_TEE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60098000, .hex);
+pub const DR_REG_HP_APM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60099000, .hex);
+pub const DR_REG_LP_APM0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60099800, .hex);
+pub const DR_REG_MISC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6009F000, .hex);
+pub const DR_REG_I2C_ANA_MST_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600AF800, .hex);
+pub const DR_REG_PMU_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B0000, .hex);
+pub const DR_REG_LP_CLKRST_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B0400, .hex);
+pub const DR_REG_EFUSE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B0800, .hex);
+pub const DR_REG_LP_TIMER_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B0C00, .hex);
+pub const DR_REG_LP_AON_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B1000, .hex);
+pub const DR_REG_LP_UART_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B1400, .hex);
+pub const DR_REG_LP_I2C_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B1800, .hex);
+pub const DR_REG_LP_WDT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B1C00, .hex);
+pub const DR_REG_LP_IO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B2000, .hex);
+pub const DR_REG_LP_I2C_ANA_MST_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B2400, .hex);
+pub const DR_REG_LPPERI_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B2800, .hex);
+pub const DR_REG_LP_ANALOG_PERI_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B2C00, .hex);
+pub const DR_REG_LP_TEE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B3400, .hex);
+pub const DR_REG_LP_APM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B3800, .hex);
+pub const DR_REG_OPT_DEBUG_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600B3C00, .hex);
+pub const DR_REG_TRACE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C0000, .hex);
+pub const DR_REG_ASSIST_DEBUG_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C2000, .hex);
+pub const DR_REG_CPU_BUS_MONITOR_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C2000, .hex);
+pub const DR_REG_INTPRI_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C5000, .hex);
+pub const DR_REG_EXTMEM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C8000, .hex);
+pub const PWDET_CONF_REG = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600A0810, .hex);
+pub const IEEE802154_REG_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600A3000, .hex);
+pub const PRO_CPU_NUM = @as(c_int, 0);
+pub inline fn REG_UHCI_BASE(i: anytype) @TypeOf(DR_REG_UHCI0_BASE) {
+    _ = &i;
+    return DR_REG_UHCI0_BASE;
+}
+pub inline fn REG_UART_BASE(i: anytype) @TypeOf(DR_REG_UART_BASE + (i * @as(c_int, 0x1000))) {
+    _ = &i;
+    return DR_REG_UART_BASE + (i * @as(c_int, 0x1000));
+}
+pub inline fn REG_UART_AHB_BASE(i: anytype) @TypeOf(@import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex) + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex))) {
+    _ = &i;
+    return @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex) + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex));
+}
+pub inline fn UART_FIFO_AHB_REG(i: anytype) @TypeOf(REG_UART_AHB_BASE(i) + @as(c_int, 0x0)) {
+    _ = &i;
+    return REG_UART_AHB_BASE(i) + @as(c_int, 0x0);
+}
+pub inline fn REG_I2S_BASE(i: anytype) @TypeOf(DR_REG_I2S_BASE) {
+    _ = &i;
+    return DR_REG_I2S_BASE;
+}
+pub inline fn REG_TIMG_BASE(i: anytype) @TypeOf(DR_REG_TIMERGROUP0_BASE + (i * @as(c_int, 0x1000))) {
+    _ = &i;
+    return DR_REG_TIMERGROUP0_BASE + (i * @as(c_int, 0x1000));
+}
+pub inline fn REG_SPI_MEM_BASE(i: anytype) @TypeOf(DR_REG_SPI0_BASE + (i * @as(c_int, 0x1000))) {
+    _ = &i;
+    return DR_REG_SPI0_BASE + (i * @as(c_int, 0x1000));
+}
+pub inline fn REG_SPI_BASE(i: anytype) @TypeOf(if (i == @as(c_int, 2)) DR_REG_SPI2_BASE else @as(c_int, 0)) {
+    _ = &i;
+    return if (i == @as(c_int, 2)) DR_REG_SPI2_BASE else @as(c_int, 0);
+}
+pub inline fn REG_I2C_BASE(i: anytype) @TypeOf(DR_REG_I2C_EXT_BASE) {
+    _ = &i;
+    return DR_REG_I2C_EXT_BASE;
+}
+pub inline fn REG_MCPWM_BASE(i: anytype) @TypeOf(DR_REG_MCPWM_BASE) {
+    _ = &i;
+    return DR_REG_MCPWM_BASE;
+}
+pub inline fn REG_TWAI_BASE(i: anytype) @TypeOf(DR_REG_TWAI0_BASE + (i * @as(c_int, 0x2000))) {
+    _ = &i;
+    return DR_REG_TWAI0_BASE + (i * @as(c_int, 0x2000));
+}
+pub inline fn ETS_UNCACHED_ADDR(addr: anytype) @TypeOf(addr) {
+    _ = &addr;
+    return addr;
+}
+pub inline fn ETS_CACHED_ADDR(addr: anytype) @TypeOf(addr) {
+    _ = &addr;
+    return addr;
+}
+pub const REG_WRITE = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:38:9
+pub const REG_READ = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:43:9
+pub const REG_GET_BIT = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:48:9
+pub const REG_SET_BIT = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:53:9
+pub const REG_CLR_BIT = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:58:9
+pub const REG_SET_BITS = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:63:9
+pub const REG_GET_FIELD = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:68:9
+pub const REG_SET_FIELD = @compileError("unable to translate macro: undefined identifier `_V`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:73:9
+pub const VALUE_GET_FIELD = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:78:9
+pub const VALUE_GET_FIELD2 = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:81:9
+pub const VALUE_SET_FIELD = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:84:9
+pub const VALUE_SET_FIELD2 = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:87:9
+pub const FIELD_TO_VALUE = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:90:9
+pub const FIELD_TO_VALUE2 = @compileError("unable to translate macro: undefined identifier `_S`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:93:9
+pub const READ_PERI_REG = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:96:9
+pub const WRITE_PERI_REG = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:101:9
+pub const CLEAR_PERI_REG_MASK = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:106:9
+pub const SET_PERI_REG_MASK = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:111:9
+pub const GET_PERI_REG_MASK = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:116:9
+pub const GET_PERI_REG_BITS = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:121:9
+pub const SET_PERI_REG_BITS = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:126:9
+pub const GET_PERI_REG_BITS2 = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/soc/esp32c6/include/soc/soc.h:131:9
+pub const APB_CLK_FREQ_ROM = @as(c_int, 40) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
+pub const CPU_CLK_FREQ_ROM = APB_CLK_FREQ_ROM;
+pub const CPU_CLK_FREQ_MHZ_BTLD = @as(c_int, 80);
+pub const APB_CLK_FREQ = @as(c_int, 40) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
+pub const MODEM_REQUIRED_MIN_APB_CLK_FREQ = @as(c_int, 80) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
+pub const REF_CLK_FREQ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
+pub const XTAL_CLK_FREQ = @as(c_int, 40) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
+pub const SOC_IROM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x42000000, .hex);
+pub const SOC_IROM_HIGH = SOC_IROM_LOW + (SOC_MMU_PAGE_SIZE << @as(c_int, 8));
+pub const SOC_DROM_LOW = SOC_IROM_LOW;
+pub const SOC_DROM_HIGH = SOC_IROM_HIGH;
+pub const SOC_IROM_MASK_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
+pub const SOC_IROM_MASK_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40050000, .hex);
+pub const SOC_DROM_MASK_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
+pub const SOC_DROM_MASK_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40050000, .hex);
+pub const SOC_IRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_IRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_DRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_DRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_RTC_IRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
+pub const SOC_RTC_IRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50004000, .hex);
+pub const SOC_RTC_DRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
+pub const SOC_RTC_DRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50004000, .hex);
+pub const SOC_RTC_DATA_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
+pub const SOC_RTC_DATA_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50004000, .hex);
+pub const SOC_DIRAM_IRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_DIRAM_IRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_DIRAM_DRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_DIRAM_DRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub inline fn MAP_DRAM_TO_IRAM(addr: anytype) @TypeOf(addr) {
+    _ = &addr;
+    return addr;
+}
+pub inline fn MAP_IRAM_TO_DRAM(addr: anytype) @TypeOf(addr) {
+    _ = &addr;
+    return addr;
+}
+pub const SOC_DMA_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_DMA_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_BYTE_ACCESSIBLE_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_BYTE_ACCESSIBLE_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_MEM_INTERNAL_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_MEM_INTERNAL_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_MEM_INTERNAL_LOW1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40800000, .hex);
+pub const SOC_MEM_INTERNAL_HIGH1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40880000, .hex);
+pub const SOC_MAX_CONTIGUOUS_RAM_SIZE = SOC_IRAM_HIGH - SOC_IRAM_LOW;
+pub const SOC_PERIPHERAL_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
+pub const SOC_PERIPHERAL_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60100000, .hex);
+pub const SOC_CPU_SUBSYSTEM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x20000000, .hex);
+pub const SOC_CPU_SUBSYSTEM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x30000000, .hex);
+pub const SOC_ROM_STACK_START = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x4087e610, .hex);
+pub const SOC_ROM_STACK_SIZE = @as(c_int, 0x2000);
+pub const ETS_T1_WDT_INUM = @as(c_int, 24);
+pub const ETS_CACHEERR_INUM = @as(c_int, 25);
+pub const ETS_MEMPROT_ERR_INUM = @as(c_int, 26);
+pub const ETS_ASSIST_DEBUG_INUM = @as(c_int, 27);
+pub const ETS_MAX_INUM = @as(c_int, 31);
+pub const ETS_SLC_INUM = @as(c_int, 1);
+pub const ETS_UART0_INUM = @as(c_int, 5);
+pub const ETS_UART1_INUM = @as(c_int, 5);
+pub const ETS_SPI2_INUM = @as(c_int, 1);
+pub const ETS_GPIO_INUM = @as(c_int, 4);
+pub const ETS_INVALID_INUM = @as(c_int, 0);
+pub const SOC_INTERRUPT_LEVEL_MEDIUM = @as(c_int, 4);
+pub const ETS_INT_WDT_INUM = ETS_T1_WDT_INUM;
+pub const ASSIST_DEBUG_CORE_0_INTR_ENA_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_ENA = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_ENA_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_ENA_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_ENA_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_ENA = BIT(@as(c_int, 1));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_ENA_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_ENA_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_ENA_S = @as(c_int, 1);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_ENA = BIT(@as(c_int, 2));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_ENA_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_ENA_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_ENA_S = @as(c_int, 2);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_ENA = BIT(@as(c_int, 3));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_ENA_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_ENA_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_ENA_S = @as(c_int, 3);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_ENA = BIT(@as(c_int, 4));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_ENA_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_ENA_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_ENA_S = @as(c_int, 4);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_ENA = BIT(@as(c_int, 5));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_ENA_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_ENA_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_ENA_S = @as(c_int, 5);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_ENA = BIT(@as(c_int, 6));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_ENA_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_ENA_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_ENA_S = @as(c_int, 6);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_ENA = BIT(@as(c_int, 7));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_ENA_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_ENA_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_ENA_S = @as(c_int, 7);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_ENA = BIT(@as(c_int, 8));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_ENA_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_ENA_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_ENA_S = @as(c_int, 8);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_ENA = BIT(@as(c_int, 9));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_ENA_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_ENA_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_ENA_S = @as(c_int, 9);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_ENA = BIT(@as(c_int, 10));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_ENA_M = ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_ENA_V << ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_ENA_S = @as(c_int, 10);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_ENA = BIT(@as(c_int, 11));
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_ENA_M = ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_ENA_V << ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_ENA_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_ENA_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_ENA_S = @as(c_int, 11);
+pub const ASSIST_DEBUG_CORE_0_INTR_RAW_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x4);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RAW = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RAW_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RAW_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RAW_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RAW = BIT(@as(c_int, 1));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RAW_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RAW_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RAW_S = @as(c_int, 1);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RAW = BIT(@as(c_int, 2));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RAW_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RAW_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RAW_S = @as(c_int, 2);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RAW = BIT(@as(c_int, 3));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RAW_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RAW_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RAW_S = @as(c_int, 3);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RAW = BIT(@as(c_int, 4));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RAW_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RAW_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RAW_S = @as(c_int, 4);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RAW = BIT(@as(c_int, 5));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RAW_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RAW_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RAW_S = @as(c_int, 5);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RAW = BIT(@as(c_int, 6));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RAW_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RAW_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RAW_S = @as(c_int, 6);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RAW = BIT(@as(c_int, 7));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RAW_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RAW_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RAW_S = @as(c_int, 7);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RAW = BIT(@as(c_int, 8));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RAW_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RAW_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RAW_S = @as(c_int, 8);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RAW = BIT(@as(c_int, 9));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RAW_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RAW_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RAW_S = @as(c_int, 9);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RAW = BIT(@as(c_int, 10));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RAW_M = ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RAW_V << ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RAW_S = @as(c_int, 10);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RAW = BIT(@as(c_int, 11));
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RAW_M = ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RAW_V << ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RAW_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RAW_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RAW_S = @as(c_int, 11);
+pub const ASSIST_DEBUG_CORE_0_INTR_RLS_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x8);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RLS = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RLS_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RLS_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_RLS_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RLS = BIT(@as(c_int, 1));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RLS_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RLS_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_RLS_S = @as(c_int, 1);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RLS = BIT(@as(c_int, 2));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RLS_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RLS_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_RLS_S = @as(c_int, 2);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RLS = BIT(@as(c_int, 3));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RLS_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RLS_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_RLS_S = @as(c_int, 3);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RLS = BIT(@as(c_int, 4));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RLS_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RLS_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_RLS_S = @as(c_int, 4);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RLS = BIT(@as(c_int, 5));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RLS_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RLS_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_RLS_S = @as(c_int, 5);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RLS = BIT(@as(c_int, 6));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RLS_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RLS_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_RLS_S = @as(c_int, 6);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RLS = BIT(@as(c_int, 7));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RLS_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RLS_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_RLS_S = @as(c_int, 7);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RLS = BIT(@as(c_int, 8));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RLS_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RLS_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_RLS_S = @as(c_int, 8);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RLS = BIT(@as(c_int, 9));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RLS_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RLS_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_RLS_S = @as(c_int, 9);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RLS = BIT(@as(c_int, 10));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RLS_M = ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RLS_V << ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_RLS_S = @as(c_int, 10);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RLS = BIT(@as(c_int, 11));
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RLS_M = ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RLS_V << ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RLS_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RLS_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_RLS_S = @as(c_int, 11);
+pub const ASSIST_DEBUG_CORE_0_INTR_CLR_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0xc);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_CLR = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_CLR_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_CLR_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_RD_CLR_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_CLR = BIT(@as(c_int, 1));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_CLR_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_CLR_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_WR_CLR_S = @as(c_int, 1);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_CLR = BIT(@as(c_int, 2));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_CLR_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_CLR_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_RD_CLR_S = @as(c_int, 2);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_CLR = BIT(@as(c_int, 3));
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_CLR_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_CLR_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_WR_CLR_S = @as(c_int, 3);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_CLR = BIT(@as(c_int, 4));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_CLR_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_CLR_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_RD_CLR_S = @as(c_int, 4);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_CLR = BIT(@as(c_int, 5));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_CLR_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_CLR_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_WR_CLR_S = @as(c_int, 5);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_CLR = BIT(@as(c_int, 6));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_CLR_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_CLR_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_RD_CLR_S = @as(c_int, 6);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_CLR = BIT(@as(c_int, 7));
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_CLR_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_CLR_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_WR_CLR_S = @as(c_int, 7);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_CLR = BIT(@as(c_int, 8));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_CLR_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_CLR_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MIN_CLR_S = @as(c_int, 8);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_CLR = BIT(@as(c_int, 9));
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_CLR_M = ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_CLR_V << ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_SP_SPILL_MAX_CLR_S = @as(c_int, 9);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_CLR = BIT(@as(c_int, 10));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_CLR_M = ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_CLR_V << ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_CLR_S = @as(c_int, 10);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_CLR = BIT(@as(c_int, 11));
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_CLR_M = ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_CLR_V << ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_CLR_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_CLR_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_CLR_S = @as(c_int, 11);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x10);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MIN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x14);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_0_MAX_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x18);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MIN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x1c);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX_M = ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX_V << ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_DRAM0_1_MAX_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x20);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MIN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x24);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX_M = ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX_V << ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_0_MAX_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x28);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MIN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x2c);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX_M = ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX_V << ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PIF_1_MAX_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_PC_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x30);
+pub const ASSIST_DEBUG_CORE_0_AREA_PC = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PC_M = ASSIST_DEBUG_CORE_0_AREA_PC_V << ASSIST_DEBUG_CORE_0_AREA_PC_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_PC_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_PC_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_AREA_SP_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x34);
+pub const ASSIST_DEBUG_CORE_0_AREA_SP = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_SP_M = ASSIST_DEBUG_CORE_0_AREA_SP_V << ASSIST_DEBUG_CORE_0_AREA_SP_S;
+pub const ASSIST_DEBUG_CORE_0_AREA_SP_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_AREA_SP_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_SP_MIN_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x38);
+pub const ASSIST_DEBUG_CORE_0_SP_MIN = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_SP_MIN_M = ASSIST_DEBUG_CORE_0_SP_MIN_V << ASSIST_DEBUG_CORE_0_SP_MIN_S;
+pub const ASSIST_DEBUG_CORE_0_SP_MIN_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_SP_MIN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_SP_MAX_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x3c);
+pub const ASSIST_DEBUG_CORE_0_SP_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_SP_MAX_M = ASSIST_DEBUG_CORE_0_SP_MAX_V << ASSIST_DEBUG_CORE_0_SP_MAX_S;
+pub const ASSIST_DEBUG_CORE_0_SP_MAX_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_SP_MAX_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_SP_PC_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x40);
+pub const ASSIST_DEBUG_CORE_0_SP_PC = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_SP_PC_M = ASSIST_DEBUG_CORE_0_SP_PC_V << ASSIST_DEBUG_CORE_0_SP_PC_S;
+pub const ASSIST_DEBUG_CORE_0_SP_PC_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_SP_PC_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_RCD_EN_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x44);
+pub const ASSIST_DEBUG_CORE_0_RCD_RECORDEN = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CORE_0_RCD_RECORDEN_M = ASSIST_DEBUG_CORE_0_RCD_RECORDEN_V << ASSIST_DEBUG_CORE_0_RCD_RECORDEN_S;
+pub const ASSIST_DEBUG_CORE_0_RCD_RECORDEN_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_RCD_RECORDEN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGEN = BIT(@as(c_int, 1));
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGEN_M = ASSIST_DEBUG_CORE_0_RCD_PDEBUGEN_V << ASSIST_DEBUG_CORE_0_RCD_PDEBUGEN_S;
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGEN_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGEN_S = @as(c_int, 1);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x48);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC_M = ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC_V << ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC_S;
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGPC_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x4c);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP_M = ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP_V << ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP_S;
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_RCD_PDEBUGSP_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_0_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x50);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_0 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_0_M = ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_0_V << ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_0_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_0_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_0_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_0 = BIT(@as(c_int, 24));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_0_M = ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_0_V << ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_0_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_0_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_0_S = @as(c_int, 24);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_0 = BIT(@as(c_int, 25));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_0_M = ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_0_V << ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_0_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_0_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_0_S = @as(c_int, 25);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_EXCEPTION_MONITOR_1_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x54);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_1 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_1_M = ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_1_V << ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_1_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_1_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_ADDR_1_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_1 = BIT(@as(c_int, 24));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_1_M = ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_1_V << ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_1_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_1_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_WR_1_S = @as(c_int, 24);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_1 = BIT(@as(c_int, 25));
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_1_M = ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_1_V << ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_1_S;
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_1_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_IRAM0_RECORDING_LOADSTORE_1_S = @as(c_int, 25);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_0_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x58);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_0 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_0_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_0_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_0_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_0_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_0_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_0 = BIT(@as(c_int, 24));
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_0_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_0_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_0_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_0_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_0_S = @as(c_int, 24);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_0 = @as(c_uint, 0x0000000F);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_0_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_0_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_0_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_0_V = @as(c_uint, 0x0000000F);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_0_S = @as(c_int, 25);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_1_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x5c);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_0 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_0_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_0_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_0_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_0_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_0_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_2_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x60);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_1 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_1_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_1_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_1_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_1_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x00FFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_ADDR_1_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_1 = BIT(@as(c_int, 24));
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_1_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_1_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_1_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_1_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_WR_1_S = @as(c_int, 24);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_1 = @as(c_uint, 0x0000000F);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_1_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_1_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_1_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_1_V = @as(c_uint, 0x0000000F);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_BYTEEN_1_S = @as(c_int, 25);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_EXCEPTION_MONITOR_3_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x64);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_1 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_1_M = ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_1_V << ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_1_S;
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_1_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_DRAM0_RECORDING_PC_1_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_EXCEPTION_MONITOR_0_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x68);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_0 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x000FFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_0_M = ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_0_V << ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_0_S;
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_0_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x000FFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_0_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_EXCEPTION_MONITOR_1_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x6c);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_1 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x000FFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_1_M = ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_1_V << ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_1_S;
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_1_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x000FFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_X_IRAM0_DRAM0_LIMIT_CYCLE_1_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXCEPTION_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x70);
+pub const ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXC = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXC_M = ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXC_V << ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXC_S;
+pub const ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXC_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const ASSIST_DEBUG_CORE_0_LASTPC_BEFORE_EXC_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODE_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x74);
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODE = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODE_M = ASSIST_DEBUG_CORE_0_DEBUG_MODE_V << ASSIST_DEBUG_CORE_0_DEBUG_MODE_S;
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODE_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODE_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODULE_ACTIVE = BIT(@as(c_int, 1));
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODULE_ACTIVE_M = ASSIST_DEBUG_CORE_0_DEBUG_MODULE_ACTIVE_V << ASSIST_DEBUG_CORE_0_DEBUG_MODULE_ACTIVE_S;
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODULE_ACTIVE_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CORE_0_DEBUG_MODULE_ACTIVE_S = @as(c_int, 1);
+pub const ASSIST_DEBUG_CLOCK_GATE_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x78);
+pub const ASSIST_DEBUG_CLK_EN = BIT(@as(c_int, 0));
+pub const ASSIST_DEBUG_CLK_EN_M = ASSIST_DEBUG_CLK_EN_V << ASSIST_DEBUG_CLK_EN_S;
+pub const ASSIST_DEBUG_CLK_EN_V = @as(c_uint, 0x00000001);
+pub const ASSIST_DEBUG_CLK_EN_S = @as(c_int, 0);
+pub const ASSIST_DEBUG_DATE_REG = DR_REG_ASSIST_DEBUG_BASE + @as(c_int, 0x3fc);
+pub const ASSIST_DEBUG_ASSIST_DEBUG_DATE = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x0FFFFFFF, .hex);
+pub const ASSIST_DEBUG_ASSIST_DEBUG_DATE_M = ASSIST_DEBUG_ASSIST_DEBUG_DATE_V << ASSIST_DEBUG_ASSIST_DEBUG_DATE_S;
+pub const ASSIST_DEBUG_ASSIST_DEBUG_DATE_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x0FFFFFFF, .hex);
+pub const ASSIST_DEBUG_ASSIST_DEBUG_DATE_S = @as(c_int, 0);
+pub const INTMTX_CORE0_WIFI_MAC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x0);
+pub const INTMTX_CORE0_WIFI_MAC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_MAC_INTR_MAP_M = INTMTX_CORE0_WIFI_MAC_INTR_MAP_V << INTMTX_CORE0_WIFI_MAC_INTR_MAP_S;
+pub const INTMTX_CORE0_WIFI_MAC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_MAC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_WIFI_MAC_NMI_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x4);
+pub const INTMTX_CORE0_WIFI_MAC_NMI_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_MAC_NMI_MAP_M = INTMTX_CORE0_WIFI_MAC_NMI_MAP_V << INTMTX_CORE0_WIFI_MAC_NMI_MAP_S;
+pub const INTMTX_CORE0_WIFI_MAC_NMI_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_MAC_NMI_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_WIFI_PWR_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x8);
+pub const INTMTX_CORE0_WIFI_PWR_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_PWR_INTR_MAP_M = INTMTX_CORE0_WIFI_PWR_INTR_MAP_V << INTMTX_CORE0_WIFI_PWR_INTR_MAP_S;
+pub const INTMTX_CORE0_WIFI_PWR_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_PWR_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_WIFI_BB_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xc);
+pub const INTMTX_CORE0_WIFI_BB_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_BB_INTR_MAP_M = INTMTX_CORE0_WIFI_BB_INTR_MAP_V << INTMTX_CORE0_WIFI_BB_INTR_MAP_S;
+pub const INTMTX_CORE0_WIFI_BB_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_WIFI_BB_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_BT_MAC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x10);
+pub const INTMTX_CORE0_BT_MAC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BT_MAC_INTR_MAP_M = INTMTX_CORE0_BT_MAC_INTR_MAP_V << INTMTX_CORE0_BT_MAC_INTR_MAP_S;
+pub const INTMTX_CORE0_BT_MAC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BT_MAC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_BT_BB_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x14);
+pub const INTMTX_CORE0_BT_BB_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BT_BB_INTR_MAP_M = INTMTX_CORE0_BT_BB_INTR_MAP_V << INTMTX_CORE0_BT_BB_INTR_MAP_S;
+pub const INTMTX_CORE0_BT_BB_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BT_BB_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_BT_BB_NMI_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x18);
+pub const INTMTX_CORE0_BT_BB_NMI_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BT_BB_NMI_MAP_M = INTMTX_CORE0_BT_BB_NMI_MAP_V << INTMTX_CORE0_BT_BB_NMI_MAP_S;
+pub const INTMTX_CORE0_BT_BB_NMI_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BT_BB_NMI_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_TIMER_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x1c);
+pub const INTMTX_CORE0_LP_TIMER_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_TIMER_INTR_MAP_M = INTMTX_CORE0_LP_TIMER_INTR_MAP_V << INTMTX_CORE0_LP_TIMER_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_TIMER_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_TIMER_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_COEX_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x20);
+pub const INTMTX_CORE0_COEX_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_COEX_INTR_MAP_M = INTMTX_CORE0_COEX_INTR_MAP_V << INTMTX_CORE0_COEX_INTR_MAP_S;
+pub const INTMTX_CORE0_COEX_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_COEX_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_BLE_TIMER_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x24);
+pub const INTMTX_CORE0_BLE_TIMER_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BLE_TIMER_INTR_MAP_M = INTMTX_CORE0_BLE_TIMER_INTR_MAP_V << INTMTX_CORE0_BLE_TIMER_INTR_MAP_S;
+pub const INTMTX_CORE0_BLE_TIMER_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BLE_TIMER_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_BLE_SEC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x28);
+pub const INTMTX_CORE0_BLE_SEC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BLE_SEC_INTR_MAP_M = INTMTX_CORE0_BLE_SEC_INTR_MAP_V << INTMTX_CORE0_BLE_SEC_INTR_MAP_S;
+pub const INTMTX_CORE0_BLE_SEC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_BLE_SEC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_I2C_MST_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x2c);
+pub const INTMTX_CORE0_I2C_MST_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_I2C_MST_INTR_MAP_M = INTMTX_CORE0_I2C_MST_INTR_MAP_V << INTMTX_CORE0_I2C_MST_INTR_MAP_S;
+pub const INTMTX_CORE0_I2C_MST_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_I2C_MST_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_ZB_MAC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x30);
+pub const INTMTX_CORE0_ZB_MAC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_ZB_MAC_INTR_MAP_M = INTMTX_CORE0_ZB_MAC_INTR_MAP_V << INTMTX_CORE0_ZB_MAC_INTR_MAP_S;
+pub const INTMTX_CORE0_ZB_MAC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_ZB_MAC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_PMU_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x34);
+pub const INTMTX_CORE0_PMU_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PMU_INTR_MAP_M = INTMTX_CORE0_PMU_INTR_MAP_V << INTMTX_CORE0_PMU_INTR_MAP_S;
+pub const INTMTX_CORE0_PMU_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PMU_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_EFUSE_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x38);
+pub const INTMTX_CORE0_EFUSE_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_EFUSE_INTR_MAP_M = INTMTX_CORE0_EFUSE_INTR_MAP_V << INTMTX_CORE0_EFUSE_INTR_MAP_S;
+pub const INTMTX_CORE0_EFUSE_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_EFUSE_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x3c);
+pub const INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP_M = INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP_V << INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_RTC_TIMER_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_UART_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x40);
+pub const INTMTX_CORE0_LP_UART_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_UART_INTR_MAP_M = INTMTX_CORE0_LP_UART_INTR_MAP_V << INTMTX_CORE0_LP_UART_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_UART_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_UART_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_I2C_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x44);
+pub const INTMTX_CORE0_LP_I2C_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_I2C_INTR_MAP_M = INTMTX_CORE0_LP_I2C_INTR_MAP_V << INTMTX_CORE0_LP_I2C_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_I2C_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_I2C_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_WDT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x48);
+pub const INTMTX_CORE0_LP_WDT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_WDT_INTR_MAP_M = INTMTX_CORE0_LP_WDT_INTR_MAP_V << INTMTX_CORE0_LP_WDT_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_WDT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_WDT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x4c);
+pub const INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP_M = INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP_V << INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_PERI_TIMEOUT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_APM_M0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x50);
+pub const INTMTX_CORE0_LP_APM_M0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_APM_M0_INTR_MAP_M = INTMTX_CORE0_LP_APM_M0_INTR_MAP_V << INTMTX_CORE0_LP_APM_M0_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_APM_M0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_APM_M0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_APM_M1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x54);
+pub const INTMTX_CORE0_LP_APM_M1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_APM_M1_INTR_MAP_M = INTMTX_CORE0_LP_APM_M1_INTR_MAP_V << INTMTX_CORE0_LP_APM_M1_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_APM_M1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_APM_M1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x58);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP_M = INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP_V << INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP_S;
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_0_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x5c);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP_M = INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP_V << INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP_S;
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_1_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x60);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP_M = INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP_V << INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP_S;
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_2_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x64);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP_M = INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP_V << INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP_S;
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_INTR_FROM_CPU_3_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x68);
+pub const INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP_M = INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP_V << INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP_S;
+pub const INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_ASSIST_DEBUG_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TRACE_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x6c);
+pub const INTMTX_CORE0_TRACE_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TRACE_INTR_MAP_M = INTMTX_CORE0_TRACE_INTR_MAP_V << INTMTX_CORE0_TRACE_INTR_MAP_S;
+pub const INTMTX_CORE0_TRACE_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TRACE_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CACHE_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x70);
+pub const INTMTX_CORE0_CACHE_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CACHE_INTR_MAP_M = INTMTX_CORE0_CACHE_INTR_MAP_V << INTMTX_CORE0_CACHE_INTR_MAP_S;
+pub const INTMTX_CORE0_CACHE_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CACHE_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x74);
+pub const INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP_M = INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP_V << INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP_S;
+pub const INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CPU_PERI_TIMEOUT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x78);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP_M = INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP_V << INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP_S;
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x7c);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP_M = INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP_V << INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP_S;
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_GPIO_INTERRUPT_PRO_NMI_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_PAU_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x80);
+pub const INTMTX_CORE0_PAU_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PAU_INTR_MAP_M = INTMTX_CORE0_PAU_INTR_MAP_V << INTMTX_CORE0_PAU_INTR_MAP_S;
+pub const INTMTX_CORE0_PAU_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PAU_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x84);
+pub const INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP_M = INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP_V << INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP_S;
+pub const INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_PERI_TIMEOUT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x88);
+pub const INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP_M = INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP_V << INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP_S;
+pub const INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_MODEM_PERI_TIMEOUT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_HP_APM_M0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x8c);
+pub const INTMTX_CORE0_HP_APM_M0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M0_INTR_MAP_M = INTMTX_CORE0_HP_APM_M0_INTR_MAP_V << INTMTX_CORE0_HP_APM_M0_INTR_MAP_S;
+pub const INTMTX_CORE0_HP_APM_M0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_HP_APM_M1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x90);
+pub const INTMTX_CORE0_HP_APM_M1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M1_INTR_MAP_M = INTMTX_CORE0_HP_APM_M1_INTR_MAP_V << INTMTX_CORE0_HP_APM_M1_INTR_MAP_S;
+pub const INTMTX_CORE0_HP_APM_M1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_HP_APM_M2_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x94);
+pub const INTMTX_CORE0_HP_APM_M2_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M2_INTR_MAP_M = INTMTX_CORE0_HP_APM_M2_INTR_MAP_V << INTMTX_CORE0_HP_APM_M2_INTR_MAP_S;
+pub const INTMTX_CORE0_HP_APM_M2_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M2_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_HP_APM_M3_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x98);
+pub const INTMTX_CORE0_HP_APM_M3_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M3_INTR_MAP_M = INTMTX_CORE0_HP_APM_M3_INTR_MAP_V << INTMTX_CORE0_HP_APM_M3_INTR_MAP_S;
+pub const INTMTX_CORE0_HP_APM_M3_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_HP_APM_M3_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LP_APM0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x9c);
+pub const INTMTX_CORE0_LP_APM0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_APM0_INTR_MAP_M = INTMTX_CORE0_LP_APM0_INTR_MAP_V << INTMTX_CORE0_LP_APM0_INTR_MAP_S;
+pub const INTMTX_CORE0_LP_APM0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LP_APM0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_MSPI_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xa0);
+pub const INTMTX_CORE0_MSPI_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_MSPI_INTR_MAP_M = INTMTX_CORE0_MSPI_INTR_MAP_V << INTMTX_CORE0_MSPI_INTR_MAP_S;
+pub const INTMTX_CORE0_MSPI_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_MSPI_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_I2S_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xa4);
+pub const INTMTX_CORE0_I2S_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_I2S_INTR_MAP_M = INTMTX_CORE0_I2S_INTR_MAP_V << INTMTX_CORE0_I2S_INTR_MAP_S;
+pub const INTMTX_CORE0_I2S_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_I2S_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_UHCI0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xa8);
+pub const INTMTX_CORE0_UHCI0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_UHCI0_INTR_MAP_M = INTMTX_CORE0_UHCI0_INTR_MAP_V << INTMTX_CORE0_UHCI0_INTR_MAP_S;
+pub const INTMTX_CORE0_UHCI0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_UHCI0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_UART0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xac);
+pub const INTMTX_CORE0_UART0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_UART0_INTR_MAP_M = INTMTX_CORE0_UART0_INTR_MAP_V << INTMTX_CORE0_UART0_INTR_MAP_S;
+pub const INTMTX_CORE0_UART0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_UART0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_UART1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xb0);
+pub const INTMTX_CORE0_UART1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_UART1_INTR_MAP_M = INTMTX_CORE0_UART1_INTR_MAP_V << INTMTX_CORE0_UART1_INTR_MAP_S;
+pub const INTMTX_CORE0_UART1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_UART1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_LEDC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xb4);
+pub const INTMTX_CORE0_LEDC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LEDC_INTR_MAP_M = INTMTX_CORE0_LEDC_INTR_MAP_V << INTMTX_CORE0_LEDC_INTR_MAP_S;
+pub const INTMTX_CORE0_LEDC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_LEDC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CAN0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xb8);
+pub const INTMTX_CORE0_CAN0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CAN0_INTR_MAP_M = INTMTX_CORE0_CAN0_INTR_MAP_V << INTMTX_CORE0_CAN0_INTR_MAP_S;
+pub const INTMTX_CORE0_CAN0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CAN0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CAN1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xbc);
+pub const INTMTX_CORE0_CAN1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CAN1_INTR_MAP_M = INTMTX_CORE0_CAN1_INTR_MAP_V << INTMTX_CORE0_CAN1_INTR_MAP_S;
+pub const INTMTX_CORE0_CAN1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_CAN1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_USB_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xc0);
+pub const INTMTX_CORE0_USB_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_USB_INTR_MAP_M = INTMTX_CORE0_USB_INTR_MAP_V << INTMTX_CORE0_USB_INTR_MAP_S;
+pub const INTMTX_CORE0_USB_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_USB_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_RMT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xc4);
+pub const INTMTX_CORE0_RMT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_RMT_INTR_MAP_M = INTMTX_CORE0_RMT_INTR_MAP_V << INTMTX_CORE0_RMT_INTR_MAP_S;
+pub const INTMTX_CORE0_RMT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_RMT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_I2C_EXT0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xc8);
+pub const INTMTX_CORE0_I2C_EXT0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_I2C_EXT0_INTR_MAP_M = INTMTX_CORE0_I2C_EXT0_INTR_MAP_V << INTMTX_CORE0_I2C_EXT0_INTR_MAP_S;
+pub const INTMTX_CORE0_I2C_EXT0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_I2C_EXT0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TG0_T0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xcc);
+pub const INTMTX_CORE0_TG0_T0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG0_T0_INTR_MAP_M = INTMTX_CORE0_TG0_T0_INTR_MAP_V << INTMTX_CORE0_TG0_T0_INTR_MAP_S;
+pub const INTMTX_CORE0_TG0_T0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG0_T0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TG0_T1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xd0);
+pub const INTMTX_CORE0_TG0_T1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG0_T1_INTR_MAP_M = INTMTX_CORE0_TG0_T1_INTR_MAP_V << INTMTX_CORE0_TG0_T1_INTR_MAP_S;
+pub const INTMTX_CORE0_TG0_T1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG0_T1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TG0_WDT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xd4);
+pub const INTMTX_CORE0_TG0_WDT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG0_WDT_INTR_MAP_M = INTMTX_CORE0_TG0_WDT_INTR_MAP_V << INTMTX_CORE0_TG0_WDT_INTR_MAP_S;
+pub const INTMTX_CORE0_TG0_WDT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG0_WDT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TG1_T0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xd8);
+pub const INTMTX_CORE0_TG1_T0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG1_T0_INTR_MAP_M = INTMTX_CORE0_TG1_T0_INTR_MAP_V << INTMTX_CORE0_TG1_T0_INTR_MAP_S;
+pub const INTMTX_CORE0_TG1_T0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG1_T0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TG1_T1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xdc);
+pub const INTMTX_CORE0_TG1_T1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG1_T1_INTR_MAP_M = INTMTX_CORE0_TG1_T1_INTR_MAP_V << INTMTX_CORE0_TG1_T1_INTR_MAP_S;
+pub const INTMTX_CORE0_TG1_T1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG1_T1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_TG1_WDT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xe0);
+pub const INTMTX_CORE0_TG1_WDT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG1_WDT_INTR_MAP_M = INTMTX_CORE0_TG1_WDT_INTR_MAP_V << INTMTX_CORE0_TG1_WDT_INTR_MAP_S;
+pub const INTMTX_CORE0_TG1_WDT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_TG1_WDT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xe4);
+pub const INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP_M = INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP_V << INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP_S;
+pub const INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SYSTIMER_TARGET0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xe8);
+pub const INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP_M = INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP_V << INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP_S;
+pub const INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SYSTIMER_TARGET1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xec);
+pub const INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP_M = INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP_V << INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP_S;
+pub const INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SYSTIMER_TARGET2_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_APB_ADC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xf0);
+pub const INTMTX_CORE0_APB_ADC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_APB_ADC_INTR_MAP_M = INTMTX_CORE0_APB_ADC_INTR_MAP_V << INTMTX_CORE0_APB_ADC_INTR_MAP_S;
+pub const INTMTX_CORE0_APB_ADC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_APB_ADC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_PWM_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xf4);
+pub const INTMTX_CORE0_PWM_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PWM_INTR_MAP_M = INTMTX_CORE0_PWM_INTR_MAP_V << INTMTX_CORE0_PWM_INTR_MAP_S;
+pub const INTMTX_CORE0_PWM_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PWM_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_PCNT_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xf8);
+pub const INTMTX_CORE0_PCNT_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PCNT_INTR_MAP_M = INTMTX_CORE0_PCNT_INTR_MAP_V << INTMTX_CORE0_PCNT_INTR_MAP_S;
+pub const INTMTX_CORE0_PCNT_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PCNT_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_PARL_IO_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0xfc);
+pub const INTMTX_CORE0_PARL_IO_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PARL_IO_INTR_MAP_M = INTMTX_CORE0_PARL_IO_INTR_MAP_V << INTMTX_CORE0_PARL_IO_INTR_MAP_S;
+pub const INTMTX_CORE0_PARL_IO_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_PARL_IO_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_SLC0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x100);
+pub const INTMTX_CORE0_SLC0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SLC0_INTR_MAP_M = INTMTX_CORE0_SLC0_INTR_MAP_V << INTMTX_CORE0_SLC0_INTR_MAP_S;
+pub const INTMTX_CORE0_SLC0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SLC0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_SLC1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x104);
+pub const INTMTX_CORE0_SLC1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SLC1_INTR_MAP_M = INTMTX_CORE0_SLC1_INTR_MAP_V << INTMTX_CORE0_SLC1_INTR_MAP_S;
+pub const INTMTX_CORE0_SLC1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SLC1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_DMA_IN_CH0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x108);
+pub const INTMTX_CORE0_DMA_IN_CH0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_IN_CH0_INTR_MAP_M = INTMTX_CORE0_DMA_IN_CH0_INTR_MAP_V << INTMTX_CORE0_DMA_IN_CH0_INTR_MAP_S;
+pub const INTMTX_CORE0_DMA_IN_CH0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_IN_CH0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_DMA_IN_CH1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x10c);
+pub const INTMTX_CORE0_DMA_IN_CH1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_IN_CH1_INTR_MAP_M = INTMTX_CORE0_DMA_IN_CH1_INTR_MAP_V << INTMTX_CORE0_DMA_IN_CH1_INTR_MAP_S;
+pub const INTMTX_CORE0_DMA_IN_CH1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_IN_CH1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_DMA_IN_CH2_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x110);
+pub const INTMTX_CORE0_DMA_IN_CH2_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_IN_CH2_INTR_MAP_M = INTMTX_CORE0_DMA_IN_CH2_INTR_MAP_V << INTMTX_CORE0_DMA_IN_CH2_INTR_MAP_S;
+pub const INTMTX_CORE0_DMA_IN_CH2_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_IN_CH2_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x114);
+pub const INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP_M = INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP_V << INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP_S;
+pub const INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_OUT_CH0_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x118);
+pub const INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP_M = INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP_V << INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP_S;
+pub const INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_OUT_CH1_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x11c);
+pub const INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP_M = INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP_V << INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP_S;
+pub const INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_DMA_OUT_CH2_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_GPSPI2_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x120);
+pub const INTMTX_CORE0_GPSPI2_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_GPSPI2_INTR_MAP_M = INTMTX_CORE0_GPSPI2_INTR_MAP_V << INTMTX_CORE0_GPSPI2_INTR_MAP_S;
+pub const INTMTX_CORE0_GPSPI2_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_GPSPI2_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_AES_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x124);
+pub const INTMTX_CORE0_AES_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_AES_INTR_MAP_M = INTMTX_CORE0_AES_INTR_MAP_V << INTMTX_CORE0_AES_INTR_MAP_S;
+pub const INTMTX_CORE0_AES_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_AES_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_SHA_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x128);
+pub const INTMTX_CORE0_SHA_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SHA_INTR_MAP_M = INTMTX_CORE0_SHA_INTR_MAP_V << INTMTX_CORE0_SHA_INTR_MAP_S;
+pub const INTMTX_CORE0_SHA_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_SHA_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_RSA_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x12c);
+pub const INTMTX_CORE0_RSA_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_RSA_INTR_MAP_M = INTMTX_CORE0_RSA_INTR_MAP_V << INTMTX_CORE0_RSA_INTR_MAP_S;
+pub const INTMTX_CORE0_RSA_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_RSA_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_ECC_INTR_MAP_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x130);
+pub const INTMTX_CORE0_ECC_INTR_MAP = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_ECC_INTR_MAP_M = INTMTX_CORE0_ECC_INTR_MAP_V << INTMTX_CORE0_ECC_INTR_MAP_S;
+pub const INTMTX_CORE0_ECC_INTR_MAP_V = @as(c_uint, 0x0000001F);
+pub const INTMTX_CORE0_ECC_INTR_MAP_S = @as(c_int, 0);
+pub const INTMTX_CORE0_INT_STATUS_REG_0_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x134);
+pub const INTMTX_CORE0_INT_STATUS_0 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTMTX_CORE0_INT_STATUS_0_M = INTMTX_CORE0_INT_STATUS_0_V << INTMTX_CORE0_INT_STATUS_0_S;
+pub const INTMTX_CORE0_INT_STATUS_0_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTMTX_CORE0_INT_STATUS_0_S = @as(c_int, 0);
+pub const INTMTX_CORE0_INT_STATUS_REG_1_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x138);
+pub const INTMTX_CORE0_INT_STATUS_1 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTMTX_CORE0_INT_STATUS_1_M = INTMTX_CORE0_INT_STATUS_1_V << INTMTX_CORE0_INT_STATUS_1_S;
+pub const INTMTX_CORE0_INT_STATUS_1_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTMTX_CORE0_INT_STATUS_1_S = @as(c_int, 0);
+pub const INTMTX_CORE0_INT_STATUS_REG_2_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x13c);
+pub const INTMTX_CORE0_INT_STATUS_2 = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTMTX_CORE0_INT_STATUS_2_M = INTMTX_CORE0_INT_STATUS_2_V << INTMTX_CORE0_INT_STATUS_2_S;
+pub const INTMTX_CORE0_INT_STATUS_2_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTMTX_CORE0_INT_STATUS_2_S = @as(c_int, 0);
+pub const INTMTX_CORE0_CLOCK_GATE_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x140);
+pub const INTMTX_CORE0_REG_CLK_EN = BIT(@as(c_int, 0));
+pub const INTMTX_CORE0_REG_CLK_EN_M = INTMTX_CORE0_REG_CLK_EN_V << INTMTX_CORE0_REG_CLK_EN_S;
+pub const INTMTX_CORE0_REG_CLK_EN_V = @as(c_uint, 0x00000001);
+pub const INTMTX_CORE0_REG_CLK_EN_S = @as(c_int, 0);
+pub const INTMTX_CORE0_INTERRUPT_REG_DATE_REG = DR_REG_INTERRUPT_MATRIX_BASE + @as(c_int, 0x7fc);
+pub const INTMTX_CORE0_INTERRUPT_REG_DATE = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x0FFFFFFF, .hex);
+pub const INTMTX_CORE0_INTERRUPT_REG_DATE_M = INTMTX_CORE0_INTERRUPT_REG_DATE_V << INTMTX_CORE0_INTERRUPT_REG_DATE_S;
+pub const INTMTX_CORE0_INTERRUPT_REG_DATE_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x0FFFFFFF, .hex);
+pub const INTMTX_CORE0_INTERRUPT_REG_DATE_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_ENABLE_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x0);
+pub const INTPRI_CORE0_CPU_INT_ENABLE = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_ENABLE_M = INTPRI_CORE0_CPU_INT_ENABLE_V << INTPRI_CORE0_CPU_INT_ENABLE_S;
+pub const INTPRI_CORE0_CPU_INT_ENABLE_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_ENABLE_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_TYPE_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x4);
+pub const INTPRI_CORE0_CPU_INT_TYPE = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_TYPE_M = INTPRI_CORE0_CPU_INT_TYPE_V << INTPRI_CORE0_CPU_INT_TYPE_S;
+pub const INTPRI_CORE0_CPU_INT_TYPE_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_TYPE_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_EIP_STATUS_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x8);
+pub const INTPRI_CORE0_CPU_INT_EIP_STATUS = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_EIP_STATUS_M = INTPRI_CORE0_CPU_INT_EIP_STATUS_V << INTPRI_CORE0_CPU_INT_EIP_STATUS_S;
+pub const INTPRI_CORE0_CPU_INT_EIP_STATUS_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_EIP_STATUS_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_0_REG = DR_REG_INTPRI_BASE + @as(c_int, 0xc);
+pub const INTPRI_CORE0_CPU_PRI_0_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_0_MAP_M = INTPRI_CORE0_CPU_PRI_0_MAP_V << INTPRI_CORE0_CPU_PRI_0_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_0_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_0_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_1_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x10);
+pub const INTPRI_CORE0_CPU_PRI_1_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_1_MAP_M = INTPRI_CORE0_CPU_PRI_1_MAP_V << INTPRI_CORE0_CPU_PRI_1_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_1_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_1_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_2_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x14);
+pub const INTPRI_CORE0_CPU_PRI_2_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_2_MAP_M = INTPRI_CORE0_CPU_PRI_2_MAP_V << INTPRI_CORE0_CPU_PRI_2_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_2_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_2_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_3_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x18);
+pub const INTPRI_CORE0_CPU_PRI_3_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_3_MAP_M = INTPRI_CORE0_CPU_PRI_3_MAP_V << INTPRI_CORE0_CPU_PRI_3_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_3_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_3_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_4_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x1c);
+pub const INTPRI_CORE0_CPU_PRI_4_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_4_MAP_M = INTPRI_CORE0_CPU_PRI_4_MAP_V << INTPRI_CORE0_CPU_PRI_4_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_4_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_4_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_5_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x20);
+pub const INTPRI_CORE0_CPU_PRI_5_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_5_MAP_M = INTPRI_CORE0_CPU_PRI_5_MAP_V << INTPRI_CORE0_CPU_PRI_5_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_5_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_5_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_6_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x24);
+pub const INTPRI_CORE0_CPU_PRI_6_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_6_MAP_M = INTPRI_CORE0_CPU_PRI_6_MAP_V << INTPRI_CORE0_CPU_PRI_6_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_6_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_6_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_7_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x28);
+pub const INTPRI_CORE0_CPU_PRI_7_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_7_MAP_M = INTPRI_CORE0_CPU_PRI_7_MAP_V << INTPRI_CORE0_CPU_PRI_7_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_7_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_7_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_8_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x2c);
+pub const INTPRI_CORE0_CPU_PRI_8_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_8_MAP_M = INTPRI_CORE0_CPU_PRI_8_MAP_V << INTPRI_CORE0_CPU_PRI_8_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_8_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_8_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_9_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x30);
+pub const INTPRI_CORE0_CPU_PRI_9_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_9_MAP_M = INTPRI_CORE0_CPU_PRI_9_MAP_V << INTPRI_CORE0_CPU_PRI_9_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_9_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_9_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_10_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x34);
+pub const INTPRI_CORE0_CPU_PRI_10_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_10_MAP_M = INTPRI_CORE0_CPU_PRI_10_MAP_V << INTPRI_CORE0_CPU_PRI_10_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_10_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_10_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_11_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x38);
+pub const INTPRI_CORE0_CPU_PRI_11_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_11_MAP_M = INTPRI_CORE0_CPU_PRI_11_MAP_V << INTPRI_CORE0_CPU_PRI_11_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_11_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_11_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_12_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x3c);
+pub const INTPRI_CORE0_CPU_PRI_12_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_12_MAP_M = INTPRI_CORE0_CPU_PRI_12_MAP_V << INTPRI_CORE0_CPU_PRI_12_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_12_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_12_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_13_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x40);
+pub const INTPRI_CORE0_CPU_PRI_13_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_13_MAP_M = INTPRI_CORE0_CPU_PRI_13_MAP_V << INTPRI_CORE0_CPU_PRI_13_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_13_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_13_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_14_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x44);
+pub const INTPRI_CORE0_CPU_PRI_14_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_14_MAP_M = INTPRI_CORE0_CPU_PRI_14_MAP_V << INTPRI_CORE0_CPU_PRI_14_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_14_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_14_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_15_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x48);
+pub const INTPRI_CORE0_CPU_PRI_15_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_15_MAP_M = INTPRI_CORE0_CPU_PRI_15_MAP_V << INTPRI_CORE0_CPU_PRI_15_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_15_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_15_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_16_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x4c);
+pub const INTPRI_CORE0_CPU_PRI_16_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_16_MAP_M = INTPRI_CORE0_CPU_PRI_16_MAP_V << INTPRI_CORE0_CPU_PRI_16_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_16_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_16_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_17_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x50);
+pub const INTPRI_CORE0_CPU_PRI_17_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_17_MAP_M = INTPRI_CORE0_CPU_PRI_17_MAP_V << INTPRI_CORE0_CPU_PRI_17_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_17_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_17_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_18_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x54);
+pub const INTPRI_CORE0_CPU_PRI_18_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_18_MAP_M = INTPRI_CORE0_CPU_PRI_18_MAP_V << INTPRI_CORE0_CPU_PRI_18_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_18_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_18_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_19_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x58);
+pub const INTPRI_CORE0_CPU_PRI_19_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_19_MAP_M = INTPRI_CORE0_CPU_PRI_19_MAP_V << INTPRI_CORE0_CPU_PRI_19_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_19_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_19_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_20_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x5c);
+pub const INTPRI_CORE0_CPU_PRI_20_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_20_MAP_M = INTPRI_CORE0_CPU_PRI_20_MAP_V << INTPRI_CORE0_CPU_PRI_20_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_20_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_20_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_21_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x60);
+pub const INTPRI_CORE0_CPU_PRI_21_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_21_MAP_M = INTPRI_CORE0_CPU_PRI_21_MAP_V << INTPRI_CORE0_CPU_PRI_21_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_21_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_21_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_22_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x64);
+pub const INTPRI_CORE0_CPU_PRI_22_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_22_MAP_M = INTPRI_CORE0_CPU_PRI_22_MAP_V << INTPRI_CORE0_CPU_PRI_22_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_22_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_22_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_23_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x68);
+pub const INTPRI_CORE0_CPU_PRI_23_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_23_MAP_M = INTPRI_CORE0_CPU_PRI_23_MAP_V << INTPRI_CORE0_CPU_PRI_23_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_23_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_23_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_24_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x6c);
+pub const INTPRI_CORE0_CPU_PRI_24_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_24_MAP_M = INTPRI_CORE0_CPU_PRI_24_MAP_V << INTPRI_CORE0_CPU_PRI_24_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_24_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_24_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_25_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x70);
+pub const INTPRI_CORE0_CPU_PRI_25_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_25_MAP_M = INTPRI_CORE0_CPU_PRI_25_MAP_V << INTPRI_CORE0_CPU_PRI_25_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_25_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_25_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_26_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x74);
+pub const INTPRI_CORE0_CPU_PRI_26_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_26_MAP_M = INTPRI_CORE0_CPU_PRI_26_MAP_V << INTPRI_CORE0_CPU_PRI_26_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_26_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_26_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_27_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x78);
+pub const INTPRI_CORE0_CPU_PRI_27_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_27_MAP_M = INTPRI_CORE0_CPU_PRI_27_MAP_V << INTPRI_CORE0_CPU_PRI_27_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_27_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_27_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_28_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x7c);
+pub const INTPRI_CORE0_CPU_PRI_28_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_28_MAP_M = INTPRI_CORE0_CPU_PRI_28_MAP_V << INTPRI_CORE0_CPU_PRI_28_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_28_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_28_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_29_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x80);
+pub const INTPRI_CORE0_CPU_PRI_29_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_29_MAP_M = INTPRI_CORE0_CPU_PRI_29_MAP_V << INTPRI_CORE0_CPU_PRI_29_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_29_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_29_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_30_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x84);
+pub const INTPRI_CORE0_CPU_PRI_30_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_30_MAP_M = INTPRI_CORE0_CPU_PRI_30_MAP_V << INTPRI_CORE0_CPU_PRI_30_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_30_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_30_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_PRI_31_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x88);
+pub const INTPRI_CORE0_CPU_PRI_31_MAP = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_31_MAP_M = INTPRI_CORE0_CPU_PRI_31_MAP_V << INTPRI_CORE0_CPU_PRI_31_MAP_S;
+pub const INTPRI_CORE0_CPU_PRI_31_MAP_V = @as(c_uint, 0x0000000F);
+pub const INTPRI_CORE0_CPU_PRI_31_MAP_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_THRESH_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x8c);
+pub const INTPRI_CORE0_CPU_INT_THRESH = @as(c_uint, 0x000000FF);
+pub const INTPRI_CORE0_CPU_INT_THRESH_M = INTPRI_CORE0_CPU_INT_THRESH_V << INTPRI_CORE0_CPU_INT_THRESH_S;
+pub const INTPRI_CORE0_CPU_INT_THRESH_V = @as(c_uint, 0x000000FF);
+pub const INTPRI_CORE0_CPU_INT_THRESH_S = @as(c_int, 0);
+pub const INTPRI_CPU_INTR_FROM_CPU_0_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x90);
+pub const INTPRI_CPU_INTR_FROM_CPU_0 = BIT(@as(c_int, 0));
+pub const INTPRI_CPU_INTR_FROM_CPU_0_M = INTPRI_CPU_INTR_FROM_CPU_0_V << INTPRI_CPU_INTR_FROM_CPU_0_S;
+pub const INTPRI_CPU_INTR_FROM_CPU_0_V = @as(c_uint, 0x00000001);
+pub const INTPRI_CPU_INTR_FROM_CPU_0_S = @as(c_int, 0);
+pub const INTPRI_CPU_INTR_FROM_CPU_1_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x94);
+pub const INTPRI_CPU_INTR_FROM_CPU_1 = BIT(@as(c_int, 0));
+pub const INTPRI_CPU_INTR_FROM_CPU_1_M = INTPRI_CPU_INTR_FROM_CPU_1_V << INTPRI_CPU_INTR_FROM_CPU_1_S;
+pub const INTPRI_CPU_INTR_FROM_CPU_1_V = @as(c_uint, 0x00000001);
+pub const INTPRI_CPU_INTR_FROM_CPU_1_S = @as(c_int, 0);
+pub const INTPRI_CPU_INTR_FROM_CPU_2_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x98);
+pub const INTPRI_CPU_INTR_FROM_CPU_2 = BIT(@as(c_int, 0));
+pub const INTPRI_CPU_INTR_FROM_CPU_2_M = INTPRI_CPU_INTR_FROM_CPU_2_V << INTPRI_CPU_INTR_FROM_CPU_2_S;
+pub const INTPRI_CPU_INTR_FROM_CPU_2_V = @as(c_uint, 0x00000001);
+pub const INTPRI_CPU_INTR_FROM_CPU_2_S = @as(c_int, 0);
+pub const INTPRI_CPU_INTR_FROM_CPU_3_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x9c);
+pub const INTPRI_CPU_INTR_FROM_CPU_3 = BIT(@as(c_int, 0));
+pub const INTPRI_CPU_INTR_FROM_CPU_3_M = INTPRI_CPU_INTR_FROM_CPU_3_V << INTPRI_CPU_INTR_FROM_CPU_3_S;
+pub const INTPRI_CPU_INTR_FROM_CPU_3_V = @as(c_uint, 0x00000001);
+pub const INTPRI_CPU_INTR_FROM_CPU_3_S = @as(c_int, 0);
+pub const INTPRI_DATE_REG = DR_REG_INTPRI_BASE + @as(c_int, 0xa0);
+pub const INTPRI_DATE = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x0FFFFFFF, .hex);
+pub const INTPRI_DATE_M = INTPRI_DATE_V << INTPRI_DATE_S;
+pub const INTPRI_DATE_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0x0FFFFFFF, .hex);
+pub const INTPRI_DATE_S = @as(c_int, 0);
+pub const INTPRI_CLOCK_GATE_REG = DR_REG_INTPRI_BASE + @as(c_int, 0xa4);
+pub const INTPRI_CLK_EN = BIT(@as(c_int, 0));
+pub const INTPRI_CLK_EN_M = INTPRI_CLK_EN_V << INTPRI_CLK_EN_S;
+pub const INTPRI_CLK_EN_V = @as(c_uint, 0x00000001);
+pub const INTPRI_CLK_EN_S = @as(c_int, 0);
+pub const INTPRI_CORE0_CPU_INT_CLEAR_REG = DR_REG_INTPRI_BASE + @as(c_int, 0xa8);
+pub const INTPRI_CORE0_CPU_INT_CLEAR = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_CLEAR_M = INTPRI_CORE0_CPU_INT_CLEAR_V << INTPRI_CORE0_CPU_INT_CLEAR_S;
+pub const INTPRI_CORE0_CPU_INT_CLEAR_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_CORE0_CPU_INT_CLEAR_S = @as(c_int, 0);
+pub const INTPRI_RND_ECO_REG = DR_REG_INTPRI_BASE + @as(c_int, 0xac);
+pub const INTPRI_REDCY_ENA = BIT(@as(c_int, 0));
+pub const INTPRI_REDCY_ENA_M = INTPRI_REDCY_ENA_V << INTPRI_REDCY_ENA_S;
+pub const INTPRI_REDCY_ENA_V = @as(c_uint, 0x00000001);
+pub const INTPRI_REDCY_ENA_S = @as(c_int, 0);
+pub const INTPRI_REDCY_RESULT = BIT(@as(c_int, 1));
+pub const INTPRI_REDCY_RESULT_M = INTPRI_REDCY_RESULT_V << INTPRI_REDCY_RESULT_S;
+pub const INTPRI_REDCY_RESULT_V = @as(c_uint, 0x00000001);
+pub const INTPRI_REDCY_RESULT_S = @as(c_int, 1);
+pub const INTPRI_RND_ECO_LOW_REG = DR_REG_INTPRI_BASE + @as(c_int, 0xb0);
+pub const INTPRI_REDCY_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_REDCY_LOW_M = INTPRI_REDCY_LOW_V << INTPRI_REDCY_LOW_S;
+pub const INTPRI_REDCY_LOW_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_REDCY_LOW_S = @as(c_int, 0);
+pub const INTPRI_RND_ECO_HIGH_REG = DR_REG_INTPRI_BASE + @as(c_int, 0x3fc);
+pub const INTPRI_REDCY_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_REDCY_HIGH_M = INTPRI_REDCY_HIGH_V << INTPRI_REDCY_HIGH_S;
+pub const INTPRI_REDCY_HIGH_V = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 0xFFFFFFFF, .hex);
+pub const INTPRI_REDCY_HIGH_S = @as(c_int, 0);
+pub const PLIC_MXINT_CONF_REG = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x200013FC, .hex);
+pub const PLIC_UXINT_CONF_REG = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x200017FC, .hex);
+pub inline fn PLIC_MXINT_PRI_REG(n: anytype) @TypeOf(PLIC_MXINT0_PRI_REG + (n * @as(c_int, 4))) {
+    _ = &n;
+    return PLIC_MXINT0_PRI_REG + (n * @as(c_int, 4));
+}
+pub inline fn PLIC_UXINT_PRI_REG(n: anytype) @TypeOf(PLIC_UXINT0_PRI_REG + (n * @as(c_int, 4))) {
+    _ = &n;
+    return PLIC_UXINT0_PRI_REG + (n * @as(c_int, 4));
+}
+pub const PLIC_MXINT_ENABLE_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x0);
+pub const PLIC_CPU_MXINT_ENABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_ENABLE_M = PLIC_CPU_MXINT_ENABLE_V << PLIC_CPU_MXINT_ENABLE_S;
+pub const PLIC_CPU_MXINT_ENABLE_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_ENABLE_S = @as(c_int, 0);
+pub const PLIC_MXINT_TYPE_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x4);
+pub const PLIC_CPU_MXINT_TYPE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_TYPE_M = PLIC_CPU_MXINT_TYPE_V << PLIC_CPU_MXINT_TYPE_S;
+pub const PLIC_CPU_MXINT_TYPE_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_TYPE_S = @as(c_int, 0);
+pub const PLIC_MXINT_CLEAR_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x8);
+pub const PLIC_CPU_MXINT_CLEAR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_CLEAR_M = PLIC_CPU_MXINT_CLEAR_V << PLIC_CPU_MXINT_CLEAR_S;
+pub const PLIC_CPU_MXINT_CLEAR_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_CLEAR_S = @as(c_int, 0);
+pub const PLIC_EMIP_STATUS_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0xC);
+pub const PLIC_CPU_EIP_STATUS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_EIP_STATUS_M = PLIC_CPU_EIP_STATUS_V << PLIC_CPU_EIP_STATUS_S;
+pub const PLIC_CPU_EIP_STATUS_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_EIP_STATUS_S = @as(c_int, 0);
+pub const PLIC_MXINT0_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x10);
+pub const PLIC_CPU_MXINT0_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT0_PRI_M = PLIC_CPU_MXINT0_PRI_V << PLIC_CPU_MXINT0_PRI_S;
+pub const PLIC_CPU_MXINT0_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT0_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT1_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x14);
+pub const PLIC_CPU_MXINT1_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT1_PRI_M = PLIC_CPU_MXINT1_PRI_V << PLIC_CPU_MXINT1_PRI_S;
+pub const PLIC_CPU_MXINT1_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT1_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT2_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x18);
+pub const PLIC_CPU_MXINT2_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT2_PRI_M = PLIC_CPU_MXINT2_PRI_V << PLIC_CPU_MXINT2_PRI_S;
+pub const PLIC_CPU_MXINT2_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT2_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT3_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x1C);
+pub const PLIC_CPU_MXINT3_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT3_PRI_M = PLIC_CPU_MXINT3_PRI_V << PLIC_CPU_MXINT3_PRI_S;
+pub const PLIC_CPU_MXINT3_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT3_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT4_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x20);
+pub const PLIC_CPU_MXINT4_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT4_PRI_M = PLIC_CPU_MXINT4_PRI_V << PLIC_CPU_MXINT4_PRI_S;
+pub const PLIC_CPU_MXINT4_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT4_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT5_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x24);
+pub const PLIC_CPU_MXINT5_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT5_PRI_M = PLIC_CPU_MXINT5_PRI_V << PLIC_CPU_MXINT5_PRI_S;
+pub const PLIC_CPU_MXINT5_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT5_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT6_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x28);
+pub const PLIC_CPU_MXINT6_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT6_PRI_M = PLIC_CPU_MXINT6_PRI_V << PLIC_CPU_MXINT6_PRI_S;
+pub const PLIC_CPU_MXINT6_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT6_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT7_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x2C);
+pub const PLIC_CPU_MXINT7_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT7_PRI_M = PLIC_CPU_MXINT7_PRI_V << PLIC_CPU_MXINT7_PRI_S;
+pub const PLIC_CPU_MXINT7_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT7_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT8_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x30);
+pub const PLIC_CPU_MXINT8_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT8_PRI_M = PLIC_CPU_MXINT8_PRI_V << PLIC_CPU_MXINT8_PRI_S;
+pub const PLIC_CPU_MXINT8_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT8_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT9_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x34);
+pub const PLIC_CPU_MXINT9_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT9_PRI_M = PLIC_CPU_MXINT9_PRI_V << PLIC_CPU_MXINT9_PRI_S;
+pub const PLIC_CPU_MXINT9_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT9_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT10_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x38);
+pub const PLIC_CPU_MXINT10_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT10_PRI_M = PLIC_CPU_MXINT10_PRI_V << PLIC_CPU_MXINT10_PRI_S;
+pub const PLIC_CPU_MXINT10_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT10_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT11_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x3C);
+pub const PLIC_CPU_MXINT11_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT11_PRI_M = PLIC_CPU_MXINT11_PRI_V << PLIC_CPU_MXINT11_PRI_S;
+pub const PLIC_CPU_MXINT11_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT11_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT12_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x40);
+pub const PLIC_CPU_MXINT12_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT12_PRI_M = PLIC_CPU_MXINT12_PRI_V << PLIC_CPU_MXINT12_PRI_S;
+pub const PLIC_CPU_MXINT12_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT12_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT13_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x44);
+pub const PLIC_CPU_MXINT13_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT13_PRI_M = PLIC_CPU_MXINT13_PRI_V << PLIC_CPU_MXINT13_PRI_S;
+pub const PLIC_CPU_MXINT13_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT13_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT14_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x48);
+pub const PLIC_CPU_MXINT14_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT14_PRI_M = PLIC_CPU_MXINT14_PRI_V << PLIC_CPU_MXINT14_PRI_S;
+pub const PLIC_CPU_MXINT14_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT14_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT15_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x4C);
+pub const PLIC_CPU_MXINT15_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT15_PRI_M = PLIC_CPU_MXINT15_PRI_V << PLIC_CPU_MXINT15_PRI_S;
+pub const PLIC_CPU_MXINT15_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT15_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT16_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x50);
+pub const PLIC_CPU_MXINT16_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT16_PRI_M = PLIC_CPU_MXINT16_PRI_V << PLIC_CPU_MXINT16_PRI_S;
+pub const PLIC_CPU_MXINT16_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT16_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT17_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x54);
+pub const PLIC_CPU_MXINT17_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT17_PRI_M = PLIC_CPU_MXINT17_PRI_V << PLIC_CPU_MXINT17_PRI_S;
+pub const PLIC_CPU_MXINT17_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT17_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT18_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x58);
+pub const PLIC_CPU_MXINT18_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT18_PRI_M = PLIC_CPU_MXINT18_PRI_V << PLIC_CPU_MXINT18_PRI_S;
+pub const PLIC_CPU_MXINT18_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT18_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT19_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x5C);
+pub const PLIC_CPU_MXINT19_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT19_PRI_M = PLIC_CPU_MXINT19_PRI_V << PLIC_CPU_MXINT19_PRI_S;
+pub const PLIC_CPU_MXINT19_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT19_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT20_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x60);
+pub const PLIC_CPU_MXINT20_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT20_PRI_M = PLIC_CPU_MXINT20_PRI_V << PLIC_CPU_MXINT20_PRI_S;
+pub const PLIC_CPU_MXINT20_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT20_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT21_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x64);
+pub const PLIC_CPU_MXINT21_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT21_PRI_M = PLIC_CPU_MXINT21_PRI_V << PLIC_CPU_MXINT21_PRI_S;
+pub const PLIC_CPU_MXINT21_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT21_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT22_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x68);
+pub const PLIC_CPU_MXINT22_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT22_PRI_M = PLIC_CPU_MXINT22_PRI_V << PLIC_CPU_MXINT22_PRI_S;
+pub const PLIC_CPU_MXINT22_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT22_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT23_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x6C);
+pub const PLIC_CPU_MXINT23_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT23_PRI_M = PLIC_CPU_MXINT23_PRI_V << PLIC_CPU_MXINT23_PRI_S;
+pub const PLIC_CPU_MXINT23_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT23_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT24_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x70);
+pub const PLIC_CPU_MXINT24_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT24_PRI_M = PLIC_CPU_MXINT24_PRI_V << PLIC_CPU_MXINT24_PRI_S;
+pub const PLIC_CPU_MXINT24_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT24_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT25_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x74);
+pub const PLIC_CPU_MXINT25_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT25_PRI_M = PLIC_CPU_MXINT25_PRI_V << PLIC_CPU_MXINT25_PRI_S;
+pub const PLIC_CPU_MXINT25_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT25_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT26_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x78);
+pub const PLIC_CPU_MXINT26_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT26_PRI_M = PLIC_CPU_MXINT26_PRI_V << PLIC_CPU_MXINT26_PRI_S;
+pub const PLIC_CPU_MXINT26_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT26_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT27_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x7C);
+pub const PLIC_CPU_MXINT27_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT27_PRI_M = PLIC_CPU_MXINT27_PRI_V << PLIC_CPU_MXINT27_PRI_S;
+pub const PLIC_CPU_MXINT27_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT27_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT28_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x80);
+pub const PLIC_CPU_MXINT28_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT28_PRI_M = PLIC_CPU_MXINT28_PRI_V << PLIC_CPU_MXINT28_PRI_S;
+pub const PLIC_CPU_MXINT28_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT28_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT29_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x84);
+pub const PLIC_CPU_MXINT29_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT29_PRI_M = PLIC_CPU_MXINT29_PRI_V << PLIC_CPU_MXINT29_PRI_S;
+pub const PLIC_CPU_MXINT29_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT29_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT30_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x88);
+pub const PLIC_CPU_MXINT30_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT30_PRI_M = PLIC_CPU_MXINT30_PRI_V << PLIC_CPU_MXINT30_PRI_S;
+pub const PLIC_CPU_MXINT30_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT30_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT31_PRI_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x8C);
+pub const PLIC_CPU_MXINT31_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_MXINT31_PRI_M = PLIC_CPU_MXINT31_PRI_V << PLIC_CPU_MXINT31_PRI_S;
+pub const PLIC_CPU_MXINT31_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_MXINT31_PRI_S = @as(c_int, 0);
+pub const PLIC_MXINT_THRESH_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x90);
+pub const PLIC_CPU_MXINT_THRESH = @as(c_int, 0x000000FF);
+pub const PLIC_CPU_MXINT_THRESH_M = PLIC_CPU_MXINT_THRESH_V << PLIC_CPU_MXINT_THRESH_S;
+pub const PLIC_CPU_MXINT_THRESH_V = @as(c_int, 0xFF);
+pub const PLIC_CPU_MXINT_THRESH_S = @as(c_int, 0);
+pub const PLIC_MXINT_CLAIM_REG = DR_REG_PLIC_MX_BASE + @as(c_int, 0x94);
+pub const PLIC_CPU_MXINT_CLAIM = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_CLAIM_M = PLIC_CPU_MXINT_CLAIM_V << PLIC_CPU_MXINT_CLAIM_S;
+pub const PLIC_CPU_MXINT_CLAIM_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_MXINT_CLAIM_S = @as(c_int, 0);
+pub const PLIC_UXINT_ENABLE_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x0);
+pub const PLIC_CPU_UXINT_ENABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_ENABLE_M = PLIC_CPU_UXINT_ENABLE_V << PLIC_CPU_UXINT_ENABLE_S;
+pub const PLIC_CPU_UXINT_ENABLE_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_ENABLE_S = @as(c_int, 0);
+pub const PLIC_UXINT_TYPE_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x4);
+pub const PLIC_CPU_UXINT_TYPE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_TYPE_M = PLIC_CPU_UXINT_TYPE_V << PLIC_CPU_UXINT_TYPE_S;
+pub const PLIC_CPU_UXINT_TYPE_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_TYPE_S = @as(c_int, 0);
+pub const PLIC_UXINT_CLEAR_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x8);
+pub const PLIC_CPU_UXINT_CLEAR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_CLEAR_M = PLIC_CPU_UXINT_CLEAR_V << PLIC_CPU_UXINT_CLEAR_S;
+pub const PLIC_CPU_UXINT_CLEAR_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_CLEAR_S = @as(c_int, 0);
+pub const PLIC_EUIP_STATUS_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0xC);
+pub const PLIC_UXINT0_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x10);
+pub const PLIC_CPU_UXINT0_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT0_PRI_M = PLIC_CPU_UXINT0_PRI_V << PLIC_CPU_UXINT0_PRI_S;
+pub const PLIC_CPU_UXINT0_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT0_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT1_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x14);
+pub const PLIC_CPU_UXINT1_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT1_PRI_M = PLIC_CPU_UXINT1_PRI_V << PLIC_CPU_UXINT1_PRI_S;
+pub const PLIC_CPU_UXINT1_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT1_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT2_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x18);
+pub const PLIC_CPU_UXINT2_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT2_PRI_M = PLIC_CPU_UXINT2_PRI_V << PLIC_CPU_UXINT2_PRI_S;
+pub const PLIC_CPU_UXINT2_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT2_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT3_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x1C);
+pub const PLIC_CPU_UXINT3_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT3_PRI_M = PLIC_CPU_UXINT3_PRI_V << PLIC_CPU_UXINT3_PRI_S;
+pub const PLIC_CPU_UXINT3_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT3_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT4_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x20);
+pub const PLIC_CPU_UXINT4_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT4_PRI_M = PLIC_CPU_UXINT4_PRI_V << PLIC_CPU_UXINT4_PRI_S;
+pub const PLIC_CPU_UXINT4_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT4_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT5_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x24);
+pub const PLIC_CPU_UXINT5_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT5_PRI_M = PLIC_CPU_UXINT5_PRI_V << PLIC_CPU_UXINT5_PRI_S;
+pub const PLIC_CPU_UXINT5_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT5_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT6_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x28);
+pub const PLIC_CPU_UXINT6_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT6_PRI_M = PLIC_CPU_UXINT6_PRI_V << PLIC_CPU_UXINT6_PRI_S;
+pub const PLIC_CPU_UXINT6_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT6_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT7_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x2C);
+pub const PLIC_CPU_UXINT7_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT7_PRI_M = PLIC_CPU_UXINT7_PRI_V << PLIC_CPU_UXINT7_PRI_S;
+pub const PLIC_CPU_UXINT7_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT7_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT8_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x30);
+pub const PLIC_CPU_UXINT8_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT8_PRI_M = PLIC_CPU_UXINT8_PRI_V << PLIC_CPU_UXINT8_PRI_S;
+pub const PLIC_CPU_UXINT8_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT8_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT9_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x34);
+pub const PLIC_CPU_UXINT9_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT9_PRI_M = PLIC_CPU_UXINT9_PRI_V << PLIC_CPU_UXINT9_PRI_S;
+pub const PLIC_CPU_UXINT9_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT9_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT10_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x38);
+pub const PLIC_CPU_UXINT10_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT10_PRI_M = PLIC_CPU_UXINT10_PRI_V << PLIC_CPU_UXINT10_PRI_S;
+pub const PLIC_CPU_UXINT10_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT10_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT11_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x3C);
+pub const PLIC_CPU_UXINT11_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT11_PRI_M = PLIC_CPU_UXINT11_PRI_V << PLIC_CPU_UXINT11_PRI_S;
+pub const PLIC_CPU_UXINT11_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT11_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT12_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x40);
+pub const PLIC_CPU_UXINT12_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT12_PRI_M = PLIC_CPU_UXINT12_PRI_V << PLIC_CPU_UXINT12_PRI_S;
+pub const PLIC_CPU_UXINT12_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT12_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT13_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x44);
+pub const PLIC_CPU_UXINT13_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT13_PRI_M = PLIC_CPU_UXINT13_PRI_V << PLIC_CPU_UXINT13_PRI_S;
+pub const PLIC_CPU_UXINT13_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT13_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT14_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x48);
+pub const PLIC_CPU_UXINT14_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT14_PRI_M = PLIC_CPU_UXINT14_PRI_V << PLIC_CPU_UXINT14_PRI_S;
+pub const PLIC_CPU_UXINT14_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT14_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT15_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x4C);
+pub const PLIC_CPU_UXINT15_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT15_PRI_M = PLIC_CPU_UXINT15_PRI_V << PLIC_CPU_UXINT15_PRI_S;
+pub const PLIC_CPU_UXINT15_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT15_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT16_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x50);
+pub const PLIC_CPU_UXINT16_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT16_PRI_M = PLIC_CPU_UXINT16_PRI_V << PLIC_CPU_UXINT16_PRI_S;
+pub const PLIC_CPU_UXINT16_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT16_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT17_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x54);
+pub const PLIC_CPU_UXINT17_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT17_PRI_M = PLIC_CPU_UXINT17_PRI_V << PLIC_CPU_UXINT17_PRI_S;
+pub const PLIC_CPU_UXINT17_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT17_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT18_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x58);
+pub const PLIC_CPU_UXINT18_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT18_PRI_M = PLIC_CPU_UXINT18_PRI_V << PLIC_CPU_UXINT18_PRI_S;
+pub const PLIC_CPU_UXINT18_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT18_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT19_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x5C);
+pub const PLIC_CPU_UXINT19_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT19_PRI_M = PLIC_CPU_UXINT19_PRI_V << PLIC_CPU_UXINT19_PRI_S;
+pub const PLIC_CPU_UXINT19_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT19_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT20_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x60);
+pub const PLIC_CPU_UXINT20_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT20_PRI_M = PLIC_CPU_UXINT20_PRI_V << PLIC_CPU_UXINT20_PRI_S;
+pub const PLIC_CPU_UXINT20_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT20_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT21_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x64);
+pub const PLIC_CPU_UXINT21_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT21_PRI_M = PLIC_CPU_UXINT21_PRI_V << PLIC_CPU_UXINT21_PRI_S;
+pub const PLIC_CPU_UXINT21_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT21_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT22_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x68);
+pub const PLIC_CPU_UXINT22_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT22_PRI_M = PLIC_CPU_UXINT22_PRI_V << PLIC_CPU_UXINT22_PRI_S;
+pub const PLIC_CPU_UXINT22_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT22_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT23_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x6C);
+pub const PLIC_CPU_UXINT23_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT23_PRI_M = PLIC_CPU_UXINT23_PRI_V << PLIC_CPU_UXINT23_PRI_S;
+pub const PLIC_CPU_UXINT23_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT23_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT24_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x70);
+pub const PLIC_CPU_UXINT24_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT24_PRI_M = PLIC_CPU_UXINT24_PRI_V << PLIC_CPU_UXINT24_PRI_S;
+pub const PLIC_CPU_UXINT24_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT24_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT25_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x74);
+pub const PLIC_CPU_UXINT25_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT25_PRI_M = PLIC_CPU_UXINT25_PRI_V << PLIC_CPU_UXINT25_PRI_S;
+pub const PLIC_CPU_UXINT25_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT25_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT26_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x78);
+pub const PLIC_CPU_UXINT26_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT26_PRI_M = PLIC_CPU_UXINT26_PRI_V << PLIC_CPU_UXINT26_PRI_S;
+pub const PLIC_CPU_UXINT26_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT26_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT27_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x7C);
+pub const PLIC_CPU_UXINT27_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT27_PRI_M = PLIC_CPU_UXINT27_PRI_V << PLIC_CPU_UXINT27_PRI_S;
+pub const PLIC_CPU_UXINT27_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT27_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT28_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x80);
+pub const PLIC_CPU_UXINT28_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT28_PRI_M = PLIC_CPU_UXINT28_PRI_V << PLIC_CPU_UXINT28_PRI_S;
+pub const PLIC_CPU_UXINT28_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT28_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT29_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x84);
+pub const PLIC_CPU_UXINT29_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT29_PRI_M = PLIC_CPU_UXINT29_PRI_V << PLIC_CPU_UXINT29_PRI_S;
+pub const PLIC_CPU_UXINT29_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT29_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT30_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x88);
+pub const PLIC_CPU_UXINT30_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT30_PRI_M = PLIC_CPU_UXINT30_PRI_V << PLIC_CPU_UXINT30_PRI_S;
+pub const PLIC_CPU_UXINT30_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT30_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT31_PRI_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x8C);
+pub const PLIC_CPU_UXINT31_PRI = @as(c_int, 0x0000000F);
+pub const PLIC_CPU_UXINT31_PRI_M = PLIC_CPU_UXINT31_PRI_V << PLIC_CPU_UXINT31_PRI_S;
+pub const PLIC_CPU_UXINT31_PRI_V = @as(c_int, 0xF);
+pub const PLIC_CPU_UXINT31_PRI_S = @as(c_int, 0);
+pub const PLIC_UXINT_THRESH_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x90);
+pub const PLIC_CPU_UXINT_THRESH = @as(c_int, 0x000000FF);
+pub const PLIC_CPU_UXINT_THRESH_M = PLIC_CPU_UXINT_THRESH_V << PLIC_CPU_UXINT_THRESH_S;
+pub const PLIC_CPU_UXINT_THRESH_V = @as(c_int, 0xFF);
+pub const PLIC_CPU_UXINT_THRESH_S = @as(c_int, 0);
+pub const PLIC_UXINT_CLAIM_REG = DR_REG_PLIC_UX_BASE + @as(c_int, 0x94);
+pub const PLIC_CPU_UXINT_CLAIM = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_CLAIM_M = PLIC_CPU_UXINT_CLAIM_V << PLIC_CPU_UXINT_CLAIM_S;
+pub const PLIC_CPU_UXINT_CLAIM_V = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PLIC_CPU_UXINT_CLAIM_S = @as(c_int, 0);
+pub inline fn INTERRUPT_PRIO_REG(n: anytype) @TypeOf(PLIC_MXINT0_PRI_REG + (n * @as(c_int, 4))) {
+    _ = &n;
+    return PLIC_MXINT0_PRI_REG + (n * @as(c_int, 4));
+}
+pub const INTERRUPT_CURRENT_CORE_INT_THRESH_REG = PLIC_MXINT_THRESH_REG;
+pub const INTERRUPT_CORE0_CPU_INT_ENABLE_REG = PLIC_MXINT_ENABLE_REG;
+pub const INTERRUPT_CORE0_CPU_INT_THRESH_REG = PLIC_MXINT_THRESH_REG;
+pub const INTERRUPT_CORE0_CPU_INT_CLEAR_REG = PLIC_MXINT_CLEAR_REG;
+pub const INTERRUPT_CORE0_CPU_INT_TYPE_REG = PLIC_MXINT_TYPE_REG;
+pub inline fn INTC_INT_PRIO_REG(n: anytype) @TypeOf(PLIC_MXINT0_PRI_REG + (n * @as(c_int, 4))) {
+    _ = &n;
+    return PLIC_MXINT0_PRI_REG + (n * @as(c_int, 4));
+}
+pub const DR_REG_INTERRUPT_BASE = DR_REG_INTERRUPT_MATRIX_BASE;
+pub const _SYS_PARAM_H = "";
+pub const _SYS_SYSLIMITS_H_ = "";
+pub const ARG_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 65536, .decimal);
+pub const CHILD_MAX = @as(c_int, 40);
+pub const LINK_MAX = @as(c_int, 32767);
+pub const MAX_CANON = @as(c_int, 255);
+pub const MAX_INPUT = @as(c_int, 255);
+pub const NAME_MAX = @as(c_int, 255);
+pub const NGROUPS_MAX = @as(c_int, 16);
+pub const OPEN_MAX = @as(c_int, 64);
+pub const PATH_MAX = @as(c_int, 1024);
+pub const PIPE_BUF = @as(c_int, 512);
+pub const IOV_MAX = @as(c_int, 1024);
+pub const BC_BASE_MAX = @as(c_int, 99);
+pub const BC_DIM_MAX = @as(c_int, 2048);
+pub const BC_SCALE_MAX = @as(c_int, 99);
+pub const BC_STRING_MAX = @as(c_int, 1000);
+pub const COLL_WEIGHTS_MAX = @as(c_int, 0);
+pub const EXPR_NEST_MAX = @as(c_int, 32);
+pub const LINE_MAX = @as(c_int, 2048);
+pub const RE_DUP_MAX = @as(c_int, 255);
+pub const NBBY = @as(c_int, 8);
+pub const HZ = @as(c_int, 60);
+pub const NOFILE = @as(c_int, 60);
+pub const PATHSIZE = @as(c_int, 1024);
+pub const MAXPATHLEN = PATH_MAX;
+pub inline fn MAX(a: anytype, b: anytype) @TypeOf(if (a > b) a else b) {
+    _ = &a;
+    _ = &b;
+    return if (a > b) a else b;
+}
+pub inline fn MIN(a: anytype, b: anytype) @TypeOf(if (a < b) a else b) {
+    _ = &a;
+    _ = &b;
+    return if (a < b) a else b;
+}
+pub inline fn howmany(x: anytype, y: anytype) @TypeOf(@import("std").zig.c_translation.MacroArithmetic.div(x + (y - @as(c_int, 1)), y)) {
+    _ = &x;
+    _ = &y;
+    return @import("std").zig.c_translation.MacroArithmetic.div(x + (y - @as(c_int, 1)), y);
+}
+pub const MSTATUS_UIE = @as(c_int, 0x00000001);
+pub const MSTATUS_SIE = @as(c_int, 0x00000002);
+pub const MSTATUS_HIE = @as(c_int, 0x00000004);
+pub const MSTATUS_MIE = @as(c_int, 0x00000008);
+pub const MSTATUS_UPIE = @as(c_int, 0x00000010);
+pub const MSTATUS_SPIE = @as(c_int, 0x00000020);
+pub const MSTATUS_HPIE = @as(c_int, 0x00000040);
+pub const MSTATUS_MPIE = @as(c_int, 0x00000080);
+pub const MSTATUS_SPP = @as(c_int, 0x00000100);
+pub const MSTATUS_VS = @as(c_int, 0x00000600);
+pub const MSTATUS_MPP = @as(c_int, 0x00001800);
+pub const MSTATUS_FS = @as(c_int, 0x00006000);
+pub const MSTATUS_XS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00018000, .hex);
+pub const MSTATUS_MPRV = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00020000, .hex);
+pub const MSTATUS_SUM = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00040000, .hex);
+pub const MSTATUS_MXR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00080000, .hex);
+pub const MSTATUS_TVM = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00100000, .hex);
+pub const MSTATUS_TW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00200000, .hex);
+pub const MSTATUS_TSR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00400000, .hex);
+pub const MSTATUS32_SD = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const MSTATUS_UXL = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0000000300000000, .hex);
+pub const MSTATUS_SXL = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0000000C00000000, .hex);
+pub const MSTATUS64_SD = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000000000000000, .hex);
+pub const SSTATUS_UIE = @as(c_int, 0x00000001);
+pub const SSTATUS_SIE = @as(c_int, 0x00000002);
+pub const SSTATUS_UPIE = @as(c_int, 0x00000010);
+pub const SSTATUS_SPIE = @as(c_int, 0x00000020);
+pub const SSTATUS_SPP = @as(c_int, 0x00000100);
+pub const SSTATUS_VS = @as(c_int, 0x00000600);
+pub const SSTATUS_FS = @as(c_int, 0x00006000);
+pub const SSTATUS_XS = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00018000, .hex);
+pub const SSTATUS_SUM = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00040000, .hex);
+pub const SSTATUS_MXR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00080000, .hex);
+pub const SSTATUS32_SD = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const SSTATUS_UXL = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0000000300000000, .hex);
+pub const SSTATUS64_SD = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000000000000000, .hex);
+pub const USTATUS_UIE = @as(c_int, 0x00000001);
+pub const USTATUS_UPIE = @as(c_int, 0x00000010);
+pub const DCSR_XDEBUGVER = @as(c_uint, 3) << @as(c_int, 30);
+pub const DCSR_NDRESET = @as(c_int, 1) << @as(c_int, 29);
+pub const DCSR_FULLRESET = @as(c_int, 1) << @as(c_int, 28);
+pub const DCSR_EBREAKM = @as(c_int, 1) << @as(c_int, 15);
+pub const DCSR_EBREAKH = @as(c_int, 1) << @as(c_int, 14);
+pub const DCSR_EBREAKS = @as(c_int, 1) << @as(c_int, 13);
+pub const DCSR_EBREAKU = @as(c_int, 1) << @as(c_int, 12);
+pub const DCSR_STOPCYCLE = @as(c_int, 1) << @as(c_int, 10);
+pub const DCSR_STOPTIME = @as(c_int, 1) << @as(c_int, 9);
+pub const DCSR_CAUSE = @as(c_int, 7) << @as(c_int, 6);
+pub const DCSR_DEBUGINT = @as(c_int, 1) << @as(c_int, 5);
+pub const DCSR_HALT = @as(c_int, 1) << @as(c_int, 3);
+pub const DCSR_STEP = @as(c_int, 1) << @as(c_int, 2);
+pub const DCSR_PRV = @as(c_int, 3) << @as(c_int, 0);
+pub const DCSR_CAUSE_NONE = @as(c_int, 0);
+pub const DCSR_CAUSE_SWBP = @as(c_int, 1);
+pub const DCSR_CAUSE_HWBP = @as(c_int, 2);
+pub const DCSR_CAUSE_DEBUGINT = @as(c_int, 3);
+pub const DCSR_CAUSE_STEP = @as(c_int, 4);
+pub const DCSR_CAUSE_HALT = @as(c_int, 5);
+pub const DCSR_CAUSE_GROUP = @as(c_int, 6);
+pub inline fn MCONTROL_TYPE(xlen: anytype) @TypeOf(@as(c_ulonglong, 0xf) << (xlen - @as(c_int, 4))) {
+    _ = &xlen;
+    return @as(c_ulonglong, 0xf) << (xlen - @as(c_int, 4));
+}
+pub inline fn MCONTROL_DMODE(xlen: anytype) @TypeOf(@as(c_ulonglong, 1) << (xlen - @as(c_int, 5))) {
+    _ = &xlen;
+    return @as(c_ulonglong, 1) << (xlen - @as(c_int, 5));
+}
+pub inline fn MCONTROL_MASKMAX(xlen: anytype) @TypeOf(@as(c_ulonglong, 0x3f) << (xlen - @as(c_int, 11))) {
+    _ = &xlen;
+    return @as(c_ulonglong, 0x3f) << (xlen - @as(c_int, 11));
+}
+pub const MCONTROL_SELECT = @as(c_int, 1) << @as(c_int, 19);
+pub const MCONTROL_TIMING = @as(c_int, 1) << @as(c_int, 18);
+pub const MCONTROL_ACTION = @as(c_int, 0x3f) << @as(c_int, 12);
+pub const MCONTROL_CHAIN = @as(c_int, 1) << @as(c_int, 11);
+pub const MCONTROL_MATCH = @as(c_int, 0xf) << @as(c_int, 7);
+pub const MCONTROL_M = @as(c_int, 1) << @as(c_int, 6);
+pub const MCONTROL_H = @as(c_int, 1) << @as(c_int, 5);
+pub const MCONTROL_S = @as(c_int, 1) << @as(c_int, 4);
+pub const MCONTROL_U = @as(c_int, 1) << @as(c_int, 3);
+pub const MCONTROL_EXECUTE = @as(c_int, 1) << @as(c_int, 2);
+pub const MCONTROL_STORE = @as(c_int, 1) << @as(c_int, 1);
+pub const MCONTROL_LOAD = @as(c_int, 1) << @as(c_int, 0);
+pub const MCONTROL_TYPE_NONE = @as(c_int, 0);
+pub const MCONTROL_TYPE_MATCH = @as(c_int, 2);
+pub const MCONTROL_ACTION_DEBUG_EXCEPTION = @as(c_int, 0);
+pub const MCONTROL_ACTION_DEBUG_MODE = @as(c_int, 1);
+pub const MCONTROL_ACTION_TRACE_START = @as(c_int, 2);
+pub const MCONTROL_ACTION_TRACE_STOP = @as(c_int, 3);
+pub const MCONTROL_ACTION_TRACE_EMIT = @as(c_int, 4);
+pub const MCONTROL_MATCH_EQUAL = @as(c_int, 0);
+pub const MCONTROL_MATCH_NAPOT = @as(c_int, 1);
+pub const MCONTROL_MATCH_GE = @as(c_int, 2);
+pub const MCONTROL_MATCH_LT = @as(c_int, 3);
+pub const MCONTROL_MATCH_MASK_LOW = @as(c_int, 4);
+pub const MCONTROL_MATCH_MASK_HIGH = @as(c_int, 5);
+pub const MIP_USIP = @as(c_int, 1) << IRQ_U_SOFT;
+pub const MIP_SSIP = @as(c_int, 1) << IRQ_S_SOFT;
+pub const MIP_HSIP = @as(c_int, 1) << IRQ_H_SOFT;
+pub const MIP_MSIP = @as(c_int, 1) << IRQ_M_SOFT;
+pub const MIP_UTIP = @as(c_int, 1) << IRQ_U_TIMER;
+pub const MIP_STIP = @as(c_int, 1) << IRQ_S_TIMER;
+pub const MIP_HTIP = @as(c_int, 1) << IRQ_H_TIMER;
+pub const MIP_MTIP = @as(c_int, 1) << IRQ_M_TIMER;
+pub const MIP_UEIP = @as(c_int, 1) << IRQ_U_EXT;
+pub const MIP_SEIP = @as(c_int, 1) << IRQ_S_EXT;
+pub const MIP_HEIP = @as(c_int, 1) << IRQ_H_EXT;
+pub const MIP_MEIP = @as(c_int, 1) << IRQ_M_EXT;
+pub const SIP_SSIP = MIP_SSIP;
+pub const SIP_STIP = MIP_STIP;
+pub const PRV_U = @as(c_int, 0);
+pub const PRV_S = @as(c_int, 1);
+pub const PRV_H = @as(c_int, 2);
+pub const PRV_M = @as(c_int, 3);
+pub const SATP32_MODE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const SATP32_ASID = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x7FC00000, .hex);
+pub const SATP32_PPN = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x003FFFFF, .hex);
+pub const SATP64_MODE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xF000000000000000, .hex);
+pub const SATP64_ASID = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x0FFFF00000000000, .hex);
+pub const SATP64_PPN = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x00000FFFFFFFFFFF, .hex);
+pub const SATP_MODE_OFF = @as(c_int, 0);
+pub const SATP_MODE_SV32 = @as(c_int, 1);
+pub const SATP_MODE_SV39 = @as(c_int, 8);
+pub const SATP_MODE_SV48 = @as(c_int, 9);
+pub const SATP_MODE_SV57 = @as(c_int, 10);
+pub const SATP_MODE_SV64 = @as(c_int, 11);
+pub const PMP_R = @as(c_int, 0x01);
+pub const PMP_W = @as(c_int, 0x02);
+pub const PMP_X = @as(c_int, 0x04);
+pub const PMP_A = @as(c_int, 0x18);
+pub const PMP_L = @as(c_int, 0x80);
+pub const PMP_SHIFT = @as(c_int, 2);
+pub const PMP_TOR = @as(c_int, 0x08);
+pub const PMP_NA4 = @as(c_int, 0x10);
+pub const PMP_NAPOT = @as(c_int, 0x18);
+pub const IRQ_U_SOFT = @as(c_int, 0);
+pub const IRQ_S_SOFT = @as(c_int, 1);
+pub const IRQ_H_SOFT = @as(c_int, 2);
+pub const IRQ_M_SOFT = @as(c_int, 3);
+pub const IRQ_U_TIMER = @as(c_int, 4);
+pub const IRQ_S_TIMER = @as(c_int, 5);
+pub const IRQ_H_TIMER = @as(c_int, 6);
+pub const IRQ_M_TIMER = @as(c_int, 7);
+pub const IRQ_U_EXT = @as(c_int, 8);
+pub const IRQ_S_EXT = @as(c_int, 9);
+pub const IRQ_H_EXT = @as(c_int, 10);
+pub const IRQ_M_EXT = @as(c_int, 11);
+pub const IRQ_COP = @as(c_int, 12);
+pub const IRQ_HOST = @as(c_int, 13);
+pub const DEFAULT_RSTVEC = @as(c_int, 0x00001000);
+pub const CLINT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x02000000, .hex);
+pub const CLINT_SIZE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x000c0000, .hex);
+pub const EXT_IO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
+pub const DRAM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const PTE_V = @as(c_int, 0x001);
+pub const PTE_R = @as(c_int, 0x002);
+pub const PTE_W = @as(c_int, 0x004);
+pub const PTE_X = @as(c_int, 0x008);
+pub const PTE_U = @as(c_int, 0x010);
+pub const PTE_G = @as(c_int, 0x020);
+pub const PTE_A = @as(c_int, 0x040);
+pub const PTE_D = @as(c_int, 0x080);
+pub const PTE_SOFT = @as(c_int, 0x300);
+pub const PTE_PPN_SHIFT = @as(c_int, 10);
+pub inline fn PTE_TABLE(PTE: anytype) @TypeOf((PTE & (((PTE_V | PTE_R) | PTE_W) | PTE_X)) == PTE_V) {
+    _ = &PTE;
+    return (PTE & (((PTE_V | PTE_R) | PTE_W) | PTE_X)) == PTE_V;
+}
+pub const MSTATUS_SD = MSTATUS32_SD;
+pub const SSTATUS_SD = SSTATUS32_SD;
+pub const RISCV_PGLEVEL_BITS = @as(c_int, 10);
+pub const SATP_MODE = SATP32_MODE;
+pub const RISCV_PGSHIFT = @as(c_int, 12);
+pub const RISCV_PGSIZE = @as(c_int, 1) << RISCV_PGSHIFT;
+pub const CSR_PMACFG0 = @as(c_int, 0xBC0);
+pub const CSR_PMAADDR0 = @as(c_int, 0xBD0);
+pub inline fn CSR_PMACFG(i: anytype) @TypeOf(CSR_PMACFG0 + i) {
+    _ = &i;
+    return CSR_PMACFG0 + i;
+}
+pub inline fn CSR_PMAADDR(i: anytype) @TypeOf(CSR_PMAADDR0 + i) {
+    _ = &i;
+    return CSR_PMAADDR0 + i;
+}
+pub const PMA_EN = BIT(@as(c_int, 0));
+pub const PMA_R = BIT(@as(c_int, 4));
+pub const PMA_W = BIT(@as(c_int, 3));
+pub const PMA_X = BIT(@as(c_int, 2));
+pub const PMA_L = BIT(@as(c_int, 29));
+pub const PMA_SHIFT = @as(c_int, 2);
+pub const PMA_TOR = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
+pub const PMA_NA4 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x80000000, .hex);
+pub const PMA_NAPOT = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xC0000000, .hex);
+pub const PMA_NONCACHEABLE = BIT(@as(c_int, 27));
+pub const PMA_WRITETHROUGH = BIT(@as(c_int, 26));
+pub const PMA_WRITEMISSNOALLOC = BIT(@as(c_int, 25));
+pub const PMA_READMISSNOALLOC = BIT(@as(c_int, 24));
+pub const PMA_ENTRY_SET_TOR = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:71:9
+pub const PMA_ENTRY_SET_NAPOT = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:77:9
+pub const CSR_PMPCFG0 = @as(c_int, 0x3A0);
+pub const CSR_PMPADDR0 = @as(c_int, 0x3B0);
+pub const PMPADDR_NAPOT = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:107:9
+pub const PMPADDR_ALL = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xFFFFFFFF, .hex);
+pub const PMP_ENTRY_SET = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:124:9
+pub const PMP_ENTRY_CFG_SET = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:130:9
+pub const PMP_ENTRY_CFG_RESET = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:135:9
+pub const PMA_ENTRY_CFG_RESET = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:140:9
+pub const PMA_RESET_AND_ENTRY_SET_TOR = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:146:9
+pub const PMA_RESET_AND_ENTRY_SET_NAPOT = @compileError("unable to translate C expr: unexpected token 'do'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:152:9
+pub const TCONTROL_MTE = @as(c_int, 1) << @as(c_int, 3);
+pub const TCONTROL_MPTE = @as(c_int, 1) << @as(c_int, 7);
+pub const TDATA1_LOAD = @as(c_int, 1) << @as(c_int, 0);
+pub const TDATA1_STORE = @as(c_int, 1) << @as(c_int, 1);
+pub const TDATA1_EXECUTE = @as(c_int, 1) << @as(c_int, 2);
+pub const TDATA1_USER = @as(c_int, 1) << @as(c_int, 3);
+pub const TDATA1_MACHINE = @as(c_int, 1) << @as(c_int, 6);
+pub const TDATA1_MATCH_EXACT = @as(c_int, 0);
+pub const TDATA1_MATCH_NAPOT = @as(c_int, 1) << @as(c_int, 7);
+pub const TDATA1_MATCH_V = @as(c_int, 0xF);
+pub const TDATA1_MATCH_S = @as(c_int, 7);
+pub const TDATA1_HIT_S = @as(c_int, 20);
+pub const MEXSTATUS = @as(c_int, 0x7E1);
+pub const MHINT = @as(c_int, 0x7C5);
+pub const LDPC0 = @as(c_int, 0xBE0);
+pub const LDPC1 = @as(c_int, 0xBE1);
+pub const STPC0 = @as(c_int, 0xBF0);
+pub const STPC1 = @as(c_int, 0xBF1);
+pub const STPC2 = @as(c_int, 0xBF2);
+pub const RV_READ_CONST_CSR = @compileError("unable to translate macro: undefined identifier `__tmp`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:194:9
+pub const RV_READ_CSR = @compileError("unable to translate macro: undefined identifier `__tmp`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:197:9
+pub const RV_WRITE_CSR = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:200:9
+pub const RV_SWAP_CSR = @compileError("unable to translate macro: undefined identifier `__tmp`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:203:9
+pub const RV_SET_CSR = @compileError("unable to translate macro: undefined identifier `__tmp`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:207:9
+pub const RV_CLEAR_CSR = @compileError("unable to translate macro: undefined identifier `__tmp`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:211:9
+pub const RV_SET_CSR_FIELD = @compileError("unable to translate macro: undefined identifier `_V`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:214:9
+pub const RV_CLEAR_CSR_FIELD = @compileError("unable to translate macro: undefined identifier `_V`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:215:9
+pub const RV_READ_MSTATUS_AND_DISABLE_INTR = @compileError("unable to translate macro: undefined identifier `__tmp`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:217:9
+pub const _CSR_STRINGIFY = @compileError("unable to translate C expr: unexpected token '#'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/riscv/include/riscv/csr.h:220:9
+pub const RVHAL_INTR_ENABLE_THRESH = @as(c_int, 1);
+pub const MTVEC_MODE_CSR = @as(c_int, 1);
+pub const RV_EXTERNAL_INT_COUNT = @as(c_int, 32);
+pub const RV_EXTERNAL_INT_OFFSET = @as(c_int, 0);
+pub const CSR_PCER_MACHINE = @as(c_int, 0x7e0);
+pub const CSR_PCMR_MACHINE = @as(c_int, 0x7e1);
+pub const CSR_PCCR_MACHINE = @as(c_int, 0x7e2);
+pub const RVHAL_EXCM_LEVEL = @as(c_int, 4);
 pub inline fn ESP_INTR_CPU_AFFINITY_TO_CORE_ID(cpu_affinity: anytype) @TypeOf(cpu_affinity - @as(c_int, 1)) {
     _ = &cpu_affinity;
     return cpu_affinity - @as(c_int, 1);
@@ -9351,38 +8469,21 @@ pub const SPINLOCK_FREE = @import("std").zig.c_translation.promoteIntLiteral(c_i
 pub const SPINLOCK_WAIT_FOREVER = -@as(c_int, 1);
 pub const SPINLOCK_NO_WAIT = @as(c_int, 0);
 pub const SPINLOCK_INITIALIZER = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_hw_support/include/spinlock.h:34:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_hw_support/include/spinlock.h:34:9
 pub const SPINLOCK_OWNER_ID_0 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xCDCD, .hex);
 pub const SPINLOCK_OWNER_ID_1 = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xABAB, .hex);
 pub const CORE_ID_REGVAL_XOR_SWAP = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xCDCD, .hex) ^ @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xABAB, .hex);
 pub const SPINLOCK_OWNER_ID_XOR_SWAP = CORE_ID_REGVAL_XOR_SWAP;
-pub const PORTBENCHMARK_H = "";
-pub const portbenchmarkINTERRUPT_DISABLE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portbenchmark.h:45:9
-pub const portbenchmarkINTERRUPT_RESTORE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portbenchmark.h:46:9
-pub const portbenchmarkIntLatency = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portbenchmark.h:47:9
-pub const portbenchmarkIntWait = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portbenchmark.h:48:9
-pub const portbenchmarkReset = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portbenchmark.h:49:9
-pub const portbenchmarkPrint = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portbenchmark.h:50:9
-pub const __ESP_ASSERT_H__ = "";
-pub const ESP_STATIC_ASSERT = static_assert;
-pub const TRY_STATIC_ASSERT = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_assert.h:18:9
 pub const CHOOSE_MACRO_VA_ARG_INN = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:46:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:46:9
 pub const CHOOSE_MACRO_VA_ARG = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:47:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:47:9
 pub const ESP_VA_NARG = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:58:10
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:58:10
 pub const ESP_NARG = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:60:10
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:60:10
 pub const ESP_GET_NTH_ARG = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:61:10
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:61:10
 pub inline fn ESP_RSEQ_N() @TypeOf(@as(c_int, 0)) {
     return blk: {
         _ = @as(c_int, 62);
@@ -9452,233 +8553,9 @@ pub inline fn ESP_RSEQ_N() @TypeOf(@as(c_int, 0)) {
 }
 pub const ESP_UNUSED = @import("std").zig.c_translation.Macros.DISCARD;
 pub const ESP_INFINITE_LOOP = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:83:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_common/include/esp_macros.h:83:9
 pub const __ESP_CROSSCORE_INT_H = "";
-pub const DR_REG_UART_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex);
-pub const DR_REG_SPI1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60002000, .hex);
-pub const DR_REG_SPI0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60003000, .hex);
-pub const DR_REG_GPIO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60004000, .hex);
-pub const DR_REG_GPIO_SD_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60004f00, .hex);
-pub const DR_REG_FE2_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60005000, .hex);
-pub const DR_REG_FE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60006000, .hex);
-pub const DR_REG_EFUSE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60007000, .hex);
-pub const DR_REG_RTCCNTL_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60008000, .hex);
-pub const DR_REG_RTCIO_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60008400, .hex);
-pub const DR_REG_SENS_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60008800, .hex);
-pub const DR_REG_RTC_I2C_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60008C00, .hex);
-pub const DR_REG_IO_MUX_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60009000, .hex);
-pub const DR_REG_HINF_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000B000, .hex);
-pub const DR_REG_UHCI1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000C000, .hex);
-pub const DR_REG_I2S_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6000F000, .hex);
-pub const DR_REG_UART1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60010000, .hex);
-pub const DR_REG_BT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60011000, .hex);
-pub const DR_REG_I2C_EXT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60013000, .hex);
-pub const DR_REG_UHCI0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60014000, .hex);
-pub const DR_REG_SLCHOST_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60015000, .hex);
-pub const DR_REG_RMT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60016000, .hex);
-pub const DR_REG_PCNT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60017000, .hex);
-pub const DR_REG_SLC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60018000, .hex);
-pub const DR_REG_LEDC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60019000, .hex);
-pub const DR_REG_NRX_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6001CC00, .hex);
-pub const DR_REG_BB_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6001D000, .hex);
-pub const DR_REG_PWM0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6001E000, .hex);
-pub const DR_REG_TIMERGROUP0_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6001F000, .hex);
-pub const DR_REG_TIMERGROUP1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60020000, .hex);
-pub const DR_REG_RTC_SLOWMEM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60021000, .hex);
-pub const DR_REG_SYSTIMER_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60023000, .hex);
-pub const DR_REG_SPI2_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60024000, .hex);
-pub const DR_REG_SPI3_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60025000, .hex);
-pub const DR_REG_SYSCON_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60026000, .hex);
-pub const DR_REG_APB_CTRL_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60026000, .hex);
-pub const DR_REG_I2C1_EXT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60027000, .hex);
-pub const DR_REG_SDMMC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60028000, .hex);
-pub const DR_REG_PERI_BACKUP_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6002A000, .hex);
-pub const DR_REG_TWAI_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6002B000, .hex);
-pub const DR_REG_PWM1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6002C000, .hex);
-pub const DR_REG_I2S1_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6002D000, .hex);
-pub const DR_REG_UART2_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6002E000, .hex);
-pub const DR_REG_USB_SERIAL_JTAG_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60038000, .hex);
-pub const DR_REG_USB_WRAP_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60039000, .hex);
-pub const DR_REG_AES_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6003A000, .hex);
-pub const DR_REG_SHA_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6003B000, .hex);
-pub const DR_REG_RSA_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6003C000, .hex);
-pub const DR_REG_HMAC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6003E000, .hex);
-pub const DR_REG_DIGITAL_SIGNATURE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6003D000, .hex);
-pub const DR_REG_GDMA_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x6003F000, .hex);
-pub const DR_REG_APB_SARADC_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60040000, .hex);
-pub const DR_REG_LCD_CAM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60041000, .hex);
-pub const DR_REG_SYSTEM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C0000, .hex);
-pub const DR_REG_SENSITIVE_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C1000, .hex);
-pub const DR_REG_INTERRUPT_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C2000, .hex);
-pub const DR_REG_EXTMEM_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C4000, .hex);
-pub const DR_REG_ASSIST_DEBUG_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600CE000, .hex);
-pub const DR_REG_WCL_BASE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600D0000, .hex);
-pub const PRO_CPU_NUM = @as(c_int, 0);
-pub const APP_CPU_NUM = @as(c_int, 1);
-pub const PRO_CPUID = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xcdcd, .hex);
-pub const APP_CPUID = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xabab, .hex);
-pub const DR_REG_MMU_TABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C5000, .hex);
-pub const DR_REG_ITAG_TABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C6000, .hex);
-pub const DR_REG_DTAG_TABLE = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600C8000, .hex);
-pub const DR_REG_EXT_MEM_ENC = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600CC000, .hex);
-pub inline fn REG_UHCI_BASE(i: anytype) @TypeOf(DR_REG_UHCI0_BASE - (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000, .hex))) {
-    _ = &i;
-    return DR_REG_UHCI0_BASE - (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8000, .hex));
-}
-pub inline fn REG_UART_BASE(i: anytype) @TypeOf((DR_REG_UART_BASE + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex))) + (if (i > @as(c_int, 1)) @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xe000, .hex) else @as(c_int, 0))) {
-    _ = &i;
-    return (DR_REG_UART_BASE + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex))) + (if (i > @as(c_int, 1)) @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xe000, .hex) else @as(c_int, 0));
-}
-pub inline fn REG_UART_AHB_BASE(i: anytype) @TypeOf((@import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex) + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex))) + (if (i > @as(c_int, 1)) @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xe000, .hex) else @as(c_int, 0))) {
-    _ = &i;
-    return (@import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60000000, .hex) + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x10000, .hex))) + (if (i > @as(c_int, 1)) @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xe000, .hex) else @as(c_int, 0));
-}
-pub inline fn UART_FIFO_AHB_REG(i: anytype) @TypeOf(REG_UART_AHB_BASE(i) + @as(c_int, 0x0)) {
-    _ = &i;
-    return REG_UART_AHB_BASE(i) + @as(c_int, 0x0);
-}
-pub inline fn REG_I2S_BASE(i: anytype) @TypeOf(DR_REG_I2S_BASE + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x1E000, .hex))) {
-    _ = &i;
-    return DR_REG_I2S_BASE + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x1E000, .hex));
-}
-pub inline fn REG_TIMG_BASE(i: anytype) @TypeOf(DR_REG_TIMERGROUP0_BASE + (i * @as(c_int, 0x1000))) {
-    _ = &i;
-    return DR_REG_TIMERGROUP0_BASE + (i * @as(c_int, 0x1000));
-}
-pub inline fn REG_SPI_MEM_BASE(i: anytype) @TypeOf(DR_REG_SPI0_BASE - (i * @as(c_int, 0x1000))) {
-    _ = &i;
-    return DR_REG_SPI0_BASE - (i * @as(c_int, 0x1000));
-}
-pub inline fn REG_SPI_BASE(i: anytype) @TypeOf(if (i >= @as(c_int, 2)) DR_REG_SPI2_BASE + ((i - @as(c_int, 2)) * @as(c_int, 0x1000)) else @as(c_int, 0)) {
-    _ = &i;
-    return if (i >= @as(c_int, 2)) DR_REG_SPI2_BASE + ((i - @as(c_int, 2)) * @as(c_int, 0x1000)) else @as(c_int, 0);
-}
-pub inline fn REG_I2C_BASE(i: anytype) @TypeOf(DR_REG_I2C_EXT_BASE + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x14000, .hex))) {
-    _ = &i;
-    return DR_REG_I2C_EXT_BASE + (i * @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x14000, .hex));
-}
-pub inline fn ETS_UNCACHED_ADDR(addr: anytype) @TypeOf(addr) {
-    _ = &addr;
-    return addr;
-}
-pub inline fn ETS_CACHED_ADDR(addr: anytype) @TypeOf(addr) {
-    _ = &addr;
-    return addr;
-}
-pub const REG_WRITE = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:51:9
-pub const REG_READ = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:56:9
-pub const REG_GET_BIT = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:61:9
-pub const REG_SET_BIT = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:66:9
-pub const REG_CLR_BIT = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:71:9
-pub const REG_SET_BITS = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:76:9
-pub const REG_GET_FIELD = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:81:9
-pub const REG_SET_FIELD = @compileError("unable to translate macro: undefined identifier `_V`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:86:9
-pub const VALUE_GET_FIELD = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:91:9
-pub const VALUE_GET_FIELD2 = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:94:9
-pub const VALUE_SET_FIELD = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:97:9
-pub const VALUE_SET_FIELD2 = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:100:9
-pub const FIELD_TO_VALUE = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:103:9
-pub const FIELD_TO_VALUE2 = @compileError("unable to translate macro: undefined identifier `_S`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:106:9
-pub const READ_PERI_REG = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:109:9
-pub const WRITE_PERI_REG = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:114:9
-pub const CLEAR_PERI_REG_MASK = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:119:9
-pub const SET_PERI_REG_MASK = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:124:9
-pub const GET_PERI_REG_MASK = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:129:9
-pub const GET_PERI_REG_BITS = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:134:9
-pub const SET_PERI_REG_BITS = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:139:9
-pub const GET_PERI_REG_BITS2 = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/soc/esp32s3/include/soc/soc.h:144:9
-pub const APB_CLK_FREQ_ROM = @as(c_int, 40) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
-pub const CPU_CLK_FREQ_ROM = APB_CLK_FREQ_ROM;
-pub const CPU_CLK_FREQ_MHZ_BTLD = @as(c_int, 80);
-pub const APB_CLK_FREQ = @as(c_int, 80) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
-pub const MODEM_REQUIRED_MIN_APB_CLK_FREQ = @as(c_int, 80) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
-pub const REF_CLK_FREQ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
-pub const XTAL_CLK_FREQ = @as(c_int, 40) * @import("std").zig.c_translation.promoteIntLiteral(c_int, 1000000, .decimal);
-pub const UART_CLK_FREQ = APB_CLK_FREQ;
-pub const WDT_CLK_FREQ = APB_CLK_FREQ;
-pub const TIMER_CLK_FREQ = @import("std").zig.c_translation.promoteIntLiteral(c_int, 80000000, .decimal) >> @as(c_int, 4);
-pub const SPI_CLK_DIV = @as(c_int, 4);
-pub const TICKS_PER_US_ROM = @as(c_int, 40);
-pub const SOC_DROM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3C000000, .hex);
-pub const SOC_DROM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3E000000, .hex);
-pub const SOC_IROM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x42000000, .hex);
-pub const SOC_IROM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x44000000, .hex);
-pub const SOC_IRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40370000, .hex);
-pub const SOC_IRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x403E0000, .hex);
-pub const SOC_DRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FC88000, .hex);
-pub const SOC_DRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FD00000, .hex);
-pub const SOC_RTC_IRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600FE000, .hex);
-pub const SOC_RTC_IRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60100000, .hex);
-pub const SOC_RTC_DRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x600FE000, .hex);
-pub const SOC_RTC_DRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x60100000, .hex);
-pub const SOC_RTC_DATA_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50000000, .hex);
-pub const SOC_RTC_DATA_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x50002000, .hex);
-pub const SOC_EXTRAM_DATA_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3C000000, .hex);
-pub const SOC_EXTRAM_DATA_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3E000000, .hex);
-pub const SOC_IROM_MASK_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40000000, .hex);
-pub const SOC_IROM_MASK_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40060000, .hex);
-pub const SOC_EXTRAM_DATA_SIZE = SOC_EXTRAM_DATA_HIGH - SOC_EXTRAM_DATA_LOW;
-pub const SOC_MAX_CONTIGUOUS_RAM_SIZE = SOC_EXTRAM_DATA_HIGH - SOC_EXTRAM_DATA_LOW;
-pub const SOC_DIRAM_IRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x40378000, .hex);
-pub const SOC_DIRAM_IRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x403E0000, .hex);
-pub const SOC_DIRAM_DRAM_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FC88000, .hex);
-pub const SOC_DIRAM_DRAM_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FCF0000, .hex);
-pub const SOC_I_D_OFFSET = SOC_DIRAM_IRAM_LOW - SOC_DIRAM_DRAM_LOW;
-pub inline fn MAP_DRAM_TO_IRAM(addr: anytype) @TypeOf(addr + SOC_I_D_OFFSET) {
-    _ = &addr;
-    return addr + SOC_I_D_OFFSET;
-}
-pub inline fn MAP_IRAM_TO_DRAM(addr: anytype) @TypeOf(addr - SOC_I_D_OFFSET) {
-    _ = &addr;
-    return addr - SOC_I_D_OFFSET;
-}
-pub const SOC_DMA_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FC88000, .hex);
-pub const SOC_DMA_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FD00000, .hex);
-pub const SOC_DMA_EXT_LOW = SOC_EXTRAM_DATA_LOW;
-pub const SOC_DMA_EXT_HIGH = SOC_EXTRAM_DATA_HIGH;
-pub const SOC_BYTE_ACCESSIBLE_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FC88000, .hex);
-pub const SOC_BYTE_ACCESSIBLE_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FD00000, .hex);
-pub const SOC_MEM_INTERNAL_LOW = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3FC88000, .hex);
-pub const SOC_MEM_INTERNAL_HIGH = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x403E0000, .hex);
-pub const SOC_ROM_STACK_START = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x3fceb710, .hex);
-pub const SOC_ROM_STACK_SIZE = @as(c_int, 0x2000);
-pub const ETS_WMAC_INUM = @as(c_int, 0);
-pub const ETS_WBB_INUM = @as(c_int, 4);
-pub const ETS_T1_WDT_INUM = @as(c_int, 24);
-pub const ETS_MEMACCESS_ERR_INUM = @as(c_int, 25);
-pub const ETS_CACHEERR_INUM = ETS_MEMACCESS_ERR_INUM;
-pub const ETS_IPC_ISR_INUM = @as(c_int, 28);
-pub const ETS_SLC_INUM = @as(c_int, 1);
-pub const ETS_UART0_INUM = @as(c_int, 5);
-pub const ETS_UART1_INUM = @as(c_int, 5);
-pub const ETS_SPI2_INUM = @as(c_int, 1);
-pub const ETS_FRC_TIMER2_INUM = @as(c_int, 10);
-pub const ETS_GPIO_INUM = @as(c_int, 4);
-pub const ETS_INVALID_INUM = @as(c_int, 6);
-pub const ETS_INT_WDT_INUM = ETS_T1_WDT_INUM;
-pub const portCHAR = i8;
+pub const portCHAR = u8;
 pub const portFLOAT = f32;
 pub const portDOUBLE = f64;
 pub const portLONG = i32;
@@ -9698,10 +8575,10 @@ pub inline fn portTASK_FUNCTION(vFunction: anytype, pvParameters: anytype) @Type
 }
 pub const portCRITICAL_NESTING_IN_TCB = @as(c_int, 1);
 pub const portSTACK_GROWTH = -@as(c_int, 1);
-pub const portTICK_PERIOD_MS = @import("std").zig.c_translation.MacroArithmetic.div(@import("std").zig.c_translation.cast(TickType_t, @as(c_int, 1000)), configTICK_RATE_HZ);
+pub const portTICK_PERIOD_MS = @import("std").zig.c_translation.cast(TickType_t, @import("std").zig.c_translation.MacroArithmetic.div(@as(c_int, 1000), configTICK_RATE_HZ));
 pub const portBYTE_ALIGNMENT = @as(c_int, 16);
-pub const portNOP = @compileError("unable to translate macro: undefined identifier `XT_NOP`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:76:9
+pub const portNOP = @compileError("unable to translate C expr: unexpected token '__asm'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:93:9
 pub const portMUX_INITIALIZER_UNLOCKED = SPINLOCK_INITIALIZER;
 pub const portMUX_FREE_VAL = SPINLOCK_FREE;
 pub const portMUX_NO_TIMEOUT = SPINLOCK_WAIT_FOREVER;
@@ -9711,62 +8588,37 @@ pub inline fn portMUX_INITIALIZE(mux: anytype) @TypeOf(spinlock_initialize(mux))
     return spinlock_initialize(mux);
 }
 pub const portYIELD_FROM_ISR_CHECK = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:127:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:160:9
 pub inline fn portYIELD_FROM_ISR_NO_CHECK() @TypeOf(vPortYieldFromISR()) {
     return vPortYieldFromISR();
 }
-pub const portSET_INTERRUPT_MASK = @compileError("unable to translate macro: undefined identifier `prev_level`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:162:9
-pub inline fn portSET_INTERRUPT_MASK_FROM_ISR() @TypeOf(portSET_INTERRUPT_MASK()) {
-    return portSET_INTERRUPT_MASK();
+pub inline fn portDISABLE_INTERRUPTS() @TypeOf(ulPortSetInterruptMask()) {
+    return ulPortSetInterruptMask();
 }
-pub inline fn portDISABLE_INTERRUPTS() @TypeOf(portSET_INTERRUPT_MASK()) {
-    return portSET_INTERRUPT_MASK();
+pub inline fn portENABLE_INTERRUPTS() @TypeOf(vPortClearInterruptMask(@as(c_int, 1))) {
+    return vPortClearInterruptMask(@as(c_int, 1));
 }
-pub const portCLEAR_INTERRUPT_MASK = @compileError("unable to translate macro: undefined identifier `ps_reg`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:182:9
-pub inline fn portCLEAR_INTERRUPT_MASK_FROM_ISR(x: anytype) @TypeOf(portCLEAR_INTERRUPT_MASK(x)) {
+pub inline fn portRESTORE_INTERRUPTS(x: anytype) @TypeOf(vPortClearInterruptMask(x)) {
     _ = &x;
-    return portCLEAR_INTERRUPT_MASK(x);
-}
-pub const portENABLE_INTERRUPTS = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:190:9
-pub inline fn portRESTORE_INTERRUPTS(x: anytype) @TypeOf(portCLEAR_INTERRUPT_MASK(x)) {
-    _ = &x;
-    return portCLEAR_INTERRUPT_MASK(x);
-}
-pub inline fn portGET_TASK_LOCK() @TypeOf(vPortTakeLock(&port_xTaskLock)) {
-    return vPortTakeLock(&port_xTaskLock);
-}
-pub inline fn portRELEASE_TASK_LOCK() @TypeOf(vPortReleaseLock(&port_xTaskLock)) {
-    return vPortReleaseLock(&port_xTaskLock);
-}
-pub inline fn portGET_ISR_LOCK() @TypeOf(vPortTakeLock(&port_xISRLock)) {
-    return vPortTakeLock(&port_xISRLock);
-}
-pub inline fn portRELEASE_ISR_LOCK() @TypeOf(vPortReleaseLock(&port_xISRLock)) {
-    return vPortReleaseLock(&port_xISRLock);
+    return vPortClearInterruptMask(x);
 }
 pub const portENTER_CRITICAL_SMP = @compileError("unable to translate C expr: unexpected token ';'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:210:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:218:9
 pub const portEXIT_CRITICAL_SMP = @compileError("unable to translate C expr: unexpected token ';'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:211:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:219:9
 pub const portENTER_CRITICAL = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:217:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:225:9
 pub const portEXIT_CRITICAL = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:218:9
-pub inline fn portENTER_CRITICAL_FROM_ISR() @TypeOf(vTaskEnterCriticalFromISR()) {
-    return vTaskEnterCriticalFromISR();
-}
-pub inline fn portEXIT_CRITICAL_FROM_ISR(x: anytype) @TypeOf(vTaskExitCriticalFromISR(x)) {
-    _ = &x;
-    return vTaskExitCriticalFromISR(x);
-}
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:226:9
+pub const portSET_INTERRUPT_MASK_FROM_ISR = @compileError("unable to translate macro: undefined identifier `cur_level`");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:229:9
+pub const portCLEAR_INTERRUPT_MASK_FROM_ISR = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:235:9
 pub inline fn portYIELD() @TypeOf(vPortYield()) {
     return vPortYield();
 }
 pub const portYIELD_FROM_ISR = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:232:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:246:9
 pub inline fn portYIELD_CORE(x: anytype) @TypeOf(vPortYieldCore(x)) {
     _ = &x;
     return vPortYieldCore(x);
@@ -9778,48 +8630,33 @@ pub inline fn portCHECK_IF_IN_ISR() @TypeOf(xPortCheckIfInISR()) {
     return xPortCheckIfInISR();
 }
 pub const portCONFIGURE_TIMER_FOR_RUN_TIME_STATS = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/xtensa/include/freertos/portmacro.h:244:9
-pub inline fn portGET_RUN_TIME_COUNTER_VALUE() @TypeOf(configRUN_TIME_COUNTER_TYPE ++ xthal_get_ccount()) {
-    return configRUN_TIME_COUNTER_TYPE ++ xthal_get_ccount();
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:257:9
+pub inline fn portGET_RUN_TIME_COUNTER_VALUE() @TypeOf(@as(c_int, 0)) {
+    return @as(c_int, 0);
 }
 pub inline fn portCLEAN_UP_TCB(pxTCB: anytype) @TypeOf(vPortTCBPreDeleteHook(pxTCB)) {
     _ = &pxTCB;
     return vPortTCBPreDeleteHook(pxTCB);
 }
-pub inline fn portTRY_ENTER_CRITICAL(lock: anytype, timeout: anytype) @TypeOf(xPortEnterCriticalTimeout(lock, timeout)) {
-    _ = &lock;
-    _ = &timeout;
-    return xPortEnterCriticalTimeout(lock, timeout);
+pub inline fn xPortInterruptedFromISRContext() @TypeOf(xPortInIsrContext()) {
+    return xPortInIsrContext();
 }
-pub inline fn portENTER_CRITICAL_IDF(lock: anytype) @TypeOf(vPortEnterCriticalIDF(lock)) {
-    _ = &lock;
-    return vPortEnterCriticalIDF(lock);
-}
-pub inline fn portEXIT_CRITICAL_IDF(lock: anytype) @TypeOf(vPortExitCriticalIDF(lock)) {
-    _ = &lock;
-    return vPortExitCriticalIDF(lock);
-}
-pub inline fn portTRY_ENTER_CRITICAL_ISR(lock: anytype, timeout: anytype) @TypeOf(xPortEnterCriticalTimeout(lock, timeout)) {
-    _ = &lock;
-    _ = &timeout;
-    return xPortEnterCriticalTimeout(lock, timeout);
-}
-pub inline fn portENTER_CRITICAL_ISR(lock: anytype) @TypeOf(vPortEnterCriticalIDF(lock)) {
-    _ = &lock;
-    return vPortEnterCriticalIDF(lock);
-}
-pub inline fn portEXIT_CRITICAL_ISR(lock: anytype) @TypeOf(vPortExitCriticalIDF(lock)) {
-    _ = &lock;
-    return vPortExitCriticalIDF(lock);
-}
-pub inline fn portENTER_CRITICAL_SAFE(lock: anytype) @TypeOf(vPortEnterCriticalIDF(lock)) {
-    _ = &lock;
-    return vPortEnterCriticalIDF(lock);
-}
-pub inline fn portEXIT_CRITICAL_SAFE(lock: anytype) @TypeOf(vPortExitCriticalIDF(lock)) {
-    _ = &lock;
-    return vPortExitCriticalIDF(lock);
-}
+pub const portTRY_ENTER_CRITICAL = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:316:9
+pub const portENTER_CRITICAL_IDF = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:317:9
+pub const portEXIT_CRITICAL_IDF = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:318:9
+pub const portTRY_ENTER_CRITICAL_ISR = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:320:9
+pub const portENTER_CRITICAL_ISR = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:321:9
+pub const portEXIT_CRITICAL_ISR = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:322:9
+pub const portENTER_CRITICAL_SAFE = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:324:9
+pub const portEXIT_CRITICAL_SAFE = @compileError("unable to translate C expr: unexpected token '{'");
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel-SMP/portable/riscv/include/freertos/portmacro.h:325:9
 pub inline fn portYIELD_WITHIN_API() @TypeOf(esp_crosscore_int_send_yield(xPortGetCoreID())) {
     return esp_crosscore_int_send_yield(xPortGetCoreID());
 }
@@ -9846,15 +8683,15 @@ pub const __need_va_copy = "";
 pub const __STDARG_H = "";
 pub const _VA_LIST = "";
 pub const va_start = @compileError("unable to translate macro: undefined identifier `__builtin_va_start`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/build/zig-relsafe-espressif-x86_64-linux-musl-baseline/lib/include/__stdarg_va_arg.h:17:9
+// /Users/josephmontanez_1/Downloads/zig-macos-aarch64-0.14.0-dev.3036+7ac110ac2/lib/include/__stdarg_va_arg.h:17:9
 pub const va_end = @compileError("unable to translate macro: undefined identifier `__builtin_va_end`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/build/zig-relsafe-espressif-x86_64-linux-musl-baseline/lib/include/__stdarg_va_arg.h:19:9
+// /Users/josephmontanez_1/Downloads/zig-macos-aarch64-0.14.0-dev.3036+7ac110ac2/lib/include/__stdarg_va_arg.h:19:9
 pub const va_arg = @compileError("unable to translate C expr: unexpected token 'an identifier'");
-// /home/joseph/Documents/zig-esp-idf-sample-github/build/zig-relsafe-espressif-x86_64-linux-musl-baseline/lib/include/__stdarg_va_arg.h:20:9
+// /Users/josephmontanez_1/Downloads/zig-macos-aarch64-0.14.0-dev.3036+7ac110ac2/lib/include/__stdarg_va_arg.h:20:9
 pub const __va_copy = @compileError("unable to translate macro: undefined identifier `__builtin_va_copy`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/build/zig-relsafe-espressif-x86_64-linux-musl-baseline/lib/include/__stdarg___va_copy.h:11:9
+// /Users/josephmontanez_1/Downloads/zig-macos-aarch64-0.14.0-dev.3036+7ac110ac2/lib/include/__stdarg___va_copy.h:11:9
 pub const va_copy = @compileError("unable to translate macro: undefined identifier `__builtin_va_copy`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/build/zig-relsafe-espressif-x86_64-linux-musl-baseline/lib/include/__stdarg_va_copy.h:11:9
+// /Users/josephmontanez_1/Downloads/zig-macos-aarch64-0.14.0-dev.3036+7ac110ac2/lib/include/__stdarg_va_copy.h:11:9
 pub const esp_sync_counters_rtc_and_frc = esp_sync_timekeeping_timers;
 pub const HEAP_IRAM_ATTR = "";
 pub const MALLOC_CAP_EXEC = @as(c_int, 1) << @as(c_int, 0);
@@ -9881,7 +8718,7 @@ pub const MALLOC_CAP_INVALID = @as(c_int, 1) << @as(c_int, 31);
 pub const _INTTYPES_H = "";
 pub const _SYS__LOCALE_H = "";
 pub const __STRINGIFY = @compileError("unable to translate C expr: unexpected token '#'");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:28:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:28:9
 pub inline fn __PRI8(x: anytype) @TypeOf(__INT8 ++ __STRINGIFY(x)) {
     _ = &x;
     return __INT8 ++ __STRINGIFY(x);
@@ -9907,71 +8744,71 @@ pub inline fn __SCN8FAST(x: anytype) @TypeOf(__FAST8 ++ __STRINGIFY(x)) {
     return __FAST8 ++ __STRINGIFY(x);
 }
 pub const PRId8 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:52:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:52:9
 pub const PRIi8 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:53:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:53:9
 pub const PRIo8 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:54:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:54:9
 pub const PRIu8 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:55:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:55:9
 pub const PRIx8 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:56:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:56:9
 pub const PRIX8 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:57:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:57:9
 pub const SCNd8 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:62:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:62:9
 pub const SCNi8 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:63:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:63:9
 pub const SCNo8 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:64:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:64:9
 pub const SCNu8 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:65:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:65:9
 pub const SCNx8 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:66:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:66:9
 pub const PRIdLEAST8 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:71:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:71:9
 pub const PRIiLEAST8 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:72:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:72:9
 pub const PRIoLEAST8 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:73:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:73:9
 pub const PRIuLEAST8 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:74:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:74:9
 pub const PRIxLEAST8 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:75:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:75:9
 pub const PRIXLEAST8 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:76:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:76:9
 pub const SCNdLEAST8 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:81:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:81:11
 pub const SCNiLEAST8 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:82:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:82:11
 pub const SCNoLEAST8 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:83:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:83:11
 pub const SCNuLEAST8 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:84:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:84:11
 pub const SCNxLEAST8 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:85:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:85:11
 pub const PRIdFAST8 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:89:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:89:9
 pub const PRIiFAST8 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:90:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:90:9
 pub const PRIoFAST8 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:91:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:91:9
 pub const PRIuFAST8 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:92:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:92:9
 pub const PRIxFAST8 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:93:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:93:9
 pub const PRIXFAST8 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:94:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:94:9
 pub const SCNdFAST8 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:99:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:99:11
 pub const SCNiFAST8 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:100:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:100:11
 pub const SCNoFAST8 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:101:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:101:11
 pub const SCNuFAST8 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:102:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:102:11
 pub const SCNxFAST8 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:103:11
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:103:11
 pub inline fn __PRI16(x: anytype) @TypeOf(__INT16 ++ __STRINGIFY(x)) {
     _ = &x;
     return __INT16 ++ __STRINGIFY(x);
@@ -9997,71 +8834,71 @@ pub inline fn __SCN16FAST(x: anytype) @TypeOf(__FAST16 ++ __STRINGIFY(x)) {
     return __FAST16 ++ __STRINGIFY(x);
 }
 pub const PRId16 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:116:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:116:9
 pub const PRIi16 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:117:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:117:9
 pub const PRIo16 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:118:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:118:9
 pub const PRIu16 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:119:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:119:9
 pub const PRIx16 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:120:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:120:9
 pub const PRIX16 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:121:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:121:9
 pub const SCNd16 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:123:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:123:9
 pub const SCNi16 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:124:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:124:9
 pub const SCNo16 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:125:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:125:9
 pub const SCNu16 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:126:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:126:9
 pub const SCNx16 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:127:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:127:9
 pub const PRIdLEAST16 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:130:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:130:9
 pub const PRIiLEAST16 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:131:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:131:9
 pub const PRIoLEAST16 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:132:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:132:9
 pub const PRIuLEAST16 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:133:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:133:9
 pub const PRIxLEAST16 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:134:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:134:9
 pub const PRIXLEAST16 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:135:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:135:9
 pub const SCNdLEAST16 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:137:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:137:9
 pub const SCNiLEAST16 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:138:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:138:9
 pub const SCNoLEAST16 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:139:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:139:9
 pub const SCNuLEAST16 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:140:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:140:9
 pub const SCNxLEAST16 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:141:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:141:9
 pub const PRIdFAST16 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:144:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:144:9
 pub const PRIiFAST16 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:145:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:145:9
 pub const PRIoFAST16 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:146:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:146:9
 pub const PRIuFAST16 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:147:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:147:9
 pub const PRIxFAST16 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:148:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:148:9
 pub const PRIXFAST16 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:149:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:149:9
 pub const SCNdFAST16 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:151:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:151:9
 pub const SCNiFAST16 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:152:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:152:9
 pub const SCNoFAST16 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:153:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:153:9
 pub const SCNuFAST16 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:154:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:154:9
 pub const SCNxFAST16 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:155:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:155:9
 pub inline fn __PRI32(x: anytype) @TypeOf(__STRINGIFY(x)) {
     _ = &x;
     return __STRINGIFY(x);
@@ -10087,71 +8924,71 @@ pub inline fn __SCN32FAST(x: anytype) @TypeOf(__STRINGIFY(x)) {
     return __STRINGIFY(x);
 }
 pub const PRId32 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:165:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:165:9
 pub const PRIi32 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:166:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:166:9
 pub const PRIo32 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:167:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:167:9
 pub const PRIu32 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:168:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:168:9
 pub const PRIx32 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:169:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:169:9
 pub const PRIX32 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:170:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:170:9
 pub const SCNd32 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:172:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:172:9
 pub const SCNi32 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:173:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:173:9
 pub const SCNo32 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:174:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:174:9
 pub const SCNu32 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:175:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:175:9
 pub const SCNx32 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:176:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:176:9
 pub const PRIdLEAST32 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:179:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:179:9
 pub const PRIiLEAST32 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:180:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:180:9
 pub const PRIoLEAST32 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:181:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:181:9
 pub const PRIuLEAST32 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:182:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:182:9
 pub const PRIxLEAST32 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:183:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:183:9
 pub const PRIXLEAST32 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:184:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:184:9
 pub const SCNdLEAST32 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:186:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:186:9
 pub const SCNiLEAST32 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:187:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:187:9
 pub const SCNoLEAST32 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:188:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:188:9
 pub const SCNuLEAST32 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:189:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:189:9
 pub const SCNxLEAST32 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:190:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:190:9
 pub const PRIdFAST32 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:193:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:193:9
 pub const PRIiFAST32 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:194:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:194:9
 pub const PRIoFAST32 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:195:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:195:9
 pub const PRIuFAST32 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:196:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:196:9
 pub const PRIxFAST32 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:197:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:197:9
 pub const PRIXFAST32 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:198:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:198:9
 pub const SCNdFAST32 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:200:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:200:9
 pub const SCNiFAST32 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:201:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:201:9
 pub const SCNoFAST32 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:202:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:202:9
 pub const SCNuFAST32 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:203:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:203:9
 pub const SCNxFAST32 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:204:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:204:9
 pub inline fn __PRI64(x: anytype) @TypeOf(__INT64 ++ __STRINGIFY(x)) {
     _ = &x;
     return __INT64 ++ __STRINGIFY(x);
@@ -10177,123 +9014,123 @@ pub inline fn __SCN64FAST(x: anytype) @TypeOf(__FAST64 ++ __STRINGIFY(x)) {
     return __FAST64 ++ __STRINGIFY(x);
 }
 pub const PRId64 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:217:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:217:9
 pub const PRIi64 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:218:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:218:9
 pub const PRIo64 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:219:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:219:9
 pub const PRIu64 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:220:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:220:9
 pub const PRIx64 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:221:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:221:9
 pub const PRIX64 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:222:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:222:9
 pub const SCNd64 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:224:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:224:9
 pub const SCNi64 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:225:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:225:9
 pub const SCNo64 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:226:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:226:9
 pub const SCNu64 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:227:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:227:9
 pub const SCNx64 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:228:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:228:9
 pub const PRIdLEAST64 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:232:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:232:9
 pub const PRIiLEAST64 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:233:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:233:9
 pub const PRIoLEAST64 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:234:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:234:9
 pub const PRIuLEAST64 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:235:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:235:9
 pub const PRIxLEAST64 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:236:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:236:9
 pub const PRIXLEAST64 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:237:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:237:9
 pub const SCNdLEAST64 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:239:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:239:9
 pub const SCNiLEAST64 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:240:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:240:9
 pub const SCNoLEAST64 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:241:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:241:9
 pub const SCNuLEAST64 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:242:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:242:9
 pub const SCNxLEAST64 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:243:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:243:9
 pub const PRIdFAST64 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:247:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:247:9
 pub const PRIiFAST64 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:248:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:248:9
 pub const PRIoFAST64 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:249:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:249:9
 pub const PRIuFAST64 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:250:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:250:9
 pub const PRIxFAST64 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:251:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:251:9
 pub const PRIXFAST64 = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:252:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:252:9
 pub const SCNdFAST64 = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:254:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:254:9
 pub const SCNiFAST64 = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:255:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:255:9
 pub const SCNoFAST64 = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:256:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:256:9
 pub const SCNuFAST64 = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:257:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:257:9
 pub const SCNxFAST64 = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:258:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:258:9
 pub const __PRIMAX = @compileError("unable to translate macro: undefined identifier `l`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:263:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:263:9
 pub const __SCNMAX = @compileError("unable to translate macro: undefined identifier `l`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:264:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:264:9
 pub const PRIdMAX = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:273:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:273:9
 pub const PRIiMAX = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:274:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:274:9
 pub const PRIoMAX = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:275:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:275:9
 pub const PRIuMAX = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:276:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:276:9
 pub const PRIxMAX = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:277:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:277:9
 pub const PRIXMAX = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:278:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:278:9
 pub const SCNdMAX = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:280:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:280:9
 pub const SCNiMAX = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:281:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:281:9
 pub const SCNoMAX = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:282:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:282:9
 pub const SCNuMAX = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:283:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:283:9
 pub const SCNxMAX = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:284:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:284:9
 pub const __PRIPTR = @compileError("unable to translate macro: undefined identifier `l`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:291:10
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:291:10
 pub const __SCNPTR = @compileError("unable to translate macro: undefined identifier `l`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:292:10
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:292:10
 pub const PRIdPTR = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:298:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:298:9
 pub const PRIiPTR = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:299:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:299:9
 pub const PRIoPTR = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:300:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:300:9
 pub const PRIuPTR = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:301:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:301:9
 pub const PRIxPTR = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:302:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:302:9
 pub const PRIXPTR = @compileError("unable to translate macro: undefined identifier `X`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:303:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:303:9
 pub const SCNdPTR = @compileError("unable to translate macro: undefined identifier `d`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:305:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:305:9
 pub const SCNiPTR = @compileError("unable to translate macro: undefined identifier `i`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:306:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:306:9
 pub const SCNoPTR = @compileError("unable to translate macro: undefined identifier `o`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:307:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:307:9
 pub const SCNuPTR = @compileError("unable to translate macro: undefined identifier `u`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:308:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:308:9
 pub const SCNxPTR = @compileError("unable to translate macro: undefined identifier `x`");
-// /home/joseph/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h:309:9
+// /Users/josephmontanez_1/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/inttypes.h:309:9
 pub const __ESP_SYSTEM_H__ = "";
 pub const ESP_IDF_VERSION_MAJOR = @as(c_int, 5);
 pub const ESP_IDF_VERSION_MINOR = @as(c_int, 4);
@@ -10306,48 +9143,39 @@ pub inline fn ESP_IDF_VERSION_VAL(major: anytype, minor: anytype, patch: anytype
 }
 pub const ESP_IDF_VERSION = ESP_IDF_VERSION_VAL(ESP_IDF_VERSION_MAJOR, ESP_IDF_VERSION_MINOR, ESP_IDF_VERSION_PATCH);
 pub const _LIBC_LIMITS_H_ = @as(c_int, 1);
-pub const _SYS_SYSLIMITS_H_ = "";
-pub const ARG_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 65536, .decimal);
-pub const CHILD_MAX = @as(c_int, 40);
-pub const LINK_MAX = @as(c_int, 32767);
-pub const MAX_CANON = @as(c_int, 255);
-pub const MAX_INPUT = @as(c_int, 255);
-pub const NAME_MAX = @as(c_int, 255);
-pub const NGROUPS_MAX = @as(c_int, 16);
-pub const OPEN_MAX = @as(c_int, 64);
-pub const PATH_MAX = @as(c_int, 1024);
-pub const PIPE_BUF = @as(c_int, 512);
-pub const IOV_MAX = @as(c_int, 1024);
-pub const BC_BASE_MAX = @as(c_int, 99);
-pub const BC_DIM_MAX = @as(c_int, 2048);
-pub const BC_SCALE_MAX = @as(c_int, 99);
-pub const BC_STRING_MAX = @as(c_int, 1000);
-pub const COLL_WEIGHTS_MAX = @as(c_int, 0);
-pub const EXPR_NEST_MAX = @as(c_int, 32);
-pub const LINE_MAX = @as(c_int, 2048);
-pub const RE_DUP_MAX = @as(c_int, 255);
 pub const MB_LEN_MAX = _MB_LEN_MAX;
 pub const NL_ARGMAX = @as(c_int, 32);
 pub const __CLANG_LIMITS_H = "";
 pub const _GCC_LIMITS_H_ = "";
-pub const SCHAR_MAX = __SCHAR_MAX__;
-pub const SHRT_MAX = __SHRT_MAX__;
-pub const INT_MAX = __INT_MAX__;
-pub const LONG_MAX = __LONG_MAX__;
-pub const SCHAR_MIN = -__SCHAR_MAX__ - @as(c_int, 1);
-pub const SHRT_MIN = -__SHRT_MAX__ - @as(c_int, 1);
-pub const INT_MIN = -__INT_MAX__ - @as(c_int, 1);
-pub const LONG_MIN = -__LONG_MAX__ - @as(c_long, 1);
-pub const UCHAR_MAX = (__SCHAR_MAX__ * @as(c_int, 2)) + @as(c_int, 1);
-pub const USHRT_MAX = (__SHRT_MAX__ * @as(c_int, 2)) + @as(c_int, 1);
-pub const UINT_MAX = (__INT_MAX__ * @as(c_uint, 2)) + @as(c_uint, 1);
-pub const ULONG_MAX = (__LONG_MAX__ * @as(c_ulong, 2)) + @as(c_ulong, 1);
-pub const CHAR_BIT = __CHAR_BIT__;
-pub const CHAR_MIN = SCHAR_MIN;
-pub const CHAR_MAX = __SCHAR_MAX__;
-pub const LLONG_MAX = __LONG_LONG_MAX__;
-pub const LLONG_MIN = -__LONG_LONG_MAX__ - @as(c_longlong, 1);
-pub const ULLONG_MAX = (__LONG_LONG_MAX__ * @as(c_ulonglong, 2)) + @as(c_ulonglong, 1);
+pub const _LIMITS_H_ = "";
+pub const _BSD_MACHINE_LIMITS_H_ = "";
+pub const _ARM_LIMITS_H_ = "";
+pub const _ARM__LIMITS_H_ = "";
+pub const __DARWIN_CLK_TCK = @as(c_int, 100);
+pub const USE_CLANG_LIMITS = @as(c_int, 0);
+pub const CHAR_BIT = @as(c_int, 8);
+pub const SCHAR_MAX = @as(c_int, 127);
+pub const SCHAR_MIN = -@as(c_int, 128);
+pub const UCHAR_MAX = @as(c_int, 255);
+pub const CHAR_MAX = @as(c_int, 127);
+pub const CHAR_MIN = -@as(c_int, 128);
+pub const USHRT_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 65535, .decimal);
+pub const SHRT_MAX = @as(c_int, 32767);
+pub const SHRT_MIN = -@import("std").zig.c_translation.promoteIntLiteral(c_int, 32768, .decimal);
+pub const UINT_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0xffffffff, .hex);
+pub const INT_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal);
+pub const INT_MIN = -@import("std").zig.c_translation.promoteIntLiteral(c_int, 2147483647, .decimal) - @as(c_int, 1);
+pub const ULONG_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_ulong, 0xffffffffffffffff, .hex);
+pub const LONG_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_long, 0x7fffffffffffffff, .hex);
+pub const LONG_MIN = -@import("std").zig.c_translation.promoteIntLiteral(c_long, 0x7fffffffffffffff, .hex) - @as(c_int, 1);
+pub const ULLONG_MAX = @as(c_ulonglong, 0xffffffffffffffff);
+pub const LLONG_MAX = @as(c_longlong, 0x7fffffffffffffff);
+pub const LLONG_MIN = -@as(c_longlong, 0x7fffffffffffffff) - @as(c_int, 1);
+pub const LONG_BIT = @as(c_int, 64);
+pub const SSIZE_MAX = LONG_MAX;
+pub const WORD_BIT = @as(c_int, 32);
+pub const OFF_MIN = LLONG_MIN;
+pub const OFF_MAX = LLONG_MAX;
 pub const LONG_LONG_MAX = __LONG_LONG_MAX__;
 pub const LONG_LONG_MIN = -__LONG_LONG_MAX__ - @as(c_longlong, 1);
 pub const ULONG_LONG_MAX = (__LONG_LONG_MAX__ * @as(c_ulonglong, 2)) + @as(c_ulonglong, 1);
@@ -10376,135 +9204,135 @@ pub inline fn configPRECONDITION(X: anytype) @TypeOf(configASSERT(X)) {
 }
 pub const configPRECONDITION_DEFINED = @as(c_int, 0);
 pub const portMEMORY_BARRIER = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:356:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:356:13
 pub const portSOFTWARE_BARRIER = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:360:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:360:13
 pub const portPRE_TASK_DELETE_HOOK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:393:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:393:13
 pub const portSETUP_TCB = @import("std").zig.c_translation.Macros.DISCARD;
 pub const vQueueAddToRegistry = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:405:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:405:13
 pub const vQueueUnregisterQueue = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:406:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:406:13
 pub const pcQueueGetName = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:407:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:407:13
 pub const configUSE_MINI_LIST_ITEM = @as(c_int, 1);
 pub const portPOINTER_SIZE_TYPE = u32;
 pub const traceSTART = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:423:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:423:13
 pub const traceEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:430:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:430:13
 pub const traceTASK_SWITCHED_IN = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:437:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:437:13
 pub const traceINCREASE_TICK_COUNT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:444:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:444:13
 pub const traceLOW_POWER_IDLE_BEGIN = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:449:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:449:13
 pub const traceLOW_POWER_IDLE_END = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:454:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:454:13
 pub const traceTASK_SWITCHED_OUT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:461:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:461:13
 pub const traceTASK_PRIORITY_INHERIT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:471:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:471:13
 pub const traceTASK_PRIORITY_DISINHERIT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:480:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:480:13
 pub const traceBLOCKING_ON_QUEUE_RECEIVE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:489:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:489:13
 pub const traceBLOCKING_ON_QUEUE_PEEK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:498:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:498:13
 pub const traceBLOCKING_ON_QUEUE_SEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:507:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:507:13
 pub const traceMOVED_TASK_TO_READY_STATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:525:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:525:13
 pub const tracePOST_MOVED_TASK_TO_READY_STATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:529:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:529:13
 pub const traceQUEUE_CREATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:533:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:533:13
 pub const traceQUEUE_CREATE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:537:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:537:13
 pub const traceCREATE_MUTEX = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:541:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:541:13
 pub const traceCREATE_MUTEX_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:545:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:545:13
 pub const traceGIVE_MUTEX_RECURSIVE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:549:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:549:13
 pub const traceGIVE_MUTEX_RECURSIVE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:553:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:553:13
 pub const traceTAKE_MUTEX_RECURSIVE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:557:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:557:13
 pub const traceTAKE_MUTEX_RECURSIVE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:561:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:561:13
 pub const traceCREATE_COUNTING_SEMAPHORE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:565:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:565:13
 pub const traceCREATE_COUNTING_SEMAPHORE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:569:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:569:13
 pub const traceQUEUE_SET_SEND = traceQUEUE_SEND;
 pub const traceQUEUE_SEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:577:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:577:13
 pub const traceQUEUE_SEND_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:581:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:581:13
 pub const traceQUEUE_RECEIVE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:585:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:585:13
 pub const traceQUEUE_PEEK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:589:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:589:13
 pub const traceQUEUE_PEEK_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:593:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:593:13
 pub const traceQUEUE_PEEK_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:597:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:597:13
 pub const traceQUEUE_RECEIVE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:601:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:601:13
 pub const traceQUEUE_SEND_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:605:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:605:13
 pub const traceQUEUE_SEND_FROM_ISR_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:609:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:609:13
 pub const traceQUEUE_RECEIVE_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:613:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:613:13
 pub const traceQUEUE_RECEIVE_FROM_ISR_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:617:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:617:13
 pub const traceQUEUE_PEEK_FROM_ISR_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:621:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:621:13
 pub const traceQUEUE_DELETE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:625:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:625:13
 pub const traceTASK_CREATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:629:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:629:13
 pub const traceTASK_CREATE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:633:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:633:13
 pub const traceTASK_DELETE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:637:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:637:13
 pub const traceTASK_DELAY_UNTIL = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:641:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:641:13
 pub const traceTASK_DELAY = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:645:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:645:13
 pub const traceTASK_PRIORITY_SET = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:649:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:649:13
 pub const traceTASK_SUSPEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:653:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:653:13
 pub const traceTASK_RESUME = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:657:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:657:13
 pub const traceTASK_RESUME_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:661:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:661:13
 pub const traceTASK_INCREMENT_TICK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:665:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:665:13
 pub const traceTIMER_CREATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:669:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:669:13
 pub const traceTIMER_CREATE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:673:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:673:13
 pub const traceTIMER_COMMAND_SEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:677:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:677:13
 pub const traceTIMER_EXPIRED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:681:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:681:13
 pub const traceTIMER_COMMAND_RECEIVED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:685:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:685:13
 pub const traceMALLOC = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:689:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:689:13
 pub const traceFREE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:693:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:693:13
 pub const traceEVENT_GROUP_CREATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:697:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:697:13
 pub const traceEVENT_GROUP_CREATE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:701:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:701:13
 pub const traceEVENT_GROUP_SYNC_BLOCK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:705:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:705:13
 pub inline fn traceEVENT_GROUP_SYNC_END(xEventGroup: anytype, uxBitsToSet: anytype, uxBitsToWaitFor: anytype, xTimeoutOccurred: anytype) anyopaque {
     _ = &xEventGroup;
     _ = &uxBitsToSet;
@@ -10513,7 +9341,7 @@ pub inline fn traceEVENT_GROUP_SYNC_END(xEventGroup: anytype, uxBitsToSet: anyty
     return @import("std").zig.c_translation.cast(anyopaque, xTimeoutOccurred);
 }
 pub const traceEVENT_GROUP_WAIT_BITS_BLOCK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:713:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:713:13
 pub inline fn traceEVENT_GROUP_WAIT_BITS_END(xEventGroup: anytype, uxBitsToWaitFor: anytype, xTimeoutOccurred: anytype) anyopaque {
     _ = &xEventGroup;
     _ = &uxBitsToWaitFor;
@@ -10521,89 +9349,89 @@ pub inline fn traceEVENT_GROUP_WAIT_BITS_END(xEventGroup: anytype, uxBitsToWaitF
     return @import("std").zig.c_translation.cast(anyopaque, xTimeoutOccurred);
 }
 pub const traceEVENT_GROUP_CLEAR_BITS = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:721:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:721:13
 pub const traceEVENT_GROUP_CLEAR_BITS_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:725:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:725:13
 pub const traceEVENT_GROUP_SET_BITS = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:729:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:729:13
 pub const traceEVENT_GROUP_SET_BITS_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:733:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:733:13
 pub const traceEVENT_GROUP_DELETE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:737:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:737:13
 pub const tracePEND_FUNC_CALL = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:741:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:741:13
 pub const tracePEND_FUNC_CALL_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:745:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:745:13
 pub const traceQUEUE_REGISTRY_ADD = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:749:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:749:13
 pub const traceTASK_NOTIFY_TAKE_BLOCK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:753:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:753:13
 pub const traceTASK_NOTIFY_TAKE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:757:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:757:13
 pub const traceTASK_NOTIFY_WAIT_BLOCK = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:761:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:761:13
 pub const traceTASK_NOTIFY_WAIT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:765:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:765:13
 pub const traceTASK_NOTIFY = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:769:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:769:13
 pub const traceTASK_NOTIFY_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:773:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:773:13
 pub const traceTASK_NOTIFY_GIVE_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:777:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:777:13
 pub const traceSTREAM_BUFFER_CREATE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:781:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:781:13
 pub const traceSTREAM_BUFFER_CREATE_STATIC_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:785:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:785:13
 pub const traceSTREAM_BUFFER_CREATE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:789:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:789:13
 pub const traceSTREAM_BUFFER_DELETE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:793:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:793:13
 pub const traceSTREAM_BUFFER_RESET = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:797:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:797:13
 pub const traceBLOCKING_ON_STREAM_BUFFER_SEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:801:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:801:13
 pub const traceSTREAM_BUFFER_SEND = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:805:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:805:13
 pub const traceSTREAM_BUFFER_SEND_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:809:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:809:13
 pub const traceSTREAM_BUFFER_SEND_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:813:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:813:13
 pub const traceBLOCKING_ON_STREAM_BUFFER_RECEIVE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:817:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:817:13
 pub const traceSTREAM_BUFFER_RECEIVE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:821:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:821:13
 pub const traceSTREAM_BUFFER_RECEIVE_FAILED = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:825:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:825:13
 pub const traceSTREAM_BUFFER_RECEIVE_FROM_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:829:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:829:13
 pub const configGENERATE_RUN_TIME_STATS = @as(c_int, 0);
 pub const configUSE_MALLOC_FAILED_HOOK = @as(c_int, 0);
 pub const portPRIVILEGE_BIT = @import("std").zig.c_translation.cast(UBaseType_t, @as(c_int, 0x00));
 pub const portSUPPRESS_TICKS_AND_SLEEP = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:867:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:867:13
 pub const configEXPECTED_IDLE_TIME_BEFORE_SLEEP = @as(c_int, 2);
 pub const configPRE_SUPPRESS_TICKS_AND_SLEEP_PROCESSING = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:883:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:883:13
 pub const configPRE_SLEEP_PROCESSING = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:887:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:887:13
 pub const configPOST_SLEEP_PROCESSING = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:891:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:891:13
 pub const portTASK_USES_FLOATING_POINT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:899:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:899:13
 pub const portALLOCATE_SECURE_CONTEXT = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:903:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:903:13
 pub const portDONT_DISCARD = "";
 pub const configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS = @as(c_int, 0);
 pub const configUSE_STATS_FORMATTING_FUNCTIONS = @as(c_int, 0);
 pub const portASSERT_IF_INTERRUPT_PRIORITY_INVALID = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:923:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:923:13
 pub const configUSE_TRACE_FACILITY = @as(c_int, 0);
 pub const mtCOVERAGE_TEST_MARKER = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:931:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:931:13
 pub const mtCOVERAGE_TEST_DELAY = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:935:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:935:13
 pub const portASSERT_IF_IN_ISR = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:939:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:939:13
 pub const configUSE_POSIX_ERRNO = @as(c_int, 0);
 pub const configUSE_SB_COMPLETED_CALLBACK = @as(c_int, 0);
 pub const portTICK_TYPE_IS_ATOMIC = @as(c_int, 0);
@@ -10624,7 +9452,7 @@ pub inline fn portTICK_TYPE_CLEAR_INTERRUPT_MASK_FROM_ISR(x: anytype) @TypeOf(po
     return portCLEAR_INTERRUPT_MASK_FROM_ISR(x);
 }
 pub const configPRINTF = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:1073:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h:1073:13
 pub inline fn configMAX(a: anytype, b: anytype) @TypeOf(if (a > b) a else b) {
     _ = &a;
     _ = &b;
@@ -10650,25 +9478,25 @@ pub const listSECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE = "";
 pub const listFIRST_LIST_INTEGRITY_CHECK_VALUE = "";
 pub const listSECOND_LIST_INTEGRITY_CHECK_VALUE = "";
 pub const listSET_FIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:118:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:118:13
 pub const listSET_SECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:119:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:119:13
 pub const listSET_LIST_INTEGRITY_CHECK_1_VALUE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:120:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:120:13
 pub const listSET_LIST_INTEGRITY_CHECK_2_VALUE = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:121:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:121:13
 pub const listTEST_LIST_ITEM_INTEGRITY = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:122:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:122:13
 pub const listTEST_LIST_INTEGRITY = @compileError("unable to translate C expr: unexpected token ''");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:123:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:123:13
 pub const listSET_LIST_ITEM_OWNER = @compileError("unable to translate C expr: expected ')' instead got '='");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:192:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:192:9
 pub inline fn listGET_LIST_ITEM_OWNER(pxListItem: anytype) @TypeOf(pxListItem.*.pvOwner) {
     _ = &pxListItem;
     return pxListItem.*.pvOwner;
 }
 pub const listSET_LIST_ITEM_VALUE = @compileError("unable to translate C expr: expected ')' instead got '='");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:210:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:210:9
 pub inline fn listGET_LIST_ITEM_VALUE(pxListItem: anytype) @TypeOf(pxListItem.*.xItemValue) {
     _ = &pxListItem;
     return pxListItem.*.xItemValue;
@@ -10686,7 +9514,7 @@ pub inline fn listGET_NEXT(pxListItem: anytype) @TypeOf(pxListItem.*.pxNext) {
     return pxListItem.*.pxNext;
 }
 pub const listGET_END_MARKER = @compileError("unable to translate C expr: expected ')' instead got 'const'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:253:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:253:9
 pub inline fn listLIST_IS_EMPTY(pxList: anytype) @TypeOf(if (pxList.*.uxNumberOfItems == @import("std").zig.c_translation.cast(UBaseType_t, @as(c_int, 0))) pdTRUE else pdFALSE) {
     _ = &pxList;
     return if (pxList.*.uxNumberOfItems == @import("std").zig.c_translation.cast(UBaseType_t, @as(c_int, 0))) pdTRUE else pdFALSE;
@@ -10696,11 +9524,11 @@ pub inline fn listCURRENT_LIST_LENGTH(pxList: anytype) @TypeOf(pxList.*.uxNumber
     return pxList.*.uxNumberOfItems;
 }
 pub const listGET_OWNER_OF_NEXT_ENTRY = @compileError("unable to translate macro: undefined identifier `pxConstList`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:289:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:289:9
 pub const listREMOVE_ITEM = @compileError("unable to translate macro: undefined identifier `pxList`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:318:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:318:9
 pub const listINSERT_END = @compileError("unable to translate macro: undefined identifier `pxIndex`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:358:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/list.h:358:9
 pub inline fn listGET_OWNER_OF_HEAD_ENTRY(pxList: anytype) @TypeOf((&pxList.*.xListEnd).*.pxNext.*.pvOwner) {
     _ = &pxList;
     return (&pxList.*.xListEnd).*.pxNext.*.pvOwner;
@@ -10770,7 +9598,7 @@ pub const taskSCHEDULER_SUSPENDED = @import("std").zig.c_translation.cast(BaseTy
 pub const taskSCHEDULER_NOT_STARTED = @import("std").zig.c_translation.cast(BaseType_t, @as(c_int, 1));
 pub const taskSCHEDULER_RUNNING = @import("std").zig.c_translation.cast(BaseType_t, @as(c_int, 2));
 pub const vTaskDelayUntil = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/task.h:905:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/task.h:905:9
 pub inline fn xTaskNotify(xTaskToNotify: anytype, ulValue: anytype, eAction: anytype) @TypeOf(xTaskGenericNotify(xTaskToNotify, tskDEFAULT_INDEX_TO_NOTIFY, ulValue, eAction, NULL)) {
     _ = &xTaskToNotify;
     _ = &ulValue;
@@ -10986,7 +9814,7 @@ pub const WIFI_ACTIVE_SCAN_MAX_DEFAULT_TIME = @as(c_int, 120);
 pub const WIFI_PASSIVE_SCAN_DEFAULT_TIME = @as(c_int, 360);
 pub const WIFI_SCAN_HOME_CHANNEL_DWELL_DEFAULT_TIME = @as(c_int, 30);
 pub const WIFI_SCAN_PARAMS_DEFAULT_CONFIG = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:188:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi_types_generic.h:188:9
 pub inline fn CHANNEL_TO_BIT_NUMBER(channel: anytype) @TypeOf(if ((channel >= @as(c_int, 1)) and (channel <= @as(c_int, 14))) channel else if (((channel >= @as(c_int, 36)) and (channel <= @as(c_int, 64))) and (@import("std").zig.c_translation.MacroArithmetic.rem(channel - @as(c_int, 36), @as(c_int, 4)) == @as(c_int, 0))) @import("std").zig.c_translation.MacroArithmetic.div(channel - @as(c_int, 36), @as(c_int, 4)) + @as(c_int, 1) else if (((channel >= @as(c_int, 100)) and (channel <= @as(c_int, 144))) and (@import("std").zig.c_translation.MacroArithmetic.rem(channel - @as(c_int, 100), @as(c_int, 4)) == @as(c_int, 0))) @import("std").zig.c_translation.MacroArithmetic.div(channel - @as(c_int, 100), @as(c_int, 4)) + @as(c_int, 9) else if (((channel >= @as(c_int, 149)) and (channel <= @as(c_int, 177))) and (@import("std").zig.c_translation.MacroArithmetic.rem(channel - @as(c_int, 149), @as(c_int, 4)) == @as(c_int, 0))) @import("std").zig.c_translation.MacroArithmetic.div(channel - @as(c_int, 149), @as(c_int, 4)) + @as(c_int, 21) else @as(c_int, 0)) {
     _ = &channel;
     return if ((channel >= @as(c_int, 1)) and (channel <= @as(c_int, 14))) channel else if (((channel >= @as(c_int, 36)) and (channel <= @as(c_int, 64))) and (@import("std").zig.c_translation.MacroArithmetic.rem(channel - @as(c_int, 36), @as(c_int, 4)) == @as(c_int, 0))) @import("std").zig.c_translation.MacroArithmetic.div(channel - @as(c_int, 36), @as(c_int, 4)) + @as(c_int, 1) else if (((channel >= @as(c_int, 100)) and (channel <= @as(c_int, 144))) and (@import("std").zig.c_translation.MacroArithmetic.rem(channel - @as(c_int, 100), @as(c_int, 4)) == @as(c_int, 0))) @import("std").zig.c_translation.MacroArithmetic.div(channel - @as(c_int, 100), @as(c_int, 4)) + @as(c_int, 9) else if (((channel >= @as(c_int, 149)) and (channel <= @as(c_int, 177))) and (@import("std").zig.c_translation.MacroArithmetic.rem(channel - @as(c_int, 149), @as(c_int, 4)) == @as(c_int, 0))) @import("std").zig.c_translation.MacroArithmetic.div(channel - @as(c_int, 149), @as(c_int, 4)) + @as(c_int, 21) else @as(c_int, 0);
@@ -11132,7 +9960,7 @@ pub const semBINARY_SEMAPHORE_QUEUE_LENGTH = @import("std").zig.c_translation.ca
 pub const semSEMAPHORE_QUEUE_ITEM_LENGTH = @import("std").zig.c_translation.cast(u8, @as(c_uint, 0));
 pub const semGIVE_BLOCK_TIME = @import("std").zig.c_translation.cast(TickType_t, @as(c_uint, 0));
 pub const vSemaphoreCreateBinary = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:96:13
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h:96:13
 pub inline fn xSemaphoreCreateBinary() @TypeOf(xQueueGenericCreate(@import("std").zig.c_translation.cast(UBaseType_t, @as(c_int, 1)), semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE)) {
     return xQueueGenericCreate(@import("std").zig.c_translation.cast(UBaseType_t, @as(c_int, 1)), semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE);
 }
@@ -11231,39 +10059,39 @@ pub inline fn ESP_NETIF_IPV4_ONLY_FLAGS(flags: anytype) @TypeOf(flags) {
 pub const ESP_NETIF_DEFAULT_MLDV6_REPORT_FLAGS = ESP_NETIF_FLAG_MLDV6_REPORT;
 pub const ESP_NETIF_DEFAULT_IPV6_AUTOCONFIG_FLAGS = @as(c_int, 0);
 pub const ESP_NETIF_INHERENT_DEFAULT_WIFI_STA = @compileError("unable to translate macro: undefined identifier `mac`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:45:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:45:9
 pub const ESP_NETIF_INHERENT_DEFAULT_WIFI_AP = @compileError("unable to translate macro: undefined identifier `mac`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:59:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:59:9
 pub const ESP_NETIF_INHERENT_DEFAULT_WIFI_NAN = @compileError("unable to translate macro: undefined identifier `mac`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:73:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:73:9
 pub const ESP_NETIF_INHERENT_DEFAULT_ETH = @compileError("unable to translate macro: undefined identifier `mac`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:85:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:85:9
 pub const ESP_NETIF_INHERENT_DEFAULT_BR = @compileError("unable to translate macro: undefined identifier `mac`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:113:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:113:9
 pub const ESP_NETIF_INHERENT_DEFAULT_BR_DHCPS = @compileError("unable to translate macro: undefined identifier `mac`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:126:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:126:9
 pub const ESP_NETIF_DEFAULT_ETH = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:142:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:142:9
 pub const ESP_NETIF_DEFAULT_WIFI_AP = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:153:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:153:9
 pub const ESP_NETIF_DEFAULT_WIFI_STA = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:176:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:176:9
 pub const ESP_NETIF_BASE_DEFAULT_WIFI_STA = &_g_esp_netif_inherent_sta_config;
 pub const ESP_NETIF_BASE_DEFAULT_WIFI_AP = &_g_esp_netif_inherent_ap_config;
 pub const ESP_NETIF_BASE_DEFAULT_ETH = &_g_esp_netif_inherent_eth_config;
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:227:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_ETH' contains a runtime value, translated to function
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:227:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_ETH' contains a runtime value, translated to function
 pub inline fn ESP_NETIF_NETSTACK_DEFAULT_ETH() @TypeOf(_g_esp_netif_netstack_default_eth) {
     return _g_esp_netif_netstack_default_eth;
 }
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:228:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_BR' contains a runtime value, translated to function
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:228:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_BR' contains a runtime value, translated to function
 pub inline fn ESP_NETIF_NETSTACK_DEFAULT_BR() @TypeOf(_g_esp_netif_netstack_default_br) {
     return _g_esp_netif_netstack_default_br;
 }
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:229:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA' contains a runtime value, translated to function
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:229:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA' contains a runtime value, translated to function
 pub inline fn ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA() @TypeOf(_g_esp_netif_netstack_default_wifi_sta) {
     return _g_esp_netif_netstack_default_wifi_sta;
 }
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:231:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_WIFI_AP' contains a runtime value, translated to function
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_netif/include/esp_netif_defaults.h:231:9: warning: macro 'ESP_NETIF_NETSTACK_DEFAULT_WIFI_AP' contains a runtime value, translated to function
 pub inline fn ESP_NETIF_NETSTACK_DEFAULT_WIFI_AP() @TypeOf(_g_esp_netif_netstack_default_wifi_ap) {
     return _g_esp_netif_netstack_default_wifi_ap;
 }
@@ -11318,7 +10146,7 @@ pub const WIFI_ENABLE_GMAC = @as(c_int, 1) << @as(c_int, 5);
 pub const WIFI_ENABLE_11R = @as(c_int, 0);
 pub const WIFI_ENABLE_ENTERPRISE = @as(c_int, 1) << @as(c_int, 7);
 pub const WIFI_DUMP_HESIGB_ENABLED = @"false";
-pub const WIFI_TX_HETB_QUEUE_NUM = @as(c_int, 1);
+pub const WIFI_TX_HETB_QUEUE_NUM = CONFIG_ESP_WIFI_TX_HETB_QUEUE_NUM;
 pub const CONFIG_FEATURE_WPA3_SAE_BIT = @as(c_int, 1) << @as(c_int, 0);
 pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT = @as(c_int, 1) << @as(c_int, 1);
 pub const CONFIG_FEATURE_FTM_INITIATOR_BIT = @as(c_int, 1) << @as(c_int, 2);
@@ -11329,7 +10157,7 @@ pub const CONFIG_FEATURE_11R_BIT = @as(c_int, 1) << @as(c_int, 6);
 pub const CONFIG_FEATURE_WIFI_ENT_BIT = @as(c_int, 1) << @as(c_int, 7);
 pub const WIFI_FEATURE_CAPS = ((((((WIFI_ENABLE_WPA3_SAE | WIFI_ENABLE_CACHE_TX_BUFFER) | WIFI_FTM_INITIATOR) | WIFI_FTM_RESPONDER) | WIFI_ENABLE_GCMP) | WIFI_ENABLE_GMAC) | WIFI_ENABLE_11R) | WIFI_ENABLE_ENTERPRISE;
 pub const WIFI_INIT_CONFIG_DEFAULT = @compileError("unable to translate C expr: unexpected token '{'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi.h:300:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/esp_wifi/include/esp_wifi.h:300:9
 pub const ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE = @as(c_int, 0);
 pub const LOG_LOCAL_LEVEL = CONFIG_LOG_MAXIMUM_LEVEL;
 pub inline fn _ESP_LOG_ENABLED(log_level: anytype) @TypeOf(LOG_LOCAL_LEVEL >= log_level) {
@@ -11425,59 +10253,59 @@ pub const LOG_COLOR_I = "";
 pub const LOG_COLOR_D = "";
 pub const LOG_COLOR_V = "";
 pub const ESP_LOG_BUFFER_HEX_LEVEL = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:82:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:82:9
 pub const ESP_LOG_BUFFER_CHAR_LEVEL = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:102:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:102:9
 pub const ESP_LOG_BUFFER_HEXDUMP = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:123:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:123:9
 pub const ESP_LOG_BUFFER_HEX = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:136:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:136:9
 pub const ESP_LOG_BUFFER_CHAR = @compileError("unable to translate C expr: unexpected token 'do'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:149:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log_buffer.h:149:9
 pub const LOG_FORMAT = @compileError("unable to translate macro: undefined identifier `LOG_COLOR_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:62:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:62:9
 pub const LOG_SYSTEM_TIME_FORMAT = @compileError("unable to translate macro: undefined identifier `LOG_COLOR_`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:63:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:63:9
 pub const ESP_EARLY_LOGE = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:88:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:88:9
 pub const ESP_EARLY_LOGW = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:90:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:90:9
 pub const ESP_EARLY_LOGI = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:92:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:92:9
 pub const ESP_EARLY_LOGD = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:94:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:94:9
 pub const ESP_EARLY_LOGV = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:96:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:96:9
 pub const ESP_LOG_EARLY_IMPL = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:99:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:99:9
 pub const ESP_LOGE = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:112:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:112:9
 pub const ESP_LOGW = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:113:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:113:9
 pub const ESP_LOGI = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:114:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:114:9
 pub const ESP_LOGD = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:115:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:115:9
 pub const ESP_LOGV = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:116:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:116:9
 pub const ESP_LOG_LEVEL = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:181:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:181:9
 pub const ESP_LOG_LEVEL_LOCAL = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:204:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:204:9
 pub const ESP_DRAM_LOGE = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:235:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:235:9
 pub const ESP_DRAM_LOGW = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:237:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:237:9
 pub const ESP_DRAM_LOGI = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:239:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:239:9
 pub const ESP_DRAM_LOGD = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:241:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:241:9
 pub const ESP_DRAM_LOGV = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:243:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:243:9
 pub const _ESP_LOG_DRAM_LOG_FORMAT = @compileError("unable to translate C expr: unexpected token '#'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:247:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:247:9
 pub const ESP_DRAM_LOG_IMPL = @compileError("unable to translate C expr: expected ')' instead got '...'");
-// /home/joseph/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:255:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/log/include/esp_log.h:255:9
 pub const nvs_flash_h = "";
 pub const ESP_NVS_H = "";
 pub const ESP_ERR_NVS_BASE = @as(c_int, 0x1100);
@@ -11511,9 +10339,9 @@ pub const NVS_PART_NAME_MAX_SIZE = @as(c_int, 16);
 pub const NVS_KEY_NAME_MAX_SIZE = @as(c_int, 16);
 pub const NVS_NS_NAME_MAX_SIZE = NVS_KEY_NAME_MAX_SIZE;
 pub const NVS_GUARD_SYSVIEW_MACRO_EXPANSION_PUSH = @compileError("unable to translate macro: undefined identifier `_Pragma`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/nvs_flash/include/nvs.h:64:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/nvs_flash/include/nvs.h:64:9
 pub const NVS_GUARD_SYSVIEW_MACRO_EXPANSION_POP = @compileError("unable to translate macro: undefined identifier `_Pragma`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/nvs_flash/include/nvs.h:74:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/nvs_flash/include/nvs.h:74:9
 pub const __ESP_PARTITION_H__ = "";
 pub inline fn ESP_PARTITION_SUBTYPE_OTA(i: anytype) esp_partition_subtype_t {
     _ = &i;
@@ -11521,115 +10349,115 @@ pub inline fn ESP_PARTITION_SUBTYPE_OTA(i: anytype) esp_partition_subtype_t {
 }
 pub const NVS_KEY_SIZE = @as(c_int, 32);
 pub const GPIO_PIN_REG_0 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO0_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:22:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:22:9
 pub const GPIO_PIN_REG_1 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO1_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:23:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:23:9
 pub const GPIO_PIN_REG_2 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO2_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:24:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:24:9
 pub const GPIO_PIN_REG_3 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO3_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:25:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:25:9
 pub const GPIO_PIN_REG_4 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO4_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:26:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:26:9
 pub const GPIO_PIN_REG_5 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO5_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:27:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:27:9
 pub const GPIO_PIN_REG_6 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO6_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:28:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:28:9
 pub const GPIO_PIN_REG_7 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO7_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:29:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:29:9
 pub const GPIO_PIN_REG_8 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO8_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:30:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:30:9
 pub const GPIO_PIN_REG_9 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO9_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:31:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:31:9
 pub const GPIO_PIN_REG_10 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO10_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:32:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:32:9
 pub const GPIO_PIN_REG_11 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO11_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:33:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:33:9
 pub const GPIO_PIN_REG_12 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO12_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:34:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:34:9
 pub const GPIO_PIN_REG_13 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO13_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:35:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:35:9
 pub const GPIO_PIN_REG_14 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO14_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:36:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:36:9
 pub const GPIO_PIN_REG_15 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO15_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:37:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:37:9
 pub const GPIO_PIN_REG_16 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO16_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:38:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:38:9
 pub const GPIO_PIN_REG_17 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO17_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:39:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:39:9
 pub const GPIO_PIN_REG_18 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO18_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:40:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:40:9
 pub const GPIO_PIN_REG_19 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO19_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:41:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:41:9
 pub const GPIO_PIN_REG_20 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO20_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:42:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:42:9
 pub const GPIO_PIN_REG_21 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO21_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:43:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:43:9
 pub const GPIO_PIN_REG_22 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO22_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:44:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:44:9
 pub const GPIO_PIN_REG_23 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO23_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:45:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:45:9
 pub const GPIO_PIN_REG_24 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO24_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:46:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:46:9
 pub const GPIO_PIN_REG_25 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO25_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:47:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:47:9
 pub const GPIO_PIN_REG_26 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO26_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:48:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:48:9
 pub const GPIO_PIN_REG_27 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO27_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:49:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:49:9
 pub const GPIO_PIN_REG_28 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO28_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:50:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:50:9
 pub const GPIO_PIN_REG_29 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO29_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:51:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:51:9
 pub const GPIO_PIN_REG_30 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO30_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:52:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:52:9
 pub const GPIO_PIN_REG_31 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO31_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:53:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:53:9
 pub const GPIO_PIN_REG_32 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO32_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:54:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:54:9
 pub const GPIO_PIN_REG_33 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO33_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:55:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:55:9
 pub const GPIO_PIN_REG_34 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO34_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:56:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:56:9
 pub const GPIO_PIN_REG_35 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO35_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:57:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:57:9
 pub const GPIO_PIN_REG_36 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO36_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:58:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:58:9
 pub const GPIO_PIN_REG_37 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO37_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:59:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:59:9
 pub const GPIO_PIN_REG_38 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO38_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:60:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:60:9
 pub const GPIO_PIN_REG_39 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO39_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:61:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:61:9
 pub const GPIO_PIN_REG_40 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO40_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:62:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:62:9
 pub const GPIO_PIN_REG_41 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO41_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:63:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:63:9
 pub const GPIO_PIN_REG_42 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO42_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:64:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:64:9
 pub const GPIO_PIN_REG_43 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO43_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:65:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:65:9
 pub const GPIO_PIN_REG_44 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO44_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:66:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:66:9
 pub const GPIO_PIN_REG_45 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO45_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:67:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:67:9
 pub const GPIO_PIN_REG_46 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO46_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:68:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:68:9
 pub const GPIO_PIN_REG_47 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO47_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:69:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:69:9
 pub const GPIO_PIN_REG_48 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO48_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:70:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:70:9
 pub const GPIO_PIN_REG_49 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO49_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:71:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:71:9
 pub const GPIO_PIN_REG_50 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO50_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:72:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:72:9
 pub const GPIO_PIN_REG_51 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO51_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:73:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:73:9
 pub const GPIO_PIN_REG_52 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO52_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:74:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:74:9
 pub const GPIO_PIN_REG_53 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO53_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:75:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:75:9
 pub const GPIO_PIN_REG_54 = @compileError("unable to translate macro: undefined identifier `IO_MUX_GPIO54_REG`");
-// /home/joseph/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:76:9
+// /Users/josephmontanez_1/Downloads/esp-idf-v5.4/components/hal/include/hal/gpio_types.h:76:9
 pub const GPIO_MODE_DEF_DISABLE = @as(c_int, 0);
 pub const GPIO_MODE_DEF_INPUT = BIT0;
 pub const GPIO_MODE_DEF_OUTPUT = BIT1;
@@ -11651,12 +10479,16 @@ pub inline fn GPIO_IS_VALID_DIGITAL_IO_PAD(gpio_num: anytype) @TypeOf((gpio_num 
     _ = &gpio_num;
     return (gpio_num >= @as(c_int, 0)) and (((@as(c_ulonglong, 1) << gpio_num) & SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK) != @as(c_int, 0));
 }
+pub inline fn GPIO_IS_DEEP_SLEEP_WAKEUP_VALID_GPIO(gpio_num: anytype) @TypeOf((gpio_num >= @as(c_int, 0)) and (((@as(c_ulonglong, 1) << gpio_num) & SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK) != @as(c_int, 0))) {
+    _ = &gpio_num;
+    return (gpio_num >= @as(c_int, 0)) and (((@as(c_ulonglong, 1) << gpio_num) & SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK) != @as(c_int, 0));
+}
 pub const EXAMPLE_ESP_WIFI_SSID = @compileError("unable to translate macro: undefined identifier `CONFIG_ESP_WIFI_SSID`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/station_example_main.c:40:9
+// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/station_example_main.c:40:9
 pub const EXAMPLE_ESP_WIFI_PASS = @compileError("unable to translate macro: undefined identifier `CONFIG_ESP_WIFI_PASSWORD`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/station_example_main.c:41:9
+// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/station_example_main.c:41:9
 pub const EXAMPLE_ESP_MAXIMUM_RETRY = @compileError("unable to translate macro: undefined identifier `CONFIG_ESP_MAXIMUM_RETRY`");
-// /home/joseph/Documents/zig-esp-idf-sample-github/station_example_main.c:42:9
+// /Users/josephmontanez_1/Documents/GitHub/zig-esp-idf-sample/station_example_main.c:42:9
 pub const WIFI_CONNECTED_BIT = BIT0;
 pub const WIFI_FAIL_BIT = BIT1;
 pub const __lock = struct___lock;
@@ -11684,6 +10516,7 @@ pub const esp_netif_driver_ifconfig = struct_esp_netif_driver_ifconfig;
 pub const esp_netif_netstack_config = struct_esp_netif_netstack_config;
 pub const esp_netif_config = struct_esp_netif_config;
 pub const esp_netif_driver_base_s = struct_esp_netif_driver_base_s;
+pub const intr_type = enum_intr_type;
 pub const intr_handle_data_t = struct_intr_handle_data_t;
 pub const multi_heap_info = struct_multi_heap_info;
 pub const walker_heap_info = struct_walker_heap_info;

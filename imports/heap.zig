@@ -43,7 +43,7 @@ pub const HeapCapsAllocator = struct {
         };
     }
     pub fn dump(self: Self) void {
-        sys.heap_caps_dump(self.caps);
+        sys.heap_caps_dump(@intCast(@intFromEnum(self.caps)));
     }
     pub fn allocatedSize(_: Self, ptr: ?*anyopaque) usize {
         return sys.heap_caps_get_allocated_size(ptr);

@@ -586,32 +586,41 @@ pub const espressif_targets: []const std.Target.Query = if (isEspXtensa())
 else
     riscv_targets;
 
-const riscv_targets = &[_]std.Target.Query{
-    // esp32-c3/c2
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
-    },
-    // esp32-c6/61/h2
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
-    },
-    // esp32-p4 have .xesppie cpu-feature (espressif vendor extension)
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-        .os_tag = .freestanding,
-        .abi = .eabihf,
-        .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-    },
+const riscv_targets = blk: {
+    const targets: []const std.Target.Query = &[_]std.Target.Query{
+        // esp32-c3/c2
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
+        },
+        // esp32-c6/61/h2
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
+        },
+    };
+
+    if (@hasField(std.Target.riscv.cpu, "esp32p4")) {
+        break :blk targets ++ &[_]std.Target.Query{
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+            },
+        };
+    }
+
+    break :blk targets;
 };
+
 const xtensa_targets = &[_]std.Target.Query{
     // need zig-fork (using espressif-llvm backend) to support this
     .{
