@@ -13,6 +13,8 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
+    const src_path = std.fs.path.dirname(@src().file) orelse b.pathResolve(&.{"."});
+    lib.addIncludePath(.{ .cwd_relative = b.pathJoin(&.{ src_path, "build", "config" }) });
     lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
     lib.linkLibC(); // stubs for libc
 
@@ -317,25 +319,27 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
-    const wifi = b.addModule("wifi", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "wifi.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
+    const wifi = b.addModule("wifi", .{ .root_source_file = b.path(b.pathJoin(&.{
+        src_path,
+        "imports",
+        "wifi.zig",
+    })), .imports = &.{
+        .{
+            .name = "sys",
+            .module = sys,
         },
-    });
+        .{
+            .name = "error",
+            .module = errors,
+        },
+    } });
+    //-- To pull in sdkconfig.h
     wifi.addIncludePath(.{
         .cwd_relative = b.pathJoin(&.{ src_path, "build", "config" }),
+    });
+    // If building via cmake for sdkconfig
+    wifi.addIncludePath(.{
+        .cwd_relative = b.pathJoin(&.{ "..", "build", "config" }),
     });
     const gpio = b.addModule("gpio", .{
         .root_source_file = b.path(b.pathJoin(&.{
