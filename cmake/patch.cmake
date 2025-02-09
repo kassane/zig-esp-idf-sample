@@ -5,14 +5,17 @@ message(STATUS "Patching TARGET_FILE: ${TARGET_FILE}")
 # Read the file content
 file(READ "${TARGET_FILE}" FILE_CONTENT)
 
-# Replace 
-string(REPLACE "pub const wifi_sta_config_t.*?;" "" NEW_CONTENT "${FILE_CONTENT}")
-string(REPLACE "pub const portTICK_PERIOD_MS.*?;" "" NEW_CONTENT "${FILE_CONTENT}")
+# Apply Replacements
+string(REGEX REPLACE "pub const wifi_sta_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+string(REGEX REPLACE "pub const portTICK_PERIOD_MS[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
 
-# Append
+# Append patches
+set(PATCH_DIR "${CMAKE_SOURCE_DIR}/../../../patches")
+
 foreach(PATCH_FILE "wifi_sta_config_t.zig" "porttick_period_ms.zig")
-    set(PATCH_PATH "${CMAKE_SOURCE_DIR}/patches/${PATCH_FILE}")
+    set(PATCH_PATH "${PATCH_DIR}/${PATCH_FILE}")
     if (EXISTS "${PATCH_PATH}")
+        message(STATUS "Appending patch: ${PATCH_PATH}")
         file(READ "${PATCH_PATH}" PATCH_CONTENT)
         set(FILE_CONTENT "${FILE_CONTENT}\n${PATCH_CONTENT}")
     else()
@@ -21,6 +24,6 @@ foreach(PATCH_FILE "wifi_sta_config_t.zig" "porttick_period_ms.zig")
 endforeach()
 
 # Write modified content back to the file
-file(WRITE "${TARGET_FILE}" "${NEW_CONTENT}")
+file(WRITE "${TARGET_FILE}" "${FILE_CONTENT}")
 
 message(STATUS "Successfully patched TARGET_FILE: ${TARGET_FILE}")
