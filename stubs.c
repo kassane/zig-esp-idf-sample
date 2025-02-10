@@ -9,6 +9,11 @@
 #define IRAM_ATTR _SECTION_ATTR_IMPL(".iram1", __COUNTER__)
 
 // #include <string.h>
+#ifdef _WIN32
+typedef struct _FILE FILE;
+#include <stdio.h>
+#endif
+
 #include "esp_attr.h"
 #undef IRAM_ATTR
 #define IRAM_ATTR
