@@ -22,7 +22,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     else()
         message(FATAL_ERROR "windows: Unsupported architecture ${CMAKE_HOST_SYSTEM_PROCESSOR}")
     endif()
-    set(TARGET_PLATFORM "windows-gnu")
+    set(TARGET_PLATFORM "windows")
     set(EXT "zip")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
@@ -39,6 +39,8 @@ endif()
 
 if (CONFIG_IDF_TARGET_ARCH_XTENSA OR CONFIG_IDF_TARGET_ESP32P4)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
+        message(STATUS "DOWNLOADING  https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
+            "${CMAKE_BINARY_DIR}/zig.${EXT}")
         file(DOWNLOAD "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
             "${CMAKE_BINARY_DIR}/zig.${EXT}")
 
