@@ -284,13 +284,21 @@ add_dependencies(${COMPONENT_LIB} zig_build)
 
 target_link_libraries(${COMPONENT_LIB} PRIVATE ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
 
-target_link_libraries(${COMPONENT_LIB} PRIVATE
-    "-Wl,--start-group"
+# ESP32-H2 does not have wifi support
+if (NOT CONFIG_IDF_TARGET
+  list(APPEND ESP32_LIBS
     ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libnet80211.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libcore.a
+    ${CMAKE_BINARY_DIR}/esp-idf/wpa_supplicant/libwpa_supplicant.a
+  )
+endif()
+
+target_link_libraries(${COMPONENT_LIB} PRIVATE
+    "-Wl,--start-group"
+    ${ESP32_LIBS}
     ${CMAKE_BINARY_DIR}/esp-idf/log/liblog.a
     ${CMAKE_BINARY_DIR}/esp-idf/nvs_flash/libnvs_flash.a
     ${CMAKE_BINARY_DIR}/esp-idf/soc/libsoc.a
@@ -302,7 +310,6 @@ target_link_libraries(${COMPONENT_LIB} PRIVATE
     ${CMAKE_BINARY_DIR}/esp-idf/esp_wifi/libesp_wifi.a
     ${CMAKE_BINARY_DIR}/esp-idf/esp_netif/libesp_netif.a
     ${CMAKE_BINARY_DIR}/esp-idf/esp_event/libesp_event.a
-    ${CMAKE_BINARY_DIR}/esp-idf/wpa_supplicant/libwpa_supplicant.a
     ${CMAKE_BINARY_DIR}/lib/libapp_zig.a
     "-Wl,--end-group"
 )
