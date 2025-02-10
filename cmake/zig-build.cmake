@@ -1,5 +1,14 @@
 # Zig Build Configuration
 
+# Windows Fix "C:" <!-- excludes slash "C:/"
+if(DEFINED ENV{IDF_TOOLS_PATH})
+    file(TO_CMAKE_PATH "$ENV{IDF_TOOLS_PATH}" IDF_TOOLS_PATH_NORMALIZED)
+    set(TOOLCHAIN_BASE_PATH "${IDF_TOOLS_PATH_NORMALIZED}/tools/xtensa-esp-elf")
+else()
+    file(TO_CMAKE_PATH "$ENV{HOME}/.espressif" HOME_PATH_NORMALIZED)
+    set(TOOLCHAIN_BASE_PATH "${HOME_PATH_NORMALIZED}/tools/xtensa-esp-elf")
+endif()
+
 set(EXT "tar.xz")
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
@@ -22,7 +31,7 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     else()
         message(FATAL_ERROR "windows: Unsupported architecture ${CMAKE_HOST_SYSTEM_PROCESSOR}")
     endif()
-    set(TARGET_PLATFORM "windows")
+    set(TARGET_PLATFORM "windows-gnu")
     set(EXT "zip")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
@@ -39,10 +48,9 @@ endif()
 
 if (CONFIG_IDF_TARGET_ARCH_XTENSA OR CONFIG_IDF_TARGET_ESP32P4)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-        message(STATUS "DOWNLOADING  https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
-            "${CMAKE_BINARY_DIR}/zig.${EXT}")
-        file(DOWNLOAD "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
-            "${CMAKE_BINARY_DIR}/zig.${EXT}")
+        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
+        string(REPLACE "windows-gnu" "windows" ZIG_DOWNLOAD_LINK_MODIFIED "${ZIG_DOWNLOAD_LINK}")
+        file(DOWNLOAD ZIG_DOWNLOAD_LINK_MODIFIED "${CMAKE_BINARY_DIR}/zig.${EXT}")
 
         if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
             execute_process(
@@ -118,7 +126,12 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
   endif()
 
   # Define the toolchain include paths
-  set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+  if(TARGET_PLATFORM STREQUAL "windows-gnu")
+    # Windows has no sys-include folder
+    set(TOOLCHAIN_SYS_INCLUDE "$ENV{TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys")
+  else()
+    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+  endif()
   set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
   set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
@@ -128,7 +141,12 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
   else()
       set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/xtensa-esp-elf")
   endif()
-  set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+  if(TARGET_PLATFORM STREQUAL "windows-gnu")
+    # Windows has no sys-include folder
+    set(TOOLCHAIN_SYS_INCLUDE "$ENV{TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys")
+  else()
+    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+  endif()
   set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include")
   set(ARCH_DEFINE "__XTENSA__")
 endif()
