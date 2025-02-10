@@ -244,7 +244,7 @@ message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
 add_custom_command(
     TARGET translate_c
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
+    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}" -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
 )
 
@@ -284,10 +284,16 @@ add_dependencies(${COMPONENT_LIB} zig_build)
 
 target_link_libraries(${COMPONENT_LIB} PRIVATE ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
 
-# ESP32-H2 does not have wifi support
-if (NOT CONFIG_IDF_TARGET)
+# ESP32-H2/P4 does not have wifi support
+if (NOT CONFIG_IDF_TARGET_ESP32P4)
   list(APPEND ESP32_LIBS
     ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
+  )
+endif()
+
+
+if (NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H2)
+  list(APPEND ESP32_LIBS
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libnet80211.a
@@ -295,6 +301,9 @@ if (NOT CONFIG_IDF_TARGET)
     ${CMAKE_BINARY_DIR}/esp-idf/wpa_supplicant/libwpa_supplicant.a
   )
 endif()
+
+
+message(STATUS "Wifi Libs: ${ESP32_LIBS}")
 
 target_link_libraries(${COMPONENT_LIB} PRIVATE
     "-Wl,--start-group"
