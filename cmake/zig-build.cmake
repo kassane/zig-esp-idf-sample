@@ -285,7 +285,7 @@ add_dependencies(${COMPONENT_LIB} zig_build)
 target_link_libraries(${COMPONENT_LIB} PRIVATE ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
 
 # ESP32-H2 does not have wifi support
-if (NOT CONFIG_IDF_TARGET
+if (NOT CONFIG_IDF_TARGET)
   list(APPEND ESP32_LIBS
     ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
     ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
