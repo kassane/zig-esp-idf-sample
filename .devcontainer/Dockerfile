@@ -15,10 +15,10 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # QEMU
-ENV QEMU_REL=esp_develop_8.2.0_20240122
-ENV QEMU_SHA256=e7c72ef5705ad1444d391711088c8717fc89f42e9bf6d1487f9c2a326b8cfa83
+ENV QEMU_REL=esp_develop_9.0.0_20240606
+ENV QEMU_SHA256=071d117c44a6e9a1bc8664ab63b592d3e17ceb779119dcb46c59571a4a7a88c9
 ENV QEMU_DIST=qemu-xtensa-softmmu-${QEMU_REL}-x86_64-linux-gnu.tar.xz
-ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-8.2.0-20240122/${QEMU_DIST}
+ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-9.0.0-20240606/${QEMU_DIST}
 
 # Zig v0.14.0 - xtensa
 ENV ZIG_REL=zig-relsafe-espressif-x86_64-linux-musl-baseline
@@ -27,8 +27,8 @@ ENV ZIG_DIST=${ZIG_REL}.tar.xz
 ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/${ZIG_DIST}
 
 # ZLS v0.14.0
-ENV ZLS_REL=zls-x86_64-linux-musl-baseline_ea2c303b0
-ENV ZLS_SHA256=d74ce12d36d4ba88f2d3ea01e4cb4db0cbf70e2bc1b99a6d3381a8dd62d7ea82
+ENV ZLS_REL=zls-x86_64-linux-musl-baseline_24c6dfb68
+ENV ZLS_SHA256=2ef50c00b9ad9e8fd15f0ba3b5a41a67807e762e095439ad7f75d946e5d03f9d
 ENV ZLS_DIST=${ZLS_REL}.tar.xz
 ENV ZLS_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/${ZLS_DIST}
 
