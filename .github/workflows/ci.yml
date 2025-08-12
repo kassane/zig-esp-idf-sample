@@ -22,6 +22,7 @@ jobs:
       - name: Copy diagram ${{ matrix.target }}
         run: |
           cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+      - uses: wokwi/wokwi-ci-server-action@v1
       - uses: wokwi/wokwi-ci-action@v1
         with:
           token: ${{ secrets.WOKWI_CI_TOKEN }}
