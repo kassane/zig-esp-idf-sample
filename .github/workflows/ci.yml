@@ -14,14 +14,15 @@ jobs:
         target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32p4]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v5.4
+          esp_idf_version: v5.5
           target: ${{ matrix.target }}
       - name: Copy diagram ${{ matrix.target }}
         run: |
           cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+      - uses: wokwi/wokwi-ci-server-action@v1
       - uses: wokwi/wokwi-ci-action@v1
         with:
           token: ${{ secrets.WOKWI_CI_TOKEN }}

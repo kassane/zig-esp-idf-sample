@@ -1,7 +1,7 @@
 .{
-    .name = "esp-idf-sample",
+    .name = .esp_idf_sample,
     .version = "0.1.0",
-    .minimum_zig_version = "0.12.0",
+    .fingerprint = 0xbe5a38cf3bc380ae,
     // This field is optional.
     // Each dependency must either provide a `url` and `hash`, or a `path`.
     // `zig build --fetch` can be used to fetch all dependencies of a package, recursively.

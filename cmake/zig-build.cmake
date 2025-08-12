@@ -13,11 +13,11 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     endif()
     set(TARGET_PLATFORM "linux-musl")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "AMD64")
         set(TARGET_ARCH "x86_64")
     elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86")
         set(TARGET_ARCH "x86")
-    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
         set(TARGET_ARCH "aarch64")
     else()
         message(FATAL_ERROR "windows: Unsupported architecture")
@@ -37,8 +37,8 @@ else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-    file(DOWNLOAD "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
+    file(DOWNLOAD "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}"
         "${CMAKE_BINARY_DIR}/zig.${EXT}")
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -54,7 +54,7 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET
 else()
     message(STATUS "Zig already downloaded. Skipping zig install.")
 endif()
-set(ZIG_INSTALL ${CMAKE_BINARY_DIR}/zig-relsafe-espressif-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline)
+set(ZIG_INSTALL ${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline)
 
 if(CONFIG_IDF_TARGET_ARCH_RISCV)
     set(ZIG_TARGET "riscv32-freestanding-none")

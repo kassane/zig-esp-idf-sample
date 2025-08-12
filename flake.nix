@@ -22,12 +22,12 @@
         # Determine architecture-specific properties
         platformSrc = if system == "x86_64-linux" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-x86_64-linux-musl-baseline.tar.xz";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
             sha256 = "sha256-KAFGYgUP1poW79QrLwq7JI07VyZayWbBDqcGT6NQbug=";
           }
         else if system == "aarch64-linux" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/zig-relsafe-espressif-aarch64-linux-musl-baseline.tar.xz";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
             sha256 = "sha256-1bnaav5a8gp108izghlcpdnl1y0rl5jzzmzx47q234k3h5m42jb2";
           }
         else
