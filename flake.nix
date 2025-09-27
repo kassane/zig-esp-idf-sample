@@ -2,20 +2,16 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    zls-overlay.url = "github:zigtools/zls/edd8f2264ea45f7370bac4aba809bc179d96627e";
     esp-idf.url = "github:mirrexagon/nixpkgs-esp-dev";
   };
 
-  outputs = { self, nixpkgs, flake-utils, zls-overlay, esp-idf, ... }:
+  outputs = { self, nixpkgs, flake-utils, esp-idf, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
             esp-idf.overlays.default
-            (final: prev: {
-              zls = zls-overlay.packages.${system}.default;
-            })
           ];
         };
 
@@ -56,7 +52,7 @@
               '';
             })
 
-            zls
+            pkgs.zls
 
             esp-idf-full
           ];
