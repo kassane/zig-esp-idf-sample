@@ -1,4 +1,5 @@
-FROM espressif/idf
+ARG DOCKER_TAG=latest
+FROM espressif/idf:${DOCKER_TAG}
 
 ARG DEBIAN_FRONTEND=nointeractive
 ARG CONTAINER_USER=esp
@@ -21,10 +22,10 @@ ENV QEMU_DIST=qemu-xtensa-softmmu-${QEMU_REL}-x86_64-linux-gnu.tar.xz
 ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-9.0.0-20240606/${QEMU_DIST}
 
 # Zig v0.14.0 - xtensa
-ENV ZIG_REL=zig-relsafe-espressif-x86_64-linux-musl-baseline
-ENV ZIG_SHA256=28014662050fd69a16efd42b2f0abb248d3b57265ac966c10ea7064fa3506ee8
+ENV ZIG_REL=zig-relsafe-x86_64-linux-musl-baseline
+ENV ZIG_SHA256=7331105f4de90cdce887d4868567ece66894eef2b599deec60277794748b2c20
 ENV ZIG_DIST=${ZIG_REL}.tar.xz
-ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/${ZIG_DIST}
+ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/${ZIG_DIST}
 
 # ZLS v0.14.0
 ENV ZLS_REL=zls-x86_64-linux-musl-baseline_24c6dfb68

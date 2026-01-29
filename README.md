@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/kassane/zig-esp-idf-sample)
+
 # Using Zig Language & Toolchain with ESP-IDF
 
 | Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-P4 | ESP32-S2 | ESP32-S3 |
@@ -14,7 +16,7 @@ More information about building and using Zig with ESP-IDF can be found in the [
 ## Prerequisites
 
 - [Zig](https://ziglang.org/download) toolchain - v0.14.0 or master
-- [ESP-IDF](https://github.com/espressif/esp-idf) - v4.4.x or v5.x or master
+- [ESP-IDF](https://github.com/espressif/esp-idf) - v5.x or v6.x or master
 
 ### Targets Allowed
 
