@@ -109,6 +109,13 @@ else()
     message(FATAL_ERROR "Unknown IDF target")
 endif()
 
+# Check Toolchain version
+get_filename_component(TOOLCHAIN_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
+get_filename_component(TOOLCHAIN_VERSION_DIR "${TOOLCHAIN_BIN_DIR}" DIRECTORY)
+if(NOT TOOLCHAIN_VERSION_DIR MATCHES "esp-[0-9]+\\.[0-9]+\\.[0-9]+_[0-9]+")
+    message(WARNING "TOOLCHAIN_VERSION_DIR '${TOOLCHAIN_VERSION_DIR}' does not look like a standard ESP toolchain version folder. Using as-is.")
+endif()
+message(STATUS "Detected toolchain version directory: ${TOOLCHAIN_VERSION_DIR}")
 
 if(CONFIG_IDF_TARGET_ARCH_RISCV)
     set(ARCH "riscv")
@@ -126,11 +133,11 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
     # Define the toolchain include paths
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "$ENV{TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include/sys")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include/sys")
     else()
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
     endif()
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/riscv32-esp-elf/riscv32-esp-elf/include")
+    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include")
     set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(ARCH "xtensa")
@@ -146,11 +153,11 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     endif()
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include/sys")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/include/sys")
     else()
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
     endif()
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-14.2.0_20241119/xtensa-esp-elf/xtensa-esp-elf/include")
+    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/include")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
 
@@ -160,6 +167,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/freertos/config/${ARCH}/include"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/esp_hw_support/include"
+    "${IDF_PATH}/components/soc/include"
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/esp_common/include"
     "${IDF_PATH}/components/hal/include"
@@ -171,6 +179,31 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register"
     "${IDF_PATH}/components/esp_system/include"
     "${IDF_PATH}/components/esp_driver_gpio/include"
+    "${IDF_PATH}/components/esp_hw_support/etm/include"
+    "${IDF_PATH}/components/esp_hal_ana_cmpr/include"
+    "${IDF_PATH}/components/esp_hal_ana_conv/include"
+    "${IDF_PATH}/components/esp_hal_cam/include"
+    "${IDF_PATH}/components/esp_hal_dma/include"
+    "${IDF_PATH}/components/esp_hal_gpio/include"
+    "${IDF_PATH}/components/esp_hal_gpspi/include"
+    "${IDF_PATH}/components/esp_hal_i2c/include"
+    "${IDF_PATH}/components/esp_hal_i2s/include"
+    "${IDF_PATH}/components/esp_hal_lcd/include"
+    "${IDF_PATH}/components/esp_hal_ledc/include"
+    "${IDF_PATH}/components/esp_hal_mcpwm/include"
+    "${IDF_PATH}/components/esp_hal_mspi/include"
+    "${IDF_PATH}/components/esp_hal_parlio/include"
+    "${IDF_PATH}/components/esp_hal_pcnt/include"
+    "${IDF_PATH}/components/esp_hal_ppa/include"
+    "${IDF_PATH}/components/esp_hal_rmt/include"
+    "${IDF_PATH}/components/esp_hal_timg/include"
+    "${IDF_PATH}/components/esp_hal_touch_sens/include"
+    "${IDF_PATH}/components/esp_hal_twai/include"
+    "${IDF_PATH}/components/esp_hal_uart/include"
+    "${IDF_PATH}/components/esp_hal_usb/include"
+    "${IDF_PATH}/components/esp_hal_wdt/include"
+    "${IDF_PATH}/components/esp_blockdev/include"
+    "${IDF_PATH}/components/esp_libc/platform_include"
     "${IDF_PATH}/components/newlib"
     "${IDF_PATH}/components/newlib/platform_include/sys"
     "${IDF_PATH}/components/newlib/platform_include"
@@ -285,21 +318,21 @@ add_dependencies(${COMPONENT_LIB} zig_build)
 target_link_libraries(${COMPONENT_LIB} PRIVATE ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
 
 # ESP32-H2/P4 does not have wifi support
-if (NOT CONFIG_IDF_TARGET_ESP32P4)
-  list(APPEND ESP32_LIBS
-    ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
-  )
+if(NOT CONFIG_IDF_TARGET_ESP32P4)
+    list(APPEND ESP32_LIBS
+        ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
+    )
 endif()
 
 
-if (NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H2)
-  list(APPEND ESP32_LIBS
-    ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
-    ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a
-    ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libnet80211.a
-    ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libcore.a
-    ${CMAKE_BINARY_DIR}/esp-idf/wpa_supplicant/libwpa_supplicant.a
-  )
+if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H2)
+    list(APPEND ESP32_LIBS
+        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
+        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a
+        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libnet80211.a
+        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libcore.a
+        ${CMAKE_BINARY_DIR}/esp-idf/wpa_supplicant/libwpa_supplicant.a
+    )
 endif()
 
 
@@ -313,7 +346,7 @@ target_link_libraries(${COMPONENT_LIB} PRIVATE
     ${CMAKE_BINARY_DIR}/esp-idf/soc/libsoc.a
     ${CMAKE_BINARY_DIR}/esp-idf/esp_hw_support/libesp_hw_support.a
     ${CMAKE_BINARY_DIR}/esp-idf/hal/libhal.a
-    ${CMAKE_BINARY_DIR}/esp-idf/mbedtls/mbedtls/library/libmbedcrypto.a
+    # ${CMAKE_BINARY_DIR}/esp-idf/mbedtls/mbedtls/library/libmbedcrypto.a
     ${CMAKE_BINARY_DIR}/esp-idf/freertos/libfreertos.a
     ${CMAKE_BINARY_DIR}/esp-idf/lwip/liblwip.a
     ${CMAKE_BINARY_DIR}/esp-idf/esp_wifi/libesp_wifi.a
