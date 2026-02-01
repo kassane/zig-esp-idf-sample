@@ -1,11 +1,32 @@
 const sys = @import("sys");
 const errors = @import("error");
+const sdkconfig = @cImport({
+    @cInclude("sdkconfig.h");
+});
 
-pub fn init(config: ?*const sys.wifi_init_config_t) !*const sys.wifi_init_config_t {
-    if (config) |c| {
-        try errors.espCheckError(sys.esp_wifi_init(c));
-        return c;
-    } else return .{};
+pub const WIFI_ENABLE_ENTERPRISE = 1 << 7;
+
+pub const CONFIG_FEATURE_WPA3_SAE_BIT = 1 << 0;
+pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT = 1 << 1;
+pub const CONFIG_FEATURE_FTM_INITIATOR_BIT = 1 << 2;
+pub const CONFIG_FEATURE_FTM_RESPONDER_BIT = 1 << 3;
+pub const CONFIG_FEATURE_GCMP_BIT = 1 << 4;
+pub const CONFIG_FEATURE_GMAC_BIT = 1 << 5;
+pub const CONFIG_FEATURE_11R_BIT = 1 << 6;
+pub const CONFIG_FEATURE_WIFI_ENT_BIT = 1 << 7;
+
+pub const WIFI_FEATURE_CAPS =
+    CONFIG_FEATURE_WPA3_SAE_BIT |
+    CONFIG_FEATURE_CACHE_TX_BUF_BIT |
+    CONFIG_FEATURE_FTM_INITIATOR_BIT |
+    CONFIG_FEATURE_FTM_RESPONDER_BIT |
+    CONFIG_FEATURE_GCMP_BIT |
+    CONFIG_FEATURE_GMAC_BIT |
+    CONFIG_FEATURE_11R_BIT |
+    WIFI_ENABLE_ENTERPRISE;
+
+pub fn init(config: *const sys.wifi_init_config_t) !void {
+    return try errors.espCheckError(sys.esp_wifi_init(config));
 }
 pub fn setDefaultWifiStationHandlers() !void {
     return try errors.espCheckError(sys.esp_wifi_set_default_wifi_sta_handlers());
@@ -416,3 +437,34 @@ pub const Internal = struct {
         return try errors.espCheckError(sys.esp_wifi_internal_reg_rxcb(ifx, @"fn"));
     }
 };
+
+pub fn init_config_default() sys.wifi_init_config_t {
+    return sys.wifi_init_config_t{
+        .osi_funcs = &sys.g_wifi_osi_funcs,
+        .wpa_crypto_funcs = sys.g_wifi_default_wpa_crypto_funcs,
+        .static_rx_buf_num = sdkconfig.CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM,
+        .dynamic_rx_buf_num = sdkconfig.CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM,
+        .tx_buf_type = sdkconfig.CONFIG_ESP_WIFI_TX_BUFFER_TYPE,
+        .static_tx_buf_num = sys.WIFI_STATIC_TX_BUFFER_NUM,
+        .dynamic_tx_buf_num = sys.WIFI_DYNAMIC_TX_BUFFER_NUM,
+        .rx_mgmt_buf_type = sdkconfig.CONFIG_ESP_WIFI_DYNAMIC_RX_MGMT_BUF,
+        .rx_mgmt_buf_num = sys.WIFI_RX_MGMT_BUF_NUM_DEF,
+        .cache_tx_buf_num = sys.WIFI_CACHE_TX_BUFFER_NUM,
+        .csi_enable = sys.WIFI_CSI_ENABLED,
+        .ampdu_rx_enable = sys.WIFI_AMPDU_RX_ENABLED,
+        .ampdu_tx_enable = sys.WIFI_AMPDU_TX_ENABLED,
+        .amsdu_tx_enable = sys.WIFI_AMSDU_TX_ENABLED,
+        .nvs_enable = sys.WIFI_NVS_ENABLED,
+        .nano_enable = sys.WIFI_NANO_FORMAT_ENABLED,
+        .rx_ba_win = sys.WIFI_DEFAULT_RX_BA_WIN,
+        .wifi_task_core_id = sys.WIFI_TASK_CORE_ID,
+        .beacon_max_len = sys.WIFI_SOFTAP_BEACON_MAX_LEN,
+        .mgmt_sbuf_num = sys.WIFI_MGMT_SBUF_NUM,
+        .feature_caps = sys.WIFI_FEATURE_CAPS,
+        .sta_disconnected_pm = sys.WIFI_STA_DISCONNECTED_PM_ENABLED != 0,
+        .espnow_max_encrypt_num = sdkconfig.CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM,
+        .tx_hetb_queue_num = sys.WIFI_TX_HETB_QUEUE_NUM,
+        .dump_hesigb_enable = sys.WIFI_DUMP_HESIGB_ENABLED != 0,
+        .magic = sys.WIFI_INIT_CONFIG_MAGIC,
+    };
+}

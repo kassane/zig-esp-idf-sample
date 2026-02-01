@@ -23,9 +23,9 @@ pub fn espLogFn(
     ESP_LOG(allocator, "logging", prefix ++ format ++ "\n", args);
 }
 pub const default_level: sys.esp_log_level_t = switch (@import("builtin").mode) {
-    .Debug => .ESP_LOG_DEBUG,
-    .ReleaseSafe => .ESP_LOG_INFO,
-    .ReleaseFast, .ReleaseSmall => .ESP_LOG_ERROR,
+    .Debug => @as(sys.esp_log_level_t, sys.ESP_LOG_DEBUG),
+    .ReleaseSafe => @as(sys.esp_log_level_t, sys.ESP_LOG_INFO),
+    .ReleaseFast, .ReleaseSmall => @as(sys.esp_log_level_t, sys.ESP_LOG_ERROR),
 };
 pub fn ESP_LOG(allocator: std.mem.Allocator, comptime tag: [*:0]const u8, comptime fmt: []const u8, args: anytype) void {
     const buffer = if (isComptime(args))
@@ -34,13 +34,15 @@ pub fn ESP_LOG(allocator: std.mem.Allocator, comptime tag: [*:0]const u8, compti
         std.fmt.allocPrintZ(allocator, fmt, args) catch |err| @panic(@errorName(err));
     sys.esp_log_write(default_level, tag, buffer, sys.esp_log_timestamp(), tag);
 }
-pub const default_color = switch (default_level) {
-    .ESP_LOG_DEBUG => LOG_COLOR(LOG_COLOR_BLUE),
-    .ESP_LOG_INFO => LOG_COLOR_I,
-    .ESP_LOG_ERROR => LOG_COLOR_E,
-    .ESP_LOG_NONE => LOG_COLOR(LOG_COLOR_BLACK),
-    .ESP_LOG_WARN => LOG_COLOR_W,
-    .ESP_LOG_VERBOSE => LOG_COLOR_I,
+
+pub const default_color = switch (@as(sys.esp_log_level_t, default_level)) {
+    sys.ESP_LOG_DEBUG => LOG_COLOR(LOG_COLOR_BLUE),
+    sys.ESP_LOG_INFO => LOG_COLOR_I,
+    sys.ESP_LOG_ERROR => LOG_COLOR_E,
+    sys.ESP_LOG_NONE => LOG_COLOR(LOG_COLOR_BLACK),
+    sys.ESP_LOG_WARN => LOG_COLOR_W,
+    sys.ESP_LOG_VERBOSE => LOG_COLOR_I,
+    else => LOG_COLOR(LOG_COLOR_BLACK),
 };
 pub const LOG_COLOR_BLACK = "30";
 pub const LOG_COLOR_RED = "31";
