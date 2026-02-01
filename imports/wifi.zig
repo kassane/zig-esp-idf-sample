@@ -25,6 +25,25 @@ pub const WIFI_FEATURE_CAPS =
     CONFIG_FEATURE_11R_BIT |
     WIFI_ENABLE_ENTERPRISE;
 
+pub const wifi_mode_t = enum(c_uint) {
+    WIFI_MODE_NULL = 0,
+    WIFI_MODE_STA = 1,
+    WIFI_MODE_AP = 2,
+    WIFI_MODE_APSTA = 3,
+    WIFI_MODE_NAN = 4,
+    WIFI_MODE_MAX = 5,
+};
+pub const wifi_interface_t = enum(c_uint) {
+    WIFI_IF_STA = 0,
+    WIFI_IF_AP = 1,
+    WIFI_IF_NAN = 2,
+    WIFI_IF_MAX = 3,
+};
+pub const wifi_country_policy_t = enum(c_uint) {
+    WIFI_COUNTRY_POLICY_AUTO = 0,
+    WIFI_COUNTRY_POLICY_MANUAL = 1,
+};
+
 pub fn init(config: *const sys.wifi_init_config_t) !void {
     return try errors.espCheckError(sys.esp_wifi_init(config));
 }
@@ -43,10 +62,10 @@ pub fn clearDefaultWifiDriverHandlers(esp_netif: ?*anyopaque) !void {
 pub fn deinit() !void {
     return try errors.espCheckError(sys.esp_wifi_deinit());
 }
-pub fn setMode(mode: sys.wifi_mode_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_mode(mode));
+pub fn setMode(mode: wifi_mode_t) !void {
+    return try errors.espCheckError(sys.esp_wifi_set_mode(@intFromEnum(mode)));
 }
-pub fn getMode(mode: [*c]sys.wifi_mode_t) !void {
+pub fn getMode(mode: [*]wifi_mode_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_mode(mode));
 }
 pub fn start() !void {
@@ -93,18 +112,18 @@ pub const PowerSave = struct {
     }
 };
 pub const Protocol = struct {
-    pub fn set(ifx: sys.wifi_interface_t, protocol_bitmap: u8) !void {
+    pub fn set(ifx: wifi_interface_t, protocol_bitmap: u8) !void {
         return try errors.espCheckError(sys.esp_wifi_set_protocol(ifx, protocol_bitmap));
     }
-    pub fn get(ifx: sys.wifi_interface_t, protocol_bitmap: [*:0]u8) !void {
+    pub fn get(ifx: wifi_interface_t, protocol_bitmap: [*:0]u8) !void {
         return try errors.espCheckError(sys.esp_wifi_get_protocol(ifx, protocol_bitmap));
     }
 };
 pub const Bandwidth = struct {
-    pub fn set(ifx: sys.wifi_interface_t, bw: sys.wifi_bandwidth_t) !void {
+    pub fn set(ifx: wifi_interface_t, bw: sys.wifi_bandwidth_t) !void {
         return try errors.espCheckError(sys.esp_wifi_set_bandwidth(ifx, bw));
     }
-    pub fn get(ifx: sys.wifi_interface_t, bw: [*c]sys.wifi_bandwidth_t) !void {
+    pub fn get(ifx: wifi_interface_t, bw: [*c]sys.wifi_bandwidth_t) !void {
         return try errors.espCheckError(sys.esp_wifi_get_bandwidth(ifx, bw));
     }
 };
@@ -131,10 +150,10 @@ pub const Country = struct {
     }
 };
 pub const MAC = struct {
-    pub fn set(ifx: sys.wifi_interface_t, mac: [*:0]const u8) !void {
+    pub fn set(ifx: wifi_interface_t, mac: [*:0]const u8) !void {
         return try errors.espCheckError(sys.esp_wifi_set_mac(ifx, mac));
     }
-    pub fn get(ifx: sys.wifi_interface_t, mac: [*:0]u8) !void {
+    pub fn get(ifx: wifi_interface_t, mac: [*:0]u8) !void {
         return try errors.espCheckError(sys.esp_wifi_get_mac(ifx, mac));
     }
 };
@@ -162,10 +181,11 @@ pub const Promiscuous = struct {
         return try errors.espCheckError(sys.esp_wifi_get_promiscuous_ctrl_filter(filter));
     }
 };
-pub fn setConfig(interface: sys.wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_config(interface, conf));
+pub const wifiConfig = sys.wifi_config_t;
+pub fn setConfig(interface: wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
+    return try errors.espCheckError(sys.esp_wifi_set_config(@intFromEnum(interface), conf));
 }
-pub fn getConfig(interface: sys.wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
+pub fn getConfig(interface: wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_config(interface, conf));
 }
 pub fn setStorage(storage: sys.wifi_storage_t) !void {
@@ -192,7 +212,7 @@ pub fn setEventMask(mask: u32) !void {
 pub fn getEventMask(mask: [*c]u32) !void {
     return try errors.espCheckError(sys.esp_wifi_get_event_mask(mask));
 }
-pub fn p80211TX(ifx: sys.wifi_interface_t, buffer: ?*const anyopaque, len: c_int, en_sys_seq: bool) !void {
+pub fn p80211TX(ifx: wifi_interface_t, buffer: ?*const anyopaque, len: c_int, en_sys_seq: bool) !void {
     return try errors.espCheckError(sys.esp_wifi_80211_tx(ifx, buffer, len, en_sys_seq));
 }
 pub const csi_callback_type = sys.wifi_csi_cb_t;
@@ -217,13 +237,13 @@ pub fn setAnt(config: ?*const sys.wifi_ant_config_t) !void {
 pub fn getAnt(config: ?*sys.wifi_ant_config_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_ant(config));
 }
-pub fn getTsfTime(interface: sys.wifi_interface_t) i64 {
+pub fn getTsfTime(interface: wifi_interface_t) i64 {
     return sys.esp_wifi_get_tsf_time(interface);
 }
-pub fn setInactiveTime(ifx: sys.wifi_interface_t, sec: u16) !void {
+pub fn setInactiveTime(ifx: wifi_interface_t, sec: u16) !void {
     return try errors.espCheckError(sys.esp_wifi_set_inactive_time(ifx, sec));
 }
-pub fn getInactiveTime(ifx: sys.wifi_interface_t, sec: [*c]u16) !void {
+pub fn getInactiveTime(ifx: wifi_interface_t, sec: [*c]u16) !void {
     return try errors.espCheckError(sys.esp_wifi_get_inactive_time(ifx, sec));
 }
 pub fn statisDump(modules: u32) !void {
@@ -243,7 +263,7 @@ pub const FTM = struct {
         return try errors.espCheckError(sys.esp_wifi_ftm_resp_set_offset(offset_cm));
     }
 };
-pub fn config11bRate(ifx: sys.wifi_interface_t, disable: bool) !void {
+pub fn config11bRate(ifx: wifi_interface_t, disable: bool) !void {
     return try errors.espCheckError(sys.esp_wifi_config_11b_rate(ifx, disable));
 }
 pub fn connectionlessModuleSetWakeInterval(wake_interval: u16) !void {
@@ -255,10 +275,10 @@ pub fn forceWakeupAcquire() !void {
 pub fn forceWakeupRelease() !void {
     return try errors.espCheckError(sys.esp_wifi_force_wakeup_release());
 }
-pub fn config80211TXRate(ifx: sys.wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
+pub fn config80211TXRate(ifx: wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
     return try errors.espCheckError(sys.esp_wifi_config_80211_tx_rate(ifx, rate));
 }
-pub fn disablePMFConfig(ifx: sys.wifi_interface_t) !void {
+pub fn disablePMFConfig(ifx: wifi_interface_t) !void {
     return try errors.espCheckError(sys.esp_wifi_disable_pmf_config(ifx));
 }
 pub fn setDynCS(enabled: bool) !void {
@@ -336,7 +356,7 @@ pub const EspNow = struct {
     pub fn modPeer(peer: [*c]const sys.esp_now_peer_info_t) !void {
         return try errors.espCheckError(sys.esp_now_mod_peer(peer));
     }
-    pub fn wifiConfigRate(ifx: sys.wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
+    pub fn wifiConfigRate(ifx: wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
         return try errors.espCheckError(sys.esp_wifi_config_espnow_rate(ifx, rate));
     }
     pub fn setPeerRateConfig(peer_addr: [*:0]const u8, config: [*c]sys.esp_now_rate_config_t) !void {
@@ -430,10 +450,10 @@ pub const Internal = struct {
         if (buffer) |b|
             return try errors.espCheckError(sys.esp_wifi_internal_free_rx_buffer(b));
     }
-    pub fn txBuffer(ifx: sys.wifi_interface_t, buffer: ?*anyopaque, len: u16) !void {
+    pub fn txBuffer(ifx: wifi_interface_t, buffer: ?*anyopaque, len: u16) !void {
         return try errors.espCheckError(sys.esp_wifi_internal_tx(ifx, buffer, len));
     }
-    pub fn registryTXCallBack(ifx: sys.wifi_interface_t, @"fn": sys.wifi_rxcb_t) !void {
+    pub fn registryTXCallBack(ifx: wifi_interface_t, @"fn": sys.wifi_rxcb_t) !void {
         return try errors.espCheckError(sys.esp_wifi_internal_reg_rxcb(ifx, @"fn"));
     }
 };

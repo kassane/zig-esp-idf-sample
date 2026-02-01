@@ -141,15 +141,14 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
     else()
         set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/riscv32-esp-elf")
     endif()
-
+    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include")
     # Define the toolchain include paths
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include/sys")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
     endif()
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include")
     set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(ARCH "xtensa")
@@ -163,13 +162,13 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     else()
         set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/xtensa-esp-elf")
     endif()
+    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/include")
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/include/sys")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
     endif()
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/include")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
 
@@ -214,6 +213,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_hal_uart/include"
     "${IDF_PATH}/components/esp_hal_usb/include"
     "${IDF_PATH}/components/esp_hal_wdt/include"
+    "${IDF_PATH}/components/esp_phy/include"
     "${IDF_PATH}/components/esp_blockdev/include"
     "${IDF_PATH}/components/esp_libc/platform_include"
     "${IDF_PATH}/components/newlib"
