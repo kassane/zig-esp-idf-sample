@@ -127,7 +127,7 @@ fn wifi_init_sta(allocator: std.mem.Allocator) void {
         &instance_got_ip,
     )) catch {};
 
-    var wifi_config = idf.sys.wifi_config_t{
+    var wifi_config = idf.wifi.wifiConfig{
         .sta = .{
             .ssid = mem.zeroes([32]u8),
             .password = mem.zeroes([64]u8),
@@ -149,8 +149,8 @@ fn wifi_init_sta(allocator: std.mem.Allocator) void {
     mem.copyForwards(u8, wifi_config.sta.sae_h2e_identifier[0..sae_h2e_id.len], sae_h2e_id);
     wifi_config.sta.sae_h2e_identifier[sae_h2e_id.len] = 0;
 
-    idf.wifi.setMode(idf.sys.WIFI_MODE_STA) catch {};
-    idf.wifi.setConfig(idf.sys.WIFI_IF_STA, &wifi_config) catch {};
+    idf.wifi.setMode(.WIFI_MODE_STA) catch {};
+    idf.wifi.setConfig(.WIFI_IF_STA, &wifi_config) catch {};
     idf.wifi.start() catch {};
 
     idf.ESP_LOG(allocator, tag, "wifi_init_sta finished.\n", .{});
