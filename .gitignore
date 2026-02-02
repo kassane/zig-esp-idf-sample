@@ -6,5 +6,5 @@ sdkconfig
 *.old
 *.lock
 managed_components/
-
+imports/idf-sys.zig
 !flake.lock

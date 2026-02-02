@@ -13,6 +13,8 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
+    const src_path = std.fs.path.dirname(@src().file) orelse b.pathResolve(&.{"."});
+    lib.addIncludePath(.{ .cwd_relative = b.pathJoin(&.{ src_path, "build", "config" }) });
     lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
     lib.linkLibC(); // stubs for libc
 
@@ -317,22 +319,27 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
-    const wifi = b.addModule("wifi", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "wifi.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
+    const wifi = b.addModule("wifi", .{ .root_source_file = b.path(b.pathJoin(&.{
+        src_path,
+        "imports",
+        "wifi.zig",
+    })), .imports = &.{
+        .{
+            .name = "sys",
+            .module = sys,
         },
+        .{
+            .name = "error",
+            .module = errors,
+        },
+    } });
+    //-- To pull in sdkconfig.h
+    wifi.addIncludePath(.{
+        .cwd_relative = b.pathJoin(&.{ src_path, "build", "config" }),
+    });
+    // If building via cmake for sdkconfig
+    wifi.addIncludePath(.{
+        .cwd_relative = b.pathJoin(&.{ "..", "build", "config" }),
     });
     const gpio = b.addModule("gpio", .{
         .root_source_file = b.path(b.pathJoin(&.{
@@ -570,6 +577,11 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .name = "pulse",
                 .module = pcnt,
             },
+
+            .{
+                .name = "sys",
+                .module = sys,
+            },
         },
     });
 }
@@ -580,32 +592,48 @@ pub const espressif_targets: []const std.Target.Query = if (isEspXtensa())
 else
     riscv_targets;
 
-const riscv_targets = &[_]std.Target.Query{
-    // esp32-c3/c2
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
-    },
-    // esp32-c6/61/h2
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-        .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
-    },
-    // esp32-p4 have .xesppie cpu-feature (espressif vendor extension)
-    .{
-        .cpu_arch = .riscv32,
-        .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-        .os_tag = .freestanding,
-        .abi = .eabihf,
-        .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-    },
+const riscv_targets = blk: {
+    const targets: []const std.Target.Query = &[_]std.Target.Query{
+        // esp32-c3/c2
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
+        },
+        // esp32-c6/61/h2
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+            .os_tag = .freestanding,
+            .abi = .none,
+            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
+        },
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+            .os_tag = .freestanding,
+            .abi = .eabihf,
+            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+        },
+    };
+
+    if (@hasDecl(std.Target.riscv.cpu, "esp32p4")) {
+        break :blk targets ++ &[_]std.Target.Query{
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+            },
+        };
+    }
+
+    break :blk targets;
 };
+
 const xtensa_targets = &[_]std.Target.Query{
     // need zig-fork (using espressif-llvm backend) to support this
     .{

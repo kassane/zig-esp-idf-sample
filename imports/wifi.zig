@@ -1,11 +1,51 @@
 const sys = @import("sys");
 const errors = @import("error");
+const sdkconfig = @cImport({
+    @cInclude("sdkconfig.h");
+});
 
-pub fn init(config: ?*const sys.wifi_init_config_t) !*const sys.wifi_init_config_t {
-    if (config) |c| {
-        try errors.espCheckError(sys.esp_wifi_init(c));
-        return c;
-    } else return .{};
+pub const WIFI_ENABLE_ENTERPRISE = 1 << 7;
+
+pub const CONFIG_FEATURE_WPA3_SAE_BIT = 1 << 0;
+pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT = 1 << 1;
+pub const CONFIG_FEATURE_FTM_INITIATOR_BIT = 1 << 2;
+pub const CONFIG_FEATURE_FTM_RESPONDER_BIT = 1 << 3;
+pub const CONFIG_FEATURE_GCMP_BIT = 1 << 4;
+pub const CONFIG_FEATURE_GMAC_BIT = 1 << 5;
+pub const CONFIG_FEATURE_11R_BIT = 1 << 6;
+pub const CONFIG_FEATURE_WIFI_ENT_BIT = 1 << 7;
+
+pub const WIFI_FEATURE_CAPS =
+    CONFIG_FEATURE_WPA3_SAE_BIT |
+    CONFIG_FEATURE_CACHE_TX_BUF_BIT |
+    CONFIG_FEATURE_FTM_INITIATOR_BIT |
+    CONFIG_FEATURE_FTM_RESPONDER_BIT |
+    CONFIG_FEATURE_GCMP_BIT |
+    CONFIG_FEATURE_GMAC_BIT |
+    CONFIG_FEATURE_11R_BIT |
+    WIFI_ENABLE_ENTERPRISE;
+
+pub const wifi_mode_t = enum(sys.wifi_mode_t) {
+    WIFI_MODE_NULL = sys.WIFI_MODE_NULL,
+    WIFI_MODE_STA = sys.WIFI_MODE_STA,
+    WIFI_MODE_AP = sys.WIFI_MODE_AP,
+    WIFI_MODE_APSTA = sys.WIFI_MODE_APSTA,
+    WIFI_MODE_NAN = sys.WIFI_MODE_NAN,
+    WIFI_MODE_MAX = sys.WIFI_MODE_MAX,
+};
+pub const wifi_interface_t = enum(sys.wifi_interface_t) {
+    WIFI_IF_STA = sys.WIFI_IF_STA,
+    WIFI_IF_AP = sys.WIFI_IF_AP,
+    WIFI_IF_NAN = sys.WIFI_IF_NAN,
+    WIFI_IF_MAX = sys.WIFI_IF_MAX,
+};
+pub const wifi_country_policy_t = enum(sys.wifi_country_policy_t) {
+    WIFI_COUNTRY_POLICY_AUTO = sys.WIFI_COUNTRY_POLICY_AUTO,
+    WIFI_COUNTRY_POLICY_MANUAL = sys.WIFI_COUNTRY_POLICY_MANUAL,
+};
+
+pub fn init(config: *const sys.wifi_init_config_t) !void {
+    return try errors.espCheckError(sys.esp_wifi_init(config));
 }
 pub fn setDefaultWifiStationHandlers() !void {
     return try errors.espCheckError(sys.esp_wifi_set_default_wifi_sta_handlers());
@@ -22,10 +62,10 @@ pub fn clearDefaultWifiDriverHandlers(esp_netif: ?*anyopaque) !void {
 pub fn deinit() !void {
     return try errors.espCheckError(sys.esp_wifi_deinit());
 }
-pub fn setMode(mode: sys.wifi_mode_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_mode(mode));
+pub fn setMode(mode: wifi_mode_t) !void {
+    return try errors.espCheckError(sys.esp_wifi_set_mode(@intFromEnum(mode)));
 }
-pub fn getMode(mode: [*c]sys.wifi_mode_t) !void {
+pub fn getMode(mode: [*]wifi_mode_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_mode(mode));
 }
 pub fn start() !void {
@@ -72,18 +112,18 @@ pub const PowerSave = struct {
     }
 };
 pub const Protocol = struct {
-    pub fn set(ifx: sys.wifi_interface_t, protocol_bitmap: u8) !void {
+    pub fn set(ifx: wifi_interface_t, protocol_bitmap: u8) !void {
         return try errors.espCheckError(sys.esp_wifi_set_protocol(ifx, protocol_bitmap));
     }
-    pub fn get(ifx: sys.wifi_interface_t, protocol_bitmap: [*:0]u8) !void {
+    pub fn get(ifx: wifi_interface_t, protocol_bitmap: [*:0]u8) !void {
         return try errors.espCheckError(sys.esp_wifi_get_protocol(ifx, protocol_bitmap));
     }
 };
 pub const Bandwidth = struct {
-    pub fn set(ifx: sys.wifi_interface_t, bw: sys.wifi_bandwidth_t) !void {
+    pub fn set(ifx: wifi_interface_t, bw: sys.wifi_bandwidth_t) !void {
         return try errors.espCheckError(sys.esp_wifi_set_bandwidth(ifx, bw));
     }
-    pub fn get(ifx: sys.wifi_interface_t, bw: [*c]sys.wifi_bandwidth_t) !void {
+    pub fn get(ifx: wifi_interface_t, bw: [*c]sys.wifi_bandwidth_t) !void {
         return try errors.espCheckError(sys.esp_wifi_get_bandwidth(ifx, bw));
     }
 };
@@ -110,10 +150,10 @@ pub const Country = struct {
     }
 };
 pub const MAC = struct {
-    pub fn set(ifx: sys.wifi_interface_t, mac: [*:0]const u8) !void {
+    pub fn set(ifx: wifi_interface_t, mac: [*:0]const u8) !void {
         return try errors.espCheckError(sys.esp_wifi_set_mac(ifx, mac));
     }
-    pub fn get(ifx: sys.wifi_interface_t, mac: [*:0]u8) !void {
+    pub fn get(ifx: wifi_interface_t, mac: [*:0]u8) !void {
         return try errors.espCheckError(sys.esp_wifi_get_mac(ifx, mac));
     }
 };
@@ -141,10 +181,11 @@ pub const Promiscuous = struct {
         return try errors.espCheckError(sys.esp_wifi_get_promiscuous_ctrl_filter(filter));
     }
 };
-pub fn setConfig(interface: sys.wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_config(interface, conf));
+pub const wifiConfig = sys.wifi_config_t;
+pub fn setConfig(interface: wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
+    return try errors.espCheckError(sys.esp_wifi_set_config(@intFromEnum(interface), conf));
 }
-pub fn getConfig(interface: sys.wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
+pub fn getConfig(interface: wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_config(interface, conf));
 }
 pub fn setStorage(storage: sys.wifi_storage_t) !void {
@@ -171,7 +212,7 @@ pub fn setEventMask(mask: u32) !void {
 pub fn getEventMask(mask: [*c]u32) !void {
     return try errors.espCheckError(sys.esp_wifi_get_event_mask(mask));
 }
-pub fn p80211TX(ifx: sys.wifi_interface_t, buffer: ?*const anyopaque, len: c_int, en_sys_seq: bool) !void {
+pub fn p80211TX(ifx: wifi_interface_t, buffer: ?*const anyopaque, len: c_int, en_sys_seq: bool) !void {
     return try errors.espCheckError(sys.esp_wifi_80211_tx(ifx, buffer, len, en_sys_seq));
 }
 pub const csi_callback_type = sys.wifi_csi_cb_t;
@@ -196,13 +237,13 @@ pub fn setAnt(config: ?*const sys.wifi_ant_config_t) !void {
 pub fn getAnt(config: ?*sys.wifi_ant_config_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_ant(config));
 }
-pub fn getTsfTime(interface: sys.wifi_interface_t) i64 {
+pub fn getTsfTime(interface: wifi_interface_t) i64 {
     return sys.esp_wifi_get_tsf_time(interface);
 }
-pub fn setInactiveTime(ifx: sys.wifi_interface_t, sec: u16) !void {
+pub fn setInactiveTime(ifx: wifi_interface_t, sec: u16) !void {
     return try errors.espCheckError(sys.esp_wifi_set_inactive_time(ifx, sec));
 }
-pub fn getInactiveTime(ifx: sys.wifi_interface_t, sec: [*c]u16) !void {
+pub fn getInactiveTime(ifx: wifi_interface_t, sec: [*c]u16) !void {
     return try errors.espCheckError(sys.esp_wifi_get_inactive_time(ifx, sec));
 }
 pub fn statisDump(modules: u32) !void {
@@ -222,7 +263,7 @@ pub const FTM = struct {
         return try errors.espCheckError(sys.esp_wifi_ftm_resp_set_offset(offset_cm));
     }
 };
-pub fn config11bRate(ifx: sys.wifi_interface_t, disable: bool) !void {
+pub fn config11bRate(ifx: wifi_interface_t, disable: bool) !void {
     return try errors.espCheckError(sys.esp_wifi_config_11b_rate(ifx, disable));
 }
 pub fn connectionlessModuleSetWakeInterval(wake_interval: u16) !void {
@@ -234,10 +275,10 @@ pub fn forceWakeupAcquire() !void {
 pub fn forceWakeupRelease() !void {
     return try errors.espCheckError(sys.esp_wifi_force_wakeup_release());
 }
-pub fn config80211TXRate(ifx: sys.wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
+pub fn config80211TXRate(ifx: wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
     return try errors.espCheckError(sys.esp_wifi_config_80211_tx_rate(ifx, rate));
 }
-pub fn disablePMFConfig(ifx: sys.wifi_interface_t) !void {
+pub fn disablePMFConfig(ifx: wifi_interface_t) !void {
     return try errors.espCheckError(sys.esp_wifi_disable_pmf_config(ifx));
 }
 pub fn setDynCS(enabled: bool) !void {
@@ -315,7 +356,7 @@ pub const EspNow = struct {
     pub fn modPeer(peer: [*c]const sys.esp_now_peer_info_t) !void {
         return try errors.espCheckError(sys.esp_now_mod_peer(peer));
     }
-    pub fn wifiConfigRate(ifx: sys.wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
+    pub fn wifiConfigRate(ifx: wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
         return try errors.espCheckError(sys.esp_wifi_config_espnow_rate(ifx, rate));
     }
     pub fn setPeerRateConfig(peer_addr: [*:0]const u8, config: [*c]sys.esp_now_rate_config_t) !void {
@@ -409,10 +450,41 @@ pub const Internal = struct {
         if (buffer) |b|
             return try errors.espCheckError(sys.esp_wifi_internal_free_rx_buffer(b));
     }
-    pub fn txBuffer(ifx: sys.wifi_interface_t, buffer: ?*anyopaque, len: u16) !void {
+    pub fn txBuffer(ifx: wifi_interface_t, buffer: ?*anyopaque, len: u16) !void {
         return try errors.espCheckError(sys.esp_wifi_internal_tx(ifx, buffer, len));
     }
-    pub fn registryTXCallBack(ifx: sys.wifi_interface_t, @"fn": sys.wifi_rxcb_t) !void {
+    pub fn registryTXCallBack(ifx: wifi_interface_t, @"fn": sys.wifi_rxcb_t) !void {
         return try errors.espCheckError(sys.esp_wifi_internal_reg_rxcb(ifx, @"fn"));
     }
 };
+
+pub fn init_config_default() sys.wifi_init_config_t {
+    return sys.wifi_init_config_t{
+        .osi_funcs = &sys.g_wifi_osi_funcs,
+        .wpa_crypto_funcs = sys.g_wifi_default_wpa_crypto_funcs,
+        .static_rx_buf_num = sdkconfig.CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM,
+        .dynamic_rx_buf_num = sdkconfig.CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM,
+        .tx_buf_type = sdkconfig.CONFIG_ESP_WIFI_TX_BUFFER_TYPE,
+        .static_tx_buf_num = sys.WIFI_STATIC_TX_BUFFER_NUM,
+        .dynamic_tx_buf_num = sys.WIFI_DYNAMIC_TX_BUFFER_NUM,
+        .rx_mgmt_buf_type = sdkconfig.CONFIG_ESP_WIFI_DYNAMIC_RX_MGMT_BUF,
+        .rx_mgmt_buf_num = sys.WIFI_RX_MGMT_BUF_NUM_DEF,
+        .cache_tx_buf_num = sys.WIFI_CACHE_TX_BUFFER_NUM,
+        .csi_enable = sys.WIFI_CSI_ENABLED,
+        .ampdu_rx_enable = sys.WIFI_AMPDU_RX_ENABLED,
+        .ampdu_tx_enable = sys.WIFI_AMPDU_TX_ENABLED,
+        .amsdu_tx_enable = sys.WIFI_AMSDU_TX_ENABLED,
+        .nvs_enable = sys.WIFI_NVS_ENABLED,
+        .nano_enable = sys.WIFI_NANO_FORMAT_ENABLED,
+        .rx_ba_win = sys.WIFI_DEFAULT_RX_BA_WIN,
+        .wifi_task_core_id = sys.WIFI_TASK_CORE_ID,
+        .beacon_max_len = sys.WIFI_SOFTAP_BEACON_MAX_LEN,
+        .mgmt_sbuf_num = sys.WIFI_MGMT_SBUF_NUM,
+        .feature_caps = sys.WIFI_FEATURE_CAPS,
+        .sta_disconnected_pm = sys.WIFI_STA_DISCONNECTED_PM_ENABLED != 0,
+        .espnow_max_encrypt_num = sdkconfig.CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM,
+        .tx_hetb_queue_num = sys.WIFI_TX_HETB_QUEUE_NUM,
+        .dump_hesigb_enable = sys.WIFI_DUMP_HESIGB_ENABLED != 0,
+        .magic = sys.WIFI_INIT_CONFIG_MAGIC,
+    };
+}
