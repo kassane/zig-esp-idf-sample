@@ -25,23 +25,23 @@ pub const WIFI_FEATURE_CAPS =
     CONFIG_FEATURE_11R_BIT |
     WIFI_ENABLE_ENTERPRISE;
 
-pub const wifi_mode_t = enum(c_uint) {
-    WIFI_MODE_NULL = 0,
-    WIFI_MODE_STA = 1,
-    WIFI_MODE_AP = 2,
-    WIFI_MODE_APSTA = 3,
-    WIFI_MODE_NAN = 4,
-    WIFI_MODE_MAX = 5,
+pub const wifi_mode_t = enum(sys.wifi_mode_t) {
+    WIFI_MODE_NULL = sys.WIFI_MODE_NULL,
+    WIFI_MODE_STA = sys.WIFI_MODE_STA,
+    WIFI_MODE_AP = sys.WIFI_MODE_AP,
+    WIFI_MODE_APSTA = sys.WIFI_MODE_APSTA,
+    WIFI_MODE_NAN = sys.WIFI_MODE_NAN,
+    WIFI_MODE_MAX = sys.WIFI_MODE_MAX,
 };
-pub const wifi_interface_t = enum(c_uint) {
-    WIFI_IF_STA = 0,
-    WIFI_IF_AP = 1,
-    WIFI_IF_NAN = 2,
-    WIFI_IF_MAX = 3,
+pub const wifi_interface_t = enum(sys.wifi_interface_t) {
+    WIFI_IF_STA = sys.WIFI_IF_STA,
+    WIFI_IF_AP = sys.WIFI_IF_AP,
+    WIFI_IF_NAN = sys.WIFI_IF_NAN,
+    WIFI_IF_MAX = sys.WIFI_IF_MAX,
 };
-pub const wifi_country_policy_t = enum(c_uint) {
-    WIFI_COUNTRY_POLICY_AUTO = 0,
-    WIFI_COUNTRY_POLICY_MANUAL = 1,
+pub const wifi_country_policy_t = enum(sys.wifi_country_policy_t) {
+    WIFI_COUNTRY_POLICY_AUTO = sys.WIFI_COUNTRY_POLICY_AUTO,
+    WIFI_COUNTRY_POLICY_MANUAL = sys.WIFI_COUNTRY_POLICY_MANUAL,
 };
 
 pub fn init(config: *const sys.wifi_init_config_t) !void {
