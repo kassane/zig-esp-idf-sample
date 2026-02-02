@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const idf = @import("esp_idf");
 const wifi = idf.wifi;
 
-export fn app_main() callconv(.C) void {
+export fn app_main() callconv(.c) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
     // std.heap.raw_c_allocator
 
@@ -147,13 +147,13 @@ export fn blinkclock(_: ?*anyopaque) void {
         @panic(@errorName(err));
 }
 
-export fn foo(_: ?*anyopaque) callconv(.C) void {
+export fn foo(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
         idf.vTaskDelay(2000 / idf.portTICK_PERIOD_MS);
     }
 }
-export fn bar(_: ?*anyopaque) callconv(.C) void {
+export fn bar(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task bar printing..", .{});
         idf.vTaskDelay(1000 / idf.portTICK_PERIOD_MS);
@@ -161,7 +161,7 @@ export fn bar(_: ?*anyopaque) callconv(.C) void {
 }
 
 // override the std panic function with idf.panic
-pub const panic = idf.panic;
+pub const panic = idf.esp_panic.panic;
 const log = std.log.scoped(.@"esp-idf");
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
@@ -169,7 +169,7 @@ pub const std_options: std.Options = .{
         else => .info,
     },
     // Define logFn to override the std implementation
-    .logFn = idf.espLogFn,
+    .logFn = idf.log.espLogFn,
 };
 
 const tag = "zig-example";

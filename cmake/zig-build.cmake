@@ -311,7 +311,6 @@ add_custom_target(zig_build
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
     -freference-trace
-    --prominent-compile-errors
     --cache-dir ${CMAKE_BINARY_DIR}/../.zig-cache
     --prefix ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

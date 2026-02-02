@@ -7,7 +7,7 @@ pub fn espLogFn(
     comptime format: []const u8,
     args: anytype,
 ) void {
-    var heap = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
+    var heap = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer heap.deinit();
     const allocator = heap.allocator();
 
