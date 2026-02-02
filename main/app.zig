@@ -68,11 +68,10 @@ export fn app_main() callconv(.C) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    if (!std.mem.eql(u8, idf.sys.mcpu, "esp32h2")) {
-        wifi_init() catch |err| {
-            log.err("Error: {s}", .{@errorName(err)});
-        };
-    }
+    // FIXME: NOT BUILD on H2 ('builtin.cpu.model.name' not exists esp32h2)
+    // wifi_init() catch |err| {
+    //     log.err("Error: {s}", .{@errorName(err)});
+    // };
 
     // FreeRTOS Tasks
     if (idf.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
