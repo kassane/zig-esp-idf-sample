@@ -253,7 +253,7 @@ separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
     "-Dtarget=${ZIG_TARGET}"
-    "-Dmcpu=esp32s3"
+    "-Dmcpu=${TARGET_IDF_MODEL}"
     "-D__${TARGET_IDF_ARCH}"
     "-D${ARCH_DEFINE}"
     "-Dcpu_${TARGET_CPU_MODEL}"
