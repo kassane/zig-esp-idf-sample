@@ -52,7 +52,7 @@ endif()
 
 if(USE_ZIG_ESPRESSIF_TOOLCHAIN)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
+        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
         message(STATUS "Downloading ${ZIG_DOWNLOAD_LINK} to ${CMAKE_BINARY_DIR}/zig.${EXT}")
 
         file(DOWNLOAD "${ZIG_DOWNLOAD_LINK}" "${CMAKE_BINARY_DIR}/zig.${EXT}" SHOW_PROGRESS)
