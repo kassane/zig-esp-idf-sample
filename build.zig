@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) !void {
 
     const lib = b.addStaticLibrary(.{
         .name = "app_zig",
-        .root_source_file = b.path("main/examples/wifi-station.zig"),
+        .root_source_file = b.path("main/app.zig"),
         .target = target,
         .optimize = optimize,
     });
