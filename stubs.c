@@ -14,45 +14,44 @@ typedef struct _FILE FILE;
 #include <stdio.h>
 #endif
 
-#include "esp_attr.h"
 #undef IRAM_ATTR
 #define IRAM_ATTR
-#include "hal/assert.h"
-#include "esp_netif_types.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include "esp_log.h"
-#include "esp_event_base.h"
-#include "soc/gpio_num.h"
-#include "hal/gpio_types.h"
-#include "esp_heap_caps.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
-#include "driver/uart.h"
+#include "driver/i2s_common.h"
 #include "driver/spi_master.h"
 #include "driver/spi_slave.h"
-#include "driver/i2s_common.h"
-#include "hal/i2s_types.h"
-#include "esp_flash.h"
+#include "driver/uart.h"
 #include "esp_attr.h"
+#include "esp_event.h"
+#include "esp_event_base.h"
+#include "esp_flash.h"
+#include "esp_heap_caps.h"
+#include "esp_log.h"
+#include "esp_netif_types.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/task.h"
+#include "hal/assert.h"
+#include "hal/gpio_types.h"
+#include "hal/i2s_types.h"
+#include "nvs_flash.h"
+#include "soc/gpio_num.h"
 
-//#include "lwip/err.h"
-// #include "lwip/sys.h"
+// #include "lwip/err.h"
+//  #include "lwip/sys.h"
 
-/* The examples use WiFi configuration that you can set via project configuration menu
+/* The examples use WiFi configuration that you can set via project
+   configuration menu
 
    If you'd rather not, just change the below entries to strings with
    the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
 */
-#define EXAMPLE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
-#define EXAMPLE_ESP_WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD
-#define EXAMPLE_ESP_MAXIMUM_RETRY  CONFIG_ESP_MAXIMUM_RETRY
+#define EXAMPLE_ESP_WIFI_SSID CONFIG_ESP_WIFI_SSID
+#define EXAMPLE_ESP_WIFI_PASS CONFIG_ESP_WIFI_PASSWORD
+#define EXAMPLE_ESP_MAXIMUM_RETRY CONFIG_ESP_MAXIMUM_RETRY
 
 #if CONFIG_ESP_WPA3_SAE_PWE_HUNT_AND_PECK
 #define ESP_WIFI_SAE_MODE WPA3_SAE_PWE_HUNT_AND_PECK
@@ -85,9 +84,11 @@ typedef struct _FILE FILE;
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
 
-/* The event group allows multiple bits for each event, but we only care about two events:
+/* The event group allows multiple bits for each event, but we only care about
+ * two events:
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT      BIT1
+#define WIFI_FAIL_BIT BIT1
 
+const uint8_t g_espnow_user_oui[3] = {0x12, 0x34, 0x56};
