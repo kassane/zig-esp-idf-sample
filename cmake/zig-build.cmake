@@ -270,7 +270,7 @@ if(ARCH_DEFINE)
 endif()
 
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
-set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/stubs.c")
+set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 
 # Run `translate-c` to generate `idf-sys.zig`
 add_custom_command(
