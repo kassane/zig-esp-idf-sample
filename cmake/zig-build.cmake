@@ -52,7 +52,7 @@ endif()
 
 if(USE_ZIG_ESPRESSIF_TOOLCHAIN)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
+        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
         message(STATUS "Downloading ${ZIG_DOWNLOAD_LINK} to ${CMAKE_BINARY_DIR}/zig.${EXT}")
 
         file(DOWNLOAD "${ZIG_DOWNLOAD_LINK}" "${CMAKE_BINARY_DIR}/zig.${EXT}" SHOW_PROGRESS)
@@ -250,6 +250,23 @@ foreach(dir ${INCLUDE_DIRS})
 endforeach()
 separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
+# get esp-idf CMacros
+get_property(comp_flags TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_OPTIONS)
+get_property(comp_defs  TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
+
+foreach(def ${comp_defs})
+    list(APPEND EXTRA_DEFINE_FLAGS "-D${def}")
+endforeach()
+
+list(APPEND EXTRA_DEFINE_FLAGS 
+    "-fno-builtin" 
+    "-DESP_PLATFORM"
+    "-D_WINT_T"
+    "-D__GNUC__"
+    "-D__extension__="
+    "-D__restrict="
+)
+
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
     "-Dtarget=${ZIG_TARGET}"
@@ -275,7 +292,7 @@ set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 # Run `translate-c` to generate `idf-sys.zig`
 add_custom_command(
     OUTPUT "${IDF_SYS_ZIG}"
-    COMMAND ${ZIG_BIN} translate-c ${DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
+    COMMAND ${ZIG_BIN} translate-c ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
     DEPENDS ${IDF_SYS_C}
 )
 

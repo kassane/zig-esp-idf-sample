@@ -30,12 +30,12 @@ inline fn buildExtendedGPIO(comptime lib: type) []const std.builtin.Type.EnumFie
 // Ensure it runs at comptime
 pub const extended_gpio = buildExtendedGPIO(sys);
 
-pub const Num = @Type(.{ .@"enum" = .{
+pub const Num: std.builtin.Type.Enum = .{
     .tag_type = sys.gpio_num_t,
     .fields = extended_gpio,
     .decls = &[_]std.builtin.Type.Declaration{},
     .is_exhaustive = false,
-} });
+};
 
 // comptime {
 // // Depending on Xtensa or RiscV there may be more or less pins
