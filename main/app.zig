@@ -5,7 +5,7 @@ const wifi = idf.wifi;
 const ver = idf.ver.Version;
 const ESP_LOG = idf.log.ESP_LOG;
 
-export fn app_main() callconv(.c) void {
+export fn app_main() callconv(.C) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
     // std.heap.raw_c_allocator
 
@@ -31,13 +31,13 @@ export fn app_main() callconv(.c) void {
         @tagName(builtin.zig_backend),
     });
 
-    ESP_LOG(allocator, tag,
+    idf.log.ESP_LOG(allocator, tag,
         \\[ESP-IDF Info]
         \\* Version: {s}
         \\
-    , .{ver.get().toString(allocator)});
+    , .{idf.ver.Version.get().toString(allocator)});
 
-    ESP_LOG(
+    idf.log.ESP_LOG(
         allocator,
         tag,
         \\[Memory Info]
@@ -53,7 +53,7 @@ export fn app_main() callconv(.c) void {
         },
     );
 
-    ESP_LOG(
+    idf.log.ESP_LOG(
         allocator,
         tag,
         "Let's have a look at your shiny {s} - {s} system! :)\n\n",
@@ -135,7 +135,7 @@ fn arraylist(allocator: std.mem.Allocator) !void {
     try arr.append(30);
 
     for (arr.items) |index| {
-        ESP_LOG(
+        idf.log.ESP_LOG(
             allocator,
             tag,
             "Arr value: {}\n",
@@ -149,16 +149,16 @@ export fn blinkclock(_: ?*anyopaque) void {
         @panic(@errorName(err));
 }
 
-export fn foo(_: ?*anyopaque) callconv(.c) void {
+export fn foo(_: ?*anyopaque) callconv(.C) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
-        idf.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
-export fn bar(_: ?*anyopaque) callconv(.c) void {
+export fn bar(_: ?*anyopaque) callconv(.C) void {
     while (true) {
         log.info("Demo_Task bar printing..", .{});
-        idf.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
 
