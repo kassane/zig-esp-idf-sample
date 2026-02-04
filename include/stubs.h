@@ -50,7 +50,30 @@ typedef void *__VALIST;
 #define wcstombs
 
 /* Include the real bindings AFTER all the protections */
-#include "bindings.h"
+// #include "bindings.h"
+#include "driver/gpio.h"
+#include "driver/i2c.h"
+#include "driver/i2s_common.h"
+#include "driver/spi_master.h"
+#include "driver/spi_slave.h"
+#include "driver/uart.h"
+#include "esp_attr.h"
+#include "esp_event.h"
+#include "esp_event_base.h"
+#include "esp_flash.h"
+#include "esp_heap_caps.h"
+#include "esp_log.h"
+#include "esp_netif_types.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/task.h"
+#include "hal/assert.h"
+#include "hal/gpio_types.h"
+#include "hal/i2s_types.h"
+#include "nvs_flash.h"
+#include "soc/gpio_num.h"
 
 /* The examples use WiFi configuration that you can set via project
    configuration menu
