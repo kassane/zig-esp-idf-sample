@@ -128,6 +128,4 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 
-const uint8_t g_espnow_user_oui[3] = {0x12, 0x34, 0x56};
-
 #endif // STUBS_H
