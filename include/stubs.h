@@ -17,15 +17,17 @@
 #define _UNISTD_H
 #define _TIME_H
 
-/* Define opaque types as simple replacements */
+/* Avoid redefining types that exist in real headers */
+#undef _mbstate_t
+#undef __mbstate_t_defined
+
+/* Define only what's strictly necessary without conflicting */
 typedef void *FILE;
-typedef void *struct__reent;
-typedef int _mbstate_t;
+typedef int _LOCK_T;
+typedef void *__VALIST;
 typedef long off_t;
 typedef long _off_t;
 typedef unsigned int wint_t;
-typedef int _LOCK_T;
-typedef void *__VALIST;
 
 /* Disable macros and attributes that confuse zig translate-c */
 #define __restrict
@@ -36,18 +38,22 @@ typedef void *__VALIST;
 #define __volatile__
 #define __inline
 
-/* Disable IDF-specific section attributes that are not needed here */
+/* Disable IDF-specific attributes */
 #define IRAM_ATTR
 #define DRAM_ATTR
 #define RTC_DATA_ATTR
 #define SECTION_ATTR_IMPL(x, y)
 
-/* Block multibyte functions that appear in stdlib.h */
+/* Block multibyte functions from stdlib */
 #define mblen
 #define mbtowc
 #define wctomb
 #define mbstowcs
 #define wcstombs
+
+/* Workaround for FreeRTOS TLS dummy field (prevents struct _reent usage) */
+#define configTLS_BLOCK_TYPE int
+#define portTLS_BLOCK_TYPE int
 
 /* Include the real bindings AFTER all the protections */
 // #include "bindings.h"
