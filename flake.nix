@@ -19,7 +19,7 @@
         platformSrc = if system == "x86_64-linux" then
           {
             url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
-            sha256 = "sha256-QrTCGCr/RXvrxVqmhpHKuHBy1mXlamIxHIn4tpLx7Ss=";
+            sha256 = "sha256-MU1uKav1Xo60atpG+pZ3ExKEkswND7f/mpVdoNzqg+Q=";
           }
         else if system == "aarch64-linux" then
           {
