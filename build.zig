@@ -502,13 +502,13 @@ const riscv_targets = blk: {
             .abi = .none,
             .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
         },
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-            .os_tag = .freestanding,
-            .abi = .eabihf,
-            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-        },
+        // .{
+        //     .cpu_arch = .riscv32,
+        //     .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+        //     .os_tag = .freestanding,
+        //     .abi = .eabihf,
+        //     .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+        // },
     };
 
     if (@hasDecl(std.Target.riscv.cpu, "esp32p4")) {

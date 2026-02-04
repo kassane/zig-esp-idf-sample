@@ -31,8 +31,8 @@ pub fn ESP_LOG(allocator: std.mem.Allocator, comptime tag: [*:0]const u8, compti
     const buffer = if (isComptime(args))
         std.fmt.comptimePrint(fmt, args)
     else
-        std.fmt.allocPrintZ(allocator, fmt, args) catch |err| @panic(@errorName(err));
-    sys.esp_log_write(default_level, tag, buffer, sys.esp_log_timestamp(), tag);
+        std.fmt.allocPrint(allocator, fmt, args) catch |err| @panic(@errorName(err));
+    sys.esp_log_write(default_level, tag, buffer.ptr, sys.esp_log_timestamp(), tag);
 }
 
 pub const default_color = switch (@as(sys.esp_log_level_t, default_level)) {

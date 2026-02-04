@@ -55,8 +55,7 @@ typedef unsigned int wint_t;
 #define configTLS_BLOCK_TYPE int
 #define portTLS_BLOCK_TYPE int
 
-/* Include the real bindings AFTER all the protections */
-// #include "bindings.h"
+/* Include AFTER all the protections */
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/i2s_common.h"

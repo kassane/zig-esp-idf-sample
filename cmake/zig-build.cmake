@@ -298,39 +298,13 @@ if(ARCH_DEFINE)
     set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
 endif()
 
-# Thanks esp-rs team
-set(ESP_RS_BINDINGS_URL "https://raw.githubusercontent.com/esp-rs/esp-idf-sys/master/src/include/esp-idf/bindings.h")
-set(BINDINGS_DEST "${CMAKE_SOURCE_DIR}/include/bindings.h")
-
-if(NOT EXISTS "${BINDINGS_DEST}")
-    message(STATUS "Downloading esp-idf bindings.h from esp-rs...")
-    file(DOWNLOAD
-        "${ESP_RS_BINDINGS_URL}"
-        "${BINDINGS_DEST}"
-        STATUS download_status
-        SHOW_PROGRESS
-    )
-
-    list(GET download_status 0 status_code)
-    if(NOT status_code EQUAL 0)
-        message(FATAL_ERROR "Failed to download esp-idf bindings.h: ${download_status}")
-    else()
-        message(STATUS "Successfully downloaded esp-idf bindings.h to ${BINDINGS_DEST}")
-    endif()
-else()
-    message(STATUS "esp-idf bindings.h already exists at ${BINDINGS_DEST}. Skipping download.")
-endif()
-
-set_source_files_properties("${BINDINGS_DEST}" PROPERTIES GENERATED TRUE)
-
-
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 
 # Run `translate-c` to generate `idf-sys.zig`
 add_custom_command(
     OUTPUT "${IDF_SYS_ZIG}"
-    COMMAND ${ZIG_BIN} translate-c ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
+    COMMAND ${ZIG_BIN} translate-c -target ${ZIG_TARGET} ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
     DEPENDS ${IDF_SYS_C}
 )
 

@@ -2,7 +2,7 @@ const sys = @import("sys");
 const std = @import("std");
 
 pub const Caps = enum(c_int) {
-    MALLOC_CAP_EXEC = sys.MALLOC_CAP_EXEC, //< Memory must be able to run executable code
+    // MALLOC_CAP_EXEC = sys.MALLOC_CAP_EXEC, //< Memory must be able to run executable code
     MALLOC_CAP_32BIT = sys.MALLOC_CAP_32BIT, //< Memory must allow for aligned 32-bit data accesses
     MALLOC_CAP_8BIT = sys.MALLOC_CAP_8BIT, //< Memory must allow for 8/16/...-bit data accesses
     MALLOC_CAP_DMA = sys.MALLOC_CAP_DMA, //< Memory must be able to accessed by DMA

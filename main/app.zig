@@ -111,28 +111,31 @@ fn wifi_init() !void {
 
 // comptime function
 fn blinkLED(delay_ms: u32) !void {
-    try idf.gpio.Direction.set(
-        .GPIO_NUM_18,
-        .GPIO_MODE_OUTPUT,
-    );
-    while (true) {
-        log.info("LED: ON", .{});
-        try idf.gpio.Level.set(.GPIO_NUM_18, 1);
+    _ = delay_ms;
+    // try idf.gpio.Direction.set(
+    //     .GPIO_NUM_18,
+    //     .GPIO_MODE_OUTPUT,
+    // );
+    // while (true) {
+    //     log.info("LED: ON", .{});
+    //     try idf.gpio.Level.set(.GPIO_NUM_18, 1);
 
-        idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
+    //     idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
 
-        log.info("LED: OFF", .{});
-        try idf.gpio.Level.set(.GPIO_NUM_18, 0);
-    }
+    //     log.info("LED: OFF", .{});
+    //     try idf.gpio.Level.set(.GPIO_NUM_18, 0);
+    // }
 }
 
 fn arraylist(allocator: std.mem.Allocator) !void {
-    var arr = std.ArrayList(u32).init(allocator);
-    defer arr.deinit();
+    var arr: std.ArrayList(u32) = .empty;
+    defer arr.deinit(
+        allocator,
+    );
 
-    try arr.append(10);
-    try arr.append(20);
-    try arr.append(30);
+    try arr.append(allocator, 10);
+    try arr.append(allocator, 20);
+    try arr.append(allocator, 30);
 
     for (arr.items) |index| {
         ESP_LOG(
