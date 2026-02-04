@@ -175,7 +175,9 @@ endif()
 set(INCLUDE_DIRS
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
     "${IDF_PATH}/components/freertos/config/include/freertos"
+    "${IDF_PATH}/components/freertos/esp_additions/include"
     "${IDF_PATH}/components/freertos/config/${ARCH}/include"
+    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/esp_hw_support/include"
     "${IDF_PATH}/components/soc/include"
@@ -183,6 +185,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_common/include"
     "${IDF_PATH}/components/hal/include"
     "${IDF_PATH}/components/${ARCH}/include"
+    "${IDF_PATH}/components/bt/include/${TARGET_IDF_MODEL}/include"
+    "${IDF_PATH}/components/bt/host/bluedroid/api/include/api"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}/config"
@@ -216,6 +220,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_phy/include"
     "${IDF_PATH}/components/esp_blockdev/include"
     "${IDF_PATH}/components/esp_libc/platform_include"
+    "${IDF_PATH}/components/esp_libc/platform_include/sys"
     "${IDF_PATH}/components/newlib"
     "${IDF_PATH}/components/newlib/platform_include/sys"
     "${IDF_PATH}/components/newlib/platform_include"
@@ -239,6 +244,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_driver_spi/include"
     "${IDF_PATH}/components/spi_flash/include"
     "${IDF_PATH}/components/esp_driver_i2s/include"
+    "${IDF_PATH}/components/esp_driver_usb_serial_jtag/include"
     "${CMAKE_SOURCE_DIR}/build/config"
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
@@ -252,14 +258,14 @@ separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
 # get esp-idf CMacros
 get_property(comp_flags TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_OPTIONS)
-get_property(comp_defs  TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
+get_property(comp_defs TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
 
 foreach(def ${comp_defs})
     list(APPEND EXTRA_DEFINE_FLAGS "-D${def}")
 endforeach()
 
-list(APPEND EXTRA_DEFINE_FLAGS 
-    "-fno-builtin" 
+list(APPEND EXTRA_DEFINE_FLAGS
+    "-fno-builtin"
     "-DESP_PLATFORM"
     "-D_WINT_T"
     "-D__GNUC__"
@@ -272,7 +278,6 @@ set(DEFINE_FLAGS
     "-Dtarget=${ZIG_TARGET}"
     "-Dmcpu=${TARGET_IDF_MODEL}"
     "-D__${TARGET_IDF_ARCH}"
-    "-D${ARCH_DEFINE}"
     "-Dcpu_${TARGET_CPU_MODEL}"
     "-DCONFIG_IDF_TARGET_${TARGET_IDF_MODEL_UPPER}"
     "-D__COUNTER__=0"
@@ -283,7 +288,13 @@ set(DEFINE_FLAGS
 string(JOIN " " DEFINE_FLAGS_STR ${DEFINE_FLAGS})
 
 if(ARCH_DEFINE)
-    set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
+    if(CONFIG_IDF_TARGET_ARCH_XTENSA)
+        # xtensa-gcc / ieeefp.h rename ARCH_DEFINE
+        string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
+        set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE} -D__${TARGET_IDF_ARCH_UPPER}_EL__")
+    else()
+        set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
+    endif()
 endif()
 
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
