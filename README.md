@@ -15,7 +15,7 @@ More information about building and using Zig with ESP-IDF can be found in the [
 
 ## Prerequisites
 
-- [Zig](https://ziglang.org/download) toolchain - v0.14.0 or master
+- [Zig](https://ziglang.org/download) toolchain - v0.16.0 or master
 - [ESP-IDF](https://github.com/espressif/esp-idf) - v5.x or v6.x or master
 
 ### Targets Allowed

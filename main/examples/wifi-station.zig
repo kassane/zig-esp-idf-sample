@@ -1,9 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const idf = @import("esp_idf");
-const sdkconfig = @cImport({
-    @cInclude("sdkconfig.h");
-});
 
 const mem = std.mem;
 
@@ -17,7 +14,7 @@ export fn app_main() callconv(.C) void {
     const heap = std.heap.raw_c_allocator;
     var arena = std.heap.ArenaAllocator.init(heap);
     defer {
-        idf.ESP_LOG(global_allocator.?, tag, "ARENA DEINIT();\n", .{});
+        idf.log.ESP_LOG(global_allocator.?, tag, "ARENA DEINIT();\n", .{});
         arena.deinit();
     }
     global_allocator = arena.allocator();
@@ -25,18 +22,18 @@ export fn app_main() callconv(.C) void {
     // Initalize NVS
     var ret = idf.sys.nvs_flash_init();
     if (ret == idf.sys.ESP_ERR_NVS_NO_FREE_PAGES or ret == idf.sys.ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        idf.espCheckError(idf.sys.nvs_flash_erase()) catch {};
+        idf.err.espCheckError(idf.sys.nvs_flash_erase()) catch {};
         ret = idf.sys.nvs_flash_init();
     }
-    idf.espCheckError(ret) catch {};
+    idf.err.espCheckError(ret) catch {};
 
-    idf.ESP_LOG(global_allocator.?, tag, "ESP_WIFI_MODE_STA\n", .{});
+    idf.log.ESP_LOG(global_allocator.?, tag, "ESP_WIFI_MODE_STA\n", .{});
 
     wifi_init_sta(global_allocator.?);
 }
 
 // override the std panic function with idf.panic
-pub const panic = idf.panic;
+pub const panic = idf.esp_panic.panic;
 const log = std.log.scoped(.@"esp-idf");
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
@@ -44,7 +41,7 @@ pub const std_options: std.Options = .{
         else => .info,
     },
     // Define logFn to override the std implementation
-    .logFn = idf.espLogFn,
+    .logFn = idf.log.espLogFn,
 };
 
 fn ip_to_str(ip: u32) []u8 {
@@ -75,18 +72,18 @@ export fn event_handler(
                     idf.wifi.connect() catch {
                         s_retry_num += 1;
                     };
-                    idf.ESP_LOG(allocator, tag, "retry to connect to the AP\n", .{});
+                    idf.log.ESP_LOG(allocator, tag, "retry to connect to the AP\n", .{});
                 } else {
                     _ = idf.sys.xEventGroupSetBits(@as(idf.sys.EventGroupHandle_t, @ptrCast(s_wifi_event_group)), idf.sys.WIFI_FAIL_BIT);
                 }
-                idf.ESP_LOG(allocator, tag, "connect to the AP fail\n", .{});
+                idf.log.ESP_LOG(allocator, tag, "connect to the AP fail\n", .{});
             }
         } else if (event_base == idf.sys.IP_EVENT) {
             //const event_type = @as(idf.sys.ip_event_t, @enumFromInt(@as(c_uint, @intCast(event_id))));
 
             if (event_id == idf.sys.IP_EVENT_STA_GOT_IP) {
                 const event: *idf.sys.ip_event_got_ip_t = @ptrCast(@alignCast(event_data));
-                idf.ESP_LOG(allocator, tag, "got ip: {s}\n", .{ip_to_str(event.ip_info.ip.addr)});
+                idf.log.ESP_LOG(allocator, tag, "got ip: {s}\n", .{ip_to_str(event.ip_info.ip.addr)});
                 s_retry_num = 0;
                 _ = idf.sys.xEventGroupSetBits(@as(idf.sys.EventGroupHandle_t, @ptrCast(s_wifi_event_group)), idf.sys.WIFI_CONNECTED_BIT);
             }
@@ -97,29 +94,29 @@ export fn event_handler(
 fn wifi_init_sta(allocator: std.mem.Allocator) void {
     s_wifi_event_group = idf.sys.xEventGroupCreate();
 
-    idf.espCheckError(idf.sys.esp_netif_init()) catch {};
+    idf.err.espCheckError(idf.sys.esp_netif_init()) catch {};
 
-    idf.espCheckError(idf.sys.esp_event_loop_create_default()) catch {};
+    idf.err.espCheckError(idf.sys.esp_event_loop_create_default()) catch {};
     _ = idf.sys.esp_netif_create_default_wifi_sta();
 
     // TODO: Some of these come from the sdkconfig, how to parse in?
     var cfg = idf.wifi.init_config_default();
-    idf.ESP_LOG(allocator, tag, "WiFi Init Magic: 0x{x}\n", .{cfg.magic});
-    idf.espCheckError(idf.sys.esp_wifi_init(&cfg)) catch {
-        idf.ESP_LOG(allocator, tag, "WiFi init failed", .{});
+    idf.log.ESP_LOG(allocator, tag, "WiFi Init Magic: 0x{x}\n", .{cfg.magic});
+    idf.err.espCheckError(idf.sys.esp_wifi_init(&cfg)) catch {
+        idf.log.ESP_LOG(allocator, tag, "WiFi init failed", .{});
     };
 
     var instance_any_id: idf.sys.esp_event_handler_instance_t = undefined;
     var instance_got_ip: idf.sys.esp_event_handler_instance_t = undefined;
 
-    idf.espCheckError(idf.sys.esp_event_handler_instance_register(
+    idf.err.espCheckError(idf.sys.esp_event_handler_instance_register(
         idf.sys.WIFI_EVENT,
         -1,
         &event_handler,
         null,
         &instance_any_id,
     )) catch {};
-    idf.espCheckError(idf.sys.esp_event_handler_instance_register(
+    idf.err.espCheckError(idf.sys.esp_event_handler_instance_register(
         idf.sys.WIFI_EVENT,
         idf.sys.IP_EVENT_STA_GOT_IP,
         &event_handler,
@@ -136,9 +133,9 @@ fn wifi_init_sta(allocator: std.mem.Allocator) void {
             .sae_h2e_identifier = mem.zeroes([32]u8),
         },
     };
-    const ssid = sdkconfig.CONFIG_ESP_WIFI_SSID;
-    const passwd = sdkconfig.CONFIG_ESP_WIFI_PASSWORD;
-    const sae_h2e_id = sdkconfig.CONFIG_ESP_WIFI_PW_ID;
+    const ssid = idf.CONFIG_ESP_WIFI_SSID;
+    const passwd = idf.CONFIG_ESP_WIFI_PASSWORD;
+    const sae_h2e_id = idf.CONFIG_ESP_WIFI_PW_ID;
 
     mem.copyForwards(u8, wifi_config.sta.ssid[0..ssid.len], ssid);
     wifi_config.sta.ssid[ssid.len] = 0;
@@ -153,7 +150,7 @@ fn wifi_init_sta(allocator: std.mem.Allocator) void {
     idf.wifi.setConfig(.WIFI_IF_STA, &wifi_config) catch {};
     idf.wifi.start() catch {};
 
-    idf.ESP_LOG(allocator, tag, "wifi_init_sta finished.\n", .{});
+    idf.log.ESP_LOG(allocator, tag, "wifi_init_sta finished.\n", .{});
 
     // Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
     // number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above)
@@ -168,10 +165,10 @@ fn wifi_init_sta(allocator: std.mem.Allocator) void {
     // xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
     // happened.
     if ((bits & idf.sys.WIFI_CONNECTED_BIT) != 0) {
-        idf.ESP_LOG(allocator, tag, "connected to ap SSID: {s} password: {s}\n", .{ ssid, passwd });
+        idf.log.ESP_LOG(allocator, tag, "connected to ap SSID: {s} password: {s}\n", .{ ssid, passwd });
     } else if ((bits & idf.sys.WIFI_FAIL_BIT) != 0) {
-        idf.ESP_LOG(allocator, tag, "Failed to connect SSID: {s} password: {s}\n", .{ ssid, passwd });
+        idf.log.ESP_LOG(allocator, tag, "Failed to connect SSID: {s} password: {s}\n", .{ ssid, passwd });
     } else {
-        idf.ESP_LOG(allocator, tag, "UNEXPECTED EVENT", .{});
+        idf.log.ESP_LOG(allocator, tag, "UNEXPECTED EVENT", .{});
     }
 }

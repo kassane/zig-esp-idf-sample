@@ -2,73 +2,59 @@ const sys = @import("sys");
 const std = @import("std");
 const errors = @import("error");
 
-inline fn buildExtendedGPIO(comptime lib: type) []const std.builtin.Type.EnumField {
-    var targets: []const std.builtin.Type.EnumField = &[_]std.builtin.Type.EnumField{
-        .{
-            .name = "GPIO_NUM_NC",
-            .value = lib.GPIO_NUM_NC,
-        },
-    };
-
-    for ([_]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }) |n| {
-        const field_name = std.fmt.comptimePrint("GPIO_NUM_{}", .{n});
-        if (@hasDecl(lib, field_name)) {
-            targets = targets ++ &[_]std.builtin.Type.EnumField{
-                .{
-                    .name = field_name,
-                    .value = @field(lib, field_name),
-                },
-            };
-        }
-    }
-
-    return targets ++ &[_]std.builtin.Type.EnumField{
-        .{ .name = "GPIO_NUM_MAX", .value = lib.GPIO_NUM_MAX },
-    };
-}
-
-// Ensure it runs at comptime
-pub const extended_gpio = buildExtendedGPIO(sys);
-
-pub const Num = @Type(.{ .@"enum" = .{
-    .tag_type = sys.gpio_num_t,
-    .fields = extended_gpio,
-    .decls = &[_]std.builtin.Type.Declaration{},
-    .is_exhaustive = false,
-} });
-
-// comptime {
-// // Depending on Xtensa or RiscV there may be more or less pins
-// const extended_gpio = blk: {
-//     var targets: []const std.builtin.Type.EnumField = &[_]std.builtin.Type.EnumField{
-//         .{
-//             .name = "GPIO_NUM_NC",
-//             .value = sys.GPIO_NUM_NC,
-//         },
-//     };
-//     for ([_]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 }) |n| {
-//         const field_name = std.fmt.comptimePrint("GPIO_NUM_{}", .{n});
-//         if (@hasField(sys, field_name)) {
-//             targets = targets ++ &[_]std.builtin.Type.EnumField{
-//                 .{
-//                     .name = field_name,
-//                     .value = @field(sys, field_name),
-//                 },
-//             };
-//         }
-//     }
-//     break :blk targets ++ &[_]std.builtin.Type.EnumField{
-//         .{ .name = "GPIO_NUM_MAX", .value = sys.GPIO_NUM_MAX },
-//     };
-// };
-
-// pub const Num = @Type(.{ .@"enum" = .{
-//     .tag_type = sys.gpio_num_t,
-//     .fields = extended_gpio,
-//     .decls = &[_]std.builtin.Type.Declaration{},
-//     .is_exhaustive = false,
-// } });
-// }
+pub const Num = enum(sys.gpio_num_t) {
+    GPIO_NUM_NC = sys.GPIO_NUM_NC,
+    GPIO_NUM_0 = if (@hasDecl(sys, "GPIO_NUM_0")) sys.GPIO_NUM_0 else sys.GPIO_NUM_MAX + 1000,
+    GPIO_NUM_1 = if (@hasDecl(sys, "GPIO_NUM_1")) sys.GPIO_NUM_1 else sys.GPIO_NUM_MAX + 1001,
+    GPIO_NUM_2 = if (@hasDecl(sys, "GPIO_NUM_2")) sys.GPIO_NUM_2 else sys.GPIO_NUM_MAX + 1002,
+    GPIO_NUM_3 = if (@hasDecl(sys, "GPIO_NUM_3")) sys.GPIO_NUM_3 else sys.GPIO_NUM_MAX + 1003,
+    GPIO_NUM_4 = if (@hasDecl(sys, "GPIO_NUM_4")) sys.GPIO_NUM_4 else sys.GPIO_NUM_MAX + 1004,
+    GPIO_NUM_5 = if (@hasDecl(sys, "GPIO_NUM_5")) sys.GPIO_NUM_5 else sys.GPIO_NUM_MAX + 1005,
+    GPIO_NUM_6 = if (@hasDecl(sys, "GPIO_NUM_6")) sys.GPIO_NUM_6 else sys.GPIO_NUM_MAX + 1006,
+    GPIO_NUM_7 = if (@hasDecl(sys, "GPIO_NUM_7")) sys.GPIO_NUM_7 else sys.GPIO_NUM_MAX + 1007,
+    GPIO_NUM_8 = if (@hasDecl(sys, "GPIO_NUM_8")) sys.GPIO_NUM_8 else sys.GPIO_NUM_MAX + 1008,
+    GPIO_NUM_9 = if (@hasDecl(sys, "GPIO_NUM_9")) sys.GPIO_NUM_9 else sys.GPIO_NUM_MAX + 1009,
+    GPIO_NUM_10 = if (@hasDecl(sys, "GPIO_NUM_10")) sys.GPIO_NUM_10 else sys.GPIO_NUM_MAX + 1010,
+    GPIO_NUM_11 = if (@hasDecl(sys, "GPIO_NUM_11")) sys.GPIO_NUM_11 else sys.GPIO_NUM_MAX + 1011,
+    GPIO_NUM_12 = if (@hasDecl(sys, "GPIO_NUM_12")) sys.GPIO_NUM_12 else sys.GPIO_NUM_MAX + 1012,
+    GPIO_NUM_13 = if (@hasDecl(sys, "GPIO_NUM_13")) sys.GPIO_NUM_13 else sys.GPIO_NUM_MAX + 1013,
+    GPIO_NUM_14 = if (@hasDecl(sys, "GPIO_NUM_14")) sys.GPIO_NUM_14 else sys.GPIO_NUM_MAX + 1014,
+    GPIO_NUM_15 = if (@hasDecl(sys, "GPIO_NUM_15")) sys.GPIO_NUM_15 else sys.GPIO_NUM_MAX + 1015,
+    GPIO_NUM_16 = if (@hasDecl(sys, "GPIO_NUM_16")) sys.GPIO_NUM_16 else sys.GPIO_NUM_MAX + 1016,
+    GPIO_NUM_17 = if (@hasDecl(sys, "GPIO_NUM_17")) sys.GPIO_NUM_17 else sys.GPIO_NUM_MAX + 1017,
+    GPIO_NUM_18 = if (@hasDecl(sys, "GPIO_NUM_18")) sys.GPIO_NUM_18 else sys.GPIO_NUM_MAX + 1018,
+    GPIO_NUM_19 = if (@hasDecl(sys, "GPIO_NUM_19")) sys.GPIO_NUM_19 else sys.GPIO_NUM_MAX + 1019,
+    GPIO_NUM_20 = if (@hasDecl(sys, "GPIO_NUM_20")) sys.GPIO_NUM_20 else sys.GPIO_NUM_MAX + 1020,
+    GPIO_NUM_21 = if (@hasDecl(sys, "GPIO_NUM_21")) sys.GPIO_NUM_21 else sys.GPIO_NUM_MAX + 1021,
+    GPIO_NUM_22 = if (@hasDecl(sys, "GPIO_NUM_22")) sys.GPIO_NUM_22 else sys.GPIO_NUM_MAX + 1022,
+    GPIO_NUM_23 = if (@hasDecl(sys, "GPIO_NUM_23")) sys.GPIO_NUM_23 else sys.GPIO_NUM_MAX + 1023,
+    GPIO_NUM_24 = if (@hasDecl(sys, "GPIO_NUM_24")) sys.GPIO_NUM_24 else sys.GPIO_NUM_MAX + 1024,
+    GPIO_NUM_25 = if (@hasDecl(sys, "GPIO_NUM_25")) sys.GPIO_NUM_25 else sys.GPIO_NUM_MAX + 1025,
+    GPIO_NUM_26 = if (@hasDecl(sys, "GPIO_NUM_26")) sys.GPIO_NUM_26 else sys.GPIO_NUM_MAX + 1026,
+    GPIO_NUM_27 = if (@hasDecl(sys, "GPIO_NUM_27")) sys.GPIO_NUM_27 else sys.GPIO_NUM_MAX + 1027,
+    GPIO_NUM_28 = if (@hasDecl(sys, "GPIO_NUM_28")) sys.GPIO_NUM_28 else sys.GPIO_NUM_MAX + 1028,
+    GPIO_NUM_29 = if (@hasDecl(sys, "GPIO_NUM_29")) sys.GPIO_NUM_29 else sys.GPIO_NUM_MAX + 1029,
+    GPIO_NUM_30 = if (@hasDecl(sys, "GPIO_NUM_30")) sys.GPIO_NUM_30 else sys.GPIO_NUM_MAX + 1030,
+    GPIO_NUM_31 = if (@hasDecl(sys, "GPIO_NUM_31")) sys.GPIO_NUM_31 else sys.GPIO_NUM_MAX + 1031,
+    GPIO_NUM_32 = if (@hasDecl(sys, "GPIO_NUM_32")) sys.GPIO_NUM_32 else sys.GPIO_NUM_MAX + 1032,
+    GPIO_NUM_33 = if (@hasDecl(sys, "GPIO_NUM_33")) sys.GPIO_NUM_33 else sys.GPIO_NUM_MAX + 1033,
+    GPIO_NUM_34 = if (@hasDecl(sys, "GPIO_NUM_34")) sys.GPIO_NUM_34 else sys.GPIO_NUM_MAX + 1034,
+    GPIO_NUM_35 = if (@hasDecl(sys, "GPIO_NUM_35")) sys.GPIO_NUM_35 else sys.GPIO_NUM_MAX + 1035,
+    GPIO_NUM_36 = if (@hasDecl(sys, "GPIO_NUM_36")) sys.GPIO_NUM_36 else sys.GPIO_NUM_MAX + 1036,
+    GPIO_NUM_37 = if (@hasDecl(sys, "GPIO_NUM_37")) sys.GPIO_NUM_37 else sys.GPIO_NUM_MAX + 1037,
+    GPIO_NUM_38 = if (@hasDecl(sys, "GPIO_NUM_38")) sys.GPIO_NUM_38 else sys.GPIO_NUM_MAX + 1038,
+    GPIO_NUM_39 = if (@hasDecl(sys, "GPIO_NUM_39")) sys.GPIO_NUM_39 else sys.GPIO_NUM_MAX + 1039,
+    GPIO_NUM_40 = if (@hasDecl(sys, "GPIO_NUM_40")) sys.GPIO_NUM_40 else sys.GPIO_NUM_MAX + 1040,
+    GPIO_NUM_41 = if (@hasDecl(sys, "GPIO_NUM_41")) sys.GPIO_NUM_41 else sys.GPIO_NUM_MAX + 1041,
+    GPIO_NUM_42 = if (@hasDecl(sys, "GPIO_NUM_42")) sys.GPIO_NUM_42 else sys.GPIO_NUM_MAX + 1042,
+    GPIO_NUM_43 = if (@hasDecl(sys, "GPIO_NUM_43")) sys.GPIO_NUM_43 else sys.GPIO_NUM_MAX + 1043,
+    GPIO_NUM_44 = if (@hasDecl(sys, "GPIO_NUM_44")) sys.GPIO_NUM_44 else sys.GPIO_NUM_MAX + 1044,
+    GPIO_NUM_45 = if (@hasDecl(sys, "GPIO_NUM_45")) sys.GPIO_NUM_45 else sys.GPIO_NUM_MAX + 1045,
+    GPIO_NUM_46 = if (@hasDecl(sys, "GPIO_NUM_46")) sys.GPIO_NUM_46 else sys.GPIO_NUM_MAX + 1046,
+    GPIO_NUM_47 = if (@hasDecl(sys, "GPIO_NUM_47")) sys.GPIO_NUM_47 else sys.GPIO_NUM_MAX + 1047,
+    GPIO_NUM_48 = if (@hasDecl(sys, "GPIO_NUM_48")) sys.GPIO_NUM_48 else sys.GPIO_NUM_MAX + 1048,
+    GPIO_NUM_MAX = sys.GPIO_NUM_MAX,
+};
 
 pub const Port = enum(sys.gpio_port_t) {
     GPIO_PORT_0 = sys.GPIO_PORT_0,

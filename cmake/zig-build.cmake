@@ -52,7 +52,7 @@ endif()
 
 if(USE_ZIG_ESPRESSIF_TOOLCHAIN)
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
+        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
         message(STATUS "Downloading ${ZIG_DOWNLOAD_LINK} to ${CMAKE_BINARY_DIR}/zig.${EXT}")
 
         file(DOWNLOAD "${ZIG_DOWNLOAD_LINK}" "${CMAKE_BINARY_DIR}/zig.${EXT}" SHOW_PROGRESS)
@@ -84,6 +84,9 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
         string(REGEX REPLACE "-none" "-eabihf" ZIG_TARGET ${ZIG_TARGET})
         # (zca, zcb, zcmt, zcmp) are not supported on ESP32-P4-Function-EV-Board (crash application)
         set(TARGET_CPU_MODEL "esp32p4-zca-zcb-zcmt-zcmp")
+    elseif(CONFIG_IDF_TARGET_ESP32H4)
+        string(REGEX REPLACE "-none" "-eabihf" ZIG_TARGET ${ZIG_TARGET})
+        set(TARGET_CPU_MODEL "esp32h4-zca-zcb-zcmt-zcmp")
     else()
         set(TARGET_CPU_MODEL "generic_rv32+m+c+zicsr+zifencei")
     endif()
@@ -147,7 +150,7 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
         # Windows has no sys-include folder
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/sys-include")
     endif()
     set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
@@ -167,7 +170,7 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
         # Windows has no sys-include folder
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/sys-include")
     endif()
     set(ARCH_DEFINE "__XTENSA__")
 endif()
@@ -175,7 +178,9 @@ endif()
 set(INCLUDE_DIRS
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
     "${IDF_PATH}/components/freertos/config/include/freertos"
+    "${IDF_PATH}/components/freertos/esp_additions/include"
     "${IDF_PATH}/components/freertos/config/${ARCH}/include"
+    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/esp_hw_support/include"
     "${IDF_PATH}/components/soc/include"
@@ -183,6 +188,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_common/include"
     "${IDF_PATH}/components/hal/include"
     "${IDF_PATH}/components/${ARCH}/include"
+    "${IDF_PATH}/components/bt/include/${TARGET_IDF_MODEL}/include"
+    "${IDF_PATH}/components/bt/host/bluedroid/api/include/api"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}/config"
@@ -216,6 +223,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_phy/include"
     "${IDF_PATH}/components/esp_blockdev/include"
     "${IDF_PATH}/components/esp_libc/platform_include"
+    "${IDF_PATH}/components/esp_libc/platform_include/sys"
     "${IDF_PATH}/components/newlib"
     "${IDF_PATH}/components/newlib/platform_include/sys"
     "${IDF_PATH}/components/newlib/platform_include"
@@ -239,6 +247,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_driver_spi/include"
     "${IDF_PATH}/components/spi_flash/include"
     "${IDF_PATH}/components/esp_driver_i2s/include"
+    "${IDF_PATH}/components/esp_driver_usb_serial_jtag/include"
     "${CMAKE_SOURCE_DIR}/build/config"
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
@@ -250,19 +259,42 @@ foreach(dir ${INCLUDE_DIRS})
 endforeach()
 separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
+# get esp-idf CMacros
+idf_build_get_property(all_defines COMPILE_DEFINITIONS)
+
+set(EXTRA_DEFINE_FLAGS "")
+foreach(def ${all_defines})
+    string(STRIP "${def}" def_clean)
+    if(NOT def_clean STREQUAL "")
+        if(NOT def_clean MATCHES "^-D")
+            list(APPEND EXTRA_DEFINE_FLAGS "-D${def_clean}")
+        else()
+            list(APPEND EXTRA_DEFINE_FLAGS "${def_clean}")
+        endif()
+    endif()
+endforeach()
+
+list(APPEND EXTRA_DEFINE_FLAGS
+    "-fno-builtin"
+    "-D__GNUC__"
+)
+
+string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
     "-Dtarget=${ZIG_TARGET}"
     "-Dmcpu=${TARGET_IDF_MODEL}"
     "-D__${TARGET_IDF_ARCH}"
-    "-D${ARCH_DEFINE}"
     "-Dcpu_${TARGET_CPU_MODEL}"
+    "-D${ARCH_DEFINE}"
+    "-D__${TARGET_IDF_ARCH_UPPER}_EL__"
     "-DCONFIG_IDF_TARGET_${TARGET_IDF_MODEL_UPPER}"
     "-D__COUNTER__=0"
     "-DIRAM_ATTR="
     "-D_SECTION_ATTR_IMPL\\(x,y\\)="
     "-DSOC_MMU_PAGE_SIZE=0x8000"
-    "-DLWIP_NO_UNISTD_H=")
+    "-DLWIP_NO_UNISTD_H="
+)
 string(JOIN " " DEFINE_FLAGS_STR ${DEFINE_FLAGS})
 
 if(ARCH_DEFINE)
@@ -275,7 +307,7 @@ set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 # Run `translate-c` to generate `idf-sys.zig`
 add_custom_command(
     OUTPUT "${IDF_SYS_ZIG}"
-    COMMAND ${ZIG_BIN} translate-c ${DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
+    COMMAND ${ZIG_BIN} translate-c -target ${ZIG_TARGET} ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
     DEPENDS ${IDF_SYS_C}
 )
 
@@ -311,7 +343,6 @@ add_custom_target(zig_build
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
     -freference-trace
-    --prominent-compile-errors
     --cache-dir ${CMAKE_BINARY_DIR}/../.zig-cache
     --prefix ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

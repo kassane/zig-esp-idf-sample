@@ -21,17 +21,17 @@ ENV QEMU_SHA256=071d117c44a6e9a1bc8664ab63b592d3e17ceb779119dcb46c59571a4a7a88c9
 ENV QEMU_DIST=qemu-xtensa-softmmu-${QEMU_REL}-x86_64-linux-gnu.tar.xz
 ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-9.0.0-20240606/${QEMU_DIST}
 
-# Zig v0.14.0 - xtensa
+# Zig v0.16.0 - xtensa
 ENV ZIG_REL=zig-relsafe-x86_64-linux-musl-baseline
-ENV ZIG_SHA256=7331105f4de90cdce887d4868567ece66894eef2b599deec60277794748b2c20
+ENV ZIG_SHA256=314d6e29abf55e8eb46ada46fa967713128492cc0d0fb7ff9a955da0dcea83e4
 ENV ZIG_DIST=${ZIG_REL}.tar.xz
-ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa/${ZIG_DIST}
+ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/${ZIG_DIST}
 
-# ZLS v0.14.0
-ENV ZLS_REL=zls-x86_64-linux-musl-baseline_24c6dfb68
-ENV ZLS_SHA256=2ef50c00b9ad9e8fd15f0ba3b5a41a67807e762e095439ad7f75d946e5d03f9d
+# ZLS v0.16.0
+ENV ZLS_REL=zls-x86_64-linux-musl-baseline
+ENV ZLS_SHA256=fbd8fcced9c69a144d34ccee8076d52291cfdd02b3be6dbc8ed9cd228a537ed3
 ENV ZLS_DIST=${ZLS_REL}.tar.xz
-ENV ZLS_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.14.0-xtensa-dev/${ZLS_DIST}
+ENV ZLS_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/${ZLS_DIST}
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8

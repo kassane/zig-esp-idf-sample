@@ -2,8 +2,10 @@ const std = @import("std");
 const builtin = @import("builtin");
 const idf = @import("esp_idf");
 const wifi = idf.wifi;
+const ver = idf.ver.Version;
+const ESP_LOG = idf.log.ESP_LOG;
 
-export fn app_main() callconv(.C) void {
+export fn app_main() callconv(.c) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
     // std.heap.raw_c_allocator
 
@@ -29,13 +31,13 @@ export fn app_main() callconv(.C) void {
         @tagName(builtin.zig_backend),
     });
 
-    idf.ESP_LOG(allocator, tag,
+    ESP_LOG(allocator, tag,
         \\[ESP-IDF Info]
         \\* Version: {s}
         \\
-    , .{idf.Version.get().toString(allocator)});
+    , .{ver.get().toString(allocator)});
 
-    idf.ESP_LOG(
+    ESP_LOG(
         allocator,
         tag,
         \\[Memory Info]
@@ -51,7 +53,7 @@ export fn app_main() callconv(.C) void {
         },
     );
 
-    idf.ESP_LOG(
+    ESP_LOG(
         allocator,
         tag,
         "Let's have a look at your shiny {s} - {s} system! :)\n\n",
@@ -74,13 +76,13 @@ export fn app_main() callconv(.C) void {
     // };
 
     // FreeRTOS Tasks
-    if (idf.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
+    if (idf.rtos.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
         @panic("Error: Task foo not created!\n");
     }
-    if (idf.xTaskCreate(bar, "bar", 1024 * 3, null, 2, null) == 0) {
+    if (idf.rtos.xTaskCreate(bar, "bar", 1024 * 3, null, 2, null) == 0) {
         @panic("Error: Task bar not created!\n");
     }
-    if (idf.xTaskCreate(blinkclock, "blink", 1024 * 2, null, 5, null) == 0) {
+    if (idf.rtos.xTaskCreate(blinkclock, "blink", 1024 * 2, null, 5, null) == 0) {
         @panic("Error: Task blinkclock not created!\n");
     }
 }
@@ -117,7 +119,7 @@ fn blinkLED(delay_ms: u32) !void {
         log.info("LED: ON", .{});
         try idf.gpio.Level.set(.GPIO_NUM_18, 1);
 
-        idf.vTaskDelay(delay_ms / idf.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
 
         log.info("LED: OFF", .{});
         try idf.gpio.Level.set(.GPIO_NUM_18, 0);
@@ -125,15 +127,17 @@ fn blinkLED(delay_ms: u32) !void {
 }
 
 fn arraylist(allocator: std.mem.Allocator) !void {
-    var arr = std.ArrayList(u32).init(allocator);
-    defer arr.deinit();
+    var arr: std.ArrayList(u32) = .empty;
+    defer arr.deinit(
+        allocator,
+    );
 
-    try arr.append(10);
-    try arr.append(20);
-    try arr.append(30);
+    try arr.append(allocator, 10);
+    try arr.append(allocator, 20);
+    try arr.append(allocator, 30);
 
     for (arr.items) |index| {
-        idf.ESP_LOG(
+        ESP_LOG(
             allocator,
             tag,
             "Arr value: {}\n",
@@ -147,21 +151,21 @@ export fn blinkclock(_: ?*anyopaque) void {
         @panic(@errorName(err));
 }
 
-export fn foo(_: ?*anyopaque) callconv(.C) void {
+export fn foo(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
-        idf.vTaskDelay(2000 / idf.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
-export fn bar(_: ?*anyopaque) callconv(.C) void {
+export fn bar(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task bar printing..", .{});
-        idf.vTaskDelay(1000 / idf.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
 
 // override the std panic function with idf.panic
-pub const panic = idf.panic;
+pub const panic = idf.esp_panic.panic;
 const log = std.log.scoped(.@"esp-idf");
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
@@ -169,7 +173,7 @@ pub const std_options: std.Options = .{
         else => .info,
     },
     // Define logFn to override the std implementation
-    .logFn = idf.espLogFn,
+    .logFn = idf.log.espLogFn,
 };
 
 const tag = "zig-example";

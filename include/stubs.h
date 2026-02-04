@@ -1,21 +1,61 @@
-/* WiFi station Example
+/* stubs.h - Stubs file for zig translate-c with ESP-IDF */
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+#ifndef STUBS_H
+#define STUBS_H
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #define IRAM_ATTR _SECTION_ATTR_IMPL(".iram1", __COUNTER__)
 
-// #include <string.h>
-#ifdef _WIN32
-typedef struct _FILE FILE;
-#include <stdio.h>
-#endif
+/* Prevent inclusion of problematic cstdlib headers */
+#define _STDIO_H_
+#define _STDLIB_H_
+#define _STRING_H_
+#define _WCHAR_H_
+#define _SYS_TYPES_H
+#define _SYS_REENT_H
+#define _MBSTATE_T
+#define _SYS_LOCK_H
+#define _UNISTD_H
+#define _TIME_H
 
-#undef IRAM_ATTR
+/* Avoid redefining types that exist in real headers */
+#undef _mbstate_t
+#undef __mbstate_t_defined
+
+/* Define only what's strictly necessary without conflicting */
+typedef void *FILE;
+typedef int _LOCK_T;
+typedef void *__VALIST;
+typedef long off_t;
+typedef long _off_t;
+typedef unsigned int wint_t;
+
+/* Disable macros and attributes that confuse zig translate-c */
+#define __restrict
+#define __extension__
+#define __attribute__(x)
+#define __THROW
+#define __wur
+#define __volatile__
+#define __inline
+
+/* Disable IDF-specific attributes */
 #define IRAM_ATTR
+#define DRAM_ATTR
+#define RTC_DATA_ATTR
+#define SECTION_ATTR_IMPL(x, y)
+
+/* Block multibyte functions from stdlib */
+#define mblen
+#define mbtowc
+#define wctomb
+#define mbstowcs
+#define wcstombs
+
+/* Workaround for FreeRTOS TLS dummy field (prevents struct _reent usage) */
+#define configTLS_BLOCK_TYPE int
+#define portTLS_BLOCK_TYPE int
+
+/* Include AFTER all the protections */
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/i2s_common.h"
@@ -39,9 +79,6 @@ typedef struct _FILE FILE;
 #include "hal/i2s_types.h"
 #include "nvs_flash.h"
 #include "soc/gpio_num.h"
-
-// #include "lwip/err.h"
-//  #include "lwip/sys.h"
 
 /* The examples use WiFi configuration that you can set via project
    configuration menu
@@ -91,4 +128,4 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 
-const uint8_t g_espnow_user_oui[3] = {0x12, 0x34, 0x56};
+#endif // STUBS_H

@@ -494,20 +494,13 @@ const riscv_targets = blk: {
             .abi = .none,
             .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
         },
-        // esp32-c6/61/h2
+        // esp32-c6/c5/61/h2
         .{
             .cpu_arch = .riscv32,
             .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
             .os_tag = .freestanding,
             .abi = .none,
             .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
-        },
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-            .os_tag = .freestanding,
-            .abi = .eabihf,
-            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
         },
     };
 
@@ -516,6 +509,17 @@ const riscv_targets = blk: {
             .{
                 .cpu_arch = .riscv32,
                 .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+            },
+        };
+    }
+    if (@hasDecl(std.Target.riscv.cpu, "esp32h4")) {
+        break :blk targets ++ &[_]std.Target.Query{
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
                 .os_tag = .freestanding,
                 .abi = .eabihf,
                 .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
