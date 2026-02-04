@@ -2,24 +2,28 @@ const sys = @import("sys");
 const std = @import("std");
 
 pub const Caps = enum(c_int) {
-    // MALLOC_CAP_EXEC = sys.MALLOC_CAP_EXEC, //< Memory must be able to run executable code
-    MALLOC_CAP_32BIT = sys.MALLOC_CAP_32BIT, //< Memory must allow for aligned 32-bit data accesses
-    MALLOC_CAP_8BIT = sys.MALLOC_CAP_8BIT, //< Memory must allow for 8/16/...-bit data accesses
-    MALLOC_CAP_DMA = sys.MALLOC_CAP_DMA, //< Memory must be able to accessed by DMA
-    MALLOC_CAP_PID2 = sys.MALLOC_CAP_PID2, //< Memory must be mapped to PID2 memory space (PIDs are not currently used)
-    MALLOC_CAP_PID3 = sys.MALLOC_CAP_PID3, //< Memory must be mapped to PID3 memory space (PIDs are not currently used)
-    MALLOC_CAP_PID4 = sys.MALLOC_CAP_PID4, //< Memory must be mapped to PID4 memory space (PIDs are not currently used)
-    MALLOC_CAP_PID5 = sys.MALLOC_CAP_PID5, //< Memory must be mapped to PID5 memory space (PIDs are not currently used)
-    MALLOC_CAP_PID6 = sys.MALLOC_CAP_PID6, //< Memory must be mapped to PID6 memory space (PIDs are not currently used)
-    MALLOC_CAP_PID7 = sys.MALLOC_CAP_PID7, //< Memory must be mapped to PID7 memory space (PIDs are not currently used)
-    MALLOC_CAP_SPIRAM = sys.MALLOC_CAP_SPIRAM, //< Memory must be in SPI RAM
-    MALLOC_CAP_INTERNAL = sys.MALLOC_CAP_INTERNAL, //< Memory must be internal; specifically it should not disappear when flash/spiram cache is switched off
-    MALLOC_CAP_DEFAULT = sys.MALLOC_CAP_DEFAULT, //< Memory can be returned in a non-capability-specific memory allocation (e.g. malloc(), calloc()) call
-    MALLOC_CAP_IRAM_8BIT = sys.MALLOC_CAP_IRAM_8BIT, //< Memory must be in IRAM and allow unaligned access
-    MALLOC_CAP_RETENTION = sys.MALLOC_CAP_RETENTION, //< Memory must be able to accessed by retention DMA
-    MALLOC_CAP_RTCRAM = sys.MALLOC_CAP_RTCRAM, //< Memory must be in RTC fast memory
-    MALLOC_CAP_TCM = sys.MALLOC_CAP_TCM, //< Memory must be in TCM memory
-    MALLOC_CAP_INVALID = sys.MALLOC_CAP_INVALID, //< Memory can't be used / list end marker
+    MALLOC_CAP_EXEC = if (@hasDecl(sys, "MALLOC_CAP_EXEC")) sys.MALLOC_CAP_EXEC else 0, //< Memory must be able to run executable code
+    MALLOC_CAP_32BIT = if (@hasDecl(sys, "MALLOC_CAP_32BIT")) sys.MALLOC_CAP_32BIT else 0, //< Memory must allow for aligned 32-bit data accesses
+    MALLOC_CAP_8BIT = if (@hasDecl(sys, "MALLOC_CAP_8BIT")) sys.MALLOC_CAP_8BIT else 0, //< Memory must allow for 8/16/...-bit data accesses
+    MALLOC_CAP_DMA = if (@hasDecl(sys, "MALLOC_CAP_DMA")) sys.MALLOC_CAP_DMA else 0, //< Memory must be able to accessed by DMA
+    MALLOC_CAP_PID2 = if (@hasDecl(sys, "MALLOC_CAP_PID2")) sys.MALLOC_CAP_PID2 else 0, //< Memory must be mapped to PID2 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID3 = if (@hasDecl(sys, "MALLOC_CAP_PID3")) sys.MALLOC_CAP_PID3 else 0, //< Memory must be mapped to PID3 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID4 = if (@hasDecl(sys, "MALLOC_CAP_PID4")) sys.MALLOC_CAP_PID4 else 0, //< Memory must be mapped to PID4 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID5 = if (@hasDecl(sys, "MALLOC_CAP_PID5")) sys.MALLOC_CAP_PID5 else 0, //< Memory must be mapped to PID5 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID6 = if (@hasDecl(sys, "MALLOC_CAP_PID6")) sys.MALLOC_CAP_PID6 else 0, //< Memory must be mapped to PID6 memory space (PIDs are not currently used)
+    MALLOC_CAP_PID7 = if (@hasDecl(sys, "MALLOC_CAP_PID7")) sys.MALLOC_CAP_PID7 else 0, //< Memory must be mapped to PID7 memory space (PIDs are not currently used)
+    MALLOC_CAP_SPIRAM = if (@hasDecl(sys, "MALLOC_CAP_SPIRAM")) sys.MALLOC_CAP_SPIRAM else 0, //< Memory must be in SPI RAM
+    MALLOC_CAP_INTERNAL = if (@hasDecl(sys, "MALLOC_CAP_INTERNAL")) sys.MALLOC_CAP_INTERNAL else 0, //< Memory must be internal; specifically it should not disappear when flash/spiram cache is switched off
+    MALLOC_CAP_DEFAULT = if (@hasDecl(sys, "MALLOC_CAP_DEFAULT")) sys.MALLOC_CAP_DEFAULT else 0, //< Memory can be returned in a non-capability-specific memory allocation (e.g. malloc(), calloc()) call
+    MALLOC_CAP_IRAM_8BIT = if (@hasDecl(sys, "MALLOC_CAP_IRAM_8BIT")) sys.MALLOC_CAP_IRAM_8BIT else 0, //< Memory must be in IRAM and allow unaligned access
+    MALLOC_CAP_RETENTION = if (@hasDecl(sys, "MALLOC_CAP_RETENTION")) sys.MALLOC_CAP_RETENTION else 0, //< Memory must be able to accessed by retention DMA
+    MALLOC_CAP_RTCRAM = if (@hasDecl(sys, "MALLOC_CAP_RTCRAM")) sys.MALLOC_CAP_RTCRAM else 0, //< Memory must be in RTC fast memory
+    MALLOC_CAP_TCM = if (@hasDecl(sys, "MALLOC_CAP_TCM")) sys.MALLOC_CAP_TCM else 0, //< Memory must be in TCM memory
+    MALLOC_CAP_DMA_DESC_AHB = if (@hasDecl(sys, "MALLOC_CAP_DMA_DESC_AHB")) sys.MALLOC_CAP_DMA_DESC_AHB else (@as(c_int, 1) << 17), //< Memory must be in AHB DMA descriptor
+    MALLOC_CAP_DMA_DESC_AXI = if (@hasDecl(sys, "MALLOC_CAP_DMA_DESC_AXI")) sys.MALLOC_CAP_DMA_DESC_AXI else (@as(c_int, 1) << 18), //< Memory must be in AXI DMA descriptor
+    MALLOC_CAP_CACHE_ALIGNED = if (@hasDecl(sys, "MALLOC_CAP_CACHE_ALIGNED")) sys.MALLOC_CAP_CACHE_ALIGNED else (@as(c_int, 1) << 19), //< Memory must be cache aligned
+    MALLOC_CAP_SIMD = if (@hasDecl(sys, "MALLOC_CAP_SIMD")) sys.MALLOC_CAP_SIMD else (@as(c_int, 1) << 20), //< Memory must support SIMD operations
+    MALLOC_CAP_INVALID = if (@hasDecl(sys, "MALLOC_CAP_INVALID")) sys.MALLOC_CAP_INVALID else 0, //< Memory can't be used / list end marker
 };
 
 /// Alocator for use heap_caps_allocator
