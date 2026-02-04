@@ -147,7 +147,7 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
         # Windows has no sys-include folder
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/sys-include")
     endif()
     set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
@@ -167,7 +167,7 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
         # Windows has no sys-include folder
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/sys-include")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/sys-include")
     endif()
     set(ARCH_DEFINE "__XTENSA__")
 endif()
@@ -257,45 +257,72 @@ endforeach()
 separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
 # get esp-idf CMacros
-get_property(comp_flags TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_OPTIONS)
-get_property(comp_defs TARGET ${COMPONENT_LIB} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
+idf_build_get_property(all_defines COMPILE_DEFINITIONS)
 
-foreach(def ${comp_defs})
-    list(APPEND EXTRA_DEFINE_FLAGS "-D${def}")
+set(EXTRA_DEFINE_FLAGS "")
+foreach(def ${all_defines})
+    string(STRIP "${def}" def_clean)
+    if(NOT def_clean STREQUAL "")
+        if(NOT def_clean MATCHES "^-D")
+            list(APPEND EXTRA_DEFINE_FLAGS "-D${def_clean}")
+        else()
+            list(APPEND EXTRA_DEFINE_FLAGS "${def_clean}")
+        endif()
+    endif()
 endforeach()
 
 list(APPEND EXTRA_DEFINE_FLAGS
     "-fno-builtin"
-    "-DESP_PLATFORM"
-    "-D_WINT_T"
     "-D__GNUC__"
-    "-D__extension__="
-    "-D__restrict="
 )
 
+string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
     "-Dtarget=${ZIG_TARGET}"
     "-Dmcpu=${TARGET_IDF_MODEL}"
     "-D__${TARGET_IDF_ARCH}"
     "-Dcpu_${TARGET_CPU_MODEL}"
+    "-D${ARCH_DEFINE}"
+    "-D__${TARGET_IDF_ARCH_UPPER}_EL__"
     "-DCONFIG_IDF_TARGET_${TARGET_IDF_MODEL_UPPER}"
     "-D__COUNTER__=0"
     "-DIRAM_ATTR="
     "-D_SECTION_ATTR_IMPL\\(x,y\\)="
     "-DSOC_MMU_PAGE_SIZE=0x8000"
-    "-DLWIP_NO_UNISTD_H=")
+    "-DLWIP_NO_UNISTD_H="
+)
 string(JOIN " " DEFINE_FLAGS_STR ${DEFINE_FLAGS})
 
 if(ARCH_DEFINE)
-    if(CONFIG_IDF_TARGET_ARCH_XTENSA)
-        # xtensa-gcc / ieeefp.h rename ARCH_DEFINE
-        string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
-        set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE} -D__${TARGET_IDF_ARCH_UPPER}_EL__")
-    else()
-        set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
-    endif()
+    set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
 endif()
+
+# Thanks esp-rs team
+set(ESP_RS_BINDINGS_URL "https://raw.githubusercontent.com/esp-rs/esp-idf-sys/master/src/include/esp-idf/bindings.h")
+set(BINDINGS_DEST "${CMAKE_SOURCE_DIR}/include/bindings.h")
+
+if(NOT EXISTS "${BINDINGS_DEST}")
+    message(STATUS "Downloading esp-idf bindings.h from esp-rs...")
+    file(DOWNLOAD
+        "${ESP_RS_BINDINGS_URL}"
+        "${BINDINGS_DEST}"
+        STATUS download_status
+        SHOW_PROGRESS
+    )
+
+    list(GET download_status 0 status_code)
+    if(NOT status_code EQUAL 0)
+        message(FATAL_ERROR "Failed to download esp-idf bindings.h: ${download_status}")
+    else()
+        message(STATUS "Successfully downloaded esp-idf bindings.h to ${BINDINGS_DEST}")
+    endif()
+else()
+    message(STATUS "esp-idf bindings.h already exists at ${BINDINGS_DEST}. Skipping download.")
+endif()
+
+set_source_files_properties("${BINDINGS_DEST}" PROPERTIES GENERATED TRUE)
+
 
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")

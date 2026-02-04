@@ -1,47 +1,56 @@
-/* WiFi station Example
+/* stubs.h - Stubs file for zig translate-c with ESP-IDF */
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+#ifndef STUBS_H
+#define STUBS_H
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #define IRAM_ATTR _SECTION_ATTR_IMPL(".iram1", __COUNTER__)
 
-// #include <string.h>
-#ifdef _WIN32
-typedef struct _FILE FILE;
-#include <stdio.h>
-#endif
+/* Prevent inclusion of problematic cstdlib headers */
+#define _STDIO_H_
+#define _STDLIB_H_
+#define _STRING_H_
+#define _WCHAR_H_
+#define _SYS_TYPES_H
+#define _SYS_REENT_H
+#define _MBSTATE_T
+#define _SYS_LOCK_H
+#define _UNISTD_H
+#define _TIME_H
 
-#undef IRAM_ATTR
+/* Define opaque types as simple replacements */
+typedef void *FILE;
+typedef void *struct__reent;
+typedef int _mbstate_t;
+typedef long off_t;
+typedef long _off_t;
+typedef unsigned int wint_t;
+typedef int _LOCK_T;
+typedef void *__VALIST;
+
+/* Disable macros and attributes that confuse zig translate-c */
+#define __restrict
+#define __extension__
+#define __attribute__(x)
+#define __THROW
+#define __wur
+#define __volatile__
+#define __inline
+
+/* Disable IDF-specific section attributes that are not needed here */
 #define IRAM_ATTR
-#include "driver/gpio.h"
-#include "driver/i2c.h"
-#include "driver/i2s_common.h"
-#include "driver/spi_master.h"
-#include "driver/spi_slave.h"
-#include "driver/uart.h"
-#include "esp_attr.h"
-#include "esp_event.h"
-#include "esp_event_base.h"
-#include "esp_flash.h"
-#include "esp_heap_caps.h"
-#include "esp_log.h"
-#include "esp_netif_types.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "freertos/task.h"
-#include "hal/assert.h"
-#include "hal/gpio_types.h"
-#include "hal/i2s_types.h"
-#include "nvs_flash.h"
-#include "soc/gpio_num.h"
+#define DRAM_ATTR
+#define RTC_DATA_ATTR
+#define SECTION_ATTR_IMPL(x, y)
 
-// #include "lwip/err.h"
-//  #include "lwip/sys.h"
+/* Block multibyte functions that appear in stdlib.h */
+#define mblen
+#define mbtowc
+#define wctomb
+#define mbstowcs
+#define wcstombs
+
+/* Include the real bindings AFTER all the protections */
+#include "bindings.h"
 
 /* The examples use WiFi configuration that you can set via project
    configuration menu
@@ -92,3 +101,5 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_FAIL_BIT BIT1
 
 const uint8_t g_espnow_user_oui[3] = {0x12, 0x34, 0x56};
+
+#endif // STUBS_H

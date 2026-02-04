@@ -152,13 +152,13 @@ export fn blinkclock(_: ?*anyopaque) void {
 export fn foo(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
-        idf.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
 export fn bar(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task bar printing..", .{});
-        idf.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
 
