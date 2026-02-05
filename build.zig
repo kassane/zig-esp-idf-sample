@@ -478,15 +478,13 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
 }
 
-// Targets config
-pub const espressif_targets: []const std.Target.Query = if (isEspXtensa())
-    xtensa_targets ++ riscv_targets
-else
-    riscv_targets;
+/// Espressif target configurations for both RISC-V and Xtensa architectures
+pub const espressif_targets: []const std.Target.Query =
+    if (hasEspXtensaSupport()) riscv_targets ++ xtensa_targets else riscv_targets;
 
-const riscv_targets = blk: {
-    const targets: []const std.Target.Query = &[_]std.Target.Query{
-        // esp32-c3/c2
+const riscv_targets: []const std.Target.Query = blk: {
+    const base_targets = &[_]std.Target.Query{
+        // ESP32-C3/C2: RV32IMC with Zifencei and Zicsr
         .{
             .cpu_arch = .riscv32,
             .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
@@ -494,7 +492,7 @@ const riscv_targets = blk: {
             .abi = .none,
             .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
         },
-        // esp32-c6/c5/61/h2
+        // ESP32-C6/C5/C61/H2: RV32IMAC with Zifencei and Zicsr
         .{
             .cpu_arch = .riscv32,
             .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
@@ -504,46 +502,57 @@ const riscv_targets = blk: {
         },
     };
 
-    if (@hasDecl(std.Target.riscv.cpu, "esp32p4")) {
-        break :blk targets ++ &[_]std.Target.Query{
-            .{
-                .cpu_arch = .riscv32,
-                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-                .os_tag = .freestanding,
-                .abi = .eabihf,
-                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-            },
-        };
-    }
-    if (@hasDecl(std.Target.riscv.cpu, "esp32h4")) {
-        break :blk targets ++ &[_]std.Target.Query{
-            .{
-                .cpu_arch = .riscv32,
-                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
-                .os_tag = .freestanding,
-                .abi = .eabihf,
-                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-            },
-        };
-    }
+    const esp32h4_target = &[_]std.Target.Query{
+        // ESP32-H4: Requires Espressif LLVM fork
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
+            .os_tag = .freestanding,
+            .abi = .eabihf,
+        },
+    };
 
-    break :blk targets;
+    const esp32p4_target = &[_]std.Target.Query{
+        // ESP32-P4: Requires Espressif LLVM fork
+        .{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+            .os_tag = .freestanding,
+            .abi = .eabihf,
+            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+        },
+    };
+
+    const has_h4 = @hasDecl(std.Target.riscv.cpu, "esp32h4");
+    const has_p4 = @hasDecl(std.Target.riscv.cpu, "esp32p4");
+
+    if (has_h4 and has_p4) {
+        break :blk base_targets ++ esp32h4_target ++ esp32p4_target;
+    } else if (has_h4) {
+        break :blk base_targets ++ esp32h4_target;
+    } else if (has_p4) {
+        break :blk base_targets ++ esp32p4_target;
+    } else {
+        break :blk base_targets;
+    }
 };
 
-const xtensa_targets = &[_]std.Target.Query{
-    // need zig-fork (using espressif-llvm backend) to support this
+const xtensa_targets: []const std.Target.Query = &.{
+    // ESP32: Requires Espressif LLVM fork
     .{
         .cpu_arch = .xtensa,
         .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32 },
         .os_tag = .freestanding,
         .abi = .none,
     },
+    // ESP32-S2: Requires Espressif LLVM fork
     .{
         .cpu_arch = .xtensa,
         .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s2 },
         .os_tag = .freestanding,
         .abi = .none,
     },
+    // ESP32-S3: Requires Espressif LLVM fork
     .{
         .cpu_arch = .xtensa,
         .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s3 },
@@ -552,11 +561,10 @@ const xtensa_targets = &[_]std.Target.Query{
     },
 };
 
-fn isEspXtensa() bool {
-    var result = false;
+/// Checks if the Zig compiler has Espressif Xtensa support enabled
+fn hasEspXtensaSupport() bool {
     for (std.Target.Cpu.Arch.xtensa.allCpuModels()) |model| {
-        result = std.mem.startsWith(u8, model.name, "esp");
-        if (result) break;
+        if (std.mem.startsWith(u8, model.name, "esp")) return true;
     }
-    return result;
+    return false;
 }
