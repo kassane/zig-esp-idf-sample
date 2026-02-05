@@ -41,7 +41,7 @@ endif()
 find_program(SYSTEM_ZIG_BIN zig)
 
 if(SYSTEM_ZIG_BIN AND CONFIG_IDF_TARGET_ARCH_RISCV)
-    if(CONFIG_IDF_TARGET_ESP32P4)
+    if(CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H4)
         set(USE_ZIG_ESPRESSIF_TOOLCHAIN TRUE)
     else()
         set(USE_ZIG_ESPRESSIF_TOOLCHAIN FALSE)
@@ -74,55 +74,47 @@ if(USE_ZIG_ESPRESSIF_TOOLCHAIN)
 else()
     set(ZIG_BIN ${SYSTEM_ZIG_BIN})
 endif()
+# Determine target model from CONFIG_IDF_TARGET
+string(TOLOWER "${CONFIG_IDF_TARGET}" TARGET_IDF_MODEL)
 
-if(CONFIG_IDF_TARGET_ARCH_RISCV)
+# Target architecture configuration lookup table
+set(RISCV_TARGETS
+    "esp32c2;esp32c3;esp32c5;esp32c6;esp32c61;esp32h2;esp32h21;esp32h4;esp32p4")
+set(XTENSA_TARGETS
+    "esp32;esp32s2;esp32s3")
+
+if(TARGET_IDF_MODEL IN_LIST RISCV_TARGETS)
     set(TARGET_IDF_ARCH "riscv")
     set(ZIG_TARGET "riscv32-freestanding-none")
-    if(CONFIG_IDF_TARGET_ESP32C6 OR CONFIG_IDF_TARGET_ESP32C5 OR CONFIG_IDF_TARGET_ESP32H2)
+
+    # Determine CPU model based on target
+    if(TARGET_IDF_MODEL IN_LIST "esp32c6;esp32c5;esp32c61;esp32h2;esp32h21")
         set(TARGET_CPU_MODEL "generic_rv32+m+a+c+zicsr+zifencei")
-    elseif(CONFIG_IDF_TARGET_ESP32P4)
-        string(REGEX REPLACE "-none" "-eabihf" ZIG_TARGET ${ZIG_TARGET})
-        # (zca, zcb, zcmt, zcmp) are not supported on ESP32-P4-Function-EV-Board (crash application)
+    elseif(TARGET_IDF_MODEL STREQUAL "esp32p4")
+        set(ZIG_TARGET "riscv32-freestanding-eabihf")
+        # (zca, zcb, zcmt, zcmp) are not supported on ESP32-P4-Function-EV-Board (crashes application)
         set(TARGET_CPU_MODEL "esp32p4-zca-zcb-zcmt-zcmp")
-    elseif(CONFIG_IDF_TARGET_ESP32H4)
-        string(REGEX REPLACE "-none" "-eabihf" ZIG_TARGET ${ZIG_TARGET})
-        set(TARGET_CPU_MODEL "esp32h4-zca-zcb-zcmt-zcmp")
+    elseif(TARGET_IDF_MODEL STREQUAL "esp32h4")
+        set(ZIG_TARGET "riscv32-freestanding-eabihf")
+        set(TARGET_CPU_MODEL "esp32h4")
     else()
+        # ESP32-C2/C3 and fallback
         set(TARGET_CPU_MODEL "generic_rv32+m+c+zicsr+zifencei")
     endif()
-elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
+
+elseif(TARGET_IDF_MODEL IN_LIST XTENSA_TARGETS)
     set(TARGET_IDF_ARCH "xtensa")
     set(ZIG_TARGET "xtensa-freestanding-none")
-    if(CONFIG_IDF_TARGET_ESP32)
-        set(TARGET_CPU_MODEL "esp32")
-    elseif(CONFIG_IDF_TARGET_ESP32S2)
-        set(TARGET_CPU_MODEL "esp32s2")
-    else(CONFIG_IDF_TARGET_ESP32S3)
-        set(TARGET_CPU_MODEL "esp32s3")
-    endif()
+    set(TARGET_CPU_MODEL "${TARGET_IDF_MODEL}")
+
 else()
-    message(FATAL_ERROR "Unsupported target ${CONFIG_IDF_TARGET}")
+    message(FATAL_ERROR "Unsupported IDF target: ${CONFIG_IDF_TARGET}")
 endif()
 
-if(CONFIG_IDF_TARGET_ESP32)
-    set(TARGET_IDF_MODEL "esp32")
-elseif(CONFIG_IDF_TARGET_ESP32C2)
-    set(TARGET_IDF_MODEL "esp32c2")
-elseif(CONFIG_IDF_TARGET_ESP32C3)
-    set(TARGET_IDF_MODEL "esp32c3")
-elseif(CONFIG_IDF_TARGET_ESP32C6)
-    set(TARGET_IDF_MODEL "esp32c6")
-elseif(CONFIG_IDF_TARGET_ESP32H2)
-    set(TARGET_IDF_MODEL "esp32h2")
-elseif(CONFIG_IDF_TARGET_ESP32P4)
-    set(TARGET_IDF_MODEL "esp32p4")
-elseif(CONFIG_IDF_TARGET_ESP32S2)
-    set(TARGET_IDF_MODEL "esp32s2")
-elseif(CONFIG_IDF_TARGET_ESP32S3)
-    set(TARGET_IDF_MODEL "esp32s3")
-else()
-    message(FATAL_ERROR "Unknown IDF target")
-endif()
+message(STATUS "ESP-IDF Target: ${TARGET_IDF_MODEL}")
+message(STATUS "Architecture: ${TARGET_IDF_ARCH}")
+message(STATUS "Zig Target: ${ZIG_TARGET}")
+message(STATUS "CPU Model: ${TARGET_CPU_MODEL}")
 
 # Check Toolchain version
 get_filename_component(TOOLCHAIN_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
@@ -253,6 +245,12 @@ set(INCLUDE_DIRS
     "${TOOLCHAIN_ELF_INCLUDE}"
 )
 
+if(CONFIG_IDF_TARGET_ESP32P4)
+    list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver3")
+elseif(CONFIG_IDF_TARGET_ESP32H4)
+    list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver_mp")
+endif()
+
 set(INCLUDE_FLAGS "")
 foreach(dir ${INCLUDE_DIRS})
     set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -I\"${dir}\"")
@@ -307,7 +305,9 @@ set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 # Run `translate-c` to generate `idf-sys.zig`
 add_custom_command(
     OUTPUT "${IDF_SYS_ZIG}"
-    COMMAND ${ZIG_BIN} translate-c -target ${ZIG_TARGET} ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
+    COMMAND ${ZIG_BIN} translate-c
+    -target ${ZIG_TARGET} ${DEFINE_FLAGS} -mcpu ${TARGET_CPU_MODEL}
+    ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
     DEPENDS ${IDF_SYS_C}
 )
 
@@ -332,11 +332,7 @@ else()
     set(ZIG_BUILD_TYPE "ReleaseSafe")
 endif()
 
-# set(ZIG_CACHE_DIR ${CMAKE_BINARY_DIR}/.zig-cache)
-set(include_dirs $<TARGET_PROPERTY:${COMPONENT_LIB},INCLUDE_DIRECTORIES> ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
 add_custom_target(zig_build
-    COMMAND ${CMAKE_COMMAND} -E env
-    "INCLUDE_DIRS=${include_dirs}"
     ${ZIG_BIN} build
     --build-file ${BUILD_PATH}/build.zig
     -Doptimize=${ZIG_BUILD_TYPE}
@@ -361,14 +357,14 @@ add_dependencies(${COMPONENT_LIB} zig_build)
 target_link_libraries(${COMPONENT_LIB} PRIVATE ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
 
 # ESP32-H2/P4 does not have wifi support
-if(NOT CONFIG_IDF_TARGET_ESP32P4)
+if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H4)
     list(APPEND ESP32_LIBS
         ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
     )
 endif()
 
 
-if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H2)
+if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H2 AND NOT CONFIG_IDF_TARGET_ESP32H4)
     list(APPEND ESP32_LIBS
         ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
         ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a

@@ -2,8 +2,8 @@
 
 # Using Zig Language & Toolchain with ESP-IDF
 
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-P4 | ESP32-S2 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- | -------- |
+| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H2 | ESP32-P4 | ESP32-H4 | ESP32-S2 | ESP32-S3 |
+| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- | -------- | -------- |
 
 ## STATUS: Experimental
 
@@ -27,6 +27,7 @@ More information about building and using Zig with ESP-IDF can be found in the [
 | esp32-s3 | `-Dtarget=xtensa-freestanding-none -Dcpu=esp32s3` |
 | esp32-c2/c3 | `-Dtarget=riscv32-freestanding-none -Dcpu=generic_rv32+c+m+zicsr+zifencei` |
 | esp32-h2/c5/c6 | `-Dtarget=riscv32-freestanding-none -Dcpu=generic_rv32+a+c+m+zicsr+zifencei` |
+| esp32-h4 | `-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32h4` |
 | esp32-p4 | `-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32p4` |
 
 <br>
