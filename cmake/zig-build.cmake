@@ -1,79 +1,116 @@
-# Zig Build Configuration
+# ──────────────────────────────────────────────────────────────────────────────
+# Zig configuration for ESP-IDF (esp32 xtensa/riscv targets)
+# ──────────────────────────────────────────────────────────────────────────────
 
+set(ZIG_MIN_VERSION "0.16.0")
 
-set(EXT "tar.xz")
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
-        set(TARGET_ARCH "x86_64")
-    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86")
-        set(TARGET_ARCH "x86")
-    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "aarch64")
-        set(TARGET_ARCH "aarch64")
-    else()
-        message(FATAL_ERROR "linux: Unsupported architecture")
-    endif()
-    set(TARGET_PLATFORM "linux-musl")
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "AMD64")
-        set(TARGET_ARCH "x86_64")
-    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86")
-        set(TARGET_ARCH "x86")
-    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
-        set(TARGET_ARCH "aarch64")
-    else()
-        message(FATAL_ERROR "windows: Unsupported architecture ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-    endif()
-    set(TARGET_PLATFORM "windows")
-    set(EXT "zip")
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-    if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
-        set(TARGET_ARCH "x86_64")
-    elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
-        set(TARGET_ARCH "aarch64")
-    else()
-        message(FATAL_ERROR "macos: Unsupported architecture")
-    endif()
-    set(TARGET_PLATFORM "macos")
+# ─── Host platform & architecture detection ──────────────────────────────────
+cmake_host_system_information(RESULT HOST_OS QUERY OS_NAME)
+string(TOLOWER "${HOST_OS}" HOST_OS_LOWER)
+
+set(HOST_ARCH "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+
+# Normalize to Zig-style triple names
+if(HOST_ARCH MATCHES "^(AMD64|amd64|x86_64|X64)$")
+    set(ZIG_ARCH "x86_64")
+elseif(HOST_ARCH MATCHES "^(aarch64|arm64|ARM64)$")
+    set(ZIG_ARCH "aarch64")
+elseif(HOST_ARCH MATCHES "^(x86|i686|i386|i[345]86)$")
+    set(ZIG_ARCH "x86")
 else()
-    message(FATAL_ERROR "Unsupported platform")
+    message(FATAL_ERROR "Unsupported host architecture '${HOST_ARCH}'.\n"
+        "Please report:\n"
+        "  CMAKE_HOST_SYSTEM_PROCESSOR = ${CMAKE_HOST_SYSTEM_PROCESSOR}\n"
+        "  cmake --system-information | findstr PROCESSOR")
 endif()
 
-find_program(SYSTEM_ZIG_BIN zig)
-
-if(SYSTEM_ZIG_BIN AND CONFIG_IDF_TARGET_ARCH_RISCV)
-    if(CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H4)
-        set(USE_ZIG_ESPRESSIF_TOOLCHAIN TRUE)
-    else()
-        set(USE_ZIG_ESPRESSIF_TOOLCHAIN FALSE)
-    endif()
+# Platform + extension
+if(HOST_OS_LOWER MATCHES "(linux|unix)")
+    set(ZIG_PLATFORM "linux-musl")
+    set(ARCHIVE_EXT "tar.xz")
+elseif(HOST_OS_LOWER MATCHES "windows|win")
+    set(ZIG_PLATFORM "windows")
+    set(ARCHIVE_EXT "zip")
+elseif(HOST_OS_LOWER MATCHES "darwin|mac|osx")
+    set(ZIG_PLATFORM "macos")
+    set(ARCHIVE_EXT "tar.xz")
 else()
-    set(USE_ZIG_ESPRESSIF_TOOLCHAIN TRUE)
+    message(FATAL_ERROR "Unsupported host OS: ${HOST_OS}")
 endif()
 
-if(USE_ZIG_ESPRESSIF_TOOLCHAIN)
-    if(NOT EXISTS "${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline")
-        set(ZIG_DOWNLOAD_LINK "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline.${EXT}")
-        message(STATUS "Downloading ${ZIG_DOWNLOAD_LINK} to ${CMAKE_BINARY_DIR}/zig.${EXT}")
+set(ZIG_TRIPLET "${ZIG_ARCH}-${ZIG_PLATFORM}-baseline")
+set(ZIG_DIR "${CMAKE_BINARY_DIR}/zig-relsafe-${ZIG_TRIPLET}")
+set(ZIG_ARCHIVE "${ZIG_DIR}.${ARCHIVE_EXT}")
 
-        file(DOWNLOAD "${ZIG_DOWNLOAD_LINK}" "${CMAKE_BINARY_DIR}/zig.${EXT}" SHOW_PROGRESS)
+# ─── Decide which zig to use ─────────────────────────────────────────────────
+find_program(ZIG_FOUND zig)
 
-        if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+set(USE_ZIG_ESPRESSIF_BOOTSTRAP TRUE)
+
+if(ZIG_FOUND AND CONFIG_IDF_TARGET_ARCH_RISCV)
+    # For most RISC-V prefer system zig
+    if(NOT (CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H4))
+        set(USE_ZIG_ESPRESSIF_BOOTSTRAP FALSE)
+    endif()
+endif()
+
+# ─── Download & extract espressif zig if needed ──────────────────────────────
+if(USE_ZIG_ESPRESSIF_BOOTSTRAP)
+
+    if(NOT EXISTS "${ZIG_DIR}/zig")
+        set(ZIG_URL "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${ZIG_TRIPLET}.${ARCHIVE_EXT}")
+        message(STATUS "Zig (espressif variant) not found → downloading:")
+        message(STATUS "  → ${ZIG_URL}")
+        file(DOWNLOAD "${ZIG_URL}" "${ZIG_ARCHIVE}"
+            STATUS download_status
+            LOG download_log
+            SHOW_PROGRESS
+        )
+        list(GET download_status 0 dl_code)
+        if(NOT dl_code EQUAL 0)
+            message(FATAL_ERROR "Download failed:\n${download_log}")
+        endif()
+        message(STATUS "Extracting ${ARCHIVE_EXT} ...")
+        if(HOST_OS_LOWER MATCHES "windows|win")
             execute_process(
-                COMMAND powershell -Command "Expand-Archive -Path ${CMAKE_BINARY_DIR}/zig.${EXT} -DestinationPath ${CMAKE_BINARY_DIR}"
+                COMMAND powershell -NoProfile -ExecutionPolicy Bypass
+                -Command "Expand-Archive -Path '${ZIG_ARCHIVE}' -DestinationPath '${CMAKE_BINARY_DIR}' -Force"
+                RESULT_VARIABLE extract_result
             )
         else()
             execute_process(
-                COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_BINARY_DIR}/zig.${EXT}
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                COMMAND ${CMAKE_COMMAND} -E tar xf "${ZIG_ARCHIVE}"
+                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+                RESULT_VARIABLE extract_result
             )
         endif()
+        if(NOT extract_result EQUAL 0)
+            message(FATAL_ERROR "Extraction failed (code ${extract_result})")
+        endif()
+        file(REMOVE "${ZIG_ARCHIVE}")
     else()
-        message(STATUS "Zig already downloaded. Skipping zig install.")
+        message(STATUS "Using cached espressif zig: ${ZIG_DIR}/zig")
     endif()
-    set(ZIG_BIN ${CMAKE_BINARY_DIR}/zig-relsafe-${TARGET_ARCH}-${TARGET_PLATFORM}-baseline/zig)
+    set(ZIG_BIN "${ZIG_DIR}/zig")
 else()
-    set(ZIG_BIN ${SYSTEM_ZIG_BIN})
+    if(NOT ZIG_FOUND)
+        message(FATAL_ERROR "System 'zig' not found and espressif bootstrap is disabled.")
+    endif()
+    set(ZIG_BIN "${ZIG_FOUND}")
 endif()
+message(STATUS "Using Zig executable: ${ZIG_BIN}")
+
+# ────────────────────────────────────────────────────────────────────────────────────
+include(${CMAKE_SOURCE_DIR}/cmake/zig-run.cmake)
+# ─────── get Zig version ────────────────────────────────────────────────────────────
+zig_run(COMMAND version OUTPUT_VARIABLE ZIG_VERSION)
+if("${ZIG_VERSION}" VERSION_LESS "${ZIG_MIN_VERSION}")
+    message(FATAL_ERROR "Zig version too old: ${ZIG_VERSION} < ${ZIG_MIN_VERSION}")
+endif()
+message(STATUS "Zig version: ${ZIG_VERSION}")
+
+# ====================================================================================
+
 # Determine target model from CONFIG_IDF_TARGET
 string(TOLOWER "${CONFIG_IDF_TARGET}" TARGET_IDF_MODEL)
 
@@ -257,7 +294,7 @@ foreach(dir ${INCLUDE_DIRS})
 endforeach()
 separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
-# get esp-idf CMacros
+# get esp-idf C Macros
 idf_build_get_property(all_defines COMPILE_DEFINITIONS)
 
 set(EXTRA_DEFINE_FLAGS "")
@@ -303,11 +340,12 @@ set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 
 # Run `translate-c` to generate `idf-sys.zig`
-add_custom_command(
-    OUTPUT "${IDF_SYS_ZIG}"
-    COMMAND ${ZIG_BIN} translate-c
-    -target ${ZIG_TARGET} ${DEFINE_FLAGS} -mcpu ${TARGET_CPU_MODEL}
-    ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C} > ${IDF_SYS_ZIG}
+zig_run(
+    COMMAND translate-c
+    -target ${ZIG_TARGET} -mcpu ${TARGET_CPU_MODEL}
+    ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C}
+    OUTPUT_FILE ${IDF_SYS_ZIG}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     DEPENDS ${IDF_SYS_C}
 )
 
