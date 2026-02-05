@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# Zig toolchain bootstrap for ESP-IDF (esp32 xtensa/riscv targets)
+# Zig configuration for ESP-IDF (esp32 xtensa/riscv targets)
 # ──────────────────────────────────────────────────────────────────────────────
 
 set(ZIG_MIN_VERSION "0.16.0")
@@ -7,9 +7,6 @@ set(ZIG_MIN_VERSION "0.16.0")
 # ─── Host platform & architecture detection ──────────────────────────────────
 cmake_host_system_information(RESULT HOST_OS QUERY OS_NAME)
 string(TOLOWER "${HOST_OS}" HOST_OS_LOWER)
-
-# Force early processor detection (optional but sometimes helps)
-cmake_host_system_information(RESULT _cores QUERY NUMBER_OF_LOGICAL_CORES)
 
 set(HOST_ARCH "${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
@@ -51,7 +48,7 @@ find_program(ZIG_FOUND zig)
 set(USE_ZIG_ESPRESSIF_BOOTSTRAP TRUE)
 
 if(ZIG_FOUND AND CONFIG_IDF_TARGET_ARCH_RISCV)
-    # For most RISC-V ESP chips we prefer system zig
+    # For most RISC-V prefer system zig
     if(NOT (CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H4))
         set(USE_ZIG_ESPRESSIF_BOOTSTRAP FALSE)
     endif()
@@ -103,8 +100,9 @@ else()
 endif()
 message(STATUS "Using Zig executable: ${ZIG_BIN}")
 
+# ────────────────────────────────────────────────────────────────────────────────────
 include(${CMAKE_SOURCE_DIR}/cmake/zig-run.cmake)
-# get Zig version
+# ─────── get Zig version ────────────────────────────────────────────────────────────
 zig_run(COMMAND version OUTPUT_VARIABLE ZIG_VERSION)
 if("${ZIG_VERSION}" VERSION_LESS "${ZIG_MIN_VERSION}")
     message(FATAL_ERROR "Zig version too old: ${ZIG_VERSION} < ${ZIG_MIN_VERSION}")
@@ -296,7 +294,7 @@ foreach(dir ${INCLUDE_DIRS})
 endforeach()
 separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
-# get esp-idf CMacros
+# get esp-idf C Macros
 idf_build_get_property(all_defines COMPILE_DEFINITIONS)
 
 set(EXTRA_DEFINE_FLAGS "")
