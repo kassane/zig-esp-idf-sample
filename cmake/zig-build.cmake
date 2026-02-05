@@ -346,6 +346,7 @@ zig_run(
     ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C}
     OUTPUT_FILE ${IDF_SYS_ZIG}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    DEPENDS ${IDF_SYS_C}
 )
 
 # Ensure `translate_c` runs before modifying the file
