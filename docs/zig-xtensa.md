@@ -113,34 +113,34 @@ const std = @import("std");
 /// Zig version. When writing code that supports multiple versions of Zig, prefer
 /// feature detection (i.e. with `@hasDecl` or `@hasField`) over version checks.
 pub const zig_version = std.SemanticVersion.parse(zig_version_string) catch unreachable;
-pub const zig_version_string = "0.14.0";
+pub const zig_version_string = "0.16.0-xtensa-dev.2287+eb3f16db5";
 pub const zig_backend = std.builtin.CompilerBackend.stage2_llvm;
 
-pub const output_mode = std.builtin.OutputMode.Lib;
-pub const link_mode = std.builtin.LinkMode.static;
+pub const output_mode: std.builtin.OutputMode = .Lib;
+pub const link_mode: std.builtin.LinkMode = .static;
+pub const unwind_tables: std.builtin.UnwindTables = .async;
 pub const is_test = false;
 pub const single_threaded = false;
-pub const abi = std.Target.Abi.none;
+pub const abi: std.Target.Abi = .none;
 pub const cpu: std.Target.Cpu = .{
     .arch = .xtensa,
     .model = &std.Target.xtensa.cpu.esp32s3,
-    .features = std.Target.xtensa.featureSet(&[_]std.Target.xtensa.Feature{
-        .atomctl,
+    .features = std.Target.xtensa.featureSet(&.{
         .bool,
         .clamps,
         .coprocessor,
+        .dcache,
         .debug,
         .density,
-        .dfpaccel,
         .div32,
-        .esp32s3,
+        .esp32s3ops,
         .exception,
         .fp,
         .highpriinterrupts,
+        .highpriinterrupts_level7,
         .interrupt,
         .loop,
         .mac16,
-        .memctl,
         .minmax,
         .miscsr,
         .mul16,
@@ -153,11 +153,11 @@ pub const cpu: std.Target.Cpu = .{
         .s32c1i,
         .sext,
         .threadptr,
-        .timerint,
+        .timers3,
         .windowed,
     }),
 };
-pub const os = std.Target.Os{
+pub const os: std.Target.Os = .{
     .tag = .freestanding,
     .version_range = .{ .none = {} },
 };
@@ -166,18 +166,19 @@ pub const target: std.Target = .{
     .os = os,
     .abi = abi,
     .ofmt = object_format,
-    .dynamic_linker = std.Target.DynamicLinker.none,
+    .dynamic_linker = .none,
 };
-pub const object_format = std.Target.ObjectFormat.elf;
-pub const mode = std.builtin.OptimizeMode.Debug;
+pub const object_format: std.Target.ObjectFormat = .elf;
+pub const mode: std.builtin.OptimizeMode = .Debug;
 pub const link_libc = false;
 pub const link_libcpp = false;
 pub const have_error_return_tracing = true;
 pub const valgrind_support = false;
 pub const sanitize_thread = false;
+pub const fuzz = false;
 pub const position_independent_code = false;
 pub const position_independent_executable = false;
 pub const strip_debug_info = false;
-pub const code_model = std.builtin.CodeModel.default;
+pub const code_model: std.builtin.CodeModel = .default;
 pub const omit_frame_pointer = false;
 ```
