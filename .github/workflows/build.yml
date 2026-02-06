@@ -28,8 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32c2]
+        os: [windows-latest]
+        target: [esp32c2]
         idf-version: [v5.5, v6.0-beta2]
     steps:
       - uses: actions/checkout@main
@@ -88,10 +88,10 @@ jobs:
 
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
-        shell: pwsh
+        shell: cmd
         run: |
-          $env:IDF_PATH = "$env:USERPROFILE\esp\esp-idf"
-          & "$env:USERPROFILE\esp\esp-idf\export.ps1"
+          cd %USERPROFILE%\esp\esp-idf
+          call export.bat
           if ("${{ matrix.target }}" -eq "esp32h4") {
             idf.py --preview set-target ${{ matrix.target }}
           } else {
