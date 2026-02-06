@@ -73,7 +73,7 @@ jobs:
         shell: pwsh
         run: |
           cd ~/esp/esp-idf
-          .\install.ps1 ${{ matrix.target }}
+          .\install.ps1 ${{ matrix.target }} --enable-ci
 
       - name: Build (Unix)
         if: matrix.os != 'windows-latest'
@@ -88,10 +88,13 @@ jobs:
 
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
-        shell: cmd
+        shell: pwsh
         run: |
-          cd %USERPROFILE%\esp\esp-idf
-          call export.bat
+          cd ~/esp/esp-idf
+          $env:ESP_IDF_LEGACY_EXPORT = "1"
+          $env:IDF_PATH = "$(Get-Location)"
+          . .\export.ps1
+          cd $env:GITHUB_WORKSPACE
           if ("${{ matrix.target }}" -eq "esp32h4") {
             idf.py --preview set-target ${{ matrix.target }}
           } else {
