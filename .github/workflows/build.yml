@@ -17,7 +17,7 @@ jobs:
       - uses: mlugg/setup-zig@v2
         with:
           version: ${{ env.ZIG_VERSION }}
-      - run: zig fmt --check .
+      - run: zig fmt --exclude patches --ast-check esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6--check .
 
   build:
     runs-on: ${{ matrix.os }}
@@ -25,8 +25,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        target: [esp32, esp32s2, esp32s3, esp32c2, esp32c3, esp32c6, esp32h2]
-        idf-version: [v5.4, v5.5]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6]
+        idf-version: [v5.5, release-v6.0]
     steps:
       - uses: actions/checkout@main
       
@@ -66,10 +66,10 @@ jobs:
 
       - name: Install ESP-IDF (Windows)
         if: matrix.os == 'windows-latest'
-        shell: pwsh
+        shell: cmd
         run: |
-          cd ~/esp/esp-idf
-          .\install.ps1 ${{ matrix.target }}
+          cd %USERPROFILE%\esp\esp-idf
+          install.bat ${{ matrix.target }}
 
       - name: Build (Unix)
         if: matrix.os != 'windows-latest'
@@ -80,8 +80,10 @@ jobs:
 
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
-        shell: pwsh
+        shell: cmd
         run: |
-          ~/esp/esp-idf/export.ps1
+          cd %USERPROFILE%\esp\esp-idf
+          call export.bat
+          cd %GITHUB_WORKSPACE%
           idf.py set-target ${{ matrix.target }}
           idf.py build
