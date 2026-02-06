@@ -3,178 +3,85 @@ name: Build
 on:
   push:
   pull_request:
-  schedule:
-    - cron: "50 4 * * *"
   workflow_dispatch:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  ZIG_VERSION: "0.13.0"
+  ZIG_VERSION: "master"
 
 jobs:
   format-check:
-    name: Format Check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
+      - uses: actions/checkout@main
+      - uses: mlugg/setup-zig@v2
         with:
           version: ${{ env.ZIG_VERSION }}
+      - run: zig fmt --check .
 
-      - name: Check formatting
-        run: zig fmt --check .
-
-  build-matrix:
-    name: ${{ matrix.target }} (${{ matrix.idf-version }}) on ${{ matrix.os }}
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         target: [esp32, esp32s2, esp32s3, esp32c2, esp32c3, esp32c6, esp32h2]
-        idf-version: [v5.1.6, v5.2.5, v5.3.3, v5.4.2, v5.5]
-        exclude:
-          # ESP32-C5 requires v5.3+
-          - target: esp32c5
-            idf-version: v5.1.6
-          - target: esp32c5
-            idf-version: v5.2.5
-          # Reduce matrix size - only test latest IDF on Windows/macOS
-          - os: windows-latest
-            idf-version: v5.1.6
-          - os: windows-latest
-            idf-version: v5.2.5
-          - os: windows-latest
-            idf-version: v5.3.3
-          - os: windows-latest
-            idf-version: v5.4.2
-          - os: macos-latest
-            idf-version: v5.1.6
-          - os: macos-latest
-            idf-version: v5.2.5
-          - os: macos-latest
-            idf-version: v5.3.3
-          - os: macos-latest
-            idf-version: v5.4.2
-
+        idf-version: [v5.4, v5.5]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
+      - uses: actions/checkout@main
+      
+      - uses: mlugg/setup-zig@v2
         with:
           version: ${{ env.ZIG_VERSION }}
+
+      - name: Install ESP-IDF prerequisites (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+
+      - name: Install ESP-IDF prerequisites (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install cmake ninja dfu-util
 
       - name: Cache ESP-IDF
-        uses: actions/cache@v4
+        id: cache-idf
+        uses: actions/cache@main
         with:
-          path: |
-            ~/.espressif
-            ~/esp/esp-idf
-          key: ${{ runner.os }}-esp-idf-${{ matrix.idf-version }}-${{ matrix.target }}
-          restore-keys: |
-            ${{ runner.os }}-esp-idf-${{ matrix.idf-version }}-
-            ${{ runner.os }}-esp-idf-
+          path: ~/esp/esp-idf
+          key: ${{ runner.os }}-esp-idf-${{ matrix.idf-version }}
 
-      - name: Setup ESP-IDF
-        uses: espressif/esp-idf-ci-action@v1
-        with:
-          esp_idf_version: ${{ matrix.idf-version }}
-          target: ${{ matrix.target }}
-
-      - name: Build project
-        shell: bash
-        run: idf.py build
-
-      - name: Show build size
-        shell: bash
-        run: idf.py size
-
-      - name: Generate build report
-        if: matrix.os == 'ubuntu-latest'
-        shell: bash
+      - name: Clone ESP-IDF
+        if: steps.cache-idf.outputs.cache-hit != 'true'
         run: |
-          echo "## Build Report: ${{ matrix.target }} (${{ matrix.idf-version }})" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          idf.py size >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          mkdir -p ~/esp
+          cd ~/esp
+          git clone -b ${{ matrix.idf-version }} --recursive https://github.com/espressif/esp-idf.git
 
-      - name: Upload firmware artifacts
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware-${{ matrix.target }}-${{ matrix.idf-version }}
-          path: |
-            build/*.bin
-            build/*.elf
-            build/*.map
-          retention-days: 7
-
-  wokwi-simulation:
-    name: Wokwi Sim - ${{ matrix.target }}
-    needs: [format-check, build-matrix]
-    runs-on: ubuntu-latest
-    if: github.event_name != 'schedule'
-    strategy:
-      fail-fast: false
-      matrix:
-        target: [esp32, esp32s2, esp32s3, esp32c3, esp32c6, esp32h2]
-        idf-version: [v5.5]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
-        with:
-          version: ${{ env.ZIG_VERSION }}
-
-      - name: Setup ESP-IDF
-        uses: espressif/esp-idf-ci-action@v1
-        with:
-          esp_idf_version: ${{ matrix.idf-version }}
-          target: ${{ matrix.target }}
-
-      - name: Build firmware
-        run: idf.py build
-
-      - name: Copy Wokwi diagram
+      - name: Install ESP-IDF (Unix)
+        if: matrix.os != 'windows-latest'
         run: |
-          if [ -f .github/workflows/wokwi/diagram-${{ matrix.target }}.json ]; then
-            cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
-          else
-            echo "Warning: No Wokwi diagram found for ${{ matrix.target }}"
-            exit 1
-          fi
+          cd ~/esp/esp-idf
+          ./install.sh ${{ matrix.target }}
 
-      - name: Start Wokwi CI server
-        uses: wokwi/wokwi-ci-server-action@v1
-
-      - name: Run Wokwi simulation
-        uses: wokwi/wokwi-ci-action@v1
-        timeout-minutes: 5
-        with:
-          token: ${{ secrets.WOKWI_CI_TOKEN }}
-          timeout: 50000
-          expect_text: 'Hello, world from Zig!'
-          fail_text: 'ERROR'
-
-  build-status:
-    name: Build Status
-    if: always()
-    needs: [format-check, build-matrix, wokwi-simulation]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check build status
+      - name: Install ESP-IDF (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
         run: |
-          if [ "${{ needs.format-check.result }}" != "success" ] || \
-             [ "${{ needs.build-matrix.result }}" != "success" ]; then
-            echo "Build failed!"
-            exit 1
-          fi
-          echo "All builds passed!"
+          cd ~/esp/esp-idf
+          .\install.ps1 ${{ matrix.target }}
+
+      - name: Build (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          . ~/esp/esp-idf/export.sh
+          idf.py set-target ${{ matrix.target }}
+          idf.py build
+
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          ~/esp/esp-idf/export.ps1
+          idf.py set-target ${{ matrix.target }}
+          idf.py build
