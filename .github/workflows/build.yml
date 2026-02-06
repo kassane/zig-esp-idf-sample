@@ -26,7 +26,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6]
-        idf-version: [v5.5, release-v6.0]
+        idf-version: [v5.5, v6.0-beta2]
     steps:
       - uses: actions/checkout@main
       
