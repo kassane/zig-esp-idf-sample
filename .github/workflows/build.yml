@@ -66,10 +66,10 @@ jobs:
 
       - name: Install ESP-IDF (Windows)
         if: matrix.os == 'windows-latest'
-        shell: cmd
+        shell: pwsh
         run: |
-          cd %USERPROFILE%\esp\esp-idf
-          install.bat ${{ matrix.target }}
+          cd ~/esp/esp-idf
+          .\install.ps1 ${{ matrix.target }}
 
       - name: Build (Unix)
         if: matrix.os != 'windows-latest'
