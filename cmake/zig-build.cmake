@@ -171,6 +171,7 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(TRIPLE "xtensa-esp-elf")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
+# get toolchain includes & sys/include
 if(DEFINED ENV{IDF_TOOLS_PATH})
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         file(TO_CMAKE_PATH "$ENV{IDF_TOOLS_PATH}" IDF_TOOLS_PATH_NORMALIZED)
@@ -183,13 +184,14 @@ else()
 endif()
 set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include")
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(TOOLCHAIN_SYS_INCLUDE "$ENV{TOOLCHAIN_BASE_PATH}/esp-${TOOLCHAIN_VERSION}/${TRIPLE}/${TRIPLE}/include/sys")
+    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_BASE_PATH}/esp-${TOOLCHAIN_VERSION}/${TRIPLE}/${TRIPLE}/include/sys")
 else()
     set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include")
 endif()
 message(STATUS "Toolchain include: ${TOOLCHAIN_ELF_INCLUDE}")
 message(STATUS "Toolchain sys-include: ${TOOLCHAIN_SYS_INCLUDE}")
 
+# components list
 set(INCLUDE_DIRS
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
     "${IDF_PATH}/components/freertos/config/include/freertos"
