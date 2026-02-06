@@ -103,7 +103,6 @@ jobs:
         if: matrix.os != 'windows-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
         run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
 
-      - uses: wokwi/wokwi-ci-server-action@main
       - name: wokwi-simulation
         if: matrix.os != 'windows-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
         uses: wokwi/wokwi-ci-action@main
