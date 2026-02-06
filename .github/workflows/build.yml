@@ -1,0 +1,130 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: "50 4 * * *"
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ZIG_VERSION: "master"
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+      - run: zig fmt --exclude patches --ast-check --check .
+
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32c2]
+        idf-version: [v5.5, release/v6.0]
+    steps:
+      - uses: actions/checkout@main
+      
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+
+      - name: Install ESP-IDF prerequisites (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+
+      - name: Install ESP-IDF prerequisites (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install cmake ninja dfu-util
+
+      - name: Cache ESP-IDF
+        id: cache-idf
+        uses: actions/cache@main
+        with:
+          path: ~/esp/esp-idf
+          key: ${{ runner.os }}-esp-idf-${{ matrix.idf-version }}
+
+      - name: Clone ESP-IDF
+        if: steps.cache-idf.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/esp
+          cd ~/esp
+          git clone -b ${{ matrix.idf-version }} --recursive https://github.com/espressif/esp-idf.git
+
+      - name: Install ESP-IDF (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd ~/esp/esp-idf
+          ./install.sh ${{ matrix.target }}
+
+      - name: Install ESP-IDF (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cd ~/esp/esp-idf
+          .\install.ps1 ${{ matrix.target }} --enable-ci
+
+      - name: Build (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          . ~/esp/esp-idf/export.sh
+          if [ "${{ matrix.target }}" == "esp32h4" ]; then
+            idf.py --preview set-target ${{ matrix.target }}
+          else
+            idf.py set-target ${{ matrix.target }}
+          fi
+          idf.py build
+
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cd ~/esp/esp-idf
+          $env:ESP_IDF_LEGACY_EXPORT = "1"
+          $env:IDF_PATH = "$(Get-Location)"
+          . .\export.ps1
+          cd $env:GITHUB_WORKSPACE
+          if ("${{ matrix.target }}" -eq "esp32h4") {
+            idf.py --preview set-target ${{ matrix.target }}
+          } else {
+            idf.py set-target ${{ matrix.target }}
+          }
+          idf.py build
+
+      - name: Copy diagram ${{ matrix.target }}
+        if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+        run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+
+      - name: wokwi-simulation
+        if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+        uses: wokwi/wokwi-ci-action@main
+        with:
+          token: ${{ secrets.WOKWI_CI_TOKEN }}
+          timeout: 50000
+          expect_text: 'Hello, world from Zig!'
+
+  build-status:
+    name: Build Status
+    if: always()
+    needs: [format-check, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.format-check.result }}" != "success" ] || \
+             [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Build failed!"
+            exit 1
+          fi
+          echo "All builds passed!"

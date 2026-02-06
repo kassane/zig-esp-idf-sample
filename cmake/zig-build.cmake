@@ -156,54 +156,36 @@ message(STATUS "CPU Model: ${TARGET_CPU_MODEL}")
 # Check Toolchain version
 get_filename_component(TOOLCHAIN_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
 get_filename_component(TOOLCHAIN_VERSION_DIR "${TOOLCHAIN_BIN_DIR}" DIRECTORY)
-if(NOT TOOLCHAIN_VERSION_DIR MATCHES "esp-[0-9]+\\.[0-9]+\\.[0-9]+_[0-9]+")
-    message(WARNING "TOOLCHAIN_VERSION_DIR '${TOOLCHAIN_VERSION_DIR}' does not look like a standard ESP toolchain version folder. Using as-is.")
+if("${TOOLCHAIN_VERSION_DIR}" MATCHES "esp-([0-9]+\\.[0-9]+\\.[0-9]+_[0-9]+)")
+    set(TOOLCHAIN_VERSION "${CMAKE_MATCH_1}")
+    message(STATUS "Detected ESP toolchain version: ${TOOLCHAIN_VERSION}")
+else()
+    message(WARNING "Standard ESP version pattern not found in: ${TOOLCHAIN_VERSION_DIR}")
 endif()
-message(STATUS "Detected toolchain version directory: ${TOOLCHAIN_VERSION_DIR}")
-
 if(CONFIG_IDF_TARGET_ARCH_RISCV)
     set(ARCH "riscv")
-    if(DEFINED ENV{IDF_TOOLS_PATH})
-        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-            file(TO_CMAKE_PATH "$ENV{IDF_TOOLS_PATH}" IDF_TOOLS_PATH_NORMALIZED)
-            set(TOOLCHAIN_BASE_PATH "${IDF_TOOLS_PATH_NORMALIZED}/tools/riscv32-esp-elf")
-        else()
-            set(TOOLCHAIN_BASE_PATH "$ENV{IDF_TOOLS_PATH}/tools/riscv32-esp-elf")
-        endif()
-    else()
-        set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/riscv32-esp-elf")
-    endif()
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include")
-    # Define the toolchain include paths
-    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-        # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
-    else()
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/sys-include")
-    endif()
+    set(TRIPLE "riscv32-esp-elf")
     set(ARCH_DEFINE "__riscv")
 elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(ARCH "xtensa")
-    if(DEFINED ENV{IDF_TOOLS_PATH})
-        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-            file(TO_CMAKE_PATH "$ENV{IDF_TOOLS_PATH}" IDF_TOOLS_PATH_NORMALIZED)
-            set(TOOLCHAIN_BASE_PATH "${IDF_TOOLS_PATH_NORMALIZED}/tools/xtensa-esp-elf")
-        else()
-            set(TOOLCHAIN_BASE_PATH "$ENV{IDF_TOOLS_PATH}/tools/xtensa-esp-elf")
-        endif()
-    else()
-        set(TOOLCHAIN_BASE_PATH "$ENV{HOME}/.espressif/tools/xtensa-esp-elf")
-    endif()
-    set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/include")
-    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-        # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
-    else()
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/xtensa-esp-elf/sys-include")
-    endif()
+    set(TRIPLE "xtensa-esp-elf")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
+# get toolchain includes & sys/include
+set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include")
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include/sys")
+else()
+    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include")
+endif()
+if(NOT IS_DIRECTORY "${TOOLCHAIN_ELF_INCLUDE}")
+    message(WARNING "Toolchain include directory not found: ${TOOLCHAIN_ELF_INCLUDE}")
+endif()
+if(NOT IS_DIRECTORY "${TOOLCHAIN_SYS_INCLUDE}")
+    message(WARNING "Toolchain sys-include directory not found: ${TOOLCHAIN_SYS_INCLUDE}")
+endif()
 
+# components list
 set(INCLUDE_DIRS
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
     "${IDF_PATH}/components/freertos/config/include/freertos"
@@ -402,7 +384,11 @@ if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H4)
 endif()
 
 
-if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H2 AND NOT CONFIG_IDF_TARGET_ESP32H4)
+if(NOT CONFIG_IDF_TARGET_ESP32P4 AND
+    NOT CONFIG_IDF_TARGET_ESP32H2 AND
+    NOT CONFIG_IDF_TARGET_ESP32H4 AND
+    NOT CONFIG_IDF_TARGET_ESP32C2
+)
     list(APPEND ESP32_LIBS
         ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
         ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a

@@ -502,39 +502,37 @@ const riscv_targets: []const std.Target.Query = blk: {
         },
     };
 
-    const esp32h4_target = &[_]std.Target.Query{
-        // ESP32-H4: Requires Espressif LLVM fork
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
-            .os_tag = .freestanding,
-            .abi = .eabihf,
-        },
-    };
-
-    const esp32p4_target = &[_]std.Target.Query{
-        // ESP32-P4: Requires Espressif LLVM fork
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-            .os_tag = .freestanding,
-            .abi = .eabihf,
-            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-        },
-    };
-
     const has_h4 = @hasDecl(std.Target.riscv.cpu, "esp32h4");
     const has_p4 = @hasDecl(std.Target.riscv.cpu, "esp32p4");
 
-    if (has_h4 and has_p4) {
-        break :blk base_targets ++ esp32h4_target ++ esp32p4_target;
-    } else if (has_h4) {
-        break :blk base_targets ++ esp32h4_target;
-    } else if (has_p4) {
-        break :blk base_targets ++ esp32p4_target;
-    } else {
-        break :blk base_targets;
+    var result: []const std.Target.Query = base_targets;
+
+    if (has_h4) {
+        const esp32h4_target = &[_]std.Target.Query{
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+            },
+        };
+        result = result ++ esp32h4_target;
     }
+
+    if (has_p4) {
+        const esp32p4_target = &[_]std.Target.Query{
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+            },
+        };
+        result = result ++ esp32p4_target;
+    }
+
+    break :blk result;
 };
 
 const xtensa_targets: []const std.Target.Query = &.{
