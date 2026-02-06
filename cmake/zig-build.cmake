@@ -177,7 +177,7 @@ if(CONFIG_IDF_TARGET_ARCH_RISCV)
     # Define the toolchain include paths
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         # Windows has no sys-include folder
-        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/include/sys")
+        set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_ELF_INCLUDE}/sys")
     else()
         set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/riscv32-esp-elf/sys-include")
     endif()
