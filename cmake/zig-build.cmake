@@ -188,8 +188,16 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 else()
     set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include")
 endif()
-message(STATUS "Toolchain include: ${TOOLCHAIN_ELF_INCLUDE}")
-message(STATUS "Toolchain sys-include: ${TOOLCHAIN_SYS_INCLUDE}")
+if(EXISTS "${TOOLCHAIN_SYS_INCLUDE}" AND IS_DIRECTORY "${TOOLCHAIN_SYS_INCLUDE}")
+    message(STATUS "Directory exists: ${TOOLCHAIN_SYS_INCLUDE}")
+else()
+    message(WARNING "Directory does not exist: ${TOOLCHAIN_SYS_INCLUDE}")
+endif()
+if(EXISTS "${TOOLCHAIN_ELF_INCLUDE}" AND IS_DIRECTORY "${TOOLCHAIN_ELF_INCLUDE}")
+    message(STATUS "Directory exists: ${TOOLCHAIN_ELF_INCLUDE}")
+else()
+    message(WARNING "Directory does not exist: ${TOOLCHAIN_ELF_INCLUDE}")
+endif()
 
 # components list
 set(INCLUDE_DIRS
