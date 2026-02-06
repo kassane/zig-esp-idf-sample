@@ -28,8 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
-        target: [esp32c2]
+        os: [ubuntu-latest, macos-latest]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32c2]
         idf-version: [v5.5, v6.0-beta2]
     steps:
       - uses: actions/checkout@main
