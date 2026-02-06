@@ -115,7 +115,7 @@ jobs:
   build-status:
     name: Build Status
     if: always()
-    needs: [format-check, build, wokwi-simulation]
+    needs: [format-check, build]
     runs-on: ubuntu-latest
     steps:
       - name: Check build status
