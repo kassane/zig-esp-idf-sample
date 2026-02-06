@@ -87,3 +87,18 @@ jobs:
           cd %GITHUB_WORKSPACE%
           idf.py set-target ${{ matrix.target }}
           idf.py build
+
+  build-status:
+    name: Build Status
+    if: always()
+    needs: [format-check, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.format-check.result }}" != "success" ] || \
+             [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Build failed!"
+            exit 1
+          fi
+          echo "All builds passed!"
