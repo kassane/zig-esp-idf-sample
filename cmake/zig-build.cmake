@@ -187,6 +187,8 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 else()
     set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include")
 endif()
+message(STATUS "Toolchain include: ${TOOLCHAIN_ELF_INCLUDE}")
+message(STATUS "Toolchain sys-include: ${TOOLCHAIN_SYS_INCLUDE}")
 
 set(INCLUDE_DIRS
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
