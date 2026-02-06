@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32p4, esp32h4, esp32c5, esp32c2]
         idf-version: [v5.5, v6.0-beta2]
     steps:
       - uses: actions/checkout@main
@@ -79,23 +79,43 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           . ~/esp/esp-idf/export.sh
-          idf.py set-target ${{ matrix.target }}
+          if [ "${{ matrix.target }}" == "esp32h4" ]; then
+            idf.py --preview set-target ${{ matrix.target }}
+          else
+            idf.py set-target ${{ matrix.target }}
+          fi
           idf.py build
 
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
-        shell: cmd
+        shell: pwsh
         run: |
-          cd %USERPROFILE%\esp\esp-idf
-          call export.bat
-          cd %GITHUB_WORKSPACE%
-          idf.py set-target ${{ matrix.target }}
+          $env:IDF_PATH = "$env:USERPROFILE\esp\esp-idf"
+          & "$env:USERPROFILE\esp\esp-idf\export.ps1"
+          if ("${{ matrix.target }}" -eq "esp32h4") {
+            idf.py --preview set-target ${{ matrix.target }}
+          } else {
+            idf.py set-target ${{ matrix.target }}
+          }
           idf.py build
+
+      - name: Copy diagram ${{ matrix.target }}
+        if: matrix.os != 'windows-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+        run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+
+      - uses: wokwi/wokwi-ci-server-action@main
+      - name: wokwi-simulation
+        if: matrix.os != 'windows-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+        uses: wokwi/wokwi-ci-action@main
+        with:
+          token: ${{ secrets.WOKWI_CI_TOKEN }}
+          timeout: 50000
+          expect_text: 'Hello, world from Zig!'
 
   build-status:
     name: Build Status
     if: always()
-    needs: [format-check, build]
+    needs: [format-check, build, wokwi-simulation]
     runs-on: ubuntu-latest
     steps:
       - name: Check build status
