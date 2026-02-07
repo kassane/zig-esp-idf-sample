@@ -46,7 +46,7 @@ jobs:
 
       - name: Install ESP-IDF prerequisites (macOS)
         if: matrix.os == 'macos-latest'
-        run: brew install cmake ninja dfu-util
+        run: brew install cmake dfu-util
 
       - name: Cache ESP-IDF
         id: cache-idf
@@ -66,7 +66,7 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           cd ~/esp/esp-idf
-          ./install.sh ${{ matrix.target }}
+          ./install.sh ${{ matrix.target }} --enable-ci
 
       - name: Install ESP-IDF (Windows)
         if: matrix.os == 'windows-latest'
@@ -101,6 +101,56 @@ jobs:
             idf.py set-target ${{ matrix.target }}
           }
           idf.py build
+
+      - name: Build analysis (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          . ~/esp/esp-idf/export.sh
+          echo "::group::Component sizes"
+          idf.py size-components
+          echo "::endgroup::"
+          echo ""
+          echo "::group::Binary size summary"
+          idf.py size
+          echo "::endgroup::"
+          echo ""
+          echo "::group::Memory usage details"
+          idf.py size-files
+          echo "::endgroup::"
+
+      - name: Build analysis (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cd ~/esp/esp-idf
+          $env:ESP_IDF_LEGACY_EXPORT = "1"
+          $env:IDF_PATH = "$(Get-Location)"
+          . .\export.ps1
+          cd $env:GITHUB_WORKSPACE
+          Write-Output "::group::Component sizes"
+          idf.py size-components
+          Write-Output "::endgroup::"
+          Write-Output ""
+          Write-Output "::group::Binary size summary"
+          idf.py size
+          Write-Output "::endgroup::"
+          Write-Output ""
+          Write-Output "::group::Memory usage details"
+          idf.py size-files
+          Write-Output "::endgroup::"
+
+      - name: Save build artifacts
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@main
+        with:
+          name: build-${{ matrix.target }}-${{ matrix.idf-version }}
+          path: |
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/*.bin
+            build/*.elf
+            build/*.map
+          retention-days: 7
 
       - name: Copy diagram ${{ matrix.target }}
         if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
