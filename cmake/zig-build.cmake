@@ -116,16 +116,17 @@ string(TOLOWER "${CONFIG_IDF_TARGET}" TARGET_IDF_MODEL)
 
 # Target architecture configuration lookup table
 set(RISCV_TARGETS
-    "esp32c2;esp32c3;esp32c5;esp32c6;esp32c61;esp32h2;esp32h21;esp32h4;esp32p4")
+    "esp32c2" "esp32c3" "esp32c5" "esp32c6" "esp32c61" "esp32h2" "esp32h21" "esp32h4" "esp32p4")
 set(XTENSA_TARGETS
-    "esp32;esp32s2;esp32s3")
+    "esp32" "esp32s2" "esp32s3")
 
 if(TARGET_IDF_MODEL IN_LIST RISCV_TARGETS)
     set(TARGET_IDF_ARCH "riscv")
     set(ZIG_TARGET "riscv32-freestanding-none")
 
     # Determine CPU model based on target
-    if(TARGET_IDF_MODEL IN_LIST "esp32c6;esp32c5;esp32c61;esp32h2;esp32h21")
+    set(RV_IMAC_TARGETS "esp32c6" "esp32c5" "esp32c61" "esp32h2" "esp32h21")
+    if(TARGET_IDF_MODEL IN_LIST RV_IMAC_TARGETS)
         set(TARGET_CPU_MODEL "generic_rv32+m+a+c+zicsr+zifencei")
     elseif(TARGET_IDF_MODEL STREQUAL "esp32p4")
         set(ZIG_TARGET "riscv32-freestanding-eabihf")
