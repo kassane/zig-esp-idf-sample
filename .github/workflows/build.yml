@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@main
       
-      - uses: mlugg/setup-zig@v2
+      - uses: mlugg/setup-zig@main
         with:
           version: ${{ env.ZIG_VERSION }}
 
@@ -46,7 +46,7 @@ jobs:
 
       - name: Install ESP-IDF prerequisites (macOS)
         if: matrix.os == 'macos-latest'
-        run: brew install cmake dfu-util
+        run: brew install dfu-util
 
       - name: Cache ESP-IDF
         id: cache-idf
@@ -143,7 +143,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@main
         with:
-          name: build-${{ matrix.target }}-${{ matrix.idf-version }}
+          name: build-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || matrix.idf-version }}
           path: |
             build/bootloader/bootloader.bin
             build/partition_table/partition-table.bin
