@@ -283,7 +283,6 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_blockdev/include"
     "${IDF_PATH}/components/esp_libc/platform_include/sys"
     "${IDF_PATH}/components/newlib/platform_include/sys"
-    "${IDF_PATH}/components/newlib/platform_include"
     "${IDF_PATH}/components/hal/platform_port/include"
     "${IDF_PATH}/components/heap/include"
     "${IDF_PATH}/components/esp_rom/include"
@@ -311,6 +310,7 @@ set(INCLUDE_DIRS
 set(SYSTEM_INCLUDE_DIRS
     "${IDF_PATH}/components/esp_libc/platform_include"
     "${IDF_PATH}/components/newlib"
+    "${IDF_PATH}/components/newlib/platform_include"
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
 )
