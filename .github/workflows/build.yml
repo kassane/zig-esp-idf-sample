@@ -2,6 +2,12 @@ name: Build
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: "50 4 * * *"
+  workflow_dispatch:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,8 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
-        target: [esp32, esp32c3]
+        os: [ubuntu-latest, macos-latest]
+        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32c2]
         idf-version: [v5.5, release/v6.0]
     steps:
       - uses: actions/checkout@main
