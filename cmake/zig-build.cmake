@@ -79,7 +79,7 @@ if(USE_ZIG_ESPRESSIF_BOOTSTRAP)
         endif()
         set(ZIG_URL "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${ZIG_TRIPLET}.${ARCHIVE_EXT}")
         message(STATUS "Downloading Zig (espressif variant):")
-        message(STATUS "  → ${ZIG_URL}")
+        message(STATUS "  => ${ZIG_URL}")
         file(DOWNLOAD "${ZIG_URL}" "${ZIG_ARCHIVE}"
             TLS_VERIFY ON
             EXPECTED_HASH SHA256=${HASH_SUM}
