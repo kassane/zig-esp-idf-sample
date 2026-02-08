@@ -55,64 +55,7 @@ endif()
 
 # ─── Download & extract espressif zig if needed ──────────────────────────────
 if(USE_ZIG_ESPRESSIF_BOOTSTRAP)
-    if(NOT EXISTS "${ZIG_DIR}/zig")
-        if(ZIG_PLATFORM STREQUAL "linux-musl")
-            if(ZIG_ARCH STREQUAL "aarch64")
-                set(HASH_SUM "f228441e7ab1d0f1c48a37df2802f456a36e1a50e8a9389fd9f02bdd4ccfb964")
-            elseif(ZIG_ARCH STREQUAL "x86_64")
-                set(HASH_SUM "314d6e29abf55e8eb46ada46fa967713128492cc0d0fb7ff9a955da0dcea83e4")
-            else()
-                message(FATAL_ERROR "Unsupported architecture: ${ZIG_ARCH}")
-            endif()
-        elseif(ZIG_PLATFORM STREQUAL "windows")
-            if(ZIG_ARCH STREQUAL "x86_64")
-                set(HASH_SUM "5c344f6773a596382d2ba77e1915ae68f16d3da51a20e0e529c39c079fc13737")
-            else()
-                message(FATAL_ERROR "Unsupported architecture: ${ZIG_ARCH}")
-            endif()
-        elseif(ZIG_PLATFORM STREQUAL "macos")
-            if(ZIG_ARCH STREQUAL "aarch64")
-                set(HASH_SUM "25b86e08481580b123b3c942b9b51590a9d5dbc662d499f59a5108b1104bd742")
-            else()
-                message(FATAL_ERROR "Unsupported architecture: ${ZIG_ARCH}")
-            endif()
-        endif()
-        set(ZIG_URL "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-${ZIG_TRIPLET}.${ARCHIVE_EXT}")
-        message(STATUS "Downloading Zig (espressif variant):")
-        message(STATUS "  → ${ZIG_URL}")
-        file(DOWNLOAD "${ZIG_URL}" "${ZIG_ARCHIVE}"
-            TLS_VERIFY ON
-            EXPECTED_HASH SHA256=${HASH_SUM}
-            STATUS download_status
-            LOG download_log
-            SHOW_PROGRESS
-        )
-        list(GET download_status 0 dl_code)
-        if(NOT dl_code EQUAL 0)
-            message(FATAL_ERROR "Download failed:\n${download_log}")
-        endif()
-        message(STATUS "Extracting ${ARCHIVE_EXT} ...")
-        if(HOST_OS_LOWER MATCHES "windows|win")
-            execute_process(
-                COMMAND powershell -NoProfile -ExecutionPolicy Bypass
-                -Command "Expand-Archive -Path '${ZIG_ARCHIVE}' -DestinationPath '${CMAKE_BINARY_DIR}' -Force"
-                RESULT_VARIABLE extract_result
-            )
-        else()
-            execute_process(
-                COMMAND ${CMAKE_COMMAND} -E tar xf "${ZIG_ARCHIVE}"
-                WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-                RESULT_VARIABLE extract_result
-            )
-        endif()
-        if(NOT extract_result EQUAL 0)
-            message(FATAL_ERROR "Extraction failed (code ${extract_result})")
-        endif()
-        file(REMOVE "${ZIG_ARCHIVE}")
-    else()
-        message(STATUS "Using cached espressif zig: ${ZIG_DIR}/zig")
-    endif()
-    set(ZIG_BIN "${ZIG_DIR}/zig")
+    include(${CMAKE_SOURCE_DIR}/cmake/zig-download.cmake)
 else()
     if(NOT ZIG_FOUND)
         message(FATAL_ERROR "System 'zig' not found and espressif bootstrap is disabled.")
@@ -122,7 +65,7 @@ endif()
 message(STATUS "Using Zig executable: ${ZIG_BIN}")
 
 # ────────────────────────────────────────────────────────────────────────────────────
-include(${CMAKE_SOURCE_DIR}/cmake/zig-run.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/zig-runner.cmake)
 # ─────── get Zig version ────────────────────────────────────────────────────────────
 zig_run(COMMAND version OUTPUT_VARIABLE ZIG_VERSION)
 if("${ZIG_VERSION}" VERSION_LESS "${ZIG_MIN_VERSION}")
@@ -184,6 +127,7 @@ if("${TOOLCHAIN_VERSION_DIR}" MATCHES "esp-([0-9]+\\.[0-9]+\\.[0-9]+_[0-9]+)")
 else()
     message(WARNING "Standard ESP version pattern not found in: ${TOOLCHAIN_VERSION_DIR}")
 endif()
+
 if(CONFIG_IDF_TARGET_ARCH_RISCV)
     set(ARCH "riscv")
     set(TRIPLE "riscv32-esp-elf")
@@ -193,13 +137,38 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(TRIPLE "xtensa-esp-elf")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
-# get toolchain includes & sys/include
-set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include")
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include/sys")
-else()
-    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include")
-endif()
+# Get toolchain includes with fallback paths
+set(POSSIBLE_INCLUDE_PATHS
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include"
+    "${TOOLCHAIN_BIN_DIR}/../${TRIPLE}/include"
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/${TRIPLE}/include"
+)
+# Find the toolchain include directory
+set(TOOLCHAIN_ELF_INCLUDE "")
+foreach(PATH ${POSSIBLE_INCLUDE_PATHS})
+    if(IS_DIRECTORY "${PATH}")
+        set(TOOLCHAIN_ELF_INCLUDE "${PATH}")
+        message(STATUS "Found toolchain include at: ${TOOLCHAIN_ELF_INCLUDE}")
+        break()
+    endif()
+endforeach()
+# sys-include should be sys-include directory OR the same as regular include
+# (since sys headers are typically under include/sys/)
+set(POSSIBLE_SYS_INCLUDE_PATHS
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include"
+    "${TOOLCHAIN_BIN_DIR}/../${TRIPLE}/sys-include"
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/${TRIPLE}/sys-include"
+    "${TOOLCHAIN_ELF_INCLUDE}"
+)
+# Find the first existing sys-include directory
+set(TOOLCHAIN_SYS_INCLUDE "")
+foreach(PATH ${POSSIBLE_SYS_INCLUDE_PATHS})
+    if(IS_DIRECTORY "${PATH}")
+        set(TOOLCHAIN_SYS_INCLUDE "${PATH}")
+        message(STATUS "Found sys-include at: ${TOOLCHAIN_SYS_INCLUDE}")
+        break()
+    endif()
+endforeach()
 if(NOT IS_DIRECTORY "${TOOLCHAIN_ELF_INCLUDE}")
     message(WARNING "Toolchain include directory not found: ${TOOLCHAIN_ELF_INCLUDE}")
 endif()
@@ -255,11 +224,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_hal_wdt/include"
     "${IDF_PATH}/components/esp_phy/include"
     "${IDF_PATH}/components/esp_blockdev/include"
-    "${IDF_PATH}/components/esp_libc/platform_include"
     "${IDF_PATH}/components/esp_libc/platform_include/sys"
-    "${IDF_PATH}/components/newlib"
     "${IDF_PATH}/components/newlib/platform_include/sys"
-    "${IDF_PATH}/components/newlib/platform_include"
     "${IDF_PATH}/components/hal/platform_port/include"
     "${IDF_PATH}/components/heap/include"
     "${IDF_PATH}/components/esp_rom/include"
@@ -282,21 +248,33 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_driver_i2s/include"
     "${IDF_PATH}/components/esp_driver_usb_serial_jtag/include"
     "${CMAKE_SOURCE_DIR}/build/config"
+)
+# Toolchain system includes (separate from regular includes)
+set(SYSTEM_INCLUDE_DIRS
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
+    "${IDF_PATH}/components/newlib"
+    "${IDF_PATH}/components/newlib/platform_include"
+    "${IDF_PATH}/components/esp_libc/platform_include"
 )
-
 if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver3")
 elseif(CONFIG_IDF_TARGET_ESP32H4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver_mp")
 endif()
-
 set(INCLUDE_FLAGS "")
 foreach(dir ${INCLUDE_DIRS})
     set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -I\"${dir}\"")
 endforeach()
-separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
+# Build system include flags (for toolchain)
+foreach(dir ${SYSTEM_INCLUDE_DIRS})
+    set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -isystem \"${dir}\"")
+endforeach()
+if(NOT WIN32)
+    separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
+else()
+    separate_arguments(INCLUDE_FLAGS WINDOWS_COMMAND "${INCLUDE_FLAGS}")
+endif()
 
 # get esp-idf C Macros
 idf_build_get_property(all_defines COMPILE_DEFINITIONS)

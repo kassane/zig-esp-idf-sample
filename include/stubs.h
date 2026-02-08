@@ -23,7 +23,7 @@
 
 /* Define only what's strictly necessary without conflicting */
 typedef void *FILE;
-typedef int _LOCK_T;
+// typedef int _LOCK_T;
 typedef void *__VALIST;
 typedef long off_t;
 typedef long _off_t;
@@ -55,6 +55,9 @@ typedef unsigned int wint_t;
 #define configTLS_BLOCK_TYPE int
 #define portTLS_BLOCK_TYPE int
 
+#include <stddef.h>    // for size_t, ptrdiff_t, NULL
+#include <stdint.h>    // for uint8_t, uint32_t, etc.
+#include <sys/types.h> // for additional POSIX types
 /* Include AFTER all the protections */
 #include "driver/gpio.h"
 #include "driver/i2c.h"
