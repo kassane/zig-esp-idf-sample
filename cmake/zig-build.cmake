@@ -292,9 +292,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_hal_wdt/include"
     "${IDF_PATH}/components/esp_phy/include"
     "${IDF_PATH}/components/esp_blockdev/include"
-    "${IDF_PATH}/components/esp_libc/platform_include"
     "${IDF_PATH}/components/esp_libc/platform_include/sys"
-    "${IDF_PATH}/components/newlib"
     "${IDF_PATH}/components/newlib/platform_include/sys"
     "${IDF_PATH}/components/newlib/platform_include"
     "${IDF_PATH}/components/hal/platform_port/include"
@@ -322,6 +320,8 @@ set(INCLUDE_DIRS
 )
 # Toolchain system includes (separate from regular includes)
 set(SYSTEM_INCLUDE_DIRS
+    "${IDF_PATH}/components/esp_libc/platform_include"
+    "${IDF_PATH}/components/newlib"
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
 )
