@@ -308,11 +308,11 @@ set(INCLUDE_DIRS
 )
 # Toolchain system includes (separate from regular includes)
 set(SYSTEM_INCLUDE_DIRS
-    "${IDF_PATH}/components/esp_libc/platform_include"
-    "${IDF_PATH}/components/newlib"
-    "${IDF_PATH}/components/newlib/platform_include"
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
+    "${IDF_PATH}/components/newlib"
+    "${IDF_PATH}/components/newlib/platform_include"
+    "${IDF_PATH}/components/esp_libc/platform_include"
 )
 if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver3")
@@ -327,7 +327,11 @@ endforeach()
 foreach(dir ${SYSTEM_INCLUDE_DIRS})
     set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -isystem \"${dir}\"")
 endforeach()
-separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
+if(NOT WIN32)
+    separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
+else()
+    separate_arguments(INCLUDE_FLAGS WINDOWS_COMMAND "${INCLUDE_FLAGS}")
+endif()
 
 # get esp-idf C Macros
 idf_build_get_property(all_defines COMPILE_DEFINITIONS)

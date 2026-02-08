@@ -23,7 +23,7 @@
 
 /* Define only what's strictly necessary without conflicting */
 typedef void *FILE;
-typedef int _LOCK_T;
+// typedef int _LOCK_T;
 typedef void *__VALIST;
 typedef long off_t;
 typedef long _off_t;
@@ -56,6 +56,10 @@ typedef unsigned int wint_t;
 #define portTLS_BLOCK_TYPE int
 
 /* Include AFTER all the protections */
+// Essential system types that Zig's translate-c needs
+#include <stddef.h>      // for size_t, ptrdiff_t, NULL
+#include <stdint.h>      // for uint8_t, uint32_t, etc.
+#include <sys/types.h>   // for additional POSIX types
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/i2s_common.h"
