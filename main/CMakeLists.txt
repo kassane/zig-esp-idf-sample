@@ -5,4 +5,4 @@ idf_component_register(SRCS "placeholder.c"
     PRIV_REQUIRES "${DEPS}"
 )
 
-include(../cmake/zig-build.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/zig-config.cmake)
