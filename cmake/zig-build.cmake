@@ -88,8 +88,19 @@ if(USE_ZIG_ESPRESSIF_BOOTSTRAP)
             SHOW_PROGRESS
         )
         list(GET download_status 0 dl_code)
-        if(NOT dl_code EQUAL 0)
-            message(FATAL_ERROR "Download failed:\n${download_log}")
+        # 35 is "SSL connect error"
+        if(dl_code EQUAL 35)
+            message(
+                WARNING
+                "Could not retrieve ${ZIG_ARCHIVE} at the first tentative, retrying with TLS verification turned off."
+            )
+            file(DOWNLOAD "${ZIG_URL}" "${ZIG_ARCHIVE}"
+                TLS_VERIFY OFF
+                STATUS download_status
+                LOG download_log
+                EXPECTED_HASH SHA256=${HASH_SUM}
+                SHOW_PROGRESS
+            )
         endif()
         message(STATUS "Extracting ${ARCHIVE_EXT} ...")
         if(HOST_OS_LOWER MATCHES "windows|win")
