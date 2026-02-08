@@ -184,6 +184,7 @@ if("${TOOLCHAIN_VERSION_DIR}" MATCHES "esp-([0-9]+\\.[0-9]+\\.[0-9]+_[0-9]+)")
 else()
     message(WARNING "Standard ESP version pattern not found in: ${TOOLCHAIN_VERSION_DIR}")
 endif()
+
 if(CONFIG_IDF_TARGET_ARCH_RISCV)
     set(ARCH "riscv")
     set(TRIPLE "riscv32-esp-elf")
@@ -193,13 +194,38 @@ elseif(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(TRIPLE "xtensa-esp-elf")
     set(ARCH_DEFINE "__XTENSA__")
 endif()
-# get toolchain includes & sys/include
-set(TOOLCHAIN_ELF_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include")
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include/sys")
-else()
-    set(TOOLCHAIN_SYS_INCLUDE "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include")
-endif()
+# Get toolchain includes with fallback paths
+set(POSSIBLE_INCLUDE_PATHS
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/include"
+    "${TOOLCHAIN_BIN_DIR}/../${TRIPLE}/include"
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/${TRIPLE}/include"
+)
+# Find the toolchain include directory
+set(TOOLCHAIN_ELF_INCLUDE "")
+foreach(PATH ${POSSIBLE_INCLUDE_PATHS})
+    if(IS_DIRECTORY "${PATH}")
+        set(TOOLCHAIN_ELF_INCLUDE "${PATH}")
+        message(STATUS "Found toolchain include at: ${TOOLCHAIN_ELF_INCLUDE}")
+        break()
+    endif()
+endforeach()
+# sys-include should be sys-include directory OR the same as regular include
+# (since sys headers are typically under include/sys/)
+set(POSSIBLE_SYS_INCLUDE_PATHS
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include"
+    "${TOOLCHAIN_BIN_DIR}/../${TRIPLE}/sys-include"
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/${TRIPLE}/sys-include"
+    "${TOOLCHAIN_ELF_INCLUDE}"
+)
+# Find the first existing sys-include directory
+set(TOOLCHAIN_SYS_INCLUDE "")
+foreach(PATH ${POSSIBLE_SYS_INCLUDE_PATHS})
+    if(IS_DIRECTORY "${PATH}")
+        set(TOOLCHAIN_SYS_INCLUDE "${PATH}")
+        message(STATUS "Found sys-include at: ${TOOLCHAIN_SYS_INCLUDE}")
+        break()
+    endif()
+endforeach()
 if(NOT IS_DIRECTORY "${TOOLCHAIN_ELF_INCLUDE}")
     message(WARNING "Toolchain include directory not found: ${TOOLCHAIN_ELF_INCLUDE}")
 endif()
