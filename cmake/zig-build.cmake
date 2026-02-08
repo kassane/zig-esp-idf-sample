@@ -282,19 +282,24 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_driver_i2s/include"
     "${IDF_PATH}/components/esp_driver_usb_serial_jtag/include"
     "${CMAKE_SOURCE_DIR}/build/config"
+)
+# Toolchain system includes (separate from regular includes)
+set(SYSTEM_INCLUDE_DIRS
     "${TOOLCHAIN_SYS_INCLUDE}"
     "${TOOLCHAIN_ELF_INCLUDE}"
 )
-
 if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver3")
 elseif(CONFIG_IDF_TARGET_ESP32H4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver_mp")
 endif()
-
 set(INCLUDE_FLAGS "")
 foreach(dir ${INCLUDE_DIRS})
     set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -I\"${dir}\"")
+endforeach()
+# Build system include flags (for toolchain)
+foreach(dir ${SYSTEM_INCLUDE_DIRS})
+    set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -isystem \"${dir}\"")
 endforeach()
 separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
 
