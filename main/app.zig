@@ -4,6 +4,9 @@ const idf = @import("esp_idf");
 const wifi = idf.wifi;
 const ver = idf.ver.Version;
 const ESP_LOG = idf.log.ESP_LOG;
+const mem = std.mem;
+
+const target = idf.sys.CONFIG_IDF_TARGET;
 
 export fn app_main() callconv(.c) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
@@ -70,10 +73,14 @@ export fn app_main() callconv(.c) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    // FIXME: NOT BUILD on H2 ('builtin.cpu.model.name' not exists esp32h2)
-    // wifi_init() catch |err| {
-    //     log.err("Error: {s}", .{@errorName(err)});
-    // };
+    if (comptime !mem.eql(u8, target, "esp32h2") and
+        !mem.eql(u8, target, "esp32p4") and
+        !mem.eql(u8, target, "esp32h4"))
+    {
+        wifi_init() catch |err| {
+            log.err("Wi-Fi init failed: {s}", .{@errorName(err)});
+        };
+    }
 
     // FreeRTOS Tasks
     if (idf.rtos.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
