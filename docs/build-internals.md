@@ -56,10 +56,25 @@ Additional useful commands:
 - Configure project: `idf.py menuconfig`
 
 
-## `build.zig` details
+### Current role of `build.zig`
 
-- `searched_idf_libs`: checks and append all builded object-files (`*.obj`) from esp-idf and collect to `libapp_zig.a` - increase library size.
-- `includeDeps`: get and append esp-idf and espressif-(xtensa|riscv32)-gcc (sys-)includes to zig build.
-   - `searched_idf_include`: append components include files from esp-idf to zig build.
-- `idf_wrapped_modules`: get all imported zig modules (esp-idf bindings)
-   `esp_idf` is a zig module that contains all esp-idf bindings, and `sys` is private module low-level bindings to esp-idf. Avoid duplicate imports!
+Since the latest refactors (post [#37](https://github.com/kassane/zig-esp-idf-sample/pull/37) and related CMake changes), `build.zig` is **focused exclusively on Zig code**:
+
+- Defines Zig modules:
+  - `esp_idf` → facade module that re-exports safe wrappers from `imports/*.zig` (gpio, wifi, heap, rtos, etc.)
+  - `sys` → low-level module that imports the generated `idf-sys.zig` (raw C bindings)
+- Collects and links Zig sources
+- Uses pre-generated includes/dependencies from CMake (no more manual `includeDeps` or searching IDF libs/objects in `build.zig`)
+- Avoids duplicate imports (use `esp_idf` as the main entry point)
+
+**Old responsibilities moved to CMake**:
+- Searching/appending IDF object files → `.a` libs (now handled by IDF CMake)
+- Manually collecting includes from IDF components → automatic via CMake
+- Running `translate-c` in **stubs.h** to `idf-sys.zig` generate, patches → fully in `cmake/` scripts (`zig-config.cmake`, `zig-download.cmake`, `patch.cmake`)
+- Switching Zig (**upstream** x **espressif**) by target. If have installed zig-upstream use for **RISC-V** targets (*except P4 & H4*)
+
+This separation makes the project cleaner:
+- CMake handles the complex C/ESP-IDF world (toolchain, bindings generation)
+- Zig handles only modern, safe, comptime-friendly code
+
+For advanced users: see `zig-config.cmake` and `cmake/patch.cmake` for how `idf-sys.zig` is generated and refined before Zig sees it.
