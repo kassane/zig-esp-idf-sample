@@ -59,6 +59,7 @@ typedef unsigned int wint_t;
 #include <stdint.h>    // for uint8_t, uint32_t, etc.
 #include <sys/types.h> // for additional POSIX types
 /* Include AFTER all the protections */
+#include "bindings.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "driver/i2s_common.h"

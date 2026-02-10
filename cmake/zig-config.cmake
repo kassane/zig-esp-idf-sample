@@ -352,7 +352,7 @@ string(JOIN " " DEFINE_FLAGS_STR ${DEFINE_FLAGS})
 if(ARCH_DEFINE)
     set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
 endif()
-
+include(${CMAKE_SOURCE_DIR}/cmake/bindings.cmake)
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 

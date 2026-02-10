@@ -98,7 +98,7 @@ fn stringToArray(comptime size: usize, str: [:0]const u8) [size]u8 {
 }
 
 fn wifi_init() !void {
-    const conf: wifi.wifiConfig = .{
+    var conf: wifi.wifiConfig = .{
         .sta = .{
             .password = stringToArray(64, "pass"),
             .ssid = stringToArray(32, "my_ssid"),
