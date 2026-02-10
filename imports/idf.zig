@@ -22,3 +22,25 @@ pub const uart = @import("uart");
 pub const ver = @import("ver");
 pub const wifi = @import("wifi");
 pub const sys = @import("sys");
+
+const Device = enum {
+    esp32,
+    esp32s2,
+    esp32s3,
+    esp32c2,
+    esp32c3,
+    esp32c5,
+    esp32c6,
+    esp32c61,
+    esp32h2,
+    esp32h4,
+    esp32p4,
+};
+
+// Convert compile-time target string to enum
+pub const current_device = blk: {
+    const target_str = sys.CONFIG_IDF_TARGET;
+    break :blk @import("std").meta.stringToEnum(Device, target_str) orelse {
+        @compileError("Unknown ESP32 device target: " ++ target_str);
+    };
+};
