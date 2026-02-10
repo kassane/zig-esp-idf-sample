@@ -73,10 +73,7 @@ export fn app_main() callconv(.c) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    if (comptime !mem.eql(u8, target, "esp32h2") and
-        !mem.eql(u8, target, "esp32p4") and
-        !mem.eql(u8, target, "esp32h4"))
-    {
+    if (comptime mem.eql(u8, target, "esp32")) {
         wifi_init() catch |err| {
             log.err("Wi-Fi init failed: {s}", .{@errorName(err)});
         };
