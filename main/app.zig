@@ -3,10 +3,15 @@ const builtin = @import("builtin");
 const idf = @import("esp_idf");
 const wifi = idf.wifi;
 const ver = idf.ver.Version;
-const ESP_LOG = idf.log.ESP_LOG;
 const mem = std.mem;
+const sys = idf.sys;
+const ESP_LOG = idf.log.ESP_LOG;
 
-export fn app_main() callconv(.c) void {
+comptime {
+    @export(&main, .{ .name = "app_main" });
+}
+
+fn main() callconv(.c) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
     // std.heap.raw_c_allocator
 
@@ -71,10 +76,16 @@ export fn app_main() callconv(.c) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    if (comptime idf.current_device == .esp32) {
-        wifi_init() catch |err| {
-            log.err("Wi-Fi init failed: {s}", .{@errorName(err)});
-        };
+    if (comptime sys.ESP_IDF_VERSION_MAJOR > 5) {
+        switch (idf.currentTarget) {
+            .esp32h2,
+            .esp32h4,
+            .esp32p4,
+            => {},
+            else => wifi_init() catch |err| {
+                log.err("Wi-Fi init failed: {s}", .{@errorName(err)});
+            },
+        }
     }
 
     // FreeRTOS Tasks
@@ -129,7 +140,7 @@ fn blinkLED(delay_ms: u32) !void {
     }
 }
 
-fn arraylist(allocator: std.mem.Allocator) !void {
+fn arraylist(allocator: mem.Allocator) !void {
     var arr: std.ArrayList(u32) = .empty;
     defer arr.deinit(allocator);
 

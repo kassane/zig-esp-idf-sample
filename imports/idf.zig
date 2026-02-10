@@ -39,7 +39,7 @@ const Device = enum {
 };
 
 // Convert compile-time target string to enum
-pub const current_device = blk: {
+pub const currentTarget = blk: {
     const target_str = sys.CONFIG_IDF_TARGET;
     break :blk @import("std").meta.stringToEnum(Device, target_str) orelse {
         @compileError("Unknown ESP32 device target: " ++ target_str);

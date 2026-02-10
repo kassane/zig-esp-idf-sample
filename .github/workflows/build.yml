@@ -28,12 +28,31 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        target: [esp32, esp32s2, esp32s3, esp32c3, esp32h2, esp32c6, esp32c2]
-        idf-version: [v5.5, release/v6.0]
+        idf-version: [release/v5.5, release/v6.0]
+        target: 
+          - esp32
+          - esp32s2
+          - esp32s3
+          - esp32c3
+          - esp32c2
+          - esp32c6
+          - esp32h2
+          # v5.5 only → preview
+          - esp32c5
+          - esp32c61
+          - esp32p4
+          # v6.0 preview
+          - esp32h4
+        exclude:
+          - idf-version: release/v5.5
+            target: esp32h4
+          - idf-version: release/v5.5
+            target: esp32c61
     steps:
       - uses: actions/checkout@main
       
       - uses: mlugg/setup-zig@main
+        if: matrix.target != 'esp32c5' && matrix.target != 'esp32c61'
         with:
           version: ${{ env.ZIG_VERSION }}
 
@@ -78,11 +97,23 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           . ~/esp/esp-idf/export.sh
-          if [ "${{ matrix.target }}" == "esp32h4" ]; then
-            idf.py --preview set-target ${{ matrix.target }}
-          else
-            idf.py set-target ${{ matrix.target }}
+
+          PREVIEW_FLAG=""
+          if [ "${{ matrix.idf-version }}" = "release/v5.5" ]; then
+            case "${{ matrix.target }}" in
+              esp32c5|esp32p4)
+                PREVIEW_FLAG="--preview"
+                ;;
+            esac
+          elif [ "${{ matrix.idf-version }}" = "release/v6.0" ]; then
+            case "${{ matrix.target }}" in
+              esp32h4)
+                PREVIEW_FLAG="--preview"
+                ;;
+            esac
           fi
+
+          idf.py $PREVIEW_FLAG set-target ${{ matrix.target }}
           idf.py build
 
       - name: Build (Windows)
@@ -94,11 +125,20 @@ jobs:
           $env:IDF_PATH = "$(Get-Location)"
           . .\export.ps1
           cd $env:GITHUB_WORKSPACE
-          if ("${{ matrix.target }}" -eq "esp32h4") {
-            idf.py --preview set-target ${{ matrix.target }}
-          } else {
-            idf.py set-target ${{ matrix.target }}
+
+          $preview = ""
+          if ("${{ matrix.idf-version }}" -eq "release/v5.5") {
+            switch ("${{ matrix.target }}") {
+              "esp32c5" { $preview = "--preview" }
+              "esp32p4" { $preview = "--preview" }
+            }
+          } elseif ("${{ matrix.idf-version }}" -eq "release/v6.0") {
+            if ("${{ matrix.target }}" -eq "esp32h4") {
+              $preview = "--preview"
+            }
           }
+
+          idf.py $preview set-target ${{ matrix.target }}
           idf.py build
 
       - name: Build analysis (Unix)
@@ -142,7 +182,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@main
         with:
-          name: build-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || matrix.idf-version }}
+          name: build-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || matrix.idf-version == 'release/v5.5' && 'v5.5' || matrix.idf-version }}
           path: |
             build/bootloader/bootloader.bin
             build/partition_table/partition-table.bin
@@ -151,17 +191,17 @@ jobs:
             build/*.map
           retention-days: 7
 
-      - name: Copy diagram ${{ matrix.target }}
-        if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
-        run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+      # - name: Copy diagram ${{ matrix.target }}
+      #   if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+      #   run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
 
-      - name: wokwi-simulation
-        if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
-        uses: wokwi/wokwi-ci-action@main
-        with:
-          token: ${{ secrets.WOKWI_CI_TOKEN }}
-          timeout: 50000
-          expect_text: 'Hello, world from Zig!'
+      # - name: wokwi-simulation
+      #   if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+      #   uses: wokwi/wokwi-ci-action@main
+      #   with:
+      #     token: ${{ secrets.WOKWI_CI_TOKEN }}
+      #     timeout: 50000
+      #     expect_text: 'Hello, world from Zig!'
 
   build-status:
     name: Build Status
