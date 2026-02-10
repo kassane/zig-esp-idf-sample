@@ -15,7 +15,6 @@ set(BINDINGS_URL
 )
 set(BINDINGS_ESP_RS "${CMAKE_SOURCE_DIR}/include/bindings.h")
 if(NOT EXISTS "${BINDINGS_ESP_RS}")
-    message(STATUS "Downloading bindings.h from ${BINDINGS_URL}")
     file(DOWNLOAD ${BINDINGS_URL} ${BINDINGS_ESP_RS}
         TLS_VERIFY ON
         STATUS download_status

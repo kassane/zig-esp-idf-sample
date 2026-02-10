@@ -191,6 +191,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/hal/include"
     "${IDF_PATH}/components/${ARCH}/include"
     "${IDF_PATH}/components/bt/include/${TARGET_IDF_MODEL}/include"
+    "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/include"
+    "${IDF_PATH}/components/bt/host/bluedroid/api/include"
     "${IDF_PATH}/components/bt/host/bluedroid/api/include/api"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}"
