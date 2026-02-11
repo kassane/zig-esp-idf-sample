@@ -15,12 +15,20 @@ file(READ "${TARGET_FILE}" FILE_CONTENT)
 # These structs/functions are removed because they need custom implementations
 # ============================================================================
 
-# Remove wifi_sta_config_t (will be replaced with custom version)
-string(REGEX REPLACE "pub const wifi_sta_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
-# Remove wifi_ap_config_t (will be replaced with custom version)
-string(REGEX REPLACE "pub const wifi_ap_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+if(CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H2 OR CONFIG_IDF_TARGET_ESP32H4)
+    set(WIFI_SUPPORTED FALSE)
+else()
+    set(WIFI_SUPPORTED TRUE)
+endif()
+if(WIFI_SUPPORTED)
+    # Remove wifi_sta_config_t (will be replaced with custom version)
+    string(REGEX REPLACE "pub const wifi_sta_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+    # Remove wifi_ap_config_t (will be replaced with custom version)
+    string(REGEX REPLACE "pub const wifi_ap_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+endif()
 # Remove portTICK_PERIOD_MS (will be replaced with custom version)
 string(REGEX REPLACE "pub const portTICK_PERIOD_MS[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+
 # ESP32-P4 specific: Remove xPortCanYield function
 if(CONFIG_IDF_TARGET_ESP32P4)
     string(REGEX REPLACE "pub fn xPortCanYield\\([^)]*\\) callconv\\(\\.c\\) bool \\{([^{}]|\\{[^{}]*\\})*\\}" "" FILE_CONTENT "${FILE_CONTENT}")
@@ -34,14 +42,22 @@ set(PATCH_DIR "${CMAKE_SOURCE_DIR}/../../../patches")
 
 # Define patches to apply
 set(PATCH_FILES
-    "wifi_sta_config_t.zig" # WiFi station configuration
-    "wifi_ap_config_t.zig" # WiFi access point configuration
     "porttick_period_ms.zig" # FreeRTOS tick period
 )
+
 # Add target-specific patches
 if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND PATCH_FILES "xport_can_yield.zig") # ESP32-P4 yield function
 endif()
+
+# Add WiFi patches only for targets that support WiFi
+if(WIFI_SUPPORTED)
+    list(APPEND PATCH_FILES
+        "wifi_sta_config_t.zig" # WiFi station configuration
+        "wifi_ap_config_t.zig" # WiFi access point configuration
+    )
+endif()
+
 # Apply each patch file
 foreach(PATCH_FILE IN LISTS PATCH_FILES)
     set(PATCH_PATH "${PATCH_DIR}/${PATCH_FILE}")

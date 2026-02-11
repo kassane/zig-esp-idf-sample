@@ -201,6 +201,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register"
     "${IDF_PATH}/components/esp_system/include"
     "${IDF_PATH}/components/esp_hw_support/etm/include"
+    "${IDF_PATH}/components/esp_hw_support/ldo/include"
     "${IDF_PATH}/components/esp_hal_ana_cmpr/include"
     "${IDF_PATH}/components/esp_hal_ana_conv/include"
     "${IDF_PATH}/components/esp_hal_cam/include"
@@ -254,6 +255,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_phy/include"
     "${IDF_PATH}/components/esp_tee/include"
     "${IDF_PATH}/components/esp_timer/include"
+    "${IDF_PATH}/components/esp_coex/include"
     "${IDF_PATH}/components/esp_psram/include"
     "${IDF_PATH}/components/esp_security/include"
     "${IDF_PATH}/components/esp_trace/include"
@@ -266,6 +268,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_wifi/include"
     "${IDF_PATH}/components/esp_event/include"
     "${IDF_PATH}/components/lwip/include"
+    "${IDF_PATH}/components/lwip/lwip/src/include"
     "${IDF_PATH}/components/lwip/port/include"
     "${IDF_PATH}/components/freertos/config/include"
     "${IDF_PATH}/components/lwip/port/freertos/include"
@@ -278,6 +281,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_netif/include"
     "${IDF_PATH}/components/esp_event/include"
     "${IDF_PATH}/components/driver/i2c/include"
+    "${IDF_PATH}/components/driver/deprecated"
     "${IDF_PATH}/components/driver/touch_sensor/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/driver/touch_sensor/include"
     "${IDF_PATH}/components/driver/twai/include"
@@ -336,8 +340,6 @@ list(APPEND EXTRA_DEFINE_FLAGS
 string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
-    "-Dtarget=${ZIG_TARGET}"
-    "-Dmcpu=${TARGET_IDF_MODEL}"
     "-D__${TARGET_IDF_ARCH}"
     "-Dcpu_${TARGET_CPU_MODEL}"
     "-D${ARCH_DEFINE}"
@@ -378,7 +380,11 @@ message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
 add_custom_command(
     TARGET translate_c
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}" -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
+    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}"
+    -D CONFIG_IDF_TARGET_ESP32H2="${CONFIG_IDF_TARGET_ESP32H2}"
+    -D CONFIG_IDF_TARGET_ESP32H4="${CONFIG_IDF_TARGET_ESP32H4}"
+    -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}"
+    -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
 )
 
