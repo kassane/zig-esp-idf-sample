@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) !void {
     const obj = b.addObject(.{
         .name = "app_zig",
         .root_module = b.createModule(.{
-            .root_source_file = b.path("main/examples/wifi-station.zig"),
+            .root_source_file = b.path("main/app.zig"),
             .target = target,
             .optimize = optimize,
             .link_libc = true,
