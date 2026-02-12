@@ -1,7 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const idf = @import("esp_idf");
-const wifi = idf.wifi;
 const ver = idf.ver.Version;
 const mem = std.mem;
 const sys = idf.sys;
@@ -76,18 +75,6 @@ fn main() callconv(.c) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    if (comptime sys.ESP_IDF_VERSION_MAJOR > 5) {
-        switch (idf.currentTarget) {
-            .esp32h2,
-            .esp32h4,
-            .esp32p4,
-            => {},
-            else => wifi_init() catch |err| {
-                log.err("Wi-Fi init failed: {s}", .{@errorName(err)});
-            },
-        }
-    }
-
     // FreeRTOS Tasks
     if (idf.rtos.xTaskCreate(fooTask, "foo", 1024 * 3, null, 1, null) == 0) {
         @panic("Error: Task foo not created!\n");
@@ -98,28 +85,6 @@ fn main() callconv(.c) void {
     if (idf.rtos.xTaskCreate(blinkTask, "blink", 1024 * 2, null, 5, null) == 0) {
         @panic("Error: Task blinkclock not created!\n");
     }
-}
-
-fn stringToArray(comptime size: usize, str: [:0]const u8) [size]u8 {
-    var arr: [size]u8 = undefined;
-    @memset(&arr, 0); // Zero-fill
-    const len = @min(str.len, size);
-    @memcpy(arr[0..len], str[0..len]);
-    return arr;
-}
-
-fn wifi_init() !void {
-    var conf: wifi.wifiConfig = .{
-        .sta = .{
-            .password = stringToArray(64, "pass"),
-            .ssid = stringToArray(32, "my_ssid"),
-        },
-    };
-    try wifi.init(&.{});
-    try wifi.setMode(.WIFI_MODE_STA);
-    try wifi.setConfig(.WIFI_IF_STA, &conf);
-    try wifi.start();
-    try wifi.connect();
 }
 
 fn blinkLED(delay_ms: u32) !void {
