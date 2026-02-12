@@ -19,7 +19,6 @@
 #define _SYS_UNISTD_H
 #define _UNISTD_H
 #define _TIME_H_
-#define PORTMACRO_H
 
 /* Avoid redefining types that exist in real headers */
 #undef _mbstate_t
