@@ -179,12 +179,13 @@ endif()
 
 # components list
 set(INCLUDE_DIRS
+    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
+    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
+    "${IDF_PATH}/components/freertos/config/include"
     "${IDF_PATH}/components/freertos/config/include/freertos"
     "${IDF_PATH}/components/freertos/esp_additions/include"
     "${IDF_PATH}/components/freertos/config/${ARCH}/include"
-    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
-    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/esp_hw_support/include"
     "${IDF_PATH}/components/soc/include"
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/include"
@@ -271,7 +272,6 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/lwip/include"
     "${IDF_PATH}/components/lwip/lwip/src/include"
     "${IDF_PATH}/components/lwip/port/include"
-    "${IDF_PATH}/components/freertos/config/include"
     "${IDF_PATH}/components/lwip/port/freertos/include"
     "${IDF_PATH}/components/lwip/port/esp32xx/include"
     "${IDF_PATH}/components/log/include"
