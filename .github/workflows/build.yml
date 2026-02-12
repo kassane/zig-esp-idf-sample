@@ -49,6 +49,7 @@ jobs:
         run: brew install dfu-util
 
       - name: Cache ESP-IDF
+        if: matrix.os != 'windows-latest'
         id: cache-idf
         uses: actions/cache@main
         with:
@@ -152,9 +153,9 @@ jobs:
             build/*.map
           retention-days: 7
 
-      - name: Copy diagram ${{ matrix.target }}
-        if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
-        run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
+      # - name: Copy diagram ${{ matrix.target }}
+      #   if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
+      #   run: cp .github/workflows/wokwi/diagram-${{ matrix.target }}.json diagram.json
 
       # - name: wokwi-simulation
       #   if: matrix.os == 'ubuntu-latest' && !contains(fromJSON('["esp32h4", "esp32p4", "esp32c2", "esp32c5"]'), matrix.target)
