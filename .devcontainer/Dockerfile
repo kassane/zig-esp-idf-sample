@@ -29,7 +29,7 @@ ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download
 
 # ZLS v0.16.0
 ENV ZLS_REL=zls-x86_64-linux-musl-baseline
-ENV ZLS_SHA256=26f7dbdb57a1466e4f76075db6833fcbaff2dcb833c7955c8e894bdec2714336
+ENV ZLS_SHA256=13cc80fc80e5dec8b2424289a9fecfa9191014cdfa8c8273117d5e393f9ff122
 ENV ZLS_DIST=${ZLS_REL}.tar.xz
 ENV ZLS_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/${ZLS_DIST}
 
