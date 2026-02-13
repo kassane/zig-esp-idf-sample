@@ -7,7 +7,7 @@ pub fn build(b: *std.Build) !void {
     });
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addLibrary(.{
+    const obj = b.addObject(.{
         .name = "app_zig",
         .root_module = b.createModule(.{
             .root_source_file = b.path("main/app.zig"),
@@ -16,9 +16,16 @@ pub fn build(b: *std.Build) !void {
             .link_libc = true,
         }),
     });
-    lib.root_module.addImport("esp_idf", idf_wrapped_modules(b));
+    obj.root_module.addImport("esp_idf", idf_wrapped_modules(b));
 
-    b.installArtifact(lib);
+    const obj_install = b.addInstallArtifact(obj, .{
+        .dest_dir = .{
+            .override = .{
+                .custom = "obj",
+            },
+        },
+    });
+    b.getInstallStep().dependOn(&obj_install.step);
 }
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {

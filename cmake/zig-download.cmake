@@ -28,7 +28,7 @@ if(NOT EXISTS "${ZIG_DIR}/zig")
         EXPECTED_HASH SHA256=${HASH_SUM}
         STATUS download_status
         LOG download_log
-        SHOW_PROGRESS
+        # SHOW_PROGRESS
     )
     list(GET download_status 0 dl_code)
     if(NOT dl_code EQUAL 0)

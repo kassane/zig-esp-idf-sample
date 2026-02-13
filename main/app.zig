@@ -1,11 +1,16 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const idf = @import("esp_idf");
-const wifi = idf.wifi;
 const ver = idf.ver.Version;
+const mem = std.mem;
+const sys = idf.sys;
 const ESP_LOG = idf.log.ESP_LOG;
 
-export fn app_main() callconv(.c) void {
+comptime {
+    @export(&main, .{ .name = "app_main" });
+}
+
+fn main() callconv(.c) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
     // std.heap.raw_c_allocator
 
@@ -27,7 +32,7 @@ export fn app_main() callconv(.c) void {
         \\* Compiler Backend: {s}
         \\
     , .{
-        @as([]const u8, builtin.zig_version_string), // fix esp32p4(.xesppie) fmt-slice bug
+        @as([]const u8, builtin.zig_version_string),
         @tagName(builtin.zig_backend),
     });
 
@@ -70,46 +75,18 @@ export fn app_main() callconv(.c) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    // FIXME: NOT BUILD on H2 ('builtin.cpu.model.name' not exists esp32h2)
-    // wifi_init() catch |err| {
-    //     log.err("Error: {s}", .{@errorName(err)});
-    // };
-
     // FreeRTOS Tasks
-    if (idf.rtos.xTaskCreate(foo, "foo", 1024 * 3, null, 1, null) == 0) {
+    if (idf.rtos.xTaskCreate(fooTask, "foo", 1024 * 3, null, 1, null) == 0) {
         @panic("Error: Task foo not created!\n");
     }
-    if (idf.rtos.xTaskCreate(bar, "bar", 1024 * 3, null, 2, null) == 0) {
+    if (idf.rtos.xTaskCreate(barTask, "bar", 1024 * 3, null, 2, null) == 0) {
         @panic("Error: Task bar not created!\n");
     }
-    if (idf.rtos.xTaskCreate(blinkclock, "blink", 1024 * 2, null, 5, null) == 0) {
+    if (idf.rtos.xTaskCreate(blinkTask, "blink", 1024 * 2, null, 5, null) == 0) {
         @panic("Error: Task blinkclock not created!\n");
     }
 }
 
-fn stringToArray(comptime size: usize, str: [:0]const u8) [size]u8 {
-    var arr: [size]u8 = undefined;
-    @memset(&arr, 0); // Zero-fill
-    const len = @min(str.len, size);
-    @memcpy(arr[0..len], str[0..len]);
-    return arr;
-}
-
-fn wifi_init() !void {
-    var conf: wifi.wifiConfig = .{
-        .sta = .{
-            .password = stringToArray(64, "pass"),
-            .ssid = stringToArray(32, "my_ssid"),
-        },
-    };
-    try wifi.init(&.{});
-    try wifi.setMode(.WIFI_MODE_STA);
-    try wifi.setConfig(.WIFI_IF_STA, &conf);
-    try wifi.start();
-    try wifi.connect();
-}
-
-// comptime function
 fn blinkLED(delay_ms: u32) !void {
     try idf.gpio.Direction.set(
         .GPIO_NUM_18,
@@ -123,41 +100,43 @@ fn blinkLED(delay_ms: u32) !void {
 
         log.info("LED: OFF", .{});
         try idf.gpio.Level.set(.GPIO_NUM_18, 0);
+
+        idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
     }
 }
 
-fn arraylist(allocator: std.mem.Allocator) !void {
+fn arraylist(allocator: mem.Allocator) !void {
     var arr: std.ArrayList(u32) = .empty;
-    defer arr.deinit(
-        allocator,
-    );
+    defer arr.deinit(allocator);
 
     try arr.append(allocator, 10);
     try arr.append(allocator, 20);
     try arr.append(allocator, 30);
 
-    for (arr.items) |index| {
+    for (arr.items) |value| {
         ESP_LOG(
             allocator,
             tag,
             "Arr value: {}\n",
-            .{index},
+            .{value},
         );
     }
 }
-// Task functions (must be exported to C ABI) - runtime functions
-export fn blinkclock(_: ?*anyopaque) void {
+
+// Task functions (must be exported to C ABI)
+export fn blinkTask(_: ?*anyopaque) callconv(.c) void {
     blinkLED(1000) catch |err|
         @panic(@errorName(err));
 }
 
-export fn foo(_: ?*anyopaque) callconv(.c) void {
+export fn fooTask(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
         idf.rtos.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
     }
 }
-export fn bar(_: ?*anyopaque) callconv(.c) void {
+
+export fn barTask(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task bar printing..", .{});
         idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);

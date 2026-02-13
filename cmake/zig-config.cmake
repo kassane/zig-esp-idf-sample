@@ -48,7 +48,8 @@ find_program(ZIG_FOUND zig)
 set(USE_ZIG_ESPRESSIF_BOOTSTRAP TRUE)
 if(ZIG_FOUND AND CONFIG_IDF_TARGET_ARCH_RISCV)
     # For most RISC-V prefer system zig (except P4 & H4)
-    if(NOT (CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H4))
+    # FIXME: https://github.com/kassane/zig-esp-idf-sample/issues/45 (upstream - no fixed)
+    if(NOT (CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H4 OR CONFIG_IDF_TARGET_ESP32C5 OR CONFIG_IDF_TARGET_ESP32C61))
         set(USE_ZIG_ESPRESSIF_BOOTSTRAP FALSE)
     endif()
 endif()
@@ -178,12 +179,13 @@ endif()
 
 # components list
 set(INCLUDE_DIRS
+    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
+    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
+    "${IDF_PATH}/components/freertos/config/include"
     "${IDF_PATH}/components/freertos/config/include/freertos"
     "${IDF_PATH}/components/freertos/esp_additions/include"
     "${IDF_PATH}/components/freertos/config/${ARCH}/include"
-    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
-    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/esp_hw_support/include"
     "${IDF_PATH}/components/soc/include"
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/include"
@@ -191,6 +193,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/hal/include"
     "${IDF_PATH}/components/${ARCH}/include"
     "${IDF_PATH}/components/bt/include/${TARGET_IDF_MODEL}/include"
+    "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/include"
+    "${IDF_PATH}/components/bt/host/bluedroid/api/include"
     "${IDF_PATH}/components/bt/host/bluedroid/api/include/api"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}"
@@ -198,8 +202,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/${ARCH}/${TARGET_IDF_MODEL}/include/${ARCH}/core"
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register"
     "${IDF_PATH}/components/esp_system/include"
-    "${IDF_PATH}/components/esp_driver_gpio/include"
     "${IDF_PATH}/components/esp_hw_support/etm/include"
+    "${IDF_PATH}/components/esp_hw_support/ldo/include"
     "${IDF_PATH}/components/esp_hal_ana_cmpr/include"
     "${IDF_PATH}/components/esp_hal_ana_conv/include"
     "${IDF_PATH}/components/esp_hal_cam/include"
@@ -222,31 +226,69 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_hal_uart/include"
     "${IDF_PATH}/components/esp_hal_usb/include"
     "${IDF_PATH}/components/esp_hal_wdt/include"
+    "${IDF_PATH}/components/esp_driver_ana_cmpr/include"
+    "${IDF_PATH}/components/esp_driver_bitscrambler/include"
+    "${IDF_PATH}/components/esp_driver_cam/include"
+    "${IDF_PATH}/components/esp_driver_dac/include"
+    "${IDF_PATH}/components/esp_driver_gpio/include"
+    "${IDF_PATH}/components/esp_driver_gptimer/include"
+    "${IDF_PATH}/components/esp_driver_i2c/include"
+    "${IDF_PATH}/components/esp_driver_i2s/include"
+    "${IDF_PATH}/components/esp_driver_i3c/include"
+    "${IDF_PATH}/components/esp_driver_isp/include"
+    "${IDF_PATH}/components/esp_driver_jpeg/include"
+    "${IDF_PATH}/components/esp_driver_ledc/include"
+    "${IDF_PATH}/components/esp_driver_mcpwm/include"
+    "${IDF_PATH}/components/esp_driver_parlio/include"
+    "${IDF_PATH}/components/esp_driver_pcnt/include"
+    "${IDF_PATH}/components/esp_driver_ppa/include"
+    "${IDF_PATH}/components/esp_driver_rmt/include"
+    "${IDF_PATH}/components/esp_driver_sd_intf/include"
+    "${IDF_PATH}/components/esp_driver_sdio/include"
+    "${IDF_PATH}/components/esp_driver_sdm/include"
+    "${IDF_PATH}/components/esp_driver_sdmmc/include"
+    "${IDF_PATH}/components/esp_driver_sdspi/include"
+    "${IDF_PATH}/components/esp_driver_spi/include"
+    "${IDF_PATH}/components/esp_driver_touch_sens/include"
+    "${IDF_PATH}/components/esp_driver_tsens/include"
+    "${IDF_PATH}/components/esp_driver_twai/include"
+    "${IDF_PATH}/components/esp_driver_uart/include"
+    "${IDF_PATH}/components/esp_driver_usb_serial_jtag/include"
     "${IDF_PATH}/components/esp_phy/include"
+    "${IDF_PATH}/components/esp_tee/include"
+    "${IDF_PATH}/components/esp_timer/include"
+    "${IDF_PATH}/components/esp_coex/include"
+    "${IDF_PATH}/components/esp_psram/include"
+    "${IDF_PATH}/components/esp_security/include"
+    "${IDF_PATH}/components/esp_trace/include"
     "${IDF_PATH}/components/esp_blockdev/include"
-    "${IDF_PATH}/components/esp_libc/platform_include/sys"
-    "${IDF_PATH}/components/newlib/platform_include/sys"
     "${IDF_PATH}/components/hal/platform_port/include"
     "${IDF_PATH}/components/heap/include"
+    "${IDF_PATH}/components/ieee802154/include"
+    "${IDF_PATH}/components/openthread/include"
     "${IDF_PATH}/components/esp_rom/include"
     "${IDF_PATH}/components/esp_wifi/include"
     "${IDF_PATH}/components/esp_event/include"
     "${IDF_PATH}/components/lwip/include"
+    "${IDF_PATH}/components/lwip/lwip/src/include"
     "${IDF_PATH}/components/lwip/port/include"
-    "${IDF_PATH}/components/freertos/config/include"
     "${IDF_PATH}/components/lwip/port/freertos/include"
     "${IDF_PATH}/components/lwip/port/esp32xx/include"
     "${IDF_PATH}/components/log/include"
+    "${IDF_PATH}/components/vfs/include"
+    "${IDF_PATH}/components/wpa_supplicant/esp_supplicant/include"
     "${IDF_PATH}/components/nvs_flash/include"
     "${IDF_PATH}/components/esp_partition/include"
     "${IDF_PATH}/components/esp_netif/include"
     "${IDF_PATH}/components/esp_event/include"
     "${IDF_PATH}/components/driver/i2c/include"
-    "${IDF_PATH}/components/esp_driver_uart/include"
-    "${IDF_PATH}/components/esp_driver_spi/include"
+    "${IDF_PATH}/components/driver/deprecated"
+    "${IDF_PATH}/components/driver/touch_sensor/${TARGET_IDF_MODEL}/include"
+    "${IDF_PATH}/components/driver/touch_sensor/include"
+    "${IDF_PATH}/components/driver/twai/include"
     "${IDF_PATH}/components/spi_flash/include"
-    "${IDF_PATH}/components/esp_driver_i2s/include"
-    "${IDF_PATH}/components/esp_driver_usb_serial_jtag/include"
+    "${IDF_PATH}/components/esp_usb_cdc_rom_console/include"
+    "${CMAKE_SOURCE_DIR}/managed_components/espressif__led_strip/include"
     "${CMAKE_SOURCE_DIR}/build/config"
 )
 # Toolchain system includes (separate from regular includes)
@@ -299,8 +341,6 @@ list(APPEND EXTRA_DEFINE_FLAGS
 string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
-    "-Dtarget=${ZIG_TARGET}"
-    "-Dmcpu=${TARGET_IDF_MODEL}"
     "-D__${TARGET_IDF_ARCH}"
     "-Dcpu_${TARGET_CPU_MODEL}"
     "-D${ARCH_DEFINE}"
@@ -317,7 +357,7 @@ string(JOIN " " DEFINE_FLAGS_STR ${DEFINE_FLAGS})
 if(ARCH_DEFINE)
     set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
 endif()
-
+include(${CMAKE_SOURCE_DIR}/cmake/bindings.cmake)
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
 
@@ -341,7 +381,11 @@ message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
 add_custom_command(
     TARGET translate_c
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}" -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}" -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
+    COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}"
+    -D CONFIG_IDF_TARGET_ESP32H2="${CONFIG_IDF_TARGET_ESP32H2}"
+    -D CONFIG_IDF_TARGET_ESP32H4="${CONFIG_IDF_TARGET_ESP32H4}"
+    -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}"
+    -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
 )
 
@@ -354,7 +398,7 @@ endif()
 
 add_custom_target(zig_build
     ${ZIG_BIN} build
-    --build-file ${BUILD_PATH}/build.zig
+    --build-file ${CMAKE_SOURCE_DIR}/build.zig
     -Doptimize=${ZIG_BUILD_TYPE}
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
@@ -362,59 +406,13 @@ add_custom_target(zig_build
     --cache-dir ${CMAKE_BINARY_DIR}/../.zig-cache
     --prefix ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/libapp_zig.a
+    BYPRODUCTS ${CMAKE_BINARY_DIR}/obj/app_zig.o
     VERBATIM)
 
 add_dependencies(zig_build translate_c)
-add_library(app_zig STATIC IMPORTED)
-set_target_properties(app_zig PROPERTIES IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
-add_dependencies(app_zig zig_build)
-
-add_prebuilt_library(zig ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
 add_dependencies(${COMPONENT_LIB} zig_build)
 
-
-target_link_libraries(${COMPONENT_LIB} PRIVATE ${CMAKE_BINARY_DIR}/lib/libapp_zig.a)
-
-# ESP32-H2/P4 does not have wifi support
-if(NOT CONFIG_IDF_TARGET_ESP32P4 AND NOT CONFIG_IDF_TARGET_ESP32H4)
-    list(APPEND ESP32_LIBS
-        ${IDF_PATH}/components/esp_phy/lib/${TARGET_IDF_MODEL}/libphy.a
-    )
-endif()
-
-
-if(NOT CONFIG_IDF_TARGET_ESP32P4 AND
-    NOT CONFIG_IDF_TARGET_ESP32H2 AND
-    NOT CONFIG_IDF_TARGET_ESP32H4 AND
-    NOT CONFIG_IDF_TARGET_ESP32C2
-)
-    list(APPEND ESP32_LIBS
-        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libpp.a
-        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libmesh.a
-        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libnet80211.a
-        ${IDF_PATH}/components/esp_wifi/lib/${TARGET_IDF_MODEL}/libcore.a
-        ${CMAKE_BINARY_DIR}/esp-idf/wpa_supplicant/libwpa_supplicant.a
-    )
-endif()
-
-
-message(STATUS "Wifi Libs: ${ESP32_LIBS}")
-
-target_link_libraries(${COMPONENT_LIB} PRIVATE
-    "-Wl,--start-group"
-    ${ESP32_LIBS}
-    ${CMAKE_BINARY_DIR}/esp-idf/log/liblog.a
-    ${CMAKE_BINARY_DIR}/esp-idf/nvs_flash/libnvs_flash.a
-    ${CMAKE_BINARY_DIR}/esp-idf/soc/libsoc.a
-    ${CMAKE_BINARY_DIR}/esp-idf/esp_hw_support/libesp_hw_support.a
-    ${CMAKE_BINARY_DIR}/esp-idf/hal/libhal.a
-    # ${CMAKE_BINARY_DIR}/esp-idf/mbedtls/mbedtls/library/libmbedcrypto.a
-    ${CMAKE_BINARY_DIR}/esp-idf/freertos/libfreertos.a
-    ${CMAKE_BINARY_DIR}/esp-idf/lwip/liblwip.a
-    ${CMAKE_BINARY_DIR}/esp-idf/esp_wifi/libesp_wifi.a
-    ${CMAKE_BINARY_DIR}/esp-idf/esp_netif/libesp_netif.a
-    ${CMAKE_BINARY_DIR}/esp-idf/esp_event/libesp_event.a
-    ${CMAKE_BINARY_DIR}/lib/libapp_zig.a
-    "-Wl,--end-group"
+target_sources(${COMPONENT_LIB}
+    PRIVATE
+    ${CMAKE_BINARY_DIR}/obj/app_zig.o
 )
