@@ -2,11 +2,7 @@ name: Build
 
 on:
   push:
-    branches:
-      - main
   pull_request:
-  schedule:
-    - cron: "50 4 * * *"
   workflow_dispatch:
 
 env:
@@ -185,6 +181,12 @@ jobs:
       #     token: ${{ secrets.WOKWI_CI_TOKEN }}
       #     timeout: 50000
       #     expect_text: 'Hello, world from Zig!'
+      - name: 'QEMU Runner'
+        if: matrix.os == 'ubuntu-latest' && contains(fromJSON('["esp32c3", "esp32", "esp32s3"]'), matrix.target)
+        uses: tobozo/esp32-qemu-sim@main
+        with:
+          chip: ${{ matrix.target }}
+          qemu-timeout: "60"
 
   build-status:
     name: Build Status
