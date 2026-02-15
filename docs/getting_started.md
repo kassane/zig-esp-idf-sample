@@ -372,6 +372,7 @@ idf.py reconfigure
 ```
 
 **3. Check provided example:**
+
 The example in [examples/smartled-rgb.zig](../main/examples/smartled-rgb.zig) demonstrates:
 - Configuring WS2812B LED strip on GPIO 2
 - Setting individual pixel colors
@@ -391,7 +392,7 @@ idf.py menuconfig
 # Set WiFi SSID and Password
 ```
 
-Or edit `main/Kconfig.projbuild` to change default values.
+Or edit [main/Kconfig.projbuild](../main/Kconfig.projbuild) to change default values.
 
 ### Available Wrapper APIs
 
