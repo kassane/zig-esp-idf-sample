@@ -8,6 +8,3 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose default type of build (Debug)" FORCE)
 endif()
 project(zig-sample-idf)
-
-idf_build_get_property(comps BUILD_COMPONENTS)
-set(BUILD_COMPONENTS ${comps} CACHE STRING "all esp-idf components" FORCE)

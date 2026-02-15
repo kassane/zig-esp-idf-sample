@@ -83,4 +83,16 @@ typedef unsigned int wint_t;
 #include "bindings.h"
 #include "wifi_stubs.h"
 
+// Optional/Managed Components
+// check cmake/extra-components.cmake
+#if HAS_LED_STRIP
+#include "led_strip.h"
+#endif
+#if HAS_ESP_DSP
+#include "esp_dsp.h"
+#endif
+#if HAS_ESP_BSP_DEVKIT
+#include "bsp/esp-bsp.h"
+#endif
+
 #endif // STUBS_H
