@@ -106,7 +106,7 @@ More information about building and using Zig with ESP-IDF can be found in the [
 > The upstream [Zig compiler](https://ziglang.org/download) (LLVM backend) does not support Xtensa architecture. For ESP32, ESP32-S2, and ESP32-S3 targets, you must use the [Espressif Zig fork](https://github.com/kassane/zig-espressif-bootstrap/releases).
 > 
 > - **RISC-V targets (C2/C3/C5/C6/H2/etc):** Works with upstream Zig ✅
-> - **Xtensa targets (ESP32/S2/S3) & RISC-V with FPU (H4/P4):** Requires [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) (auto-downloaded)
+> - **Xtensa targets (ESP32/S2/S3) & custom RISC-V targets (H4/P4):** Requires [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) (auto-downloaded)
 > 
 > The build system automatically downloads the correct toolchain for your target.
 
