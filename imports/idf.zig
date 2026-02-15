@@ -21,7 +21,7 @@ pub const spi = @import("spi");
 pub const uart = @import("uart");
 pub const ver = @import("ver");
 pub const wifi = switch (currentTarget) {
-    .esp32h2, .esp32h4, .esp32p4 => {},
+    .esp32h2, .esp32h21, .esp32h4, .esp32p4 => @compileError("Wifi unavailable!"),
     else => @import("wifi"),
 };
 pub const sys = @import("sys");
