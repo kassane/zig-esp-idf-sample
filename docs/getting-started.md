@@ -671,7 +671,7 @@ idf.py reconfigure
 Found a bug or want to contribute?
 - **GitHub:** https://github.com/kassane/zig-esp-idf-sample
 - **Issues:** https://github.com/kassane/zig-esp-idf-sample/issues
-- **Pull Requests:** See [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Pull Requests:** See [CONTRIBUTING.md](../CONTRIBUTING.md)
 
 ---
 
@@ -738,6 +738,6 @@ Check your board's pinout:
 
 ## Support
 
-- **Documentation:** [docs/](docs/)
+- **Documentation:** [docs/](.)
 - **Issues:** https://github.com/kassane/zig-esp-idf-sample/issues
 - **Discussions:** https://github.com/kassane/zig-esp-idf-sample/discussions
