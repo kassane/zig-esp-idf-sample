@@ -252,7 +252,6 @@ comptime {
 }
 
 fn main() callconv(.c) void {
-    const log = std.log.scoped(.app);
     log.info("Hello from Zig on ESP32!", .{});
     log.info("Zig version: {s}", .{@import("builtin").zig_version_string});
     
@@ -268,7 +267,7 @@ fn main() callconv(.c) void {
 
 // overwrite zig std_options config
 pub const std_options: std.Options = .{
-    .logFn = idf.logger.espLogFn,
+    .logFn = idf.log.espLogFn,
 };
 // rename log instance
 const log = std.log.scoped(.@"esp-idf");
@@ -295,9 +294,7 @@ comptime {
     @export(&main, .{ .name = "app_main" });
 }
 
-fn main() callconv(.c) void {
-    const log = std.log.scoped(.blink);
-    
+fn main() callconv(.c) void {    
     // Configure GPIO as output
     idf.gpio.Direction.set(.GPIO_NUM_18, .GPIO_MODE_OUTPUT) catch {
         log.err("Failed to configure GPIO", .{});
@@ -321,10 +318,10 @@ fn main() callconv(.c) void {
 
 // overwrite zig std_options config
 pub const std_options: std.Options = .{
-    .logFn = idf.logger.espLogFn,
+    .logFn = idf.log.espLogFn,
 };
 // rename log instance
-const log = std.log.scoped(.@"esp-idf");
+const log = std.log.scoped(.blink);
 // overwrite std panic-handler
 pub const panic = idf.esp_panic.panic;
 ```
@@ -407,7 +404,7 @@ The project provides comprehensive Zig wrappers in `imports/`:
 |--------|-------------|---------------|
 | `idf.gpio` | GPIO control | `idf.gpio.Level.set(.GPIO_NUM_18, 1)` |
 | `idf.wifi` | WiFi connectivity | `idf.wifi.init()` |
-| `idf.bluetooth` | Bluetooth/BLE | `idf.bluetooth.*` |
+| `idf.bt` | Bluetooth/BLE | `idf.bt.*` |
 | `idf.heap` | Memory allocators | `idf.heap.HeapCapsAllocator` |
 | `idf.rtos` | FreeRTOS tasks | `idf.rtos.xTaskCreate()` |
 | `idf.led` | LED strip (WS2812B) | `idf.led.setPixel()` (requires led-strip) |
@@ -419,9 +416,9 @@ The project provides comprehensive Zig wrappers in `imports/`:
 | `idf.mqtt` | MQTT client | `idf.mqtt.*` |
 | `idf.lwip` | TCP/IP stack | `idf.lwip.*` |
 | `idf.dsp` | DSP functions | `idf.dsp.*` (requires esp-dsp) |
-| `idf.pcnt` | Pulse counter | `idf.pcnt.*` |
-| `idf.logger` | Logging utilities | `idf.logger.espLogFn` |
-| `idf.error` | Error handling | `idf.error.espCheckError()` |
+| `idf.pulse` | Pulse counter | `idf.pulse.*` |
+| `idf.log` | Logging utilities | `idf.log.espLogFn` |
+| `idf.err` | Error handling | `idf.err.espCheckError()` |
 | `idf.sys` | Raw C bindings | Direct ESP-IDF API access |
 
 ---
@@ -436,6 +433,10 @@ const std = @import("std");
 
 // overwrite std panic-handler
 pub const panic = idf.esp_panic.panic;
+// overwrite std.log
+pub const std_options: std.Options = .{
+    .logFn = idf.log.espLogFn,
+};
 
 export fn myTask(_: ?*anyopaque) callconv(.c) void {
     const log = std.log.scoped(.task);
@@ -464,13 +465,12 @@ const idf = @import("esp_idf");
 const std = @import("std");
 
 export fn app_main() callconv(.c) void {
-    var heap = idf.heap.HeapCapsAllocator.init(.MALLOC_CAP_8BIT);
-    var arena = std.heap.ArenaAllocator.init(heap.allocator());
+    var arena = std.heap.ArenaAllocator.init(std.heap.c_allocator);
     defer arena.deinit();
     
     const allocator = arena.allocator();
     
-    var list = std.ArrayList(u32) = .empty;
+    var list: std.ArrayList(u32) = .empty;
     defer list.deinit(allocator);
     
     list.append(allocator, 10) catch {};
@@ -487,6 +487,7 @@ When wrappers aren't available, use raw bindings:
 
 ```zig
 const idf = @import("esp_idf");
+const std = @import("std");
 const sys = idf.sys;
 const log = std.log.scoped(.@"esp-idf");
 
@@ -507,10 +508,6 @@ export fn app_main() callconv(.c) void {
 }
 
 pub const std_options: std.Options = .{
-    .log_level = switch (builtin.mode) {
-        .Debug => .debug,
-        else => .info,
-    },
     .logFn = idf.log.espLogFn,
 };
 ```
