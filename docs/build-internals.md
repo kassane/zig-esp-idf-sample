@@ -340,4 +340,3 @@ This architecture allows safe, idiomatic Zig code while maintaining full access 
 │  Zig code: const led = @import("esp_idf").led;                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
-</br>

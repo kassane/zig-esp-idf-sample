@@ -28,14 +28,10 @@ endif()
 if(NOT DEFINED HAS_ESP_DSP)
     set(HAS_ESP_DSP 0)
 endif()
-if(NOT DEFINED HAS_ESP_BSP_DEVKIT)
-    set(HAS_ESP_BSP_DEVKIT 0)
-endif()
 
 # message(STATUS "Component detection:")
 # message(STATUS "  HAS_LED_STRIP: ${HAS_LED_STRIP}")
 # message(STATUS "  HAS_ESP_DSP: ${HAS_ESP_DSP}")
-# message(STATUS "  HAS_ESP_BSP_DEVKIT: ${HAS_ESP_BSP_DEVKIT}")
 
 # ============================================================================
 # Remove problematic definitions

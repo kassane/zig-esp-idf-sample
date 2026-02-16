@@ -181,8 +181,8 @@ zig-esp-idf-sample/
 ├── wokwi.toml            # Wokwi simulator config
 │
 ├── main/
-│   ├── CMakeLists.txt     # Main component config
-│   ├── placeholder.c      # Minimal C entry point
+│   ├── CMakeLists.txt    # Main component config
+│   ├── placeholder.c     # Minimal C entry point
 │   ├── app.zig           # Main Zig application entry
 │   ├── idf_component.yml # Component dependencies
 │   ├── Kconfig.projbuild # Project configuration options
@@ -190,7 +190,7 @@ zig-esp-idf-sample/
 │       ├── smartled-rgb.zig   # LED strip (WS2812B) example
 │       └── wifi-station.zig   # WiFi station example
 │
-├── imports/               # Zig API wrappers and bindings
+├── imports/              # Zig API wrappers and bindings
 │   ├── idf.zig           # Main ESP-IDF facade module
 │   ├── idf-sys.zig       # Generated C bindings (auto-generated)
 │   ├── gpio.zig          # GPIO wrapper
@@ -214,9 +214,9 @@ zig-esp-idf-sample/
 │   └── version.zig       # Version information
 │
 ├── include/              # C headers for binding generation
-│   ├── stubs.h          # Core ESP-IDF headers
-│   ├── wifi_stubs.h     # WiFi-specific headers
-│   └── bindings.h       # Additional bindings
+│   ├── stubs.h           # Core ESP-IDF headers
+│   ├── wifi_stubs.h      # WiFi-specific headers
+│   └── bindings.h        # Additional bindings
 │
 ├── cmake/               # CMake build system scripts
 │   ├── zig-config.cmake        # Main Zig configuration
@@ -227,17 +227,12 @@ zig-esp-idf-sample/
 │   └── patch.cmake             # Post-processing patches
 │
 ├── patches/             # Binding fixes for translate-c issues
-│   ├── porttick_period_ms.zig
-│   ├── xport_can_yield.zig
-│   ├── wifi_sta_config_t.zig
-│   ├── wifi_ap_config_t.zig
-│   ├── led_strip_struct_format_layout_15.zig
-│   └── led_strip_rmt_extra_config_20.zig
+│   ├── *.zig
 │
 ├── docs/                # Documentation
 │   ├── build-internals.md      # Build system details
 │   ├── build-scheme.png        # Build flow diagram
-│   └── zig-xtensa.md          # Xtensa toolchain info
+│   └── zig-xtensa.md           # Xtensa toolchain info
 │
 └── flake.nix            # Nix development environment
 ```
@@ -378,6 +373,16 @@ The example in [examples/smartled-rgb.zig](../main/examples/smartled-rgb.zig) de
 - Setting individual pixel colors
 - Refreshing the display
 - Blinking pattern
+
+### DSP basics (FFT + math)
+
+[examples/dsp-math.zig](../main/examples/dsp-math.zig)
+
+- Generates a sine tone (freq = 0.2 normalized)
+- Applies Hann window
+- Does FFT (1024 points, float32, radix-2)
+- Computes power spectrum in dB
+- Prints ASCII plot of the spectrum (64×10 chars, -120 to +40 dB)
 
 ### Using WiFi
 
