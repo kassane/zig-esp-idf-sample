@@ -590,8 +590,8 @@ ls /dev/tty*
 - **Zig Language:** https://ziglang.org/documentation/master/
 - **ESP-IDF Docs:** https://docs.espressif.com/projects/esp-idf/
 - **Project Wiki:** 
-  - [Build Internals](docs/build-internals.md)
-  - [Xtensa Toolchain](docs/zig-xtensa.md)
+  - [Build Internals](./build-internals.md)
+  - [Xtensa Toolchain](./zig-xtensa.md)
 
 ### Explore Examples
 

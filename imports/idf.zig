@@ -1,14 +1,23 @@
 pub const bl = @import("bootloader");
 pub const bt = @import("bluetooth");
 pub const crc = @import("crc");
-pub const dsp = @import("dsp");
+pub const dsp = switch (currentTarget) {
+    .esp32, .esp32s3, .esp32p4 => if (@as(bool, sys.HAS_ESP_DSP))
+        @import("dsp")
+    else
+        @compileError("requires: add-component espressif/esp_dsp"),
+    else => @compileError("DSP unavailable!"),
+};
 pub const err = @import("error");
 pub const gpio = @import("gpio");
 pub const heap = @import("heap");
 pub const http = @import("http");
 pub const i2c = @import("i2c");
 pub const i2s = @import("i2s");
-pub const led = @import("led");
+pub const led = switch (@as(bool, sys.HAS_ESP_LED_STRIP)) {
+    true => @import("led"),
+    else => @compileError("requires: add-component espressif/led_strip"),
+};
 pub const log = @import("log");
 pub const lwip = @import("lwip");
 pub const mqtt = @import("mqtt");

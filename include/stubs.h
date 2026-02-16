@@ -91,8 +91,5 @@ typedef unsigned int wint_t;
 #if HAS_ESP_DSP
 #include "esp_dsp.h"
 #endif
-#if HAS_ESP_BSP_DEVKIT
-#include "bsp/esp-bsp.h"
-#endif
 
 #endif // STUBS_H

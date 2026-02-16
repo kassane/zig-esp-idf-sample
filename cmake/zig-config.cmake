@@ -394,7 +394,6 @@ add_custom_command(
     -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}"
     -D HAS_LED_STRIP="${HAS_LED_STRIP}"
     -D HAS_ESP_DSP="${HAS_ESP_DSP}"
-    -D HAS_ESP_BSP_DEVKIT="${HAS_ESP_BSP_DEVKIT}"
     -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
 )
