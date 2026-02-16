@@ -1,3 +1,4 @@
+// requires: idf.py add-dependency espressif/led_strip
 const sys = @import("sys");
 const errors = @import("error");
 
@@ -28,7 +29,7 @@ pub const PixelFormat = enum(u32) {
     grbw = 0x10,
     rgbw = 0x11,
 };
-pub const LedStripConfig = struct {
+pub const LedStripConfig = extern struct {
     strip_gpio_num: i32,
     max_leds: u32,
     led_model: LedModel,
@@ -79,12 +80,17 @@ pub const LedStripSpiConfig = struct {
 // API functions
 
 /// Creates RMT-backed LED strip
-pub fn newRmtDevice(led_config: *const LedStripConfig, rmt_config: *const LedStripRmtConfig, handle: LedStripHandle) !LedStripHandle {
-    return try errors.espCheckError(sys.led_strip_new_rmt_device(@ptrCast(led_config), @ptrCast(rmt_config), &handle));
+pub fn newRmtDevice(led_config: *const LedStripConfig, rmt_config: *const LedStripRmtConfig, handle: *LedStripHandle) !LedStripHandle {
+    const result = sys.led_strip_new_rmt_device(@ptrCast(led_config), @ptrCast(rmt_config), @ptrCast(handle));
+    try errors.espCheckError(result);
+    return handle.*;
 }
+
 /// Creates SPI-backed LED strip
-pub fn newSpiDevice(led_config: *const LedStripConfig, spi_config: *const LedStripSpiConfig, handle: LedStripHandle) !LedStripHandle {
-    return try errors.espCheckError(sys.led_strip_new_spi_device(@ptrCast(led_config), @ptrCast(spi_config), &handle));
+pub fn newSpiDevice(led_config: *const LedStripConfig, spi_config: *const LedStripSpiConfig, handle: *LedStripHandle) !LedStripHandle {
+    const result = sys.led_strip_new_spi_device(@ptrCast(led_config), @ptrCast(spi_config), @ptrCast(handle));
+    try errors.espCheckError(result);
+    return handle.*;
 }
 /// Set one RGB pixel
 pub fn setPixel(strip: LedStripHandle, index: u32, r: u8, g: u8, b: u8) !void {

@@ -1,14 +1,20 @@
 pub const bl = @import("bootloader");
 pub const bt = @import("bluetooth");
 pub const crc = @import("crc");
-pub const dsp = @import("dsp");
+pub const dsp = switch (@as(bool, sys.HAS_ESP_DSP)) {
+    true => @import("dsp"),
+    else => @compileError("requires: idf.py add-component espressif/esp-dsp"),
+};
 pub const err = @import("error");
 pub const gpio = @import("gpio");
 pub const heap = @import("heap");
 pub const http = @import("http");
 pub const i2c = @import("i2c");
 pub const i2s = @import("i2s");
-pub const led = @import("led");
+pub const led = switch (@as(bool, sys.HAS_ESP_LED_STRIP)) {
+    true => @import("led"),
+    else => @compileError("requires: idf.py add-component espressif/led-strip"),
+};
 pub const log = @import("log");
 pub const lwip = @import("lwip");
 pub const mqtt = @import("mqtt");
@@ -21,7 +27,7 @@ pub const spi = @import("spi");
 pub const uart = @import("uart");
 pub const ver = @import("ver");
 pub const wifi = switch (currentTarget) {
-    .esp32h2, .esp32h4, .esp32p4 => {},
+    .esp32h2, .esp32h21, .esp32h4, .esp32p4 => @compileError("Wifi unsupported!"),
     else => @import("wifi"),
 };
 pub const sys = @import("sys");

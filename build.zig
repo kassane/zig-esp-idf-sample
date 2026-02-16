@@ -63,6 +63,19 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             },
         },
     });
+    const errors = b.addModule("error", .{
+        .root_source_file = b.path(b.pathJoin(&.{
+            src_path,
+            "imports",
+            "error.zig",
+        })),
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+        },
+    });
     const log = b.addModule("log", .{
         .root_source_file = b.path(b.pathJoin(&.{
             src_path,
@@ -104,6 +117,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
                 .name = "sys",
                 .module = sys,
             },
+            .{
+                .name = "error",
+                .module = errors,
+            },
         },
     });
     const bootloader = b.addModule("bootloader", .{
@@ -111,19 +128,6 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             src_path,
             "imports",
             "bootloader.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const errors = b.addModule("error", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "error.zig",
         })),
         .imports = &.{
             .{
@@ -361,6 +365,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "sys",
                 .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
             },
         },
     });

@@ -288,7 +288,6 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/driver/twai/include"
     "${IDF_PATH}/components/spi_flash/include"
     "${IDF_PATH}/components/esp_usb_cdc_rom_console/include"
-    "${CMAKE_SOURCE_DIR}/managed_components/espressif__led_strip/include"
     "${CMAKE_SOURCE_DIR}/build/config"
 )
 # Toolchain system includes (separate from regular includes)
@@ -303,19 +302,6 @@ if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver3")
 elseif(CONFIG_IDF_TARGET_ESP32H4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver_mp")
-endif()
-set(INCLUDE_FLAGS "")
-foreach(dir ${INCLUDE_DIRS})
-    set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -I\"${dir}\"")
-endforeach()
-# Build system include flags (for toolchain)
-foreach(dir ${SYSTEM_INCLUDE_DIRS})
-    set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -isystem \"${dir}\"")
-endforeach()
-if(NOT WIN32)
-    separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
-else()
-    separate_arguments(INCLUDE_FLAGS WINDOWS_COMMAND "${INCLUDE_FLAGS}")
 endif()
 
 # get esp-idf C Macros
@@ -357,9 +343,29 @@ string(JOIN " " DEFINE_FLAGS_STR ${DEFINE_FLAGS})
 if(ARCH_DEFINE)
     set(DEFINE_FLAGS "${DEFINE_FLAGS} -D${ARCH_DEFINE}")
 endif()
-include(${CMAKE_SOURCE_DIR}/cmake/bindings.cmake)
 set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 set(IDF_SYS_C "${CMAKE_SOURCE_DIR}/include/stubs.h")
+
+# get esp-rs bindings.h
+include(${CMAKE_SOURCE_DIR}/cmake/bindings.cmake)
+
+# add extra-components
+include(${CMAKE_SOURCE_DIR}/cmake/extra-components.cmake)
+
+set(INCLUDE_FLAGS "")
+foreach(dir ${INCLUDE_DIRS})
+    set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -I\"${dir}\"")
+endforeach()
+
+# Build system include flags (for toolchain)
+foreach(dir ${SYSTEM_INCLUDE_DIRS})
+    set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -isystem \"${dir}\"")
+endforeach()
+if(NOT WIN32)
+    separate_arguments(INCLUDE_FLAGS UNIX_COMMAND "${INCLUDE_FLAGS}")
+else()
+    separate_arguments(INCLUDE_FLAGS WINDOWS_COMMAND "${INCLUDE_FLAGS}")
+endif()
 
 # Run `translate-c` to generate `idf-sys.zig`
 zig_run(
@@ -383,8 +389,11 @@ add_custom_command(
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -D TARGET_FILE="${IDF_SYS_ZIG}"
     -D CONFIG_IDF_TARGET_ESP32H2="${CONFIG_IDF_TARGET_ESP32H2}"
+    -D CONFIG_IDF_TARGET_ESP32H21="${CONFIG_IDF_TARGET_ESP32H21}"
     -D CONFIG_IDF_TARGET_ESP32H4="${CONFIG_IDF_TARGET_ESP32H4}"
     -D CONFIG_IDF_TARGET_ESP32P4="${CONFIG_IDF_TARGET_ESP32P4}"
+    -D HAS_LED_STRIP="${HAS_LED_STRIP}"
+    -D HAS_ESP_DSP="${HAS_ESP_DSP}"
     -P ${CMAKE_SOURCE_DIR}/cmake/patch.cmake
     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/patches_applied.done"
 )
