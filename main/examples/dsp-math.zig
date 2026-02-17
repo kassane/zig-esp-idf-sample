@@ -52,7 +52,7 @@ fn processAndShow(allocator: std.mem.Allocator, data: []f32, length: u32) !void 
 fn main() callconv(.c) void {
     log.info("*** ESP-DSP Basic Math Example (Zig) ***", .{});
 
-    var heap: idf.heap.vPortAllocator = .init();
+    var heap: idf.heap.VPortAllocator = .init();
     const allocator = heap.allocator();
 
     log.info("Available heap: {} bytes", .{heap.freeSize()});

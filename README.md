@@ -132,15 +132,15 @@ More information about building and using Zig with ESP-IDF can be found in the [
 > Asserts allocations are within `@alignOf(std.c.max_align_t)` and directly calls
 > `malloc`/`free`. Does not attempt to utilize `malloc_usable_size`.
 >
-> - `std.heap.raw_c_allocator` allocator is safe to use as the backing allocator with `std.heap.ArenaAllocator` for example and is more optimal in such a case than `std.heap.c_allocator`. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#std.heap.raw_c_allocator)
+> - `std.heap.raw_c_allocator` allocator is safe to use as the backing allocator with `std.heap.ArenaAllocator` for example and is more optimal in such a case than `std.heap.c_allocator`. - ref.: [std-doc](https://ziglang.org/documentation/0.15.2/std/#std.heap.raw_c_allocator)
 >
 > - `std.heap.ArenaAllocator` takes an existing allocator, wraps it, and provides an interface where you can allocate without freeing, and then free it all together. - ref.: [std-doc](https://ziglang.org/documentation/master/std/#std.heap.ArenaAllocator)
 >
 > **Custom Allocators** (based on `std.heap.raw_c_allocator`)
 >
-> - `idf.heap.HeapCapsAllocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/v5.2.1/esp32c3/api-reference/system/mem_alloc.html)
-> - `idf.heap.MultiHeapAllocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/v5.2.1/esp32c3/api-reference/system/mem_alloc.html)
-> - `idf.heap.vPortAllocator` - ref.: [FreeRTOS-doc](https://www.freertos.org/a00111.html)
+> - `idf.heap.HeapCapsAllocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/mem_alloc.html)
+> - `idf.heap.MultiHeapAllocator` - ref.: [espressif-doc](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/mem_alloc.html)
+> - `idf.heap.VPortAllocator` - ref.: [FreeRTOS-doc](https://www.freertos.org/a00111.html)
 
 
 ### License

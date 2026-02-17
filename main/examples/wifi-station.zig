@@ -3,7 +3,6 @@ const builtin = @import("builtin");
 const idf = @import("esp_idf");
 const sys = idf.sys;
 
-const tag = "zig-wifi";
 const log = std.log.scoped(.@"esp-idf");
 
 const MAX_RETRY_ATTEMPTS = 5;

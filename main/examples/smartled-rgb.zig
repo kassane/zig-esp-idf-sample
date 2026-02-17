@@ -97,6 +97,7 @@ fn main() callconv(.c) void {
 
 // Override the std panic function with idf.panic
 pub const panic = idf.esp_panic.panic;
+
 const log = std.log.scoped(.@"led-strip");
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
@@ -106,5 +107,3 @@ pub const std_options: std.Options = .{
     // Define logFn to override the std implementation
     .logFn = idf.log.espLogFn,
 };
-
-const tag = "led-strip-example";

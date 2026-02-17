@@ -4,7 +4,6 @@ const idf = @import("esp_idf");
 const ver = idf.ver.Version;
 const mem = std.mem;
 const sys = idf.sys;
-const ESP_LOG = idf.log.ESP_LOG;
 
 comptime {
     @export(&main, .{ .name = "app_main" });
@@ -12,14 +11,13 @@ comptime {
 
 fn main() callconv(.c) void {
     // This allocator is safe to use as the backing allocator w/ arena allocator
-    // std.heap.raw_c_allocator
 
-    // custom allocators (based on raw_c_allocator)
+    // custom allocators (based on old raw_c_allocator)
     // idf.heap.HeapCapsAllocator
     // idf.heap.MultiHeapAllocator
-    // idf.heap.vPortAllocator
+    // idf.heap.VPortAllocator
 
-    var heap = idf.heap.HeapCapsAllocator.init(.MALLOC_CAP_8BIT);
+    var heap = idf.heap.HeapCapsAllocator.init(.{ .@"8bit" = true });
     var arena = std.heap.ArenaAllocator.init(heap.allocator());
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -30,26 +28,21 @@ fn main() callconv(.c) void {
         \\[Zig Info]
         \\* Version: {s}
         \\* Compiler Backend: {s}
-        \\
     , .{
         @as([]const u8, builtin.zig_version_string),
         @tagName(builtin.zig_backend),
     });
 
-    ESP_LOG(allocator, tag,
+    log.info(
         \\[ESP-IDF Info]
         \\* Version: {s}
-        \\
     , .{ver.get().toString(allocator)});
 
-    ESP_LOG(
-        allocator,
-        tag,
+    log.info(
         \\[Memory Info]
         \\* Total: {d}
         \\* Free: {d}
         \\* Minimum: {d}
-        \\
     ,
         .{
             heap.totalSize(),
@@ -58,15 +51,10 @@ fn main() callconv(.c) void {
         },
     );
 
-    ESP_LOG(
-        allocator,
-        tag,
-        "Let's have a look at your shiny {s} - {s} system! :)\n\n",
-        .{
-            @tagName(builtin.cpu.arch),
-            builtin.cpu.model.name,
-        },
-    );
+    log.info("Let's have a look at your shiny {s} - {s} system! :)", .{
+        @tagName(builtin.cpu.arch),
+        builtin.cpu.model.name,
+    });
 
     arraylist(allocator) catch |err| {
         log.err("Error: {s}", .{@errorName(err)});
@@ -114,12 +102,7 @@ fn arraylist(allocator: mem.Allocator) !void {
     try arr.append(allocator, 30);
 
     for (arr.items) |value| {
-        ESP_LOG(
-            allocator,
-            tag,
-            "Arr value: {}\n",
-            .{value},
-        );
+        idf.log.ESP_LOG(allocator, idf.log.default_level, "EXAMPLE", "Arr value: {}\n", .{value});
     }
 }
 
@@ -154,5 +137,3 @@ pub const std_options: std.Options = .{
     // Define logFn to override the std implementation
     .logFn = idf.log.espLogFn,
 };
-
-const tag = "zig-example";

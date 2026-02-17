@@ -12,7 +12,7 @@ CONFIG_ESP_WIFI_ENABLED=y
 # CONFIG_FREERTOS_HZ=1000
 
 # not working using `HeapCapsAllocator`,
-# but std `raw_c_allocator` or `vPortAllocator` works
+# but std `raw_c_allocator` or `VPortAllocator` works
 # CONFIG_HEAP_TASK_TRACKING=y
 
 # CONFIG_BLINK_LED_STRIP=y
