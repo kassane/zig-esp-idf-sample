@@ -76,18 +76,15 @@ fn main() callconv(.c) void {
 }
 
 fn blinkLED(delay_ms: u32) !void {
-    try idf.gpio.Direction.set(
-        .GPIO_NUM_18,
-        .GPIO_MODE_OUTPUT,
-    );
+    try idf.gpio.Direction.set(.@"18", .output);
     while (true) {
         log.info("LED: ON", .{});
-        try idf.gpio.Level.set(.GPIO_NUM_18, 1);
+        try idf.gpio.Level.set(.@"18", 1);
 
         idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
 
         log.info("LED: OFF", .{});
-        try idf.gpio.Level.set(.GPIO_NUM_18, 0);
+        try idf.gpio.Level.set(.@"18", 0);
 
         idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
     }

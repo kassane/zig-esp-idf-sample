@@ -288,7 +288,7 @@ idf.py build flash monitor
 const std = @import("std");
 const idf = @import("esp_idf");
 
-const LED_PIN = 18; // Change to your LED pin
+const LED_PIN = .@"18"; // Change to your LED pin
 
 comptime {
     @export(&main, .{ .name = "app_main" });
@@ -296,7 +296,7 @@ comptime {
 
 fn main() callconv(.c) void {    
     // Configure GPIO as output
-    idf.gpio.Direction.set(.GPIO_NUM_18, .GPIO_MODE_OUTPUT) catch {
+    idf.gpio.Direction.set(LED_PIN, .output) catch {
         log.err("Failed to configure GPIO", .{});
         return;
     };
@@ -305,12 +305,12 @@ fn main() callconv(.c) void {
     
     while (true) {
         // LED ON
-        idf.gpio.Level.set(.GPIO_NUM_18, 1) catch {};
+        idf.gpio.Level.set(LED_PIN, 1) catch {};
         log.info("LED ON", .{});
         idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
         
         // LED OFF
-        idf.gpio.Level.set(.GPIO_NUM_18, 0) catch {};
+        idf.gpio.Level.set(LED_PIN, 0) catch {};
         log.info("LED OFF", .{});
         idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
     }
