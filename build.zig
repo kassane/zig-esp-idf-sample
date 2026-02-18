@@ -236,14 +236,6 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .module = errors,
         },
     } });
-    //-- To pull in sdkconfig.h
-    wifi.addIncludePath(.{
-        .cwd_relative = b.pathJoin(&.{ src_path, "build", "config" }),
-    });
-    // If building via cmake for sdkconfig
-    wifi.addIncludePath(.{
-        .cwd_relative = b.pathJoin(&.{ "..", "build", "config" }),
-    });
     const gpio = b.addModule("gpio", .{
         .root_source_file = b.path(b.pathJoin(&.{
             src_path,
@@ -317,6 +309,23 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             src_path,
             "imports",
             "spi.zig",
+        })),
+        .imports = &.{
+            .{
+                .name = "sys",
+                .module = sys,
+            },
+            .{
+                .name = "error",
+                .module = errors,
+            },
+        },
+    });
+    const now = b.addModule("now", .{
+        .root_source_file = b.path(b.pathJoin(&.{
+            src_path,
+            "imports",
+            "now.zig",
         })),
         .imports = &.{
             .{
@@ -447,6 +456,10 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
             .{
                 .name = "i2s",
                 .module = i2s,
+            },
+            .{
+                .name = "now",
+                .module = now,
             },
             .{
                 .name = "phy",
