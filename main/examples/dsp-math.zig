@@ -157,7 +157,7 @@ fn main() callconv(.c) void {
 
     // Keep running
     while (true) {
-        idf.rtos.vTaskDelay(10000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(10000);
     }
 }
 

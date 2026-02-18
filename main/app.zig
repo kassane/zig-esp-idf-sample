@@ -3,7 +3,6 @@ const builtin = @import("builtin");
 const idf = @import("esp_idf");
 const ver = idf.ver.Version;
 const mem = std.mem;
-const sys = idf.sys;
 
 comptime {
     @export(&main, .{ .name = "app_main" });
@@ -43,13 +42,11 @@ fn main() callconv(.c) void {
         \\* Total: {d}
         \\* Free: {d}
         \\* Minimum: {d}
-    ,
-        .{
-            heap.totalSize(),
-            heap.freeSize(),
-            heap.minimumFreeSize(),
-        },
-    );
+    , .{
+        heap.totalSize(),
+        heap.freeSize(),
+        heap.minimumFreeSize(),
+    });
 
     log.info("Let's have a look at your shiny {s} - {s} system! :)", .{
         @tagName(builtin.cpu.arch),
@@ -63,16 +60,10 @@ fn main() callconv(.c) void {
     if (builtin.mode == .Debug)
         heap.dump();
 
-    // FreeRTOS Tasks
-    if (idf.rtos.xTaskCreate(fooTask, "foo", 1024 * 3, null, 1, null) == 0) {
-        @panic("Error: Task foo not created!\n");
-    }
-    if (idf.rtos.xTaskCreate(barTask, "bar", 1024 * 3, null, 2, null) == 0) {
-        @panic("Error: Task bar not created!\n");
-    }
-    if (idf.rtos.xTaskCreate(blinkTask, "blink", 1024 * 2, null, 5, null) == 0) {
-        @panic("Error: Task blinkclock not created!\n");
-    }
+    // FreeRTOS Tasks — Task.create returns !Handle; on failure panic with a clear message.
+    _ = idf.rtos.Task.create(fooTask, "foo", 1024 * 3, null, 1) catch @panic("Task foo not created");
+    _ = idf.rtos.Task.create(barTask, "bar", 1024 * 3, null, 2) catch @panic("Task bar not created");
+    _ = idf.rtos.Task.create(blinkTask, "blink", 1024 * 2, null, 5) catch @panic("Task blink not created");
 }
 
 fn blinkLED(delay_ms: u32) !void {
@@ -80,13 +71,11 @@ fn blinkLED(delay_ms: u32) !void {
     while (true) {
         log.info("LED: ON", .{});
         try idf.gpio.Level.set(.@"18", 1);
-
-        idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(delay_ms);
 
         log.info("LED: OFF", .{});
         try idf.gpio.Level.set(.@"18", 0);
-
-        idf.rtos.vTaskDelay(delay_ms / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(delay_ms);
     }
 }
 
@@ -103,34 +92,30 @@ fn arraylist(allocator: mem.Allocator) !void {
     }
 }
 
-// Task functions (must be exported to C ABI)
 export fn blinkTask(_: ?*anyopaque) callconv(.c) void {
-    blinkLED(1000) catch |err|
-        @panic(@errorName(err));
+    blinkLED(1000) catch |err| @panic(@errorName(err));
 }
 
 export fn fooTask(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task foo printing..", .{});
-        idf.rtos.vTaskDelay(2000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(2000);
     }
 }
 
 export fn barTask(_: ?*anyopaque) callconv(.c) void {
     while (true) {
         log.info("Demo_Task bar printing..", .{});
-        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(1000);
     }
 }
 
-// override the std panic function with idf.panic
 pub const panic = idf.esp_panic.panic;
-const log = std.log.scoped(.@"esp-idf");
+const log = std.log.scoped(idf.log.default_log_scope);
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
         .Debug => .debug,
         else => .info,
     },
-    // Define logFn to override the std implementation
     .logFn = idf.log.espLogFn,
 };

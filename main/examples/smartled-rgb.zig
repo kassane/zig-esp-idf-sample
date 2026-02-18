@@ -67,7 +67,7 @@ fn ledStripTask(led_strip_ptr: ?*anyopaque) callconv(.c) void {
         }
 
         led_on_off = !led_on_off;
-        idf.rtos.vTaskDelay(500 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(500);
     }
 }
 
@@ -81,16 +81,7 @@ fn main() callconv(.c) void {
     };
 
     // Create LED strip control task
-    if (idf.rtos.xTaskCreate(
-        ledStripTask,
-        "led_strip",
-        1024 * 4,
-        led_strip,
-        5,
-        null,
-    ) == 0) {
-        @panic("Error: LED strip task not created!");
-    }
+    _ = idf.rtos.Task.create(ledStripTask, "led_strip", 1024 * 4, led_strip, 5) catch @panic("Error: LED strip task not created!");
 
     log.info("LED strip task started successfully", .{});
 }

@@ -261,7 +261,7 @@ fn main() callconv(.c) void {
     
     // Sleep forever
     while (true) {
-        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(1000);
     }
 }
 
@@ -307,12 +307,12 @@ fn main() callconv(.c) void {
         // LED ON
         idf.gpio.Level.set(LED_PIN, 1) catch {};
         log.info("LED ON", .{});
-        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(1000);
         
         // LED OFF
         idf.gpio.Level.set(LED_PIN, 0) catch {};
         log.info("LED OFF", .{});
-        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(1000);
     }
 }
 
@@ -406,8 +406,8 @@ The project provides comprehensive Zig wrappers in `imports/`:
 | `idf.wifi` | WiFi connectivity | `idf.wifi.init()` |
 | `idf.bt` | Bluetooth/BLE | `idf.bt.*` |
 | `idf.heap` | Memory allocators | `idf.heap.HeapCapsAllocator` |
-| `idf.rtos` | FreeRTOS tasks | `idf.rtos.xTaskCreate()` |
-| `idf.led` | LED strip (WS2812B) | `idf.led.setPixel()` (requires led-strip) |
+| `idf.rtos` | FreeRTOS tasks | `idf.rtos.*` |
+| `idf.led` | LED strip (WS2812B) | `idf.led.*` (requires led-strip) |
 | `idf.i2c` | I2C communication | `idf.i2c.*` |
 | `idf.spi` | SPI communication | `idf.spi.*` |
 | `idf.uart` | UART serial | `idf.uart.*` |
@@ -442,18 +442,16 @@ export fn myTask(_: ?*anyopaque) callconv(.c) void {
     const log = std.log.scoped(.task);
     while (true) {
         log.info("Task running!", .{});
-        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(1000);
     }
 }
 
 export fn app_main() callconv(.c) void {
-    if (idf.rtos.xTaskCreate(myTask, "my_task", 2048, null, 5, null) == 0) {
-        @panic("Failed to create task");
-    }
+    _ = idf.rtos.Task.create(myTask, "my_task", 2048, null, 5) catch @panic("Failed to create task");
     
     // Main task continues...
     while (true) {
-        idf.rtos.vTaskDelay(1000 / idf.rtos.portTICK_PERIOD_MS);
+        idf.rtos.Task.delayMs(1000);
     }
 }
 ```
