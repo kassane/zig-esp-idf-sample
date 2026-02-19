@@ -28,491 +28,116 @@ pub fn build(b: *std.Build) !void {
     b.getInstallStep().dependOn(&obj_install.step);
 }
 
+// ---------------------------------------------------------------------------
+// Module descriptor table
+//
+// To add a new module:
+//   1. Add a row here with the .zig source file and any deps by name.
+//   2. Add the name to the `esp_idf` entry's deps list if it should be
+//      re-exported through the top-level "esp_idf" namespace module.
+//
+// To add a new dependency inside an existing .zig source file:
+//   1. Add the dep name to the matching row's `deps` field here.
+//   That is the *only* place you need to edit — no other blocks to touch.
+// ---------------------------------------------------------------------------
+const ModuleSpec = struct {
+    /// Name used for @import("…") and as the key in the resolver map.
+    name: []const u8,
+    /// Path relative to the `imports/` directory.
+    file: []const u8,
+    /// Names of other modules (must appear earlier in this table).
+    deps: []const []const u8 = &.{},
+};
+
+/// Ordered list — a module may only reference deps that appear before it.
+const module_specs = [_]ModuleSpec{
+    // ── leaf (no deps) ──────────────────────────────────────────────────
+    .{ .name = "sys", .file = "idf-sys.zig" },
+    // ── depend on sys only ──────────────────────────────────────────────
+    .{ .name = "error", .file = "error.zig", .deps = &.{"sys"} },
+    .{ .name = "log", .file = "logger.zig", .deps = &.{"sys"} },
+    .{ .name = "ver", .file = "version.zig", .deps = &.{"sys"} },
+    .{ .name = "heap", .file = "heap.zig", .deps = &.{"sys"} },
+    .{ .name = "bootloader", .file = "bootloader.zig", .deps = &.{"sys"} },
+    .{ .name = "lwip", .file = "lwip.zig", .deps = &.{"sys"} },
+    .{ .name = "mqtt", .file = "mqtt.zig", .deps = &.{"sys"} },
+    .{ .name = "phy", .file = "phy.zig", .deps = &.{"sys"} },
+    .{ .name = "segger", .file = "segger.zig", .deps = &.{"sys"} },
+    .{ .name = "crc", .file = "crc.zig", .deps = &.{"sys"} },
+    .{ .name = "bluetooth", .file = "bluetooth.zig", .deps = &.{"sys"} },
+    // ── depend on sys + error ───────────────────────────────────────────
+    .{ .name = "led", .file = "led-strip.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "wifi", .file = "wifi.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "gpio", .file = "gpio.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "uart", .file = "uart.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "i2c", .file = "i2c.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "i2s", .file = "i2s.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "spi", .file = "spi.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "now", .file = "now.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "pulse", .file = "pcnt.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "http", .file = "http.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "dsp", .file = "dsp.zig", .deps = &.{ "sys", "error" } },
+    // ── depend on sys + log (+ optionally error) ────────────────────────
+    .{ .name = "panic", .file = "panic.zig", .deps = &.{ "sys", "log" } },
+    // ── depend on sys + error (rtos now also uses error — just add it) ──
+    .{ .name = "rtos", .file = "rtos.zig", .deps = &.{ "sys", "error" } },
+};
+
+/// Names re-exported by the top-level "esp_idf" umbrella module (idf.zig).
+const esp_idf_exports = [_][]const u8{
+    "sys",  "error",  "log", "ver",       "heap",  "bootloader", "lwip", "mqtt",
+    "phy",  "segger", "crc", "bluetooth", "led",   "wifi",       "gpio", "uart",
+    "i2c",  "i2s",    "spi", "now",       "pulse", "http",       "dsp",  "panic",
+    "rtos",
+};
+
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     const src_path = std.fs.path.dirname(@src().file) orelse b.pathResolve(&.{"."});
-    const sys = b.addModule("sys", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "idf-sys.zig",
-        })),
-    });
-    const rtos = b.addModule("rtos", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "rtos.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const version = b.addModule("ver", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "version.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const errors = b.addModule("error", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "error.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const log = b.addModule("log", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "logger.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const panic = b.addModule("panic", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "panic.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "log",
-                .module = log,
-            },
-        },
-    });
-    const led = b.addModule("led", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "led-strip.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const bootloader = b.addModule("bootloader", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "bootloader.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const lwip = b.addModule("lwip", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "lwip.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const mqtt = b.addModule("mqtt", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "mqtt.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const heap = b.addModule("heap", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "heap.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const http = b.addModule("http", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "http.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const pcnt = b.addModule("pulse", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "pcnt.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const bt = b.addModule("bluetooth", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "bluetooth.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const wifi = b.addModule("wifi", .{ .root_source_file = b.path(b.pathJoin(&.{
-        src_path,
-        "imports",
-        "wifi.zig",
-    })), .imports = &.{
-        .{
-            .name = "sys",
-            .module = sys,
-        },
-        .{
-            .name = "error",
-            .module = errors,
-        },
-    } });
-    const gpio = b.addModule("gpio", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "gpio.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const uart = b.addModule("uart", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "uart.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const i2c = b.addModule("i2c", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "i2c.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const i2s = b.addModule("i2s", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "i2s.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const spi = b.addModule("spi", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "spi.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const now = b.addModule("now", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "now.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const phy = b.addModule("phy", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "phy.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const segger = b.addModule("segger", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "segger.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    const dsp = b.addModule("dsp", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "dsp.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-        },
-    });
-    const crc = b.addModule("crc", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "crc.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
-    });
-    return b.addModule("esp_idf", .{
-        .root_source_file = b.path(b.pathJoin(&.{
-            src_path,
-            "imports",
-            "idf.zig",
-        })),
-        .imports = &.{
-            .{
-                .name = "led",
-                .module = led,
-            },
-            .{
-                .name = "crc",
-                .module = crc,
-            },
-            .{
-                .name = "bootloader",
-                .module = bootloader,
-            },
-            .{
-                .name = "rtos",
-                .module = rtos,
-            },
-            .{
-                .name = "ver",
-                .module = version,
-            },
-            .{
-                .name = "lwip",
-                .module = lwip,
-            },
-            .{
-                .name = "mqtt",
-                .module = mqtt,
-            },
-            .{
-                .name = "panic",
-                .module = panic,
-            },
-            .{
-                .name = "log",
-                .module = log,
-            },
-            .{
-                .name = "heap",
-                .module = heap,
-            },
-            .{
-                .name = "gpio",
-                .module = gpio,
-            },
-            .{
-                .name = "uart",
-                .module = uart,
-            },
-            .{
-                .name = "i2c",
-                .module = i2c,
-            },
-            .{
-                .name = "i2s",
-                .module = i2s,
-            },
-            .{
-                .name = "now",
-                .module = now,
-            },
-            .{
-                .name = "phy",
-                .module = phy,
-            },
-            .{
-                .name = "spi",
-                .module = spi,
-            },
-            .{
-                .name = "error",
-                .module = errors,
-            },
-            .{
-                .name = "wifi",
-                .module = wifi,
-            },
-            .{
-                .name = "bluetooth",
-                .module = bt,
-            },
-            .{
-                .name = "dsp",
-                .module = dsp,
-            },
-            .{
-                .name = "segger",
-                .module = segger,
-            },
-            .{
-                .name = "http",
-                .module = http,
-            },
-            .{
-                .name = "pulse",
-                .module = pcnt,
-            },
+    const imports_dir = b.pathJoin(&.{ src_path, "imports" });
 
-            .{
-                .name = "sys",
-                .module = sys,
-            },
-        },
+    // Build a name → *Module map so deps can be looked up by name.
+    var map = std.StringHashMap(*std.Build.Module).init(b.allocator);
+    defer map.deinit();
+
+    inline for (module_specs) |spec| {
+        // Collect this module's imports from the already-resolved map.
+        var imports: std.ArrayList(std.Build.Module.Import) = .empty;
+        defer imports.deinit(b.allocator);
+
+        inline for (spec.deps) |dep_name| {
+            const dep_mod = map.get(dep_name) orelse
+                @panic("dep '" ++ dep_name ++ "' not yet resolved — check ordering in module_specs");
+            imports.append(b.allocator, .{ .name = dep_name, .module = dep_mod }) catch @panic("OOM");
+        }
+
+        const mod = b.addModule(spec.name, .{
+            .root_source_file = b.path(b.pathJoin(&.{ imports_dir, spec.file })),
+            .imports = imports.items,
+        });
+        map.put(spec.name, mod) catch @panic("OOM");
+    }
+
+    // Build the esp_idf umbrella module's import list.
+    var top_imports: std.ArrayList(std.Build.Module.Import) = .empty;
+    defer top_imports.deinit(b.allocator);
+
+    inline for (esp_idf_exports) |name| {
+        const mod = map.get(name) orelse
+            @panic("export '" ++ name ++ "' not found in module_specs");
+        top_imports.append(b.allocator, .{ .name = name, .module = mod }) catch @panic("OOM");
+    }
+
+    return b.addModule("esp_idf", .{
+        .root_source_file = b.path(b.pathJoin(&.{ imports_dir, "idf.zig" })),
+        .imports = top_imports.items,
     });
 }
 
-/// Espressif target configurations for both RISC-V and Xtensa architectures
 pub const espressif_targets: []const std.Target.Query =
     if (hasEspXtensaSupport()) riscv_targets ++ xtensa_targets else riscv_targets;
 
 const riscv_targets: []const std.Target.Query = blk: {
     const base_targets = &[_]std.Target.Query{
-        // ESP32-C3/C2: RV32IMC with Zifencei and Zicsr
         .{
             .cpu_arch = .riscv32,
             .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
@@ -520,7 +145,6 @@ const riscv_targets: []const std.Target.Query = blk: {
             .abi = .none,
             .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
         },
-        // ESP32-C6/C5/C61/H2: RV32IMAC with Zifencei and Zicsr
         .{
             .cpu_arch = .riscv32,
             .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
@@ -536,27 +160,25 @@ const riscv_targets: []const std.Target.Query = blk: {
     var result: []const std.Target.Query = base_targets;
 
     if (has_h4) {
-        const esp32h4_target = &[_]std.Target.Query{
-            .{
-                .cpu_arch = .riscv32,
-                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
-                .os_tag = .freestanding,
-                .abi = .eabihf,
-            },
-        };
+        // ESP32-H4: Requires Espressif LLVM fork
+        const esp32h4_target = &[_]std.Target.Query{.{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
+            .os_tag = .freestanding,
+            .abi = .eabihf,
+        }};
         result = result ++ esp32h4_target;
     }
 
     if (has_p4) {
-        const esp32p4_target = &[_]std.Target.Query{
-            .{
-                .cpu_arch = .riscv32,
-                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-                .os_tag = .freestanding,
-                .abi = .eabihf,
-                .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-            },
-        };
+        // ESP32-P4: Requires Espressif LLVM fork
+        const esp32p4_target = &[_]std.Target.Query{.{
+            .cpu_arch = .riscv32,
+            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
+            .os_tag = .freestanding,
+            .abi = .eabihf,
+            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
+        }};
         result = result ++ esp32p4_target;
     }
 
