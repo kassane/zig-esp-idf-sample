@@ -18,7 +18,7 @@ pub const led = switch (sys.HAS_ESP_LED_STRIP != 0) {
 pub const log = @import("log");
 pub const lwip = @import("lwip");
 pub const mqtt = @import("mqtt");
-//pub const esp_now = @import("now");
+// pub const esp_now = @import("now");
 pub const phy = @import("phy");
 pub const pulse = @import("pulse");
 pub const esp_panic = @import("panic");
@@ -71,7 +71,7 @@ comptime {
     _ = log;
     _ = lwip;
     _ = mqtt;
-    _ = esp_now;
+    // _ = esp_now;
     _ = phy;
     _ = pulse;
     _ = esp_panic;
