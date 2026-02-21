@@ -52,3 +52,51 @@ pub fn channelReconfigPdmTXSlot(handle: sys.i2s_chan_handle_t, slot_cfg: [*c]con
 pub fn channelReconfigPdmTXGPIO(handle: sys.i2s_chan_handle_t, gpio_cfg: ?*const sys.i2s_pdm_tx_gpio_config_t) !void {
     return try errors.espCheckError(sys.i2s_channel_reconfig_pdm_tx_gpio(handle, gpio_cfg));
 }
+
+// ---------------------------------------------------------------------------
+// STD mode (standard I2S / PCM — most common)
+// ---------------------------------------------------------------------------
+
+/// Initialise a channel in standard I2S mode (I2S, MSB-justified, LSB-justified, PCM).
+pub fn channelInitStdMode(handle: sys.i2s_chan_handle_t, std_cfg: *const sys.i2s_std_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_init_std_mode(handle, std_cfg));
+}
+
+/// Reconfigure clock parameters of a standard-mode channel (must be disabled first).
+pub fn channelReconfigStdClock(handle: sys.i2s_chan_handle_t, clk_cfg: *const sys.i2s_std_clk_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_reconfig_std_clock(handle, clk_cfg));
+}
+
+/// Reconfigure slot parameters of a standard-mode channel (must be disabled first).
+pub fn channelReconfigStdSlot(handle: sys.i2s_chan_handle_t, slot_cfg: *const sys.i2s_std_slot_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_reconfig_std_slot(handle, slot_cfg));
+}
+
+/// Reconfigure GPIO pins of a standard-mode channel (must be disabled first).
+pub fn channelReconfigStdGPIO(handle: sys.i2s_chan_handle_t, gpio_cfg: *const sys.i2s_std_gpio_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_reconfig_std_gpio(handle, gpio_cfg));
+}
+
+// ---------------------------------------------------------------------------
+// TDM mode (Time-Division Multiplexed — multiple slots per frame)
+// ---------------------------------------------------------------------------
+
+/// Initialise a channel in TDM mode.
+pub fn channelInitTdmMode(handle: sys.i2s_chan_handle_t, tdm_cfg: *const sys.i2s_tdm_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_init_tdm_mode(handle, tdm_cfg));
+}
+
+/// Reconfigure clock parameters of a TDM channel (must be disabled first).
+pub fn channelReconfigTdmClock(handle: sys.i2s_chan_handle_t, clk_cfg: *const sys.i2s_tdm_clk_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_reconfig_tdm_clock(handle, clk_cfg));
+}
+
+/// Reconfigure slot parameters of a TDM channel (must be disabled first).
+pub fn channelReconfigTdmSlot(handle: sys.i2s_chan_handle_t, slot_cfg: *const sys.i2s_tdm_slot_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_reconfig_tdm_slot(handle, slot_cfg));
+}
+
+/// Reconfigure GPIO pins of a TDM channel (must be disabled first).
+pub fn channelReconfigTdmGPIO(handle: sys.i2s_chan_handle_t, gpio_cfg: *const sys.i2s_tdm_gpio_config_t) !void {
+    return errors.espCheckError(sys.i2s_channel_reconfig_tdm_gpio(handle, gpio_cfg));
+}

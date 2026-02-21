@@ -1,9 +1,17 @@
 pub const bl = @import("bootloader");
 pub const bt = @import("bluetooth");
+pub const nimble = if (@hasDecl(sys, "CONFIG_BT_NIMBLE_ENABLED"))
+    @import("nimble")
+else
+    @compileError(
+        \\NimBLE not enabled. Enable via:
+        \\  idf.py menuconfig → Component config → Bluetooth → Host → NimBLE
+        \\Then run: idf.py reconfigure
+    );
 pub const crc = @import("crc");
 pub const dsp = switch (sys.HAS_ESP_DSP != 0) {
     true => @import("dsp"),
-    false => @compileError("requires: idf.py add-component espressif/esp-dsp"),
+    false => @compileError("requires: idf.py add-dependency espressif/esp-dsp"),
 };
 pub const err = @import("error");
 pub const gpio = @import("gpio");
@@ -11,9 +19,9 @@ pub const heap = @import("heap");
 pub const http = @import("http");
 pub const i2c = @import("i2c");
 pub const i2s = @import("i2s");
-pub const led = switch (sys.HAS_ESP_LED_STRIP != 0) {
+pub const led = switch (sys.HAS_LED_STRIP != 0) {
     true => @import("led"),
-    false => @compileError("requires: idf.py add-component espressif/led_strip"),
+    false => @compileError("requires: idf.py add-dependency espressif/led_strip"),
 };
 pub const log = @import("log");
 pub const lwip = @import("lwip");
@@ -23,6 +31,11 @@ pub const phy = @import("phy");
 pub const pulse = @import("pulse");
 pub const esp_panic = @import("panic");
 pub const rtos = @import("rtos");
+pub const nvs = @import("nvs");
+pub const partition = @import("partition");
+pub const sleep = @import("sleep");
+pub const event = @import("event");
+pub const wdt = @import("wdt");
 pub const segger = @import("segger");
 pub const spi = @import("spi");
 pub const uart = @import("uart");
@@ -76,6 +89,11 @@ comptime {
     _ = pulse;
     _ = esp_panic;
     _ = rtos;
+    _ = nvs;
+    _ = partition;
+    _ = sleep;
+    _ = event;
+    _ = wdt;
     _ = segger;
     _ = spi;
     _ = uart;

@@ -1,6 +1,22 @@
 const sys = @import("sys");
 const errors = @import("error");
 
+// ---------------------------------------------------------------------------
+// Type aliases — callers can use these instead of the raw sys.* types.
+// ---------------------------------------------------------------------------
+
+pub const Host = sys.spi_host_device_t;
+pub const Device = sys.spi_device_handle_t;
+pub const Transaction = sys.spi_transaction_t;
+pub const ExtTransaction = sys.spi_transaction_ext_t;
+pub const DmaChan = sys.spi_dma_chan_t;
+pub const BusConfig = sys.spi_bus_config_t;
+pub const DeviceConfig = sys.spi_device_interface_config_t;
+
+// ---------------------------------------------------------------------------
+// Bus management
+// ---------------------------------------------------------------------------
+
 pub fn busInitialize(host_id: sys.spi_host_device_t, bus_config: [*c]const sys.spi_bus_config_t, dma_chan: sys.spi_dma_chan_t) !void {
     return try errors.espCheckError(sys.spi_bus_initialize(host_id, bus_config, dma_chan));
 }
@@ -37,8 +53,11 @@ pub fn deviceAcquireBus(device: sys.spi_device_handle_t, wait: sys.TickType_t) !
 pub fn deviceReleaseBus(dev: sys.spi_device_handle_t) void {
     sys.spi_device_release_bus(dev);
 }
-pub fn deviceGetActualFreq(handle: sys.spi_device_handle_t, freq_khz: [*c]c_int) !void {
-    return try errors.espCheckError(sys.spi_device_get_actual_freq(handle, freq_khz));
+/// Returns the actual clock frequency used by the device in kHz.
+pub fn deviceGetActualFreq(handle: sys.spi_device_handle_t) !c_int {
+    var freq_khz: c_int = 0;
+    try errors.espCheckError(sys.spi_device_get_actual_freq(handle, &freq_khz));
+    return freq_khz;
 }
 pub fn getActualClock(fapb: c_int, hz: c_int, duty_cycle: c_int) c_int {
     return sys.spi_get_actual_clock(fapb, hz, duty_cycle);
@@ -49,8 +68,11 @@ pub fn getTiming(gpio_is_used: bool, input_delay_ns: c_int, eff_clk: c_int, dumm
 pub fn getFreqLimit(gpio_is_used: bool, input_delay_ns: c_int) c_int {
     return sys.spi_get_freq_limit(gpio_is_used, input_delay_ns);
 }
-pub fn busGetMaxTransactionLen(host_id: sys.spi_host_device_t, max_bytes: [*c]usize) !void {
-    return try errors.espCheckError(sys.spi_bus_get_max_transaction_len(host_id, max_bytes));
+/// Returns the maximum allowed transaction length in bytes for the given bus.
+pub fn busGetMaxTransactionLen(host_id: sys.spi_host_device_t) !usize {
+    var max_bytes: usize = 0;
+    try errors.espCheckError(sys.spi_bus_get_max_transaction_len(host_id, &max_bytes));
+    return max_bytes;
 }
 
 pub const SDSPI = struct {

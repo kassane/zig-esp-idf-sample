@@ -64,7 +64,7 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "phy", .file = "phy.zig", .deps = &.{"sys"} },
     .{ .name = "segger", .file = "segger.zig", .deps = &.{"sys"} },
     .{ .name = "crc", .file = "crc.zig", .deps = &.{"sys"} },
-    .{ .name = "bluetooth", .file = "bluetooth.zig", .deps = &.{"sys"} },
+    .{ .name = "bluetooth", .file = "bluetooth.zig", .deps = &.{ "sys", "error" } },
     // ── depend on sys + error ───────────────────────────────────────────
     .{ .name = "led", .file = "led-strip.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "wifi", .file = "wifi.zig", .deps = &.{ "sys", "error" } },
@@ -81,14 +81,20 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "panic", .file = "panic.zig", .deps = &.{ "sys", "log" } },
     // ── depend on sys + error (rtos now also uses error — just add it) ──
     .{ .name = "rtos", .file = "rtos.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "nvs", .file = "nvs.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "partition", .file = "partition.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "sleep", .file = "sleep.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "event", .file = "event.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "wdt", .file = "wdt.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "nimble", .file = "nimble.zig", .deps = &.{ "sys", "error" } },
 };
 
 /// Names re-exported by the top-level "esp_idf" umbrella module (idf.zig).
 const esp_idf_exports = [_][]const u8{
-    "sys",  "error",  "log", "ver",       "heap",  "bootloader", "lwip", "mqtt",
-    "phy",  "segger", "crc", "bluetooth", "led",   "wifi",       "gpio", "uart",
-    "i2c",  "i2s",    "spi", "now",       "pulse", "http",       "dsp",  "panic",
-    "rtos",
+    "sys",  "error",  "log",       "ver",       "heap",  "bootloader", "lwip",   "mqtt",
+    "phy",  "segger", "crc",       "bluetooth", "led",   "wifi",       "gpio",   "uart",
+    "i2c",  "i2s",    "spi",       "now",       "pulse", "http",       "dsp",    "panic",
+    "rtos", "nvs",    "partition", "sleep",     "event", "wdt",        "nimble",
 };
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {

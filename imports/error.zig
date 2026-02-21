@@ -51,6 +51,8 @@ pub fn espError(err: sys.esp_err_t) esp_error!sys.esp_err_t {
 }
 
 pub fn espCheckError(errc: sys.esp_err_t) esp_error!void {
-    if (try espError(errc) == @as(sys.esp_err_t, sys.ESP_OK))
-        return;
+    if (errc == @as(sys.esp_err_t, sys.ESP_OK)) return;
+    // Try to surface a specific error variant; unknown non-zero codes become Fail.
+    _ = try espError(errc);
+    return error.Fail;
 }
