@@ -276,6 +276,8 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_pm/include"
     "${IDF_PATH}/components/esp_lcd/include"
     "${IDF_PATH}/components/esp_lcd/interface"
+    "${IDF_PATH}/components/esp_lcd/dsi/include"
+    "${IDF_PATH}/components/esp_lcd/rgb/include"
     "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include"
     "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/include"
     "${IDF_PATH}/components/mbedtls/esp_crt_bundle/include"
@@ -300,6 +302,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/driver/touch_sensor/include"
     "${IDF_PATH}/components/driver/twai/include"
     "${IDF_PATH}/components/spi_flash/include"
+    "${IDF_PATH}/components/esp_vfs_console/include"
     "${IDF_PATH}/components/esp_usb_cdc_rom_console/include"
     "${CMAKE_SOURCE_DIR}/build/config"
 )
