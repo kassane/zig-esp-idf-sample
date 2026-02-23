@@ -191,6 +191,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/esp_common/include"
     "${IDF_PATH}/components/hal/include"
+    "${IDF_PATH}/components/bootloader_support/include"
     "${IDF_PATH}/components/${ARCH}/include"
     "${IDF_PATH}/components/bt/include/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/include"
@@ -266,14 +267,26 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/heap/include"
     "${IDF_PATH}/components/ieee802154/include"
     "${IDF_PATH}/components/openthread/include"
+    "${IDF_PATH}/components/openthread/openthread/third_party/mbedtls/repo/include"
+    "${IDF_PATH}/components/esp_rom/${TARGET_IDF_MODEL}/include/${TARGET_IDF_MODEL}"
     "${IDF_PATH}/components/esp_rom/include"
     "${IDF_PATH}/components/esp_wifi/include"
-    "${IDF_PATH}/components/esp_event/include"
-    "${IDF_PATH}/components/lwip/include"
-    "${IDF_PATH}/components/lwip/lwip/src/include"
-    "${IDF_PATH}/components/lwip/port/include"
-    "${IDF_PATH}/components/lwip/port/freertos/include"
-    "${IDF_PATH}/components/lwip/port/esp32xx/include"
+    "${IDF_PATH}/components/esp_bootloader_format/include"
+    "${IDF_PATH}/components/esp_app_format/include"
+    "${IDF_PATH}/components/esp_pm/include"
+    "${IDF_PATH}/components/esp_lcd/include"
+    "${IDF_PATH}/components/esp_lcd/interface"
+    "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include"
+    "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/include"
+    "${IDF_PATH}/components/mbedtls/esp_crt_bundle/include"
+    "${IDF_PATH}/components/mbedtls/port/include"
+    "${IDF_PATH}/components/mbedtls/mbedtls/include"
+    "${IDF_PATH}/components/http_parser"
+    "${IDF_PATH}/components/esp-tls"
+    "${IDF_PATH}/components/esp_https_ota/include"
+    "${IDF_PATH}/components/esp_http_server/include"
+    "${IDF_PATH}/components/esp_https_server/include"
+    "${IDF_PATH}/components/esp_http_client/include"
     "${IDF_PATH}/components/log/include"
     "${IDF_PATH}/components/vfs/include"
     "${IDF_PATH}/components/wpa_supplicant/esp_supplicant/include"
@@ -297,6 +310,12 @@ set(SYSTEM_INCLUDE_DIRS
     "${IDF_PATH}/components/newlib"
     "${IDF_PATH}/components/newlib/platform_include"
     "${IDF_PATH}/components/esp_libc/platform_include"
+    "${IDF_PATH}/components/lwip/lwip/src/include"
+    "${IDF_PATH}/components/lwip/port/esp32xx/include"
+    "${IDF_PATH}/components/lwip/port/freertos/include"
+    "${IDF_PATH}/components/lwip/port/include"
+    "${IDF_PATH}/components/lwip/include"
+    "${IDF_PATH}/components/lwip/include/apps"
 )
 if(CONFIG_IDF_TARGET_ESP32P4)
     list(APPEND INCLUDE_DIRS "${IDF_PATH}/components/soc/${TARGET_IDF_MODEL}/register/hw_ver3")
@@ -381,7 +400,6 @@ zig_run(
 add_custom_target(translate_c ALL DEPENDS "${IDF_SYS_ZIG}")
 set_property(TARGET translate_c PROPERTY GENERATED TRUE)
 
-set(IDF_SYS_ZIG "${CMAKE_SOURCE_DIR}/imports/idf-sys.zig")
 message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
 
 add_custom_command(
@@ -411,6 +429,7 @@ add_custom_target(zig_build
     -Doptimize=${ZIG_BUILD_TYPE}
     -Dtarget=${ZIG_TARGET}
     -Dcpu=${TARGET_CPU_MODEL}
+    ${ZIG_EXAMPLE_ARG}
     -freference-trace
     --cache-dir ${CMAKE_BINARY_DIR}/../.zig-cache
     --prefix ${CMAKE_BINARY_DIR}

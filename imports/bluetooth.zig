@@ -2,15 +2,6 @@ const sys = @import("sys");
 const errors = @import("error");
 
 // ---------------------------------------------------------------------------
-// Build-time guard — this module requires Bluedroid BLE.
-// Enable via: idf.py menuconfig → Component config → Bluetooth → Bluedroid
-// ---------------------------------------------------------------------------
-comptime {
-    if (!@hasDecl(sys, "CONFIG_BT_ENABLED"))
-        @compileError("bluetooth.zig requires CONFIG_BT_ENABLED in sdkconfig");
-}
-
-// ---------------------------------------------------------------------------
 // Shim — BT_CONTROLLER_INIT_CONFIG_DEFAULT() macro cannot be translated by
 // zig translate-c; placeholder.c exposes it as a regular C function.
 // ---------------------------------------------------------------------------
@@ -47,9 +38,11 @@ pub fn txPowerGet(power_type: PowerType) PowerLevel {
 // ---------------------------------------------------------------------------
 
 pub const Controller = struct {
-    /// Return the default controller config (wraps BT_CONTROLLER_INIT_CONFIG_DEFAULT macro).
+    /// Return the default controller config.
+    /// Wraps the BT_CONTROLLER_INIT_CONFIG_DEFAULT() macro via a static
+    /// inline C function in include/bt_stubs.h (translated by translate-c).
     pub fn defaultConfig() sys.esp_bt_controller_config_t {
-        return zig_bt_controller_default_cfg();
+        return sys.zig_bt_controller_default_cfg();
     }
 
     pub fn init(cfg: *sys.esp_bt_controller_config_t) !void {
@@ -128,7 +121,7 @@ pub const Bluedroid = struct {
 
 /// Initialise BT controller (BLE-only mode) + Bluedroid stack.
 /// Typical call sequence for BLE applications:
-/// 1. `idf.nvs.flashInit()`
+/// 1. `idf.nvs.flashInitOrErase()`
 /// 2. `bluetooth.bleInit()`
 /// 3. Register GAP + GATT callbacks
 /// 4. `bluetooth.Gap.startAdvertising(&params)`
