@@ -60,12 +60,13 @@ pub fn ESP_LOG(
     comptime fmt: []const u8,
     args: anytype,
 ) void {
-    const buffer: []const u8 = if (isComptime(args))
-        std.fmt.comptimePrint(fmt, args)
-    else
-        std.fmt.allocPrint(allocator, fmt, args) catch return;
-
-    sys.esp_log_write(level, tag, "%s", buffer.ptr);
+    if (isComptime(args)) {
+        const buffer: [:0]const u8 = std.fmt.comptimePrint(fmt, args);
+        sys.esp_log_write(level, tag, "%s", buffer.ptr);
+    } else {
+        const buffer: [:0]u8 = std.fmt.allocPrintSentinel(allocator, fmt, args, 0) catch return;
+        sys.esp_log_write(level, tag, "%s", buffer.ptr);
+    }
 }
 
 // ---------------------------------------------------------------------------

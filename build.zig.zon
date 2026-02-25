@@ -47,7 +47,8 @@
         "imports",
         "build.zig",
         "build.zig.zon",
-        "LICENSE",
+        "LICENSE-APACHE",
+        "LICENSE-MIT",
         "README.md",
     },
 }

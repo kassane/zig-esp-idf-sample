@@ -1,9 +1,20 @@
 pub const bl = @import("bootloader");
-pub const bt = @import("bluetooth");
+pub const bt = switch (@hasDecl(sys, "CONFIG_BT_ENABLED")) {
+    true => @import("bluetooth"),
+    false => @compileError("bluetooth requires CONFIG_BT_ENABLED in sdkconfig"),
+};
+pub const nimble = if (@hasDecl(sys, "CONFIG_BT_NIMBLE_ENABLED"))
+    @import("nimble")
+else
+    @compileError(
+        \\NimBLE not enabled. Enable via:
+        \\  idf.py menuconfig → Component config → Bluetooth → Host → NimBLE
+        \\Then run: idf.py reconfigure
+    );
 pub const crc = @import("crc");
-pub const dsp = switch (sys.HAS_ESP_DSP != 0) {
+pub const dsp = switch (@hasDecl(sys, "HAS_ESP_DSP")) {
     true => @import("dsp"),
-    false => @compileError("requires: idf.py add-component espressif/esp-dsp"),
+    false => @compileError("requires: idf.py add-dependency espressif/esp-dsp"),
 };
 pub const err = @import("error");
 pub const gpio = @import("gpio");
@@ -11,18 +22,23 @@ pub const heap = @import("heap");
 pub const http = @import("http");
 pub const i2c = @import("i2c");
 pub const i2s = @import("i2s");
-pub const led = switch (sys.HAS_ESP_LED_STRIP != 0) {
+pub const led = switch (@hasDecl(sys, "HAS_LED_STRIP")) {
     true => @import("led"),
-    false => @compileError("requires: idf.py add-component espressif/led_strip"),
+    false => @compileError("requires: idf.py add-dependency espressif/led_strip"),
 };
 pub const log = @import("log");
 pub const lwip = @import("lwip");
 pub const mqtt = @import("mqtt");
-// pub const esp_now = @import("now");
+pub const esp_now = @import("now");
 pub const phy = @import("phy");
 pub const pulse = @import("pulse");
 pub const esp_panic = @import("panic");
 pub const rtos = @import("rtos");
+pub const nvs = @import("nvs");
+pub const partition = @import("partition");
+pub const sleep = @import("sleep");
+pub const event = @import("event");
+pub const wdt = @import("wdt");
 pub const segger = @import("segger");
 pub const spi = @import("spi");
 pub const uart = @import("uart");
@@ -60,7 +76,7 @@ pub const currentTarget = blk: {
 comptime {
     _ = sys;
     _ = bl;
-    _ = bt;
+    if (@hasDecl(sys, "CONFIG_BT_ENABLED")) _ = bt;
     _ = crc;
     _ = err;
     _ = gpio;
@@ -71,11 +87,16 @@ comptime {
     _ = log;
     _ = lwip;
     _ = mqtt;
-    // _ = esp_now;
+    _ = esp_now;
     _ = phy;
     _ = pulse;
     _ = esp_panic;
     _ = rtos;
+    _ = nvs;
+    _ = partition;
+    _ = sleep;
+    _ = event;
+    _ = wdt;
     _ = segger;
     _ = spi;
     _ = uart;
@@ -84,6 +105,6 @@ comptime {
         .esp32h2, .esp32h21, .esp32h4, .esp32p4 => {},
         else => wifi,
     };
-    if (sys.HAS_ESP_DSP != 0) _ = dsp;
-    if (sys.HAS_LED_STRIP != 0) _ = led;
+    if (@hasDecl(sys, "HAS_ESP_DSP")) _ = dsp;
+    if (@hasDecl(sys, "HAS_LED_STRIP")) _ = led;
 }
