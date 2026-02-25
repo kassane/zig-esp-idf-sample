@@ -96,11 +96,11 @@ endif()
 # Add LED Strip patches
 if(HAS_LED_STRIP EQUAL 1)
     list(APPEND PATCH_FILES
-        "lde_strip/led_strip_rmt_extra_config_20.zig"
-        "lde_strip/led_strip_struct_format_layout_15.zig"
-        "lde_strip/led_color_component_format_t.zig"
-        "lde_strip/led_strip_rmt_config_t.zig"
-        "lde_strip/led_strip_config_t.zig"
+        "led_strip/led_strip_rmt_extra_config_20.zig"
+        "led_strip/led_strip_struct_format_layout_15.zig"
+        "led_strip/led_color_component_format_t.zig"
+        "led_strip/led_strip_rmt_config_t.zig"
+        "led_strip/led_strip_config_t.zig"
     )
 endif()
 
