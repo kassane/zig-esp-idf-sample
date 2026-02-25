@@ -52,8 +52,9 @@ string(REGEX REPLACE "pub const portTICK_PERIOD_MS[^;]*;" "" FILE_CONTENT "${FIL
 string(REGEX REPLACE "(//[^\n]*\n?)*const struct_unnamed_[0-9]+ = opaque {};( //[^\n]*\n?)*" "" FILE_CONTENT "${FILE_CONTENT}")
 string(REGEX REPLACE "(//[^\n]*\n?)*const union_unnamed_[0-9]+ = extern union \\{\n    unnamed_0: struct_unnamed_[0-9]+,\n    val: u32,\n\\};( //[^\n]*\n?)*" "" FILE_CONTENT "${FILE_CONTENT}")
 string(REGEX REPLACE "unnamed_0: struct_unnamed_[0-9]+,\n?" "" FILE_CONTENT "${FILE_CONTENT}")
-string(REGEX REPLACE "([a-zA-Z0-9_]+): (struct|union)_unnamed_[0-9]+" "\\1: u32" FILE_CONTENT "${FILE_CONTENT}")
+string(REGEX REPLACE "([a-zA-Z0-9_]+): ((\[[0-9]+\])?)(struct|union)_unnamed_[0-9]+" "\\1: \\2u32" FILE_CONTENT "${FILE_CONTENT}")
 string(REGEX REPLACE "zeroes\\((struct|union)_unnamed_[0-9]+\\)" "zeroes(u32)" FILE_CONTENT "${FILE_CONTENT}")
+string(REGEX REPLACE "zeroes\\((\\[[0-9]+\\])(struct|union)_unnamed_[0-9]+\\)" "zeroes(\\1u32)" FILE_CONTENT "${FILE_CONTENT}")
 
 # ESP32-P4 specific: Remove xPortCanYield function
 if(CONFIG_IDF_TARGET_ESP32P4)
