@@ -52,7 +52,7 @@ RUN wget --no-verbose ${ZLS_URL} \
   && tar -xf $ZLS_DIST -C /opt/zls \
   && rm ${ZLS_DIST}
 
-ENV PATH=/opt/qemu/bin:/opt/${ZIG_REL}:/opt/zls:${PATH}
+ENV PATH=/opt/qemu/bin:/opt/${ZIG_REL}:/opt/zls/bin:${PATH}
 
 RUN groupadd --gid $USER_GID $CONTAINER_USER \
   && adduser --uid $USER_UID --gid $USER_GID --disabled-password --gecos "" ${CONTAINER_USER} \
