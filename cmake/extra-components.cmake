@@ -1,6 +1,17 @@
 # ─── Optional/Managed Components Detection ───────────────────────────────────
 idf_build_get_property(BUILD_COMPS BUILD_COMPONENTS)
 
+# Get IDF_PATH from environment
+set(IDF_PATH $ENV{IDF_PATH})
+
+# Include version.cmake to get IDF_VERSION_MAJOR, IDF_VERSION_MINOR, etc.
+if(EXISTS "${IDF_PATH}/tools/cmake/version.cmake")
+    include("${IDF_PATH}/tools/cmake/version.cmake")
+else()
+    message(FATAL_ERROR "Failed to find version.cmake in ${IDF_PATH}/tools/cmake")
+endif()
+
+
 # Helper function to check and add component
 macro(check_managed_component COMPONENT_NAME VENDOR PACKAGE DEFINE_NAME)
     set(COMP_PATHS "")
@@ -40,6 +51,34 @@ macro(check_managed_component COMPONENT_NAME VENDOR PACKAGE DEFINE_NAME)
             "${COMP_BASE}/modules/kalman/ekf/include"
             "${COMP_BASE}/modules/kalman/ekf_imu13states/include"
         )
+    elseif("${PACKAGE}" STREQUAL "esp_wifi_remote")
+        # Add base include if exists
+        set(BASE_INCLUDE "${COMP_BASE}/include")
+        if(EXISTS "${BASE_INCLUDE}")
+            list(APPEND COMP_PATHS "${BASE_INCLUDE}")
+        endif()
+
+        # Add version-specific include using MAJOR.MINOR
+        set(VERSION_SUBDIR "idf_v${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}")
+        set(VERSION_PATH "${COMP_BASE}/${VERSION_SUBDIR}/include")
+        if(EXISTS "${VERSION_PATH}")
+            list(APPEND COMP_PATHS "${VERSION_PATH}")
+            message(STATUS "Added version-specific path for ${COMPONENT_NAME}: ${VERSION_PATH}")
+        else()
+            message(FATAL_ERROR "Version-specific path not found for ${COMPONENT_NAME}: ${VERSION_PATH}")
+        endif()
+    elseif("${PACKAGE}" STREQUAL "esp_hosted")
+        # Add host and api include paths for esp_hosted
+        set(HOST_PATH "${COMP_BASE}/host")
+        if(EXISTS "${HOST_PATH}")
+            list(APPEND COMP_PATHS "${HOST_PATH}")
+        endif()
+        set(API_PATH "${COMP_BASE}/host/api/include")
+        if(EXISTS "${API_PATH}")
+            list(APPEND COMP_PATHS "${API_PATH}")
+        else()
+            message(FATAL_ERROR "API path not found for ${COMPONENT_NAME}: ${API_PATH}")
+        endif()
     else()
         list(APPEND COMP_PATHS "${COMP_BASE}/include")
     endif()
@@ -81,3 +120,5 @@ endmacro()
 # Add your components here
 check_managed_component("LED Strip" "espressif" "led_strip" "HAS_LED_STRIP")
 check_managed_component("ESP-DSP" "espressif" "esp-dsp" "HAS_ESP_DSP")
+check_managed_component("ESP Wifi Remote" "espressif" "esp_wifi_remote" "HAS_ESP_WIFI_REMOTE")
+check_managed_component("ESP Hosted" "espressif" "esp_hosted" "HAS_ESP_HOSTED")

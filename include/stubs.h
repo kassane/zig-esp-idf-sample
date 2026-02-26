@@ -44,10 +44,6 @@ typedef unsigned int wint_t;
 #define __wur
 #define __volatile__
 #define __inline
-#ifdef static_assert
-#undef static_assert
-#endif
-#define static_assert(expr, msg)
 
 /* Disable IDF-specific attributes */
 #define IRAM_ATTR
@@ -75,7 +71,7 @@ typedef unsigned int wint_t;
    Enable ONLY what your project actually uses
    ────────────────────────────────────────────────────────────────────────────
  */
-
+#include "sdkconfig.h"
 /* Always available basics */
 #define ESP_IDF_COMP_SOC_ENABLED
 #define ESP_IDF_COMP_ESP_DRIVER_GPIO_ENABLED // almost always needed
@@ -133,11 +129,17 @@ typedef unsigned int wint_t;
 #define ESP_IDF_COMP_ESP_COEX_ENABLED // coexist moved
 #endif
 
+#if HAS_ESP_WIFI_REMOTE
+#define ESP_IDF_COMP_ESP_WIFI_REMOTE_ENABLED
+#endif
+#if HAS_ESP_HOSTED
+#define ESP_IDF_COMP_ESP_HOSTED_ENABLED
+#endif
+
 #include <stddef.h>    // for size_t, ptrdiff_t, NULL
 #include <stdint.h>    // for uint8_t, uint32_t, etc.
 #include <sys/types.h> // for additional POSIX types
 
-#include "sdkconfig.h"
 /* Include AFTER all the protections */
 #include "bindings.h"
 #include "bt_stubs.h"
