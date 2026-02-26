@@ -319,64 +319,6 @@ pub const PowerDomain = struct {
     }
 };
 
-pub const EspNow = struct {
-    pub fn init() !void {
-        return try errors.espCheckError(sys.esp_now_init());
-    }
-    pub fn deinit() !void {
-        return try errors.espCheckError(sys.esp_now_deinit());
-    }
-    pub fn getVersion(version: [*c]u32) !void {
-        return try errors.espCheckError(sys.esp_now_get_version(version));
-    }
-    pub fn registerReceiveCallback(cb: sys.esp_now_recv_cb_t) !void {
-        return try errors.espCheckError(sys.esp_now_register_recv_cb(cb));
-    }
-    pub fn unregisterReceiveCallback() !void {
-        return try errors.espCheckError(sys.esp_now_unregister_recv_cb());
-    }
-    pub fn registerSendCallback(cb: sys.esp_now_send_cb_t) !void {
-        return try errors.espCheckError(sys.esp_now_register_send_cb(cb));
-    }
-    pub fn unregisterSendCallback() !void {
-        return try errors.espCheckError(sys.esp_now_unregister_send_cb());
-    }
-    pub fn send(peer_addr: [*:0]const u8, data: [*:0]const u8, len: usize) !void {
-        return try errors.espCheckError(sys.esp_now_send(peer_addr, data, len));
-    }
-    pub fn addPeer(peer: [*c]const sys.esp_now_peer_info_t) !void {
-        return try errors.espCheckError(sys.esp_now_add_peer(peer));
-    }
-    pub fn delPeer(peer_addr: [*:0]const u8) !void {
-        return try errors.espCheckError(sys.esp_now_del_peer(peer_addr));
-    }
-    pub fn modPeer(peer: [*c]const sys.esp_now_peer_info_t) !void {
-        return try errors.espCheckError(sys.esp_now_mod_peer(peer));
-    }
-    pub fn wifiConfigRate(ifx: wifi_interface_t, rate: sys.wifi_phy_rate_t) !void {
-        return try errors.espCheckError(sys.esp_wifi_config_espnow_rate(ifx, rate));
-    }
-    pub fn setPeerRateConfig(peer_addr: [*:0]const u8, config: [*c]sys.esp_now_rate_config_t) !void {
-        return try errors.espCheckError(sys.esp_now_set_peer_rate_config(peer_addr, config));
-    }
-    pub fn getPeer(peer_addr: [*:0]const u8, peer: [*c]sys.esp_now_peer_info_t) !void {
-        return try errors.espCheckError(sys.esp_now_get_peer(peer_addr, peer));
-    }
-    pub fn fetchPeer(from_head: bool, peer: [*c]sys.esp_now_peer_info_t) !void {
-        return try errors.espCheckError(sys.esp_now_fetch_peer(from_head, peer));
-    }
-    pub const isPeerExist = sys.esp_now_is_peer_exist;
-    pub fn getPeerNum(num: [*c]sys.esp_now_peer_num_t) !void {
-        return try errors.espCheckError(sys.esp_now_get_peer_num(num));
-    }
-    pub fn setPMK(pmk: [*:0]const u8) !void {
-        return try errors.espCheckError(sys.esp_now_set_pmk(pmk));
-    }
-    pub fn setWakeWindow(window: u16) !void {
-        return try errors.espCheckError(sys.esp_now_set_wake_window(window));
-    }
-};
-
 pub const Enterprise = struct {
     pub const Station = struct {
         pub fn enable() !void {

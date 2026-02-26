@@ -43,6 +43,14 @@ pub const segger = @import("segger");
 pub const spi = @import("spi");
 pub const uart = @import("uart");
 pub const ver = @import("ver");
+pub const esp_hosted = switch (@hasDecl(sys, "HAS_ESP_HOSTED")) {
+    true => @import("hosted"),
+    false => @compileError("requires: idf.py add-dependency espressif/esp_hosted"),
+};
+pub const wifi_remote = switch (@hasDecl(sys, "HAS_ESP_WIFI_REMOTE")) {
+    true => @import("wifi_remote"),
+    false => @compileError("requires: idf.py add-dependency espressif/esp_wifi_remote"),
+};
 pub const wifi = switch (currentTarget) {
     .esp32h2, .esp32h21, .esp32h4, .esp32p4 => @compileError("Wifi requires CONFIG_ESP_WIFI_ENABLED in sdkconfig"),
     else => @import("wifi"),
@@ -87,6 +95,7 @@ comptime {
     _ = log;
     _ = lwip;
     _ = mqtt;
+    if (@hasDecl(sys, "HAS_ESP_HOSTED")) _ = esp_hosted;
     _ = esp_now;
     _ = phy;
     _ = pulse;
@@ -102,10 +111,8 @@ comptime {
     _ = spi;
     _ = uart;
     _ = ver;
-    _ = switch (currentTarget) {
-        .esp32h2, .esp32h21, .esp32h4, .esp32p4 => {},
-        else => wifi,
-    };
+    if (@hasDecl(sys, "CONFIG_ESP_WIFI_ENABLED")) _ = wifi;
+    if (@hasDecl(sys, "HAS_ESP_WIFI_REMOTE")) _ = wifi_remote;
     if (@hasDecl(sys, "HAS_ESP_DSP")) _ = dsp;
     if (@hasDecl(sys, "HAS_LED_STRIP")) _ = led;
 }
