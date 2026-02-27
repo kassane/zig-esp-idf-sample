@@ -51,6 +51,11 @@ pub const wifi_remote = switch (@hasDecl(sys, "HAS_ESP_WIFI_REMOTE")) {
     true => @import("wifi_remote"),
     false => @compileError("requires: idf.py add-dependency espressif/esp_wifi_remote"),
 };
+pub const timer = @import("timer");
+pub const ledc = @import("ledc");
+pub const twai = @import("twai");
+pub const pm = @import("pm");
+pub const pthread = @import("pthread");
 pub const wifi = switch (currentTarget) {
     .esp32h2, .esp32h21, .esp32h4, .esp32p4 => @compileError("Wifi requires CONFIG_ESP_WIFI_ENABLED in sdkconfig"),
     else => @import("wifi"),
@@ -115,4 +120,9 @@ comptime {
     if (@hasDecl(sys, "HAS_ESP_WIFI_REMOTE")) _ = wifi_remote;
     if (@hasDecl(sys, "HAS_ESP_DSP")) _ = dsp;
     if (@hasDecl(sys, "HAS_LED_STRIP")) _ = led;
+    _ = timer;
+    _ = ledc;
+    _ = twai;
+    _ = pm;
+    _ = pthread;
 }

@@ -263,6 +263,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_security/include"
     "${IDF_PATH}/components/esp_trace/include"
     "${IDF_PATH}/components/esp_blockdev/include"
+    "${IDF_PATH}/components/pthread/include"
     "${IDF_PATH}/components/hal/platform_port/include"
     "${IDF_PATH}/components/heap/include"
     "${IDF_PATH}/components/ieee802154/include"

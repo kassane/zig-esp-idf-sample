@@ -19,6 +19,10 @@
 #define _SYS_UNISTD_H
 #define _UNISTD_H
 #define _TIME_H_
+/* Block system pthread.h — fails translate-c due to _SYS_TYPES_H conflicts;
+   our pthread_stubs.h provides clean, translate-c-compatible declarations. */
+#define __PTHREAD_h
+#define _PTHREAD_H
 
 /* Prevent real header from redefining them */
 #define __ESP_ASSERT_H__
@@ -98,6 +102,8 @@ typedef unsigned int wint_t;
 #define ESP_IDF_COMP_ESP_DRIVER_ADC_ENABLED
 #define ESP_IDF_COMP_ESP_DRIVER_TWAI_ENABLED
 
+#define ESP_IDF_COMP_PTHREAD_ENABLED
+
 /* Optional / advanced – enable only if used */
 #define ESP_IDF_COMP_ESP_HTTP_CLIENT_ENABLED
 #define ESP_IDF_COMP_ESP_HTTP_SERVER_ENABLED
@@ -141,6 +147,7 @@ typedef unsigned int wint_t;
 #include <sys/types.h> // for additional POSIX types
 
 /* Include AFTER all the protections */
+#include "pthread_stubs.h"
 #include "bindings.h"
 #include "bt_stubs.h"
 #include "wifi_stubs.h"
