@@ -81,6 +81,11 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "dsp", .file = "dsp.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "hosted", .file = "hosted.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "wifi_remote", .file = "wifi_remote.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "pthread", .file = "pthread.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "timer", .file = "timer.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "ledc", .file = "ledc.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "twai", .file = "twai.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "pm", .file = "pm.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "rtos", .file = "rtos.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "nvs", .file = "nvs.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "partition", .file = "partition.zig", .deps = &.{ "sys", "error" } },
@@ -98,7 +103,7 @@ const esp_idf_exports = [_][]const u8{
     "phy",         "segger", "crc",       "bluetooth", "led",   "wifi",       "gpio",   "uart",
     "i2c",         "i2s",    "spi",       "now",       "pulse", "http",       "dsp",    "panic",
     "rtos",        "nvs",    "partition", "sleep",     "event", "wdt",        "nimble", "hosted",
-    "wifi_remote",
+    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",
 };
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {

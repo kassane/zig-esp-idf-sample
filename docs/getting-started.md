@@ -225,6 +225,11 @@ zig-esp-idf-sample/
 │   ├── dsp.zig           # DSP/FFT — requires espressif/esp-dsp
 │   ├── hosted.zig        # ESP-Hosted coexistence — requires espressif/esp_hosted
 │   ├── wifi_remote.zig   # WiFi remote — requires espressif/esp_wifi_remote
+│   ├── timer.zig         # High-resolution esp_timer (one-shot + periodic)
+│   ├── ledc.zig          # LED PWM controller (duty, fade)
+│   ├── twai.zig          # TWAI/CAN bus driver
+│   ├── pm.zig            # Power management locks
+│   ├── pthread.zig       # POSIX threads (FreeRTOS-backed)
 │   └── panic.zig         # Zig panic handler
 │
 ├── include/              # C headers for binding generation
@@ -445,6 +450,11 @@ The project provides comprehensive Zig wrappers in `imports/`:
 | `idf.dsp` | DSP/FFT operations | Requires `espressif/esp-dsp` |
 | `idf.esp_hosted` | ESP-Hosted coexistence | Requires `espressif/esp_hosted` |
 | `idf.wifi_remote` | WiFi via slave MCU | Requires `espressif/esp_wifi_remote` |
+| `idf.timer` | High-resolution esp_timer | Any target |
+| `idf.ledc` | LED PWM controller | Any target |
+| `idf.twai` | TWAI/CAN bus driver | Any target |
+| `idf.pm` | Power management locks | Any target |
+| `idf.pthread` | POSIX threads (FreeRTOS-backed) | Any target |
 | `idf.log` | std.log integration (`espLogFn`) | Any target |
 | `idf.err` | esp_err_t → Zig error mapping | Any target |
 | `idf.sys` | Raw C bindings | Direct ESP-IDF API access |
