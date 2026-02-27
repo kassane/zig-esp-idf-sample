@@ -193,25 +193,39 @@ zig-esp-idf-sample/
 ├── imports/              # Zig API wrappers and bindings
 │   ├── idf.zig           # Main ESP-IDF facade module
 │   ├── idf-sys.zig       # Generated C bindings (auto-generated)
+│   ├── sys.zig           # Re-exports idf-sys
+│   ├── error.zig         # esp_err_t → Zig error mapping
+│   ├── logger.zig        # std.log integration (espLogFn)
+│   ├── version.zig       # ESP-IDF version info (ver)
+│   ├── heap.zig          # HeapCapsAllocator, MultiHeapAllocator
+│   ├── bootloader.zig    # Partition/bootloader control
 │   ├── gpio.zig          # GPIO wrapper
-│   ├── wifi.zig          # WiFi wrapper
-│   ├── bluetooth.zig     # Bluetooth wrapper
-│   ├── heap.zig          # Memory allocators
-│   ├── rtos.zig          # FreeRTOS wrappers
-│   ├── led-strip.zig     # LED strip API
-│   ├── i2c.zig           # I2C communication
-│   ├── spi.zig           # SPI communication
-│   ├── uart.zig          # UART communication
-│   ├── i2s.zig           # I2S audio
-│   ├── http.zig          # HTTP client/server
+│   ├── wifi.zig          # WiFi station/AP/scan
+│   ├── uart.zig          # UART driver
+│   ├── i2c.zig           # I2C master
+│   ├── spi.zig           # SPI master (+ SDSPI)
+│   ├── i2s.zig           # I2S audio (STD, PDM, TDM)
+│   ├── http.zig          # HTTP server + client
 │   ├── mqtt.zig          # MQTT client
-│   ├── lwip.zig          # LwIP TCP/IP stack
-│   ├── dsp.zig           # Digital Signal Processing
-│   ├── pcnt.zig          # Pulse Counter
-│   ├── error.zig         # Error handling utilities
-│   ├── logger.zig        # Logging utilities
-│   ├── panic.zig         # Panic handler
-│   └── version.zig       # Version information
+│   ├── lwip.zig          # lwIP sockets, DNS, SNTP
+│   ├── crc.zig           # ESP-ROM CRC-8/16/32
+│   ├── bluetooth.zig     # Bluedroid BLE
+│   ├── nimble.zig        # NimBLE BLE (compile-time guarded)
+│   ├── now.zig           # ESP-NOW protocol
+│   ├── nvs.zig           # NVS flash key-value storage
+│   ├── partition.zig     # Partition table operations
+│   ├── sleep.zig         # Deep/light sleep + wakeup
+│   ├── event.zig         # ESP event loop
+│   ├── wdt.zig           # Task watchdog timer
+│   ├── rtos.zig          # FreeRTOS tasks/queues/semaphores/timers
+│   ├── pcnt.zig          # Pulse counter (pulse)
+│   ├── phy.zig           # Wireless PHY / RF calibration
+│   ├── segger.zig        # Segger SystemView profiling
+│   ├── led-strip.zig     # LED strip — requires espressif/led_strip
+│   ├── dsp.zig           # DSP/FFT — requires espressif/esp-dsp
+│   ├── hosted.zig        # ESP-Hosted coexistence — requires espressif/esp_hosted
+│   ├── wifi_remote.zig   # WiFi remote — requires espressif/esp_wifi_remote
+│   └── panic.zig         # Zig panic handler
 │
 ├── include/              # C headers for binding generation
 │   ├── stubs.h           # Core ESP-IDF headers
@@ -400,25 +414,39 @@ Or edit [main/Kconfig.projbuild](../main/Kconfig.projbuild) to change default va
 
 The project provides comprehensive Zig wrappers in `imports/`:
 
-| Module | Description | Example Usage |
-|--------|-------------|---------------|
-| `idf.gpio` | GPIO control | `idf.gpio.Level.set(.GPIO_NUM_18, 1)` |
-| `idf.wifi` | WiFi connectivity | `idf.wifi.init()` |
-| `idf.bt` | Bluetooth/BLE | `idf.bt.*` |
-| `idf.heap` | Memory allocators | `idf.heap.HeapCapsAllocator` |
-| `idf.rtos` | FreeRTOS tasks | `idf.rtos.*` |
-| `idf.led` | LED strip (WS2812B) | `idf.led.*` (requires led-strip) |
-| `idf.i2c` | I2C communication | `idf.i2c.*` |
-| `idf.spi` | SPI communication | `idf.spi.*` |
-| `idf.uart` | UART serial | `idf.uart.*` |
-| `idf.i2s` | I2S audio | `idf.i2s.*` |
-| `idf.http` | HTTP client/server | `idf.http.*` |
-| `idf.mqtt` | MQTT client | `idf.mqtt.*` |
-| `idf.lwip` | TCP/IP stack | `idf.lwip.*` |
-| `idf.dsp` | DSP functions | `idf.dsp.*` (requires esp-dsp) |
-| `idf.pulse` | Pulse counter | `idf.pulse.*` |
-| `idf.log` | Logging utilities | `idf.log.espLogFn` |
-| `idf.err` | Error handling | `idf.err.espCheckError()` |
+| Module | Description | Notes |
+|--------|-------------|-------|
+| `idf.gpio` | GPIO control | Any target |
+| `idf.wifi` | WiFi station/AP/scan | Not on H2/H4/P4 |
+| `idf.bt` | Bluedroid BLE | Requires `CONFIG_BT_ENABLED` |
+| `idf.nimble` | NimBLE BLE | Requires `CONFIG_BT_NIMBLE_ENABLED` |
+| `idf.heap` | HeapCapsAllocator, MultiHeapAllocator | Any target |
+| `idf.rtos` | FreeRTOS tasks/queues/semaphores/timers | Any target |
+| `idf.nvs` | NVS flash key-value storage | Any target |
+| `idf.partition` | Partition table operations | Any target |
+| `idf.sleep` | Deep/light sleep + wakeup sources | Any target |
+| `idf.event` | ESP event loop | Any target |
+| `idf.wdt` | Task watchdog timer | Any target |
+| `idf.bl` | Bootloader/partition control | Any target |
+| `idf.i2c` | I2C master | Any target |
+| `idf.spi` | SPI master + SDSPI | Any target |
+| `idf.uart` | UART driver | Any target |
+| `idf.i2s` | I2S audio (STD, PDM, TDM) | Any target |
+| `idf.http` | HTTP server (httpd) + client | Any target |
+| `idf.mqtt` | MQTT client | Any target |
+| `idf.lwip` | lwIP sockets, DNS, SNTP | Any target |
+| `idf.crc` | ESP-ROM CRC-8/16/32 | Any target |
+| `idf.esp_now` | ESP-NOW protocol | Any target |
+| `idf.pulse` | Pulse counter (PCNT) | Any target |
+| `idf.phy` | Wireless PHY / RF calibration | Any target |
+| `idf.segger` | Segger SystemView profiling | Any target |
+| `idf.ver` | ESP-IDF version info | Any target |
+| `idf.led` | LED strip WS2812B | Requires `espressif/led_strip` |
+| `idf.dsp` | DSP/FFT operations | Requires `espressif/esp-dsp` |
+| `idf.esp_hosted` | ESP-Hosted coexistence | Requires `espressif/esp_hosted` |
+| `idf.wifi_remote` | WiFi via slave MCU | Requires `espressif/esp_wifi_remote` |
+| `idf.log` | std.log integration (`espLogFn`) | Any target |
+| `idf.err` | esp_err_t → Zig error mapping | Any target |
 | `idf.sys` | Raw C bindings | Direct ESP-IDF API access |
 
 ---
@@ -596,8 +624,14 @@ ls /dev/tty*
 ### Explore Examples
 
 All examples are in `main/examples/`:
-- `smartled-rgb.zig` - WS2812B LED strip control
-- `wifi-station.zig` - Connect to WiFi network
+- `gpio-blink.zig` - Toggle an LED on GPIO2 (any target)
+- `uart-echo.zig` - Read UART1 and echo back
+- `i2c-scan.zig` - Scan I2C bus for devices
+- `wifi-station.zig` - Connect to a WiFi AP
+- `http-server.zig` - Serve a web page over WiFi
+- `ble-gatt-server.zig` - BLE peripheral with GATT notifications (requires `CONFIG_BT_ENABLED`)
+- `smartled-rgb.zig` - WS2812B LED strip control (requires `espressif/led_strip`)
+- `dsp-math.zig` - FFT + power spectrum via DSP (requires `espressif/esp-dsp`)
 
 ### Configuration
 
