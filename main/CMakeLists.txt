@@ -6,9 +6,20 @@ if(CONFIG_BT_ENABLED)
     list(APPEND DEPS bt)
 endif()
 
+set(MAIN_SRCS "placeholder.c")
+
+# Add C++ Matter wrapper shim only when esp_matter is an active build component.
+# The component must be added via idf.py add-dependency espressif/esp_matter.
+# Note: esp_matter 1.4.x is not yet compatible with IDF v6.0 (requires json/mqtt builtins).
+if(TARGET __idf_espressif__esp_matter)
+    list(APPEND MAIN_SRCS "matter_wrappers.cpp")
+    list(APPEND DEPS espressif__esp_matter)
+    message(STATUS "ESP Matter: C++ wrapper shim enabled")
+endif()
+
 idf_component_register(
-    SRCS "placeholder.c"
-    INCLUDE_DIRS "."
+    SRCS ${MAIN_SRCS}
+    INCLUDE_DIRS "." "${CMAKE_SOURCE_DIR}/include"
     REQUIRES ${DEPS}
 )
 
@@ -39,6 +50,9 @@ elseif(CONFIG_ZIG_EXAMPLE_I2C_SCAN)
     set(ZIG_EXAMPLE_ARG "-Dexample=${ZIG_ROOT_EXAMPLE_SOURCE}")
 elseif(CONFIG_ZIG_EXAMPLE_UART_ECHO)
     set(ZIG_ROOT_EXAMPLE_SOURCE "main/examples/uart-echo.zig")
+    set(ZIG_EXAMPLE_ARG "-Dexample=${ZIG_ROOT_EXAMPLE_SOURCE}")
+elseif(CONFIG_ZIG_EXAMPLE_MATTER_LIGHT)
+    set(ZIG_ROOT_EXAMPLE_SOURCE "main/examples/matter-light.zig")
     set(ZIG_EXAMPLE_ARG "-Dexample=${ZIG_ROOT_EXAMPLE_SOURCE}")
 endif()
 
