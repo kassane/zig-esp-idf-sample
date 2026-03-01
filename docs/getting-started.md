@@ -177,18 +177,27 @@ zig-esp-idf-sample/
 ├── sdkconfig              # ESP-IDF configuration (generated)
 ├── sdkconfig.defaults     # Default SDK config
 ├── sdkconfig.defaults.esp32  # ESP32-specific defaults
+├── partitions_matter.csv  # Custom partition table for Matter (3 MB app, 4 MB flash)
 ├── dependencies.lock      # Component version lock
 ├── wokwi.toml            # Wokwi simulator config
 │
 ├── main/
-│   ├── CMakeLists.txt    # Main component config
-│   ├── placeholder.c     # Minimal C entry point
-│   ├── app.zig           # Main Zig application entry
-│   ├── idf_component.yml # Component dependencies
-│   ├── Kconfig.projbuild # Project configuration options
+│   ├── CMakeLists.txt       # Main component config
+│   ├── placeholder.c        # Minimal C entry point (required by CMake)
+│   ├── matter_wrappers.cpp  # C++ shims for esp_matter C++ API (activated when component present)
+│   ├── app.zig              # Main Zig application entry
+│   ├── idf_component.yml    # Component dependencies
+│   ├── Kconfig.projbuild    # Project configuration options
 │   └── examples/
-│       ├── smartled-rgb.zig   # LED strip (WS2812B) example
-│       └── wifi-station.zig   # WiFi station example
+│       ├── gpio-blink.zig        # Toggle LED on GPIO2
+│       ├── uart-echo.zig         # UART echo
+│       ├── i2c-scan.zig          # I2C bus scan
+│       ├── wifi-station.zig      # WiFi station
+│       ├── http-server.zig       # HTTP server
+│       ├── ble-gatt-server.zig   # BLE GATT server
+│       ├── smartled-rgb.zig      # WS2812B LED strip
+│       ├── dsp-math.zig          # DSP/FFT operations
+│       └── matter-light.zig      # Matter On/Off Light
 │
 ├── imports/              # Zig API wrappers and bindings
 │   ├── idf.zig           # Main ESP-IDF facade module
@@ -233,9 +242,12 @@ zig-esp-idf-sample/
 │   └── panic.zig         # Zig panic handler
 │
 ├── include/              # C headers for binding generation
-│   ├── stubs.h           # Core ESP-IDF headers
-│   ├── wifi_stubs.h      # WiFi-specific headers
-│   └── bindings.h        # Additional bindings
+│   ├── stubs.h                 # Core ESP-IDF headers (input to zig translate-c)
+│   ├── wifi_stubs.h            # WiFi macro wrappers
+│   ├── bt_stubs.h              # Bluetooth macro wrappers
+│   ├── matter_stubs.h          # C wrapper interface for esp_matter (C++ component)
+│   ├── matter_closure_patch.h  # GCC 14 C++23 fix for closure-control cluster
+│   └── bindings.h              # Additional bindings
 │
 ├── cmake/               # CMake build system scripts
 │   ├── zig-config.cmake        # Main Zig configuration
@@ -455,6 +467,7 @@ The project provides comprehensive Zig wrappers in `imports/`:
 | `idf.twai` | TWAI/CAN bus driver | Any target |
 | `idf.pm` | Power management locks | Any target |
 | `idf.pthread` | POSIX threads (FreeRTOS-backed) | Any target |
+| `idf.matter` | Matter/CHIP protocol | Requires `espressif/esp_matter` |
 | `idf.log` | std.log integration (`espLogFn`) | Any target |
 | `idf.err` | esp_err_t → Zig error mapping | Any target |
 | `idf.sys` | Raw C bindings | Direct ESP-IDF API access |
@@ -619,6 +632,25 @@ ls /dev/tty*
 - Ensure 2.4GHz WiFi (5GHz not supported)
 - Check WiFi credentials don't contain special characters
 
+**Matter example: "app partition is too small"**
+
+The Matter binary is ~2.2 MB and requires a 4 MB flash chip and custom partition table:
+```bash
+# Ensure sdkconfig has 4 MB flash and custom partition:
+# CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+# CONFIG_PARTITION_TABLE_CUSTOM=y
+# CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_matter.csv"
+
+# If sdkconfig doesn't reflect sdkconfig.defaults changes, update it:
+idf.py reconfigure
+idf.py build -DCONFIG_ZIG_EXAMPLE_MATTER_LIGHT=y
+```
+
+**Matter example: IDF version incompatibility**
+- `espressif/esp_matter` 1.4.x requires IDF **v5.x** (tested with v5.5)
+- Not compatible with IDF v6.x (depends on `json`/`mqtt` components removed in v6)
+- Check your IDF version: `idf.py --version`
+
 ---
 
 ## Next Steps
@@ -642,6 +674,7 @@ All examples are in `main/examples/`:
 - `ble-gatt-server.zig` - BLE peripheral with GATT notifications (requires `CONFIG_BT_ENABLED`)
 - `smartled-rgb.zig` - WS2812B LED strip control (requires `espressif/led_strip`)
 - `dsp-math.zig` - FFT + power spectrum via DSP (requires `espressif/esp-dsp`)
+- `matter-light.zig` - Matter On/Off Light device (requires `espressif/esp_matter`, IDF v5.x, 4 MB flash)
 
 ### Configuration
 

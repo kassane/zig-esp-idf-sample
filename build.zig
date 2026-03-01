@@ -86,6 +86,7 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "ledc", .file = "ledc.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "twai", .file = "twai.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "pm", .file = "pm.zig", .deps = &.{ "sys", "error" } },
+    .{ .name = "matter", .file = "matter.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "rtos", .file = "rtos.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "nvs", .file = "nvs.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "partition", .file = "partition.zig", .deps = &.{ "sys", "error" } },
@@ -103,7 +104,7 @@ const esp_idf_exports = [_][]const u8{
     "phy",         "segger", "crc",       "bluetooth", "led",   "wifi",       "gpio",   "uart",
     "i2c",         "i2s",    "spi",       "now",       "pulse", "http",       "dsp",    "panic",
     "rtos",        "nvs",    "partition", "sleep",     "event", "wdt",        "nimble", "hosted",
-    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",
+    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",    "matter",
 };
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {

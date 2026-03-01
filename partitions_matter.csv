@@ -1,0 +1,9 @@
+# Partition table for Matter examples — requires 4 MB flash.
+# Binary size: ~2.2 MB; app partition = 3 MB to provide headroom.
+#
+# Name,    Type, SubType,  Offset,  Size,  Flags
+nvs,       data, nvs,      ,        0x6000,
+phy_init,  data, phy,      ,        0x1000,
+factory,   app,  factory,  ,        0x300000,
+nvs_keys,  data, nvs_keys, ,        0x1000,
+fctry,     data, nvs,      ,        0x6000,
