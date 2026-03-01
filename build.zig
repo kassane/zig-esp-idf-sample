@@ -104,7 +104,7 @@ const esp_idf_exports = [_][]const u8{
     "phy",         "segger", "crc",       "bluetooth", "led",   "wifi",       "gpio",   "uart",
     "i2c",         "i2s",    "spi",       "now",       "pulse", "http",       "dsp",    "panic",
     "rtos",        "nvs",    "partition", "sleep",     "event", "wdt",        "nimble", "hosted",
-    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread", "matter",
+    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",    "matter",
 };
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {

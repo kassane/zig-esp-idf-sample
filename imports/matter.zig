@@ -15,9 +15,9 @@ pub const Attribute = sys.esp_matter_attribute_t;
 
 /// Endpoint creation flags.
 pub const EpFlags = enum(u8) {
-    none        = sys.ESP_MATTER_EP_FLAG_NONE,
+    none = sys.ESP_MATTER_EP_FLAG_NONE,
     destroyable = sys.ESP_MATTER_EP_FLAG_DESTROYABLE,
-    bridge      = sys.ESP_MATTER_EP_FLAG_BRIDGE,
+    bridge = sys.ESP_MATTER_EP_FLAG_BRIDGE,
 };
 
 /// Attribute value types.
