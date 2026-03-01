@@ -27,7 +27,7 @@ const LED_GPIO: idf.gpio.Num() = .@"2";
 var g_light_endpoint_id: u16 = 0;
 
 /// Called before/after every attribute update in the data model.
-fn attributeCallback(cb_type: matter.AttrCbType, endpoint_id: u16, cluster_id: u32, attribute_id: u32, val: ?*matter.AttrVal, _: ?*anyopaque) callconv(.C) i32 { // esp_err_t
+fn attributeCallback(cb_type: matter.AttrCbType, endpoint_id: u16, cluster_id: u32, attribute_id: u32, val: ?*matter.AttrVal, _: ?*anyopaque) callconv(.c) c_int {
     if (cb_type != matter.AttrCbType.ESP_MATTER_ATTR_CB_POST_UPDATE) return 0;
     if (endpoint_id != g_light_endpoint_id) return 0;
     if (cluster_id != ON_OFF_CLUSTER_ID or attribute_id != ON_OFF_ATTR_ID) return 0;
@@ -43,7 +43,7 @@ fn attributeCallback(cb_type: matter.AttrCbType, endpoint_id: u16, cluster_id: u
 }
 
 /// Called when clients interact with the Identify cluster.
-fn identifyCallback(_: matter.IdentifyCbType, _: u16, _: u8, _: u8, _: ?*anyopaque) callconv(.C) i32 {
+fn identifyCallback(_: matter.IdentifyCbType, _: u16, _: u8, _: u8, _: ?*anyopaque) callconv(.c) c_int {
     log.info("matter-light: identify request", .{});
     return 0;
 }
@@ -63,7 +63,7 @@ pub fn main() callconv(.c) void {
     idf.gpio.Level.set(LED_GPIO, 1) catch |err| @panic(@errorName(err));
 
     // 4. Build the Matter data model.
-    const node = matter.nodeCreate(@ptrCast(&attributeCallback), @ptrCast(&identifyCallback), null) catch |err| @panic(@errorName(err));
+    const node = matter.nodeCreate(&attributeCallback, &identifyCallback, null) catch |err| @panic(@errorName(err));
 
     // Add an On/Off Light endpoint with default clusters (OnOff, Identify,
     // Descriptor, Groups, Scenes Management, Level Control…).
@@ -73,13 +73,13 @@ pub fn main() callconv(.c) void {
     log.info("matter-light: light endpoint id={}", .{g_light_endpoint_id});
 
     // 5. Start the Matter stack.
-    matter.start(@ptrCast(&attributeCallback), @ptrCast(&identifyCallback)) catch |err| @panic(@errorName(err));
+    matter.start(&attributeCallback, &identifyCallback) catch |err| @panic(@errorName(err));
 
     log.info("matter-light: Matter started — waiting for commissioning", .{});
 
     // 6. Main loop — just keep the FreeRTOS idle task alive.
     while (true) {
-        idf.rtos.taskDelay(1000);
+        idf.rtos.Task.delayMs(1000);
     }
 }
 

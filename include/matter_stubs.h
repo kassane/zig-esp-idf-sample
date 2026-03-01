@@ -6,6 +6,12 @@
  *
  * The actual implementations are in main/matter_wrappers.cpp (compiled as C++
  * by the ESP-IDF CMake build, with full access to CHIP SDK headers).
+ *
+ * NOTE: esp_matter_val_type_t, esp_matter_val_t, esp_matter_attr_val_t and
+ * esp_matter_attr_bounds_t are also defined in the real esp_matter_attribute_utils.h.
+ * Those definitions are guarded with #ifndef __cplusplus so that they are only
+ * visible to zig translate-c (pure C mode).  In C++ compilation the real header
+ * definitions are used, avoiding redefinition conflicts.
  */
 #pragma once
 
@@ -13,7 +19,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* ── Opaque handle types (map to esp_matter::handle_t = size_t internally) ─ */
+/* ── Opaque handle types ─────────────────────────────────────────────────── */
+/* These names do not exist in the real esp_matter C++ headers (which use
+ * node_t / endpoint_t inside namespaces), so they are safe to define in
+ * both C and C++ compilation contexts.                                      */
 
 typedef size_t esp_matter_node_t;
 typedef size_t esp_matter_endpoint_t;
@@ -21,6 +30,7 @@ typedef size_t esp_matter_cluster_t;
 typedef size_t esp_matter_attribute_t;
 
 /* ── Endpoint flags ──────────────────────────────────────────────────────── */
+/* Real esp_matter uses ENDPOINT_FLAG_* (no prefix); these names are unique. */
 
 typedef enum esp_matter_ep_flags {
     ESP_MATTER_EP_FLAG_NONE        = 0x00,
@@ -28,7 +38,10 @@ typedef enum esp_matter_ep_flags {
     ESP_MATTER_EP_FLAG_BRIDGE      = 0x02,
 } esp_matter_ep_flags_t;
 
-/* ── Attribute value types (mirrors esp_matter_val_type_t) ──────────────── */
+/* ── Types that ALSO exist in esp_matter_attribute_utils.h ───────────────── */
+/* Guarded so the real header wins in C++ compilation.                        */
+
+#ifndef __cplusplus
 
 typedef enum esp_matter_val_type {
     ESP_MATTER_VAL_TYPE_INVALID            = 0,
@@ -89,7 +102,13 @@ typedef struct esp_matter_attr_bounds {
     esp_matter_attr_val_t max;
 } esp_matter_attr_bounds_t;
 
+#endif /* !__cplusplus */
+
 /* ── Attribute callback ──────────────────────────────────────────────────── */
+/* These types are unique to our C wrapper (not in real esp_matter headers).
+ * They must be visible in both C and C++ so the extern "C" function
+ * declarations below can use them.  In C++ mode esp_matter_attr_val_t is
+ * provided by the previously-included real esp_matter_attribute_utils.h.    */
 
 typedef enum esp_matter_attr_cb_type {
     ESP_MATTER_ATTR_CB_PRE_UPDATE = 0,
@@ -125,7 +144,11 @@ typedef esp_err_t (*esp_matter_identify_callback_t)(
     uint8_t                        effect_variant,
     void                          *priv_data);
 
-/* ── Core ────────────────────────────────────────────────────────────────── */
+/* ── Function declarations ───────────────────────────────────────────────── */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Start the Matter stack (call after building node + endpoints). */
 esp_err_t esp_matter_wrapper_start(
@@ -235,8 +258,12 @@ esp_err_t esp_matter_wrapper_attribute_set_val(
     esp_matter_attribute_t *attribute,
     esp_matter_attr_val_t  *val);
 
-/* ── Convenience attribute constructors (value helpers) ───────────────────── */
-/* These mirror the esp_matter_bool(), esp_matter_uint8() etc. macros. */
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+/* ── Convenience attribute constructors (C-only; use real esp_matter_* in C++) */
+#ifndef __cplusplus
 
 static inline esp_matter_attr_val_t esp_matter_val_bool(bool val) {
     esp_matter_attr_val_t v;
@@ -274,3 +301,5 @@ static inline esp_matter_attr_val_t esp_matter_val_nullable(void) {
     v.val.u64 = 0;
     return v;
 }
+
+#endif /* !__cplusplus */
