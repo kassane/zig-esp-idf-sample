@@ -19,12 +19,12 @@
         platformSrc = if system == "x86_64-linux" then
           {
             url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
-            sha256 = "sha256-Ejz85KqA2wnPB8qIlabyMCvw8mX3Xv95acnL84Y+NDc=";
+            sha256 = "sha256-xSo6FlCQneMK/OQu786dLg0FJ2CqaOrYuWN++er41zg=";
           }
         else if system == "aarch64-linux" then
           {
             url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa-dev/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
-            sha256 = "sha256-ReKEBDWOqmIzoiRgJW9UoOozEwJS0lNkux8OtwAA6GE=";
+            sha256 = "sha256-UwG0NfBe+uI1qDb5Bzn9Dqxxn1NYOx3bdUALvkGbpAk=";
           }
         else
           throw "Unsupported platform: ${system}";

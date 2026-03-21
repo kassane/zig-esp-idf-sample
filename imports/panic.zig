@@ -16,6 +16,6 @@ pub fn panic(msg: []const u8, stack_trace: ?*@import("std").builtin.StackTrace, 
     }
 
     while (true) {
-        asm volatile ("" ::: "memory");
+        asm volatile ("" ::: .{ .memory = true });
     }
 }
