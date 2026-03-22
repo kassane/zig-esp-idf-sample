@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [ubuntu-latest, macos-latest]
         idf-version: [release/v5.5, release/v6.0]
         target: 
           - esp32
