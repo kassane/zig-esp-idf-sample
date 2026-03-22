@@ -153,49 +153,73 @@ pub const espressif_targets: []const std.Target.Query =
     if (hasEspXtensaSupport()) riscv_targets ++ xtensa_targets else riscv_targets;
 
 const riscv_targets: []const std.Target.Query = blk: {
-    const base_targets = &[_]std.Target.Query{
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-            .os_tag = .freestanding,
-            .abi = .none,
-            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
-        },
-        .{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
-            .os_tag = .freestanding,
-            .abi = .none,
-            .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
-        },
+    var result: []const std.Target.Query = &.{};
+
+    // Named ESP32 RISC-V CPU models — available when built with the Espressif Zig fork.
+    //   MC   group (c2, c3):               m+c+zicsr+zifencei          abi=none
+    //   MAC  group (c5, c6, c61, h2, h21): m+a+c+zicsr+zifencei        abi=none
+    //   MACF group (h4, s31, p4, p4eco4):  m+a+c+f+zicsr+zifencei      abi=eabihf
+    const plain_models = .{
+        "esp32c2",  "esp32c3",
+        "esp32c5",  "esp32c6",
+        "esp32c61", "esp32c61eco0",
+        "esp32h2",  "esp32h21",
     };
-
-    const has_h4 = @hasDecl(std.Target.riscv.cpu, "esp32h4");
-    const has_p4 = @hasDecl(std.Target.riscv.cpu, "esp32p4");
-
-    var result: []const std.Target.Query = base_targets;
-
-    if (has_h4) {
-        // ESP32-H4: Requires Espressif LLVM fork
-        const esp32h4_target = &[_]std.Target.Query{.{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32h4 },
-            .os_tag = .freestanding,
-            .abi = .eabihf,
-        }};
-        result = result ++ esp32h4_target;
+    for (plain_models) |name| {
+        if (@hasDecl(std.Target.riscv.cpu, name)) {
+            result = result ++ &[_]std.Target.Query{.{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &@field(std.Target.riscv.cpu, name) },
+                .os_tag = .freestanding,
+                .abi = .none,
+            }};
+        }
     }
 
-    if (has_p4) {
-        // ESP32-P4: Requires Espressif LLVM fork
-        const esp32p4_target = &[_]std.Target.Query{.{
-            .cpu_arch = .riscv32,
-            .cpu_model = .{ .explicit = &std.Target.riscv.cpu.esp32p4 },
-            .os_tag = .freestanding,
-            .abi = .eabihf,
-            .cpu_features_sub = std.Target.riscv.featureSet(&.{ .zca, .zcb, .zcmt, .zcmp }),
-        }};
-        result = result ++ esp32p4_target;
+    // MACF group: has FPU — use eabihf ABI.
+    const macf_models = .{
+        "esp32h4",     "esp32p4",
+        "esp32p4eco4", "esp32s31",
+    };
+    for (macf_models) |name| {
+        if (@hasDecl(std.Target.riscv.cpu, name)) {
+            result = result ++ &[_]std.Target.Query{.{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &@field(std.Target.riscv.cpu, name) },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+            }};
+        }
+    }
+
+    // Generic fallback targets for standard Zig builds without named ESP models.
+    if (result.len == 0) {
+        result = &[_]std.Target.Query{
+            // MC: c2, c3
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+                .os_tag = .freestanding,
+                .abi = .none,
+                .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .c, .zifencei, .zicsr }),
+            },
+            // MAC: c5, c6, c61, h2, h21
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+                .os_tag = .freestanding,
+                .abi = .none,
+                .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .zifencei, .zicsr }),
+            },
+            // MACF: h4, s31, p4, p4eco4
+            .{
+                .cpu_arch = .riscv32,
+                .cpu_model = .{ .explicit = &std.Target.riscv.cpu.generic_rv32 },
+                .os_tag = .freestanding,
+                .abi = .eabihf,
+                .cpu_features_add = std.Target.riscv.featureSet(&.{ .m, .a, .c, .f, .zifencei, .zicsr }),
+            },
+        };
     }
 
     break :blk result;

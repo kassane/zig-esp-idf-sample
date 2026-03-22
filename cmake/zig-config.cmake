@@ -74,6 +74,23 @@ if("${ZIG_VERSION}" VERSION_LESS "${ZIG_MIN_VERSION}")
 endif()
 message(STATUS "Zig version: ${ZIG_VERSION}")
 
+# Detect whether this Zig build is the Espressif fork (has named ESP32 RISC-V CPU models).
+# Upstream Zig only ships generic RISC-V models; the fork adds esp32c3, esp32c6, etc.
+zig_run(
+    COMMAND build-obj --show-builtin -target riscv32-freestanding -mcpu=esp32c3
+    RESULT_VARIABLE _zig_esp_riscv_probe
+    OUTPUT_VARIABLE _zig_esp_riscv_probe_out
+    ERROR_VARIABLE _zig_esp_riscv_probe_err
+    ALLOW_FAIL
+)
+if(_zig_esp_riscv_probe EQUAL 0)
+    set(ZIG_HAS_ESP_RISCV_MODELS ON)
+    message(STATUS "Zig RISC-V: Espressif fork detected — using named ESP CPU models")
+else()
+    set(ZIG_HAS_ESP_RISCV_MODELS OFF)
+    message(STATUS "Zig RISC-V: upstream Zig detected — falling back to generic_rv32 models")
+endif()
+
 # ====================================================================================
 
 # Determine target model from CONFIG_IDF_TARGET
@@ -81,28 +98,41 @@ string(TOLOWER "${CONFIG_IDF_TARGET}" TARGET_IDF_MODEL)
 
 # Target architecture configuration lookup table
 set(RISCV_TARGETS
-    "esp32c2" "esp32c3" "esp32c5" "esp32c6" "esp32c61" "esp32h2" "esp32h21" "esp32h4" "esp32p4")
+    "esp32c2" "esp32c3" "esp32c5" "esp32c6" "esp32c61" "esp32c61eco0"
+    "esp32h2" "esp32h21" "esp32h4" "esp32p4" "esp32p4eco4" "esp32s31")
 set(XTENSA_TARGETS
     "esp32" "esp32s2" "esp32s3")
 
 if(TARGET_IDF_MODEL IN_LIST RISCV_TARGETS)
     set(TARGET_IDF_ARCH "riscv")
-    set(ZIG_TARGET "riscv32-freestanding-none")
 
-    # Determine CPU model based on target
-    set(RV_IMAC_TARGETS "esp32c6" "esp32c5" "esp32c61" "esp32h2" "esp32h21")
-    if(TARGET_IDF_MODEL IN_LIST RV_IMAC_TARGETS)
-        set(TARGET_CPU_MODEL "generic_rv32+m+a+c+zicsr+zifencei")
-    elseif(TARGET_IDF_MODEL STREQUAL "esp32p4")
+    # MACF group (FPU): use eabihf ABI.  All others use none.
+    set(_rv_macf_targets "esp32h4" "esp32s31" "esp32p4" "esp32p4eco4")
+    if(TARGET_IDF_MODEL IN_LIST _rv_macf_targets)
         set(ZIG_TARGET "riscv32-freestanding-eabihf")
-        # (zca, zcb, zcmt, zcmp) are not supported on ESP32-P4-Function-EV-Board (crashes application)
-        set(TARGET_CPU_MODEL "esp32p4-zca-zcb-zcmt-zcmp")
-    elseif(TARGET_IDF_MODEL STREQUAL "esp32h4")
-        set(ZIG_TARGET "riscv32-freestanding-eabihf")
-        set(TARGET_CPU_MODEL "esp32h4")
     else()
-        # ESP32-C2/C3 and fallback
-        set(TARGET_CPU_MODEL "generic_rv32+m+c+zicsr+zifencei")
+        set(ZIG_TARGET "riscv32-freestanding-none")
+    endif()
+
+    if(ZIG_HAS_ESP_RISCV_MODELS)
+        # Espressif Zig fork: use named CPU model (feature set is already encoded in model).
+        set(TARGET_CPU_MODEL "${TARGET_IDF_MODEL}")
+    else()
+        # Upstream Zig: fall back to generic_rv32 with explicit feature sets.
+        #   MC   (c2, c3):                   m+c+zicsr+zifencei         abi=none
+        #   MAC  (c5, c6, c61, h2, h21):     m+a+c+zicsr+zifencei       abi=none
+        #   MACF (h4, s31, p4, p4eco4):      m+a+c+f+zicsr+zifencei     abi=eabihf
+        set(_rv_mc_targets "esp32c2" "esp32c3")
+        set(_rv_mac_targets "esp32c5" "esp32c6" "esp32c61" "esp32c61eco0" "esp32h2" "esp32h21")
+        if(TARGET_IDF_MODEL IN_LIST _rv_mc_targets)
+            set(TARGET_CPU_MODEL "generic_rv32+m+c+zicsr+zifencei")
+        elseif(TARGET_IDF_MODEL IN_LIST _rv_mac_targets)
+            set(TARGET_CPU_MODEL "generic_rv32+m+a+c+zicsr+zifencei")
+        elseif(TARGET_IDF_MODEL IN_LIST _rv_macf_targets)
+            set(TARGET_CPU_MODEL "generic_rv32+m+a+c+f+zicsr+zifencei")
+        else()
+            set(TARGET_CPU_MODEL "generic_rv32+m+c+zicsr+zifencei")
+        endif()
     endif()
 
 elseif(TARGET_IDF_MODEL IN_LIST XTENSA_TARGETS)
@@ -179,7 +209,10 @@ endif()
 
 # components list
 set(INCLUDE_DIRS
-    "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include"
+    # Wrapper dir MUST come first — redirects "freertos/portmacro.h" through a
+    # single canonical path to fix Windows mixed-separator #pragma once failure.
+    # See include/freertos-compat/freertos/portmacro.h for details (issue #50).
+    "${CMAKE_SOURCE_DIR}/include/freertos-compat"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/portable/${ARCH}/include/freertos"
     "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include"
     "${IDF_PATH}/components/freertos/config/include"
@@ -378,11 +411,14 @@ include(${CMAKE_SOURCE_DIR}/cmake/extra-components.cmake)
 
 set(INCLUDE_FLAGS "")
 foreach(dir ${INCLUDE_DIRS})
+    # Normalize to forward slashes (prevents Windows mixed-separator double-include in translate-c)
+    file(TO_CMAKE_PATH "${dir}" dir)
     set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -I\"${dir}\"")
 endforeach()
 
 # Build system include flags (for toolchain)
 foreach(dir ${SYSTEM_INCLUDE_DIRS})
+    file(TO_CMAKE_PATH "${dir}" dir)
     set(INCLUDE_FLAGS "${INCLUDE_FLAGS} -isystem \"${dir}\"")
 endforeach()
 if(NOT WIN32)
