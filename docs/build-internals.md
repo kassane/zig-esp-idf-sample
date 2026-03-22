@@ -36,7 +36,7 @@ After cloning this project, you need to install ESP-IDF and set up the environme
    ```
    
    **Supported targets:** 
-   - RISC-V: `esp32c2`, `esp32c3`, `esp32c5`, `esp32c6`, `esp32c61`, `esp32h2`, `esp32h21`, `esp32h4`, `esp32p4`
+   - RISC-V: `esp32c2`, `esp32c3`, `esp32c5`, `esp32c6`, `esp32c61`, `esp32c61eco0`, `esp32h2`, `esp32h21`, `esp32h4`, `esp32s31`, `esp32p4`, `esp32p4eco4`
    - Xtensa: `esp32`, `esp32s2`, `esp32s3`
 
 4. **Add managed components** (optional):
@@ -143,12 +143,11 @@ The build system automatically detects managed components installed via `idf.py 
 
 The build system intelligently selects the appropriate Zig toolchain:
 
-**RISC-V targets (except ESP32-P4 and ESP32-H4):**
-- Prefers **upstream Zig** if installed on the system
-- Falls back to **Espressif's Zig fork** if upstream not available
-
-**RISC-V ESP32-P4 and ESP32-H4:**
-- Always uses **Espressif's Zig fork** (required for specific CPU features)
+**RISC-V targets (all variants including H4/P4):**
+- Works with both **upstream Zig** and **Espressif's Zig fork**
+- Upstream Zig: uses generic `riscv32-freestanding-none` with feature flags (e.g. `+m+a+c+zicsr+zifencei`)
+- Espressif fork: uses named CPU models (e.g. `esp32c6`, `esp32p4`) with exact feature sets
+- Build system auto-detects which toolchain is in use and selects the right CPU model
 
 **Xtensa targets (ESP32, ESP32-S2, ESP32-S3):**
 - Always uses **Espressif's Zig fork** (Xtensa support not in upstream)

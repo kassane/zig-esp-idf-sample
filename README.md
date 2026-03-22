@@ -89,13 +89,13 @@ More information about building and using Zig with ESP-IDF can be found in the [
     <td><strong>ESP32-H4</strong></td>
     <td>RISC-V</td>
     <td>BLE 5.2, Zigbee, Thread, FPU, No WiFi</td>
-    <td><code>-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32h4</code></td>
+    <td><code>-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32h4</code> (Espressif fork) / <code>generic_rv32+m+a+c+f+zicsr+zifencei</code> (upstream)</td>
   </tr>
   <tr>
     <td><strong>ESP32-P4</strong></td>
     <td>RISC-V</td>
     <td>Dual-core, AI, DSP, FPU, No WiFi/BT</td>
-    <td><code>-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32p4</code></td>
+    <td><code>-Dtarget=riscv32-freestanding-eabihf -Dcpu=esp32p4</code> (Espressif fork) / <code>generic_rv32+m+a+c+f+zicsr+zifencei</code> (upstream)</td>
   </tr>
 </tbody>
 </table>
@@ -105,8 +105,8 @@ More information about building and using Zig with ESP-IDF can be found in the [
 > 
 > The upstream [Zig compiler](https://ziglang.org/download) (LLVM backend) does not support Xtensa architecture. For ESP32, ESP32-S2, and ESP32-S3 targets, you must use the [Espressif Zig fork](https://github.com/kassane/zig-espressif-bootstrap/releases).
 > 
-> - **RISC-V targets (C2/C3/C5/C6/H2/etc):** Works with upstream Zig ✅
-> - **Xtensa targets (ESP32/S2/S3) & custom RISC-V targets (H4/P4):** Requires [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) (auto-downloaded)
+> - **RISC-V targets (all variants):** Works with upstream Zig ✅ (uses generic_rv32 fallback); named CPU models available with Espressif fork
+> - **Xtensa targets (ESP32/S2/S3):** Requires [zig-xtensa](https://github.com/kassane/zig-espressif-bootstrap/releases) (auto-downloaded)
 > 
 > The build system automatically downloads the correct toolchain for your target.
 

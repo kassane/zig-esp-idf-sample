@@ -3,7 +3,7 @@
 # ──────────────────────────────────────────────────────────────────────────────
 function(zig_run)
     cmake_parse_arguments(PARSE_ARGV 0 ARG
-        "VERBATIM"
+        "VERBATIM;ALLOW_FAIL"
         "WORKING_DIRECTORY;RESULT_VARIABLE;OUTPUT_VARIABLE;ERROR_VARIABLE;OUTPUT_FILE"
         "COMMAND"
     )
@@ -40,7 +40,7 @@ function(zig_run)
     if(DEFINED ARG_ERROR_VARIABLE)
         set(${ARG_ERROR_VARIABLE} "${error}" PARENT_SCOPE)
     endif()
-    if(NOT result EQUAL 0)
+    if(NOT result EQUAL 0 AND NOT ARG_ALLOW_FAIL)
         message(FATAL_ERROR "Zig command failed (code ${result}):\n"
             "  ${ZIG_BIN} ${ARG_COMMAND}\n"
             "--- stdout ---\n${output}\n"
