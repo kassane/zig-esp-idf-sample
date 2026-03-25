@@ -243,6 +243,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_hal_cam/include"
     "${IDF_PATH}/components/esp_hal_dma/include"
     "${IDF_PATH}/components/esp_hal_gpio/include"
+    "${IDF_PATH}/components/esp_hal_gpio/${TARGET_IDF_MODEL}/include"
     "${IDF_PATH}/components/esp_hal_gpspi/include"
     "${IDF_PATH}/components/esp_hal_i2c/include"
     "${IDF_PATH}/components/esp_hal_i2s/include"
