@@ -1,0 +1,93 @@
+name: Nix Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        idf-version: [release/v5.5, release/v6.0]
+        target:
+          - esp32
+          - esp32s2
+          - esp32s3
+          - esp32c3
+          - esp32c2
+          - esp32c6
+          - esp32h2
+          - esp32c5
+          - esp32c61
+          - esp32p4
+          - esp32h4
+        exclude:
+          - idf-version: release/v5.5
+            target: esp32p4
+          - idf-version: release/v5.5
+            target: esp32h4
+          - idf-version: release/v5.5
+            target: esp32c61
+          - idf-version: release/v5.5
+            target: esp32c5
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@master
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Allow unprivileged user namespaces
+        # The ESP toolchain in nixpkgs-esp-dev is wrapped with buildFHSUserEnv
+        # which uses bwrap. Ubuntu 24.04 (ubuntu-latest) blocks this via AppArmor
+        # by default; Ubuntu 22.04 may need unprivileged_userns_clone enabled.
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          sudo sysctl -w kernel.unprivileged_userns_clone=1 || true
+
+      - name: Set target and build
+        env:
+          IDF_TARGET: ${{ matrix.target }}
+        run: |
+          nix develop --no-update-lock-file --command bash -c "
+            if [ '${IDF_TARGET}' = 'esp32h4' ]; then
+              idf.py --preview set-target ${IDF_TARGET}
+            else
+              idf.py set-target ${IDF_TARGET}
+            fi
+            idf.py build
+          "
+
+      - name: Save build artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: build-nix-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || 'v5.5' }}
+          path: |
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/*.bin
+            build/*.elf
+            build/*.map
+          retention-days: 7
+
+  build-status:
+    name: Nix Build Status
+    if: always()
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Nix build failed!"
+            exit 1
+          fi
+          echo "All Nix builds passed!"

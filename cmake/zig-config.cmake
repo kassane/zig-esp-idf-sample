@@ -189,6 +189,7 @@ set(POSSIBLE_SYS_INCLUDE_PATHS
     "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/sys-include"
     "${TOOLCHAIN_BIN_DIR}/../${TRIPLE}/sys-include"
     "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/${TRIPLE}/sys-include"
+    "${TOOLCHAIN_VERSION_DIR}/${TRIPLE}/${TRIPLE}/include"
     "${TOOLCHAIN_ELF_INCLUDE}"
 )
 # Find the first existing sys-include directory
