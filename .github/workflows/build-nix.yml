@@ -13,9 +13,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        idf-version: [release/v5.5, release/v6.0]
         target:
           - esp32
+          - esp32s2
+          - esp32s3
           - esp32c3
+          - esp32c2
+          - esp32c6
+          - esp32h2
+          - esp32c5
+          - esp32c61
+          - esp32p4
+          - esp32h4
+        exclude:
+          - idf-version: release/v5.5
+            target: esp32p4
+          - idf-version: release/v5.5
+            target: esp32h4
+          - idf-version: release/v5.5
+            target: esp32c61
+          - idf-version: release/v5.5
+            target: esp32c5
 
     steps:
       - uses: actions/checkout@main
@@ -31,14 +50,18 @@ jobs:
           IDF_TARGET: ${{ matrix.target }}
         run: |
           nix develop --no-update-lock-file --command bash -c "
-            idf.py set-target ${IDF_TARGET}
+            if [ '${IDF_TARGET}' = 'esp32h4' ]; then
+              idf.py --preview set-target ${IDF_TARGET}
+            else
+              idf.py set-target ${IDF_TARGET}
+            fi
             idf.py build
           "
 
       - name: Save build artifacts
         uses: actions/upload-artifact@main
         with:
-          name: build-nix-${{ matrix.target }}
+          name: build-nix-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || 'v5.5' }}
           path: |
             build/bootloader/bootloader.bin
             build/partition_table/partition-table.bin
