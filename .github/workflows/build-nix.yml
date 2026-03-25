@@ -1,0 +1,62 @@
+name: Nix Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - esp32
+          - esp32c3
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@master
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Set target and build
+        env:
+          IDF_TARGET: ${{ matrix.target }}
+        run: |
+          nix develop --no-update-lock-file --command bash -c "
+            idf.py set-target ${IDF_TARGET}
+            idf.py build
+          "
+
+      - name: Save build artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: build-nix-${{ matrix.target }}
+          path: |
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/*.bin
+            build/*.elf
+            build/*.map
+          retention-days: 7
+
+  build-status:
+    name: Nix Build Status
+    if: always()
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Nix build failed!"
+            exit 1
+          fi
+          echo "All Nix builds passed!"
