@@ -4,7 +4,7 @@
 function(zig_run)
     cmake_parse_arguments(PARSE_ARGV 0 ARG
         "VERBATIM;ALLOW_FAIL"
-        "WORKING_DIRECTORY;RESULT_VARIABLE;OUTPUT_VARIABLE;ERROR_VARIABLE;OUTPUT_FILE"
+        "WORKING_DIRECTORY;RESULT_VARIABLE;OUTPUT_VARIABLE;ERROR_VARIABLE;OUTPUT_FILE;TIMEOUT"
         "COMMAND"
     )
     if(NOT ARG_COMMAND)
@@ -12,6 +12,12 @@ function(zig_run)
     endif()
     if(NOT DEFINED ARG_WORKING_DIRECTORY)
         set(ARG_WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    endif()
+    # Default timeout: 300 s.  translate-c normally finishes in seconds;
+    # a hung process (e.g. Aro deadlock on large stub headers) would
+    # otherwise block the build silently for hours (see issue #61).
+    if(NOT DEFINED ARG_TIMEOUT)
+        set(ARG_TIMEOUT 300)
     endif()
     set(extra_args)
     if(ARG_VERBATIM)
@@ -26,6 +32,7 @@ function(zig_run)
         RESULT_VARIABLE result
         OUTPUT_VARIABLE output
         ERROR_VARIABLE error
+        TIMEOUT ${ARG_TIMEOUT}
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_STRIP_TRAILING_WHITESPACE
         ${extra_args}
@@ -40,10 +47,20 @@ function(zig_run)
     if(DEFINED ARG_ERROR_VARIABLE)
         set(${ARG_ERROR_VARIABLE} "${error}" PARENT_SCOPE)
     endif()
-    if(NOT result EQUAL 0 AND NOT ARG_ALLOW_FAIL)
-        message(FATAL_ERROR "Zig command failed (code ${result}):\n"
-            "  ${ZIG_BIN} ${ARG_COMMAND}\n"
-            "--- stdout ---\n${output}\n"
-            "--- stderr ---\n${error}")
+    if(NOT ARG_ALLOW_FAIL)
+        if(result MATCHES "timeout")
+            message(FATAL_ERROR
+                "Zig command timed out after ${ARG_TIMEOUT}s\n"
+                "  Command: ${ZIG_BIN} ${ARG_COMMAND}\n"
+                "  This may indicate translate-c is stuck on complex headers.\n"
+                "--- stdout ---\n${output}\n"
+                "--- stderr ---\n${error}")
+        elseif(NOT result EQUAL 0)
+            message(FATAL_ERROR
+                "Zig command failed (code ${result}):\n"
+                "  ${ZIG_BIN} ${ARG_COMMAND}\n"
+                "--- stdout ---\n${output}\n"
+                "--- stderr ---\n${error}")
+        endif()
     endif()
 endfunction()
