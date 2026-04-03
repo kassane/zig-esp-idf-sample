@@ -430,11 +430,12 @@ else()
 endif()
 
 # Run `translate-c` to generate `idf-sys.zig`
-zig_run(
-    COMMAND translate-c
-    -target ${ZIG_TARGET} -mcpu ${TARGET_CPU_MODEL}
-    ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} ${IDF_SYS_C}
-    OUTPUT_FILE ${IDF_SYS_ZIG}
+include(${CMAKE_SOURCE_DIR}/cmake/zig-translateC-standalone.cmake)
+add_custom_command(
+    OUTPUT "${IDF_SYS_ZIG}"
+    COMMAND ${TRANSLATE_ZIG}
+    ${IDF_SYS_C} -target ${ZIG_TARGET} -mcpu ${TARGET_CPU_MODEL}
+    ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} -o ${IDF_SYS_ZIG}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     DEPENDS ${IDF_SYS_C}
 )
