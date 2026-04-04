@@ -52,7 +52,6 @@ function(zig_run)
             message(FATAL_ERROR
                 "Zig command timed out after ${ARG_TIMEOUT}s\n"
                 "  Command: ${ZIG_BIN} ${ARG_COMMAND}\n"
-                "  This may indicate translate-c is stuck on complex headers.\n"
                 "--- stdout ---\n${output}\n"
                 "--- stderr ---\n${error}")
         elseif(NOT result EQUAL 0)
