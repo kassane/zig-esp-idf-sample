@@ -83,11 +83,14 @@ if(CONFIG_IDF_TARGET_ESP32C61 OR CONFIG_IDF_TARGET_ESP32C5 OR CONFIG_IDF_TARGET_
     string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [3584]u8 };")
 elseif(CONFIG_IDF_TARGET_ESP32P4)
     string(APPEND FILE_CONTENT "\npub const gpio_dev_t    = extern struct { reserved: [2048]u8 };")
-    string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [308]u8 };")
 elseif(CONFIG_IDF_TARGET_ESP32C2 OR CONFIG_IDF_TARGET_ESP32C6 OR CONFIG_IDF_TARGET_ESP32H2)
     string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [1792]u8 };")
 else()
     # Fallback
+endif()
+if(CONFIG_IDF_TARGET_ESP32P4)
+    string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [308]u8 };")
+else()
     string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [1024]u8 };")
 endif()
 
