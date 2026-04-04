@@ -56,6 +56,41 @@ string(REGEX REPLACE "([a-zA-Z0-9_]+): ((\[[0-9]+\])?)(struct|union)_unnamed_[0-
 string(REGEX REPLACE "zeroes\\((struct|union)_unnamed_[0-9]+\\)" "zeroes(u32)" FILE_CONTENT "${FILE_CONTENT}")
 string(REGEX REPLACE "zeroes\\((\\[[0-9]+\\])(struct|union)_unnamed_[0-9]+\\)" "zeroes(\\1u32)" FILE_CONTENT "${FILE_CONTENT}")
 
+# ============================================================================
+# Fix peripheral register structs (lp_*, gpio_dev_t, i2c_dev_t, etc.)
+# ============================================================================
+# 1. Aggressively remove ALL gpio_dev_t and lp_* declarations (including opaque and aliases)
+string(REGEX REPLACE "pub const (struct_)?gpio_dev_t = [^;]+;" "" FILE_CONTENT "${FILE_CONTENT}")
+string(REGEX REPLACE "pub const (struct_)?lp_[a-z0-9_]*_dev_t = [^;]+;" "" FILE_CONTENT "${FILE_CONTENT}")
+string(REGEX REPLACE "pub const (struct_)?i2c_dev_t = [^;]+;" "" FILE_CONTENT "${FILE_CONTENT}")
+# 2. Also remove any remaining aliases that point to struct_ versions
+string(REGEX REPLACE "pub const (lp_[a-z0-9_]+_dev_t|gpio_dev_t|i2c_dev_t) = struct_[^;]+;" "" FILE_CONTENT "${FILE_CONTENT}")
+# 3. Append clean definitions with correct sizes
+string(APPEND FILE_CONTENT "
+pub const lp_io_dev_t        = extern struct { reserved: [1024]u8 };
+pub const lp_clkrst_dev_t    = extern struct { reserved: [1024]u8 };
+pub const lp_i2c_dev_t       = extern struct { reserved: [0x184]u8 };
+pub const lp_timer_dev_t     = extern struct { reserved: [1024]u8 };
+pub const lp_uart_dev_t      = extern struct { reserved: [0xa0]u8 };
+pub const lp_wdt_dev_t       = extern struct { reserved: [1024]u8 };
+pub const lp_io_mux_dev_t    = extern struct { reserved: [512]u8 };
+pub const lp_iomux_dev_t     = extern struct { reserved: [84]u8 };
+pub const lp_aonclkrst_dev_t = extern struct { reserved: [1024]u8 };
+pub const i2c_dev_t          = extern struct { reserved: [388]u8 };
+")
+# 4. Add gpio_dev_t with target-specific size (this must come AFTER the general remove)
+if(CONFIG_IDF_TARGET_ESP32C61 OR CONFIG_IDF_TARGET_ESP32C5 OR CONFIG_IDF_TARGET_ESP32H4)
+    string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [3584]u8 };")
+elseif(CONFIG_IDF_TARGET_ESP32P4)
+    string(APPEND FILE_CONTENT "\npub const gpio_dev_t    = extern struct { reserved: [2048]u8 };")
+    string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [308]u8 };")
+elseif(CONFIG_IDF_TARGET_ESP32C2 OR CONFIG_IDF_TARGET_ESP32C6 OR CONFIG_IDF_TARGET_ESP32H2)
+    string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [1792]u8 };")
+else()
+    # Fallback
+    string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [1024]u8 };")
+endif()
+
 # ESP32-P4 specific: Remove xPortCanYield function
 if(CONFIG_IDF_TARGET_ESP32P4)
     string(REGEX REPLACE "pub fn xPortCanYield\\([^)]*\\) callconv\\(\\.c\\) bool \\{([^{}]|\\{[^{}]*\\})*\\}" "" FILE_CONTENT "${FILE_CONTENT}")

@@ -7,5 +7,7 @@ sdkconfig
 *.lock
 managed_components/
 imports/idf-sys.zig
+imports/helpers.zig
+imports/c_builtins.zig
 include/bindings.h
 !flake.lock
