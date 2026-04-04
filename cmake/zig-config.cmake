@@ -377,11 +377,6 @@ foreach(def ${all_defines})
     endif()
 endforeach()
 
-list(APPEND EXTRA_DEFINE_FLAGS
-    "-fno-builtin"
-    "-D__GNUC__"
-)
-
 string(TOUPPER "${TARGET_IDF_ARCH}" TARGET_IDF_ARCH_UPPER)
 string(TOUPPER "${TARGET_IDF_MODEL}" TARGET_IDF_MODEL_UPPER)
 set(DEFINE_FLAGS
@@ -430,12 +425,12 @@ endif()
 
 # Run `translate-c` to generate `idf-sys.zig`
 include(${CMAKE_SOURCE_DIR}/cmake/bindgen-standalone.cmake)
-add_custom_command(
-    OUTPUT "${IDF_SYS_ZIG}"
-    COMMAND ${BINDGEN}
+bindgen_run(
+    COMMAND
     ${IDF_SYS_C} -target ${ZIG_TARGET} -mcpu ${TARGET_CPU_MODEL}
-    ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS} -o ${IDF_SYS_ZIG}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS}
+    OUTPUT_FILE ${IDF_SYS_ZIG}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/imports
     DEPENDS ${IDF_SYS_C}
 )
 

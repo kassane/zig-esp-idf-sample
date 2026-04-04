@@ -96,3 +96,63 @@ else()
     message(STATUS "Using cached translate_c-standalone: ${TRANSLATE_C_BIN}")
 endif()
 set(BINDGEN "${TRANSLATE_C_BIN}/translate-c")
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Helper to invoke translate-c (mirrors zig_run from zig-runner.cmake)
+# ──────────────────────────────────────────────────────────────────────────────
+function(bindgen_run)
+    cmake_parse_arguments(PARSE_ARGV 0 ARG
+        "VERBATIM;ALLOW_FAIL"
+        "WORKING_DIRECTORY;RESULT_VARIABLE;OUTPUT_VARIABLE;ERROR_VARIABLE;OUTPUT_FILE;TIMEOUT"
+        "COMMAND"
+    )
+    if(NOT ARG_COMMAND)
+        message(FATAL_ERROR "bindgen_run: COMMAND list is required")
+    endif()
+    if(NOT DEFINED ARG_WORKING_DIRECTORY)
+        set(ARG_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    endif()
+    if(NOT DEFINED ARG_TIMEOUT)
+        set(ARG_TIMEOUT 300)
+    endif()
+    set(extra_args)
+    if(ARG_VERBATIM)
+        list(APPEND extra_args VERBATIM)
+    endif()
+    if(ARG_OUTPUT_FILE)
+        list(APPEND extra_args OUTPUT_FILE "${ARG_OUTPUT_FILE}")
+    endif()
+    execute_process(
+        COMMAND "${BINDGEN}" ${ARG_COMMAND}
+        WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}"
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE output
+        ERROR_VARIABLE error
+        TIMEOUT ${ARG_TIMEOUT}
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE
+        ${extra_args}
+    )
+    if(DEFINED ARG_RESULT_VARIABLE)
+        set(${ARG_RESULT_VARIABLE} "${result}" PARENT_SCOPE)
+    endif()
+    if(DEFINED ARG_OUTPUT_VARIABLE)
+        set(${ARG_OUTPUT_VARIABLE} "${output}" PARENT_SCOPE)
+    endif()
+    if(DEFINED ARG_ERROR_VARIABLE)
+        set(${ARG_ERROR_VARIABLE} "${error}" PARENT_SCOPE)
+    endif()
+    if(NOT ARG_ALLOW_FAIL)
+        if(result MATCHES "timeout")
+            message(FATAL_ERROR
+                "translate-c timed out after ${ARG_TIMEOUT}s — Aro deadlock on stub headers (issue #61)\n"
+                "  Command: ${BINDGEN} ${ARG_COMMAND}\n"
+                "--- stderr ---\n${error}")
+        elseif(NOT result EQUAL 0)
+            message(FATAL_ERROR
+                "translate-c failed (code ${result}):\n"
+                "  ${BINDGEN} ${ARG_COMMAND}\n"
+                "--- stderr ---\n${error}")
+        endif()
+    endif()
+endfunction()

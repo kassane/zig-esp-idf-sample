@@ -14,8 +14,6 @@ function(zig_run)
         set(ARG_WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
     # Default timeout: 300 s.  translate-c normally finishes in seconds;
-    # a hung process (e.g. Aro deadlock on large stub headers) would
-    # otherwise block the build silently for hours (see issue #61).
     if(NOT DEFINED ARG_TIMEOUT)
         set(ARG_TIMEOUT 300)
     endif()
