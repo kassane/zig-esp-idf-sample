@@ -36,8 +36,8 @@ pub const SendStatus = enum(c_uint) {
 // ---------------------------------------------------------------------------
 
 pub const PeerInfo = extern struct {
-    peer_addr: [MAC_LEN]u8 = .{0} ** MAC_LEN,
-    lmk: [LMK_LEN]u8 = .{0} ** LMK_LEN,
+    peer_addr: [MAC_LEN]u8 = @splat(0),
+    lmk: [LMK_LEN]u8 = @splat(0),
     channel: u8 = 0,
     ifidx: WifiInterface = undefined,
     encrypt: bool = false,
@@ -69,7 +69,7 @@ pub const SwitchChannel = extern struct {
     sec_channel: WifiSecondChan = undefined,
     wait_time_ms: u32 = 0,
     op_id: u8 = 0,
-    dest_mac: [MAC_LEN]u8 = .{0} ** MAC_LEN,
+    dest_mac: [MAC_LEN]u8 = @splat(0),
     data_len: u16 = 0,
     _data: [0]u8 = .{},
 };
@@ -275,13 +275,13 @@ pub const SmartconfigEvent = enum(c_uint) {
 };
 
 pub const SmartconfigGotSsidPswd = extern struct {
-    ssid: [32]u8 = .{0} ** 32,
-    password: [64]u8 = .{0} ** 64,
+    ssid: [32]u8 = @splat(0),
+    password: [64]u8 = @splat(0),
     bssid_set: bool = false,
-    bssid: [MAC_LEN]u8 = .{0} ** MAC_LEN,
+    bssid: [MAC_LEN]u8 = @splat(0),
     type: SmartconfigType = .esptouch,
     token: u8 = 0,
-    cellphone_ip: [4]u8 = .{0} ** 4,
+    cellphone_ip: [4]u8 = @splat(0),
 };
 
 pub const SmartConfig = struct {

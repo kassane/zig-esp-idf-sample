@@ -49,7 +49,7 @@ const PROP_NOTIFY: sys.esp_gatt_char_prop_t = sys.ESP_GATT_CHAR_PROP_BIT_NOTIFY;
 // Mutable state
 // ---------------------------------------------------------------------------
 
-var handle_table: [Idx.count]u16 = .{0} ** Idx.count;
+var handle_table: [Idx.count]u16 = @splat(0);
 var conn_id: u16 = 0xFFFF;
 var gatts_if_global: bt.GattIf = sys.ESP_GATT_IF_NONE;
 var notify_enabled: bool = false;
@@ -99,7 +99,7 @@ var adv_params = sys.esp_ble_adv_params_t{
     .own_addr_type = sys.BLE_ADDR_TYPE_PUBLIC,
     .channel_map = sys.ADV_CHNL_ALL,
     .adv_filter_policy = sys.ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
-    .peer_addr = .{0} ** 6,
+    .peer_addr = @splat(0),
     .peer_addr_type = sys.BLE_ADDR_TYPE_PUBLIC,
 };
 

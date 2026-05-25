@@ -149,8 +149,7 @@ pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
     });
 }
 
-pub const espressif_targets: []const std.Target.Query =
-    if (hasEspXtensaSupport()) riscv_targets ++ xtensa_targets else riscv_targets;
+pub const espressif_targets: []const std.Target.Query = riscv_targets ++ xtensa_targets;
 
 const riscv_targets: []const std.Target.Query = blk: {
     var result: []const std.Target.Query = &.{};
@@ -225,34 +224,17 @@ const riscv_targets: []const std.Target.Query = blk: {
     break :blk result;
 };
 
-const xtensa_targets: []const std.Target.Query = &.{
-    // ESP32: Requires Espressif LLVM fork
-    .{
-        .cpu_arch = .xtensa,
-        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32 },
-        .os_tag = .freestanding,
-        .abi = .none,
-    },
-    // ESP32-S2: Requires Espressif LLVM fork
-    .{
-        .cpu_arch = .xtensa,
-        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s2 },
-        .os_tag = .freestanding,
-        .abi = .none,
-    },
-    // ESP32-S3: Requires Espressif LLVM fork
-    .{
-        .cpu_arch = .xtensa,
-        .cpu_model = .{ .explicit = &std.Target.xtensa.cpu.esp32s3 },
-        .os_tag = .freestanding,
-        .abi = .none,
-    },
-};
-
-/// Checks if the Zig compiler has Espressif Xtensa support enabled
-fn hasEspXtensaSupport() bool {
-    for (std.Target.Cpu.Arch.xtensa.allCpuModels()) |model| {
-        if (std.mem.startsWith(u8, model.name, "esp")) return true;
+const xtensa_targets: []const std.Target.Query = blk: {
+    var result: []const std.Target.Query = &.{};
+    for (.{ "esp32", "esp32s2", "esp32s3" }) |name| {
+        if (@hasDecl(std.Target.xtensa.cpu, name)) {
+            result = result ++ &[_]std.Target.Query{.{
+                .cpu_arch = .xtensa,
+                .cpu_model = .{ .explicit = &@field(std.Target.xtensa.cpu, name) },
+                .os_tag = .freestanding,
+                .abi = .none,
+            }};
+        }
     }
-    return false;
-}
+    break :blk result;
+};
