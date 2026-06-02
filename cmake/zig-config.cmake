@@ -314,6 +314,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/esp_lcd/dsi/include"
     "${IDF_PATH}/components/esp_lcd/rgb/include"
     "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include"
+    "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include/mbedtls/private"
     "${IDF_PATH}/components/mbedtls/mbedtls/tf-psa-crypto/include"
     "${IDF_PATH}/components/mbedtls/esp_crt_bundle/include"
     "${IDF_PATH}/components/mbedtls/port/include"
