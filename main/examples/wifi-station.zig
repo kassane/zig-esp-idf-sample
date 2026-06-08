@@ -59,7 +59,7 @@ fn wifiStation() !void {
         .sta = .{
             .ssid = std.mem.zeroes([32]u8),
             .password = std.mem.zeroes([64]u8),
-            .threshold = .{ .authmode = sys.WIFI_AUTH_WPA2_PSK },
+            .threshold = .{ .rssi = 0, .rssi_5g_adjustment = 0, .authmode = sys.WIFI_AUTH_WPA2_PSK },
             .sae_pwe_h2e = sys.WPA3_SAE_PWE_BOTH,
             .sae_h2e_identifier = std.mem.zeroes([32]u8),
         },

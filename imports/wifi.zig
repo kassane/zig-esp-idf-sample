@@ -399,7 +399,7 @@ pub const Internal = struct {
 
 pub fn init_config_default() sys.wifi_init_config_t {
     return sys.wifi_init_config_t{
-        .osi_funcs = &sys.g_wifi_osi_funcs,
+        .osi_funcs = @extern(*sys.wifi_osi_funcs_t, .{ .name = "g_wifi_osi_funcs" }),
         .wpa_crypto_funcs = sys.g_wifi_default_wpa_crypto_funcs,
         .static_rx_buf_num = sys.CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM,
         .dynamic_rx_buf_num = sys.CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM,

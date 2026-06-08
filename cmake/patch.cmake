@@ -41,6 +41,13 @@ endif()
 if(WIFI_SUPPORTED)
     string(REGEX REPLACE "pub const wifi_sta_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
     string(REGEX REPLACE "pub const wifi_ap_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+    string(REGEX REPLACE "pub const wifi_config_t = opaque \\{[^}]*\\};" "" FILE_CONTENT "${FILE_CONTENT}")
+    string(REGEX REPLACE "pub const g_wifi_osi_funcs = @compileError\\(\"[^\"]*\"\\)[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+    # Ensure wifi_bss_max_idle_config_t exists (added in IDF v5.5+, missing on older versions)
+    string(FIND "${FILE_CONTENT}" "wifi_bss_max_idle_config_t" _BSS_MAX_IDLE_POS)
+    if(_BSS_MAX_IDLE_POS EQUAL -1)
+        string(APPEND FILE_CONTENT "\npub const wifi_bss_max_idle_config_t = extern struct { period: u16 = 0, protected_keep_alive: bool = false };")
+    endif()
 endif()
 
 # Remove portTICK_PERIOD_MS (will be replaced with custom version)
@@ -129,6 +136,7 @@ if(WIFI_SUPPORTED)
     list(APPEND PATCH_FILES
         "wifi/wifi_sta_config_t.zig"
         "wifi/wifi_ap_config_t.zig"
+        "wifi/wifi_config_t.zig"
     )
 endif()
 
