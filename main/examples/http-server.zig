@@ -101,7 +101,7 @@ export fn app_main() callconv(.c) void {
         .sta = .{
             .ssid = std.mem.zeroes([32]u8),
             .password = std.mem.zeroes([64]u8),
-            .threshold = .{ .authmode = sys.WIFI_AUTH_WPA2_PSK },
+            .threshold = .{ .rssi = 0, .rssi_5g_adjustment = 0, .authmode = sys.WIFI_AUTH_WPA2_PSK },
             .sae_pwe_h2e = sys.WPA3_SAE_PWE_BOTH,
             .sae_h2e_identifier = std.mem.zeroes([32]u8),
         },
@@ -123,15 +123,7 @@ export fn app_main() callconv(.c) void {
 }
 
 fn startHttpServer() !void {
-    var config = std.mem.zeroes(sys.httpd_config_t);
-    config.server_port = 80;
-    config.stack_size = 4096;
-    config.task_priority = 5;
-    config.max_uri_handlers = 8;
-    config.max_resp_headers = 8;
-    config.recv_wait_timeout = 5;
-    config.send_wait_timeout = 5;
-    config.lru_purge_enable = false;
+    var config = sys.zig_httpd_default_config();
 
     const server = try idf.http.Server.start(&config);
 

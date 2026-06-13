@@ -165,4 +165,11 @@ typedef unsigned int mode_t;
 #include "matter_stubs.h"
 #endif
 
+#ifdef ESP_IDF_COMP_ESP_HTTP_SERVER_ENABLED
+static inline httpd_config_t zig_httpd_default_config(void) {
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    return config;
+}
+#endif
+
 #endif // STUBS_H

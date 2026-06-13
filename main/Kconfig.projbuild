@@ -64,4 +64,29 @@ menu "Example Configuration"
             bool "WAPI PSK"
     endchoice
 
+    choice ZIG_EXAMPLE_SELECTION
+        prompt "Select Zig Example to build"
+        default ZIG_EXAMPLE_DEFAULT
+        config ZIG_EXAMPLE_DEFAULT
+            bool "Default (main/app.zig)"
+        config ZIG_EXAMPLE_SMARTLED_RGB
+            bool "SmartLED RGB"
+        config ZIG_EXAMPLE_WIFI_STATION
+            bool "WiFi Station"
+        config ZIG_EXAMPLE_DSP_MATH
+            bool "DSP Math"
+        config ZIG_EXAMPLE_GPIO_BLINK
+            bool "GPIO Blink"
+        config ZIG_EXAMPLE_HTTP_SERVER
+            bool "HTTP Server"
+        config ZIG_EXAMPLE_BLE_GATT_SERVER
+            bool "BLE GATT Server"
+        config ZIG_EXAMPLE_I2C_SCAN
+            bool "I2C Scan"
+        config ZIG_EXAMPLE_UART_ECHO
+            bool "UART Echo"
+        config ZIG_EXAMPLE_MATTER_LIGHT
+            bool "Matter Light"
+    endchoice
+
 endmenu
