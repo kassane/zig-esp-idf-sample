@@ -114,6 +114,7 @@ if(HAS_LED_STRIP EQUAL 1)
     string(REGEX REPLACE "pub const led_strip_rmt_config_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
     string(REGEX REPLACE "pub const led_color_component_format_t[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
     string(REGEX REPLACE "pub const led_strip_config_t = extern struct \\{[^}]*\\};" "" FILE_CONTENT "${FILE_CONTENT}")
+    string(REGEX REPLACE "pub const led_strip_config_t = opaque \\{[^}]*\\};" "" FILE_CONTENT "${FILE_CONTENT}")
 endif()
 
 # ============================================================================
