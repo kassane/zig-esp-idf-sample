@@ -12,7 +12,7 @@ pub const LedModel = enum(sys.led_model_t) {
 pub const LedStripHandle = sys.led_strip_handle_t;
 
 pub const ColorComponentFormat = extern union {
-    format: packed struct {
+    format: packed struct(u32) {
         r_pos: u2, // Position of the red channel in the color order: 0~3
         g_pos: u2, // Position of the green channel in the color order: 0~3
         b_pos: u2, // Position of the blue channel in the color order: 0~3
