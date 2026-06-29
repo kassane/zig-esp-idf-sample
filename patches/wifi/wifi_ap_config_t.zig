@@ -15,8 +15,6 @@ pub const wifi_ap_config_t = extern struct {
     sae_pwe_h2e: wifi_sae_pwe_method_t = @import("std").mem.zeroes(wifi_sae_pwe_method_t),
     transition_disable: u8 = 0,
     sae_ext: u8 = 0,
-    wpa3_compatible_mode: u8 = 0,
-    reserved: u8 = 0,
     bss_max_idle_cfg: wifi_bss_max_idle_config_t = @import("std").mem.zeroes(wifi_bss_max_idle_config_t),
     gtk_rekey_interval: u16 = 0,
 };

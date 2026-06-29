@@ -120,7 +120,7 @@ endif()
 # ============================================================================
 # Append custom patch files
 # ============================================================================
-set(PATCH_DIR "${CMAKE_SOURCE_DIR}/../../../patches")
+set(PATCH_DIR "${CMAKE_CURRENT_LIST_DIR}/../patches")
 
 # Define patches to apply
 set(PATCH_FILES

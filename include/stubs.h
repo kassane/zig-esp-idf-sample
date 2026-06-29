@@ -40,6 +40,7 @@ typedef long off_t;
 typedef long _off_t;
 typedef unsigned int wint_t;
 typedef unsigned int mode_t;
+typedef int pid_t;
 
 /* Disable macros and attributes that confuse zig translate-c */
 #define __restrict
