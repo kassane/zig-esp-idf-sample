@@ -88,7 +88,7 @@ pub const Task = struct {
         return sys.xTaskCreateStaticPinnedToCore(task_fn, name, stack_size, param, priority, stack_buf, task_buf, core_id);
     }
 
-    pub fn delete(handle: ?Handle) void {
+    pub fn delete(handle: Handle) void {
         sys.vTaskDelete(handle);
     }
 
@@ -104,7 +104,7 @@ pub const Task = struct {
         return pdOK(sys.xTaskDelayUntil(prev_wake, increment));
     }
 
-    pub fn @"suspend"(handle: ?Handle) void {
+    pub fn @"suspend"(handle: Handle) void {
         sys.vTaskSuspend(handle);
     }
 
@@ -116,19 +116,19 @@ pub const Task = struct {
         return pdOK(sys.xTaskResumeFromISR(handle));
     }
 
-    pub fn priorityGet(handle: ?Handle) UBaseType {
+    pub fn priorityGet(handle: Handle) UBaseType {
         return sys.uxTaskPriorityGet(handle);
     }
 
-    pub fn prioritySet(handle: ?Handle, priority: UBaseType) void {
+    pub fn prioritySet(handle: Handle, priority: UBaseType) void {
         sys.vTaskPrioritySet(handle, priority);
     }
 
-    pub fn getName(handle: ?Handle) [*:0]const u8 {
+    pub fn getName(handle: Handle) [*:0]const u8 {
         return sys.pcTaskGetName(handle);
     }
 
-    pub fn getHandle(name: [*:0]const u8) ?Handle {
+    pub fn getHandle(name: [*:0]const u8) Handle {
         return sys.xTaskGetHandle(name);
     }
 
@@ -148,7 +148,7 @@ pub const Task = struct {
         return sys.uxTaskGetNumberOfTasks();
     }
 
-    pub fn getStackHighWaterMark(handle: ?Handle) UBaseType {
+    pub fn getStackHighWaterMark(handle: Handle) UBaseType {
         return sys.uxTaskGetStackHighWaterMark(handle);
     }
 
@@ -176,11 +176,11 @@ pub const Task = struct {
         return pdOK(sys.xTaskResumeAll());
     }
 
-    pub fn setThreadLocalStoragePointer(handle: ?Handle, index: BaseType, value: ?*anyopaque) void {
+    pub fn setThreadLocalStoragePointer(handle: Handle, index: BaseType, value: ?*anyopaque) void {
         sys.vTaskSetThreadLocalStoragePointer(handle, index, value);
     }
 
-    pub fn getThreadLocalStoragePointer(handle: ?Handle, index: BaseType) ?*anyopaque {
+    pub fn getThreadLocalStoragePointer(handle: Handle, index: BaseType) ?*anyopaque {
         return sys.pvTaskGetThreadLocalStoragePointer(handle, index);
     }
 
