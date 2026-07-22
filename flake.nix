@@ -26,6 +26,11 @@
             url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
             sha256 = "sha256-UwT0PNMN/L3FVf3j4rZQG0g4Miukfdcdo0ER4IsC7vQ=";
           }
+        else if system == "aarch64-darwin" then
+          {
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa/zig-relsafe-aarch64-macos-baseline.tar.xz";
+            sha256 = "sha256-f1BYwjroIrlYXKBUAjZ2t+B+SOTR4mWmvTEEpVsCle8=";
+          }
         else
           throw "Unsupported platform: ${system}";
 
