@@ -24,9 +24,9 @@ pub fn espLogFn(
 // ---------------------------------------------------------------------------
 
 pub const default_level: sys.esp_log_level_t = switch (@import("builtin").mode) {
-    .Debug => sys.ESP_LOG_DEBUG,
-    .ReleaseSafe => sys.ESP_LOG_INFO,
-    .ReleaseFast, .ReleaseSmall => sys.ESP_LOG_ERROR,
+    .debug => sys.ESP_LOG_DEBUG,
+    .safe => sys.ESP_LOG_INFO,
+    .fast, .small => sys.ESP_LOG_ERROR,
 };
 
 /// Converts a Zig log level to its ESP-IDF equivalent.
@@ -98,5 +98,5 @@ pub const LOG_COLOR_I = LOG_COLOR(LOG_COLOR_GREEN);
 // ---------------------------------------------------------------------------
 
 inline fn isComptime(val: anytype) bool {
-    return @typeInfo(@TypeOf(.{val})).@"struct".fields[0].is_comptime;
+    return @typeInfo(@TypeOf(.{val})).@"struct".field_attrs[0].@"comptime";
 }

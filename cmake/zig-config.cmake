@@ -2,7 +2,7 @@
 # Zig configuration for ESP-IDF (esp32 xtensa/riscv targets)
 # ──────────────────────────────────────────────────────────────────────────────
 
-set(ZIG_MIN_VERSION "0.16.0")
+set(ZIG_MIN_VERSION "0.17.0")
 
 # ─── Host platform & architecture detection ──────────────────────────────────
 cmake_host_system_information(RESULT HOST_OS QUERY OS_NAME)

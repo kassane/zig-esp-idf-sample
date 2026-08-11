@@ -57,7 +57,7 @@ fn main() callconv(.c) void {
         log.err("Error: {s}", .{@errorName(err)});
     };
 
-    if (builtin.mode == .Debug)
+    if (builtin.mode == .debug)
         heap.dump();
 
     // FreeRTOS Tasks — Task.create returns !Handle; on failure panic with a clear message.
@@ -114,7 +114,7 @@ pub const panic = idf.esp_panic.panic;
 const log = std.log.scoped(idf.log.default_log_scope);
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
-        .Debug => .debug,
+        .debug => .debug,
         else => .info,
     },
     .logFn = idf.log.espLogFn,

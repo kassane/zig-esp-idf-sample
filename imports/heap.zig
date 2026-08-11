@@ -166,7 +166,7 @@ pub const HeapCapsAllocator = struct {
 
     fn free(_: *anyopaque, buf: []u8, _: std.mem.Alignment, _: usize) void {
         sys.heap_caps_free(buf.ptr);
-        if (builtin.mode == .Debug) {
+        if (builtin.mode == .debug) {
             if (!sys.heap_caps_check_integrity_all(true))
                 @panic("heap_caps: integrity check failed after free");
         }
@@ -231,7 +231,7 @@ pub const MultiHeapAllocator = struct {
     fn free(ctx: *anyopaque, buf: []u8, _: std.mem.Alignment, _: usize) void {
         const self: *Self = @ptrCast(@alignCast(ctx));
         sys.multi_heap_free(self.handle, buf.ptr);
-        if (builtin.mode == .Debug) {
+        if (builtin.mode == .debug) {
             if (!sys.multi_heap_check(self.handle, true))
                 @panic("multi_heap: integrity check failed after free");
         }

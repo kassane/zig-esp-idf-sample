@@ -28,7 +28,7 @@ assignees: ''
 
 ## Environment
 
-- **Zig version:** [e.g. 0.14.0-xtensa,0.15.2 (upstream), 0.16.0-dev-xtensa]
+- **Zig version:** [e.g. 0.16.0-xtensa, 0.16.0, 0.17.0-dev-xtensa]
 - **ESP-IDF version:** [e.g. v5.4, 6.1, master]
 - **Target MCU:** [e.g. esp32, esp32s3, esp32c3, esp32p4]
 - **Build System:** [e.g. CMake integration, zig build]

@@ -92,7 +92,7 @@ pub const panic = idf.esp_panic.panic;
 const log = std.log.scoped(.@"led-strip");
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
-        .Debug => .debug,
+        .debug => .debug,
         else => .info,
     },
     // Define logFn to override the std implementation

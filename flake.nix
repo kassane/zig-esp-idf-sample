@@ -18,17 +18,17 @@
         # Determine architecture-specific properties
         platformSrc = if system == "x86_64-linux" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
             sha256 = "sha256-nj3O+db21VLfZBoSrdyeRDppt8va2FSS7Gd6zVW33ps=";
           }
         else if system == "aarch64-linux" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
             sha256 = "sha256-UwT0PNMN/L3FVf3j4rZQG0g4Miukfdcdo0ER4IsC7vQ=";
           }
         else if system == "aarch64-darwin" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.16.0-xtensa/zig-relsafe-aarch64-macos-baseline.tar.xz";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/zig-relsafe-aarch64-macos-baseline.tar.xz";
             sha256 = "sha256-f1BYwjroIrlYXKBUAjZ2t+B+SOTR4mWmvTEEpVsCle8=";
           }
         else
@@ -44,7 +44,7 @@
 
             (pkgs.stdenv.mkDerivation {
               pname = "zig-espressif-bootstrap";
-              version = "0.16.0-xtensa-dev";
+              version = "0.17.0-xtensa-dev-dev";
               src = pkgs.fetchurl platformSrc;
               dontConfigure = true;
               dontBuild = true;

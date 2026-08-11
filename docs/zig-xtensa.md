@@ -4,8 +4,8 @@ Like [esp-rs](https://github.com/espressif/rust-esp32-example/blob/main/docs/rus
 
 **Current version:**
 
-- **Zig**: v0.16.0 ([bootstrap fork](https://github.com/kassane/zig-espressif-bootstrap))
-- **LLVM**: v21.1.0 ([espressif-fork](https://github.com/espressif/llvm-project))
+- **Zig**: v0.17.0 ([bootstrap fork](https://github.com/kassane/zig-espressif-bootstrap))
+- **LLVM**: v22.1.4 ([espressif-fork](https://github.com/espressif/llvm-project))
 
 
 ### Commands
@@ -67,6 +67,7 @@ info: available CPU features for architecture 'xtensa':
  esp32s2ops: Support Xtensa esp32-s2 ISA extension
  esp32s3ops: Support Xtensa esp32-s3 ISA extension
  exception: Enable Xtensa Exception option
+ expstate: Enable Xtensa EXPSTATE option
  extendedl32r: Enable Xtensa Extended L32R option
  forced_atomics: Assume that lock-free native-width atomics are available
  fp: Enable Xtensa Single FP instructions
@@ -91,6 +92,7 @@ info: available CPU features for architecture 'xtensa':
  rvector: Enable Xtensa Relocatable Vector option
  s32c1i: Enable Xtensa S32C1I option
  sext: Enable Xtensa Sign Extend option
+ text_section_literals: Enable Xtensa Text Section Literals option
  threadptr: Enable Xtensa THREADPTR option
  timers1: Enable Xtensa Timers 1
  timers2: Enable Xtensa Timers 2
@@ -113,12 +115,12 @@ const std = @import("std");
 /// Zig version. When writing code that supports multiple versions of Zig, prefer
 /// feature detection (i.e. with `@hasDecl` or `@hasField`) over version checks.
 pub const zig_version = std.SemanticVersion.parse(zig_version_string) catch unreachable;
-pub const zig_version_string = "0.16.0-xtensa-dev.2287+eb3f16db5";
-pub const zig_backend = std.builtin.CompilerBackend.stage2_llvm;
+pub const zig_version_string = "0.17.0-xtensa";
+pub const zig_backend = std.lang.CompilerBackend.stage2_llvm;
 
-pub const output_mode: std.builtin.OutputMode = .Lib;
-pub const link_mode: std.builtin.LinkMode = .static;
-pub const unwind_tables: std.builtin.UnwindTables = .async;
+pub const output_mode: std.lang.OutputMode = .Lib;
+pub const link_mode: std.lang.LinkMode = .static;
+pub const unwind_tables: std.lang.UnwindTables = .async;
 pub const is_test = false;
 pub const single_threaded = false;
 pub const abi: std.Target.Abi = .none;
@@ -169,7 +171,8 @@ pub const target: std.Target = .{
     .dynamic_linker = .none,
 };
 pub const object_format: std.Target.ObjectFormat = .elf;
-pub const mode: std.builtin.OptimizeMode = .Debug;
+pub const mode = optimize;
+pub const optimize: std.lang.Optimize = .debug;
 pub const link_libc = false;
 pub const link_libcpp = false;
 pub const have_error_return_tracing = true;
@@ -179,6 +182,6 @@ pub const fuzz = false;
 pub const position_independent_code = false;
 pub const position_independent_executable = false;
 pub const strip_debug_info = false;
-pub const code_model: std.builtin.CodeModel = .default;
+pub const code_model: std.lang.CodeModel = .default;
 pub const omit_frame_pointer = false;
 ```
