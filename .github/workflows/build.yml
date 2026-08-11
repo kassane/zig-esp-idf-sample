@@ -11,7 +11,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  ZIG_VERSION: "0.17.0"
+  ZIG_VERSION: "master"
 
 jobs:
   format-check:
