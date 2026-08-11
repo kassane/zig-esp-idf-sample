@@ -47,7 +47,7 @@ pub const LedStripConfig = extern struct {
         };
     }
     pub fn ws2812(gpio: u32, count: u32) LedStripConfig {
-        return init(gpio, count, .ws2812, @intFromEnum(PixelFormat.grb));
+        return init(gpio, count, .ws2812, @backingInt(PixelFormat.grb));
     }
 };
 pub const LedStripRmtConfig = struct {

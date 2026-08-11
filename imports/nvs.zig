@@ -84,14 +84,14 @@ pub fn flashErasePartition(part_name: [*:0]const u8) !void {
 /// Open an NVS namespace in the default "nvs" partition.
 pub fn open(namespace: [*:0]const u8, mode: OpenMode) !Handle {
     var handle: Handle = 0;
-    try errors.espCheckError(sys.nvs_open(namespace, @intFromEnum(mode), &handle));
+    try errors.espCheckError(sys.nvs_open(namespace, @backingInt(mode), &handle));
     return handle;
 }
 
 /// Open an NVS namespace on a specific partition.
 pub fn openFromPartition(part_name: [*:0]const u8, namespace: [*:0]const u8, mode: OpenMode) !Handle {
     var handle: Handle = 0;
-    try errors.espCheckError(sys.nvs_open_from_partition(part_name, namespace, @intFromEnum(mode), &handle));
+    try errors.espCheckError(sys.nvs_open_from_partition(part_name, namespace, @backingInt(mode), &handle));
     return handle;
 }
 
@@ -224,7 +224,7 @@ pub fn getBlob(handle: Handle, key: [*:0]const u8, buf: ?*anyopaque, buf_len: *u
 pub fn findKey(handle: Handle, key: [*:0]const u8) !Type {
     var t: sys.nvs_type_t = 0;
     try errors.espCheckError(sys.nvs_find_key(handle, key, &t));
-    return @enumFromInt(t);
+    return @fromBackingInt(@intCast(t));
 }
 
 /// Erase a single key from the namespace.
@@ -265,14 +265,14 @@ pub fn entryFind(
     nvs_type: Type,
 ) !Iterator {
     var it: Iterator = null;
-    try errors.espCheckError(sys.nvs_entry_find(part_name, namespace, @intFromEnum(nvs_type), &it));
+    try errors.espCheckError(sys.nvs_entry_find(part_name, namespace, @backingInt(nvs_type), &it));
     return it;
 }
 
 /// Find an iterator over entries in an open handle matching the given type.
 pub fn entryFindInHandle(handle: Handle, nvs_type: Type) !Iterator {
     var it: Iterator = null;
-    try errors.espCheckError(sys.nvs_entry_find_in_handle(handle, @intFromEnum(nvs_type), &it));
+    try errors.espCheckError(sys.nvs_entry_find_in_handle(handle, @backingInt(nvs_type), &it));
     return it;
 }
 

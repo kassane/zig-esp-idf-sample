@@ -50,8 +50,8 @@ pub const MmapMemory = enum(sys.esp_partition_mmap_memory_t) {
 /// optional `label`.  Release with `iteratorRelease` when done.
 pub fn find(part_type: Type, subtype: Subtype, label: ?[*:0]const u8) Iterator {
     return sys.esp_partition_find(
-        @intFromEnum(part_type),
-        @intFromEnum(subtype),
+        @backingInt(part_type),
+        @backingInt(subtype),
         label,
     );
 }
@@ -59,8 +59,8 @@ pub fn find(part_type: Type, subtype: Subtype, label: ?[*:0]const u8) Iterator {
 /// Return a pointer to the first matching partition, or null if none found.
 pub fn findFirst(part_type: Type, subtype: Subtype, label: ?[*:0]const u8) ?*const Partition {
     return sys.esp_partition_find_first(
-        @intFromEnum(part_type),
-        @intFromEnum(subtype),
+        @backingInt(part_type),
+        @backingInt(subtype),
         label,
     );
 }
@@ -133,7 +133,7 @@ pub fn mmap(
         partition,
         offset,
         size,
-        @intFromEnum(memory),
+        @backingInt(memory),
         &out_ptr,
         &out_handle,
     ));

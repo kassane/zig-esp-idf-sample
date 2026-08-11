@@ -147,7 +147,7 @@ pub fn nodeCreate(attr_cb: AttrCallback, identify_cb: IdentifyCallback, priv_dat
 pub const endpoint = struct {
     /// Create a generic endpoint on the node.
     pub fn create(node: *Node, flags: EpFlags, priv_data: ?*anyopaque) !*Endpoint {
-        const ep = sys.esp_matter_wrapper_endpoint_create(node, @intFromEnum(flags), priv_data);
+        const ep = sys.esp_matter_wrapper_endpoint_create(node, @backingInt(flags), priv_data);
         if (ep == null) return error.MatterEndpointCreateFailed;
         return @ptrCast(ep);
     }
@@ -178,28 +178,28 @@ pub const endpoint = struct {
 
     /// Add an On/Off Light endpoint (device type 0x0100).
     pub fn addOnOffLight(node: *Node, flags: EpFlags, priv_data: ?*anyopaque) !*Endpoint {
-        const ep = sys.esp_matter_wrapper_add_on_off_light(node, @intFromEnum(flags), priv_data);
+        const ep = sys.esp_matter_wrapper_add_on_off_light(node, @backingInt(flags), priv_data);
         if (ep == null) return error.MatterEndpointCreateFailed;
         return @ptrCast(ep);
     }
 
     /// Add an On/Off Switch endpoint (device type 0x0103).
     pub fn addOnOffSwitch(node: *Node, flags: EpFlags, priv_data: ?*anyopaque) !*Endpoint {
-        const ep = sys.esp_matter_wrapper_add_on_off_switch(node, @intFromEnum(flags), priv_data);
+        const ep = sys.esp_matter_wrapper_add_on_off_switch(node, @backingInt(flags), priv_data);
         if (ep == null) return error.MatterEndpointCreateFailed;
         return @ptrCast(ep);
     }
 
     /// Add a Dimmable Light endpoint (device type 0x0101).
     pub fn addDimmableLight(node: *Node, flags: EpFlags, priv_data: ?*anyopaque) !*Endpoint {
-        const ep = sys.esp_matter_wrapper_add_dimmable_light(node, @intFromEnum(flags), priv_data);
+        const ep = sys.esp_matter_wrapper_add_dimmable_light(node, @backingInt(flags), priv_data);
         if (ep == null) return error.MatterEndpointCreateFailed;
         return @ptrCast(ep);
     }
 
     /// Add a Color Temperature Light endpoint (device type 0x010C).
     pub fn addColorTemperatureLight(node: *Node, flags: EpFlags, priv_data: ?*anyopaque) !*Endpoint {
-        const ep = sys.esp_matter_wrapper_add_color_temperature_light(node, @intFromEnum(flags), priv_data);
+        const ep = sys.esp_matter_wrapper_add_color_temperature_light(node, @backingInt(flags), priv_data);
         if (ep == null) return error.MatterEndpointCreateFailed;
         return @ptrCast(ep);
     }

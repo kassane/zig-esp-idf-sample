@@ -76,27 +76,27 @@ pub const TimerCtrl = struct {
 
     /// Reset a LEDC timer.
     pub fn reset(mode: SpeedMode, timer: Timer) !void {
-        try errors.espCheckError(sys.ledc_timer_rst(@intFromEnum(mode), @intFromEnum(timer)));
+        try errors.espCheckError(sys.ledc_timer_rst(@backingInt(mode), @backingInt(timer)));
     }
 
     /// Pause a LEDC timer.
     pub fn pause(mode: SpeedMode, timer: Timer) !void {
-        try errors.espCheckError(sys.ledc_timer_pause(@intFromEnum(mode), @intFromEnum(timer)));
+        try errors.espCheckError(sys.ledc_timer_pause(@backingInt(mode), @backingInt(timer)));
     }
 
     /// Resume a paused LEDC timer.
     pub fn @"resume"(mode: SpeedMode, timer: Timer) !void {
-        try errors.espCheckError(sys.ledc_timer_resume(@intFromEnum(mode), @intFromEnum(timer)));
+        try errors.espCheckError(sys.ledc_timer_resume(@backingInt(mode), @backingInt(timer)));
     }
 
     /// Set the frequency (Hz) of a running timer.
     pub fn setFreq(mode: SpeedMode, timer: Timer, freq_hz: u32) !void {
-        try errors.espCheckError(sys.ledc_set_freq(@intFromEnum(mode), @intFromEnum(timer), freq_hz));
+        try errors.espCheckError(sys.ledc_set_freq(@backingInt(mode), @backingInt(timer), freq_hz));
     }
 
     /// Get the current frequency (Hz) of a timer.
     pub fn getFreq(mode: SpeedMode, timer: Timer) u32 {
-        return sys.ledc_get_freq(@intFromEnum(mode), @intFromEnum(timer));
+        return sys.ledc_get_freq(@backingInt(mode), @backingInt(timer));
     }
 
     /// Return the best duty resolution for a given source clock and target frequency.
@@ -117,56 +117,56 @@ pub const ChannelCtrl = struct {
 
     /// Re-assign a GPIO to an existing channel (without full reconfiguration).
     pub fn setPin(gpio_num: c_int, mode: SpeedMode, ch: Channel) !void {
-        try errors.espCheckError(sys.ledc_set_pin(gpio_num, @intFromEnum(mode), @intFromEnum(ch)));
+        try errors.espCheckError(sys.ledc_set_pin(gpio_num, @backingInt(mode), @backingInt(ch)));
     }
 
     /// Stop the channel output and set the GPIO to `idle_level` (0 or 1).
     pub fn stop(mode: SpeedMode, ch: Channel, idle_level: u32) !void {
-        try errors.espCheckError(sys.ledc_stop(@intFromEnum(mode), @intFromEnum(ch), idle_level));
+        try errors.espCheckError(sys.ledc_stop(@backingInt(mode), @backingInt(ch), idle_level));
     }
 
     /// Bind a channel to a different timer.
     pub fn bindTimer(mode: SpeedMode, ch: Channel, timer: Timer) !void {
-        try errors.espCheckError(sys.ledc_bind_channel_timer(@intFromEnum(mode), @intFromEnum(ch), @intFromEnum(timer)));
+        try errors.espCheckError(sys.ledc_bind_channel_timer(@backingInt(mode), @backingInt(ch), @backingInt(timer)));
     }
 
     // ── Duty ──────────────────────────────────────────────────────────────
 
     /// Set the duty cycle (without updating the hardware — call `updateDuty` after).
     pub fn setDuty(mode: SpeedMode, ch: Channel, duty: u32) !void {
-        try errors.espCheckError(sys.ledc_set_duty(@intFromEnum(mode), @intFromEnum(ch), duty));
+        try errors.espCheckError(sys.ledc_set_duty(@backingInt(mode), @backingInt(ch), duty));
     }
 
     /// Set duty + hpoint (without updating hardware).
     pub fn setDutyWithHpoint(mode: SpeedMode, ch: Channel, duty: u32, hpoint: u32) !void {
-        try errors.espCheckError(sys.ledc_set_duty_with_hpoint(@intFromEnum(mode), @intFromEnum(ch), duty, hpoint));
+        try errors.espCheckError(sys.ledc_set_duty_with_hpoint(@backingInt(mode), @backingInt(ch), duty, hpoint));
     }
 
     /// Latch the duty value set by `setDuty`/`setDutyWithHpoint` into hardware.
     pub fn updateDuty(mode: SpeedMode, ch: Channel) !void {
-        try errors.espCheckError(sys.ledc_update_duty(@intFromEnum(mode), @intFromEnum(ch)));
+        try errors.espCheckError(sys.ledc_update_duty(@backingInt(mode), @backingInt(ch)));
     }
 
     /// Set duty and immediately apply it to hardware (combines set + update).
     pub fn setDutyAndUpdate(mode: SpeedMode, ch: Channel, duty: u32, hpoint: u32) !void {
-        try errors.espCheckError(sys.ledc_set_duty_and_update(@intFromEnum(mode), @intFromEnum(ch), duty, hpoint));
+        try errors.espCheckError(sys.ledc_set_duty_and_update(@backingInt(mode), @backingInt(ch), duty, hpoint));
     }
 
     /// Get the current duty cycle value.
     pub fn getDuty(mode: SpeedMode, ch: Channel) u32 {
-        return sys.ledc_get_duty(@intFromEnum(mode), @intFromEnum(ch));
+        return sys.ledc_get_duty(@backingInt(mode), @backingInt(ch));
     }
 
     /// Get the current hpoint value.
     pub fn getHpoint(mode: SpeedMode, ch: Channel) c_int {
-        return sys.ledc_get_hpoint(@intFromEnum(mode), @intFromEnum(ch));
+        return sys.ledc_get_hpoint(@backingInt(mode), @backingInt(ch));
     }
 
     // ── Callback ──────────────────────────────────────────────────────────
 
     /// Register a callback for fade-end events on a channel.
     pub fn registerCallback(mode: SpeedMode, ch: Channel, cbs: *Cbs, user_arg: ?*anyopaque) !void {
-        try errors.espCheckError(sys.ledc_cb_register(@intFromEnum(mode), @intFromEnum(ch), cbs, user_arg));
+        try errors.espCheckError(sys.ledc_cb_register(@backingInt(mode), @backingInt(ch), cbs, user_arg));
     }
 };
 
@@ -188,31 +188,31 @@ pub const Fade = struct {
 
     /// Start a fade previously configured with `setFadeStep` or `setFadeTime`.
     pub fn start(mode: SpeedMode, ch: Channel, fade_mode: FadeMode) !void {
-        try errors.espCheckError(sys.ledc_fade_start(@intFromEnum(mode), @intFromEnum(ch), @intFromEnum(fade_mode)));
+        try errors.espCheckError(sys.ledc_fade_start(@backingInt(mode), @backingInt(ch), @backingInt(fade_mode)));
     }
 
     /// Stop an in-progress fade.
     pub fn stop(mode: SpeedMode, ch: Channel) !void {
-        try errors.espCheckError(sys.ledc_fade_stop(@intFromEnum(mode), @intFromEnum(ch)));
+        try errors.espCheckError(sys.ledc_fade_stop(@backingInt(mode), @backingInt(ch)));
     }
 
     /// Configure a fade by time: ramp from current duty to `target_duty` in `fade_time_ms`.
     pub fn setFadeTime(mode: SpeedMode, ch: Channel, target_duty: u32, fade_time_ms: c_int) !void {
-        try errors.espCheckError(sys.ledc_set_fade_with_time(@intFromEnum(mode), @intFromEnum(ch), target_duty, fade_time_ms));
+        try errors.espCheckError(sys.ledc_set_fade_with_time(@backingInt(mode), @backingInt(ch), target_duty, fade_time_ms));
     }
 
     /// Configure a fade by step: ramp with a fixed `scale` increment every `cycle_num` PWM cycles.
     pub fn setFadeStep(mode: SpeedMode, ch: Channel, target_duty: u32, scale: u32, cycle_num: u32) !void {
-        try errors.espCheckError(sys.ledc_set_fade_with_step(@intFromEnum(mode), @intFromEnum(ch), target_duty, scale, cycle_num));
+        try errors.espCheckError(sys.ledc_set_fade_with_step(@backingInt(mode), @backingInt(ch), target_duty, scale, cycle_num));
     }
 
     /// Set fade time and immediately start it.
     pub fn setFadeTimeAndStart(mode: SpeedMode, ch: Channel, target_duty: u32, fade_time_ms: u32, fade_mode: FadeMode) !void {
-        try errors.espCheckError(sys.ledc_set_fade_time_and_start(@intFromEnum(mode), @intFromEnum(ch), target_duty, fade_time_ms, @intFromEnum(fade_mode)));
+        try errors.espCheckError(sys.ledc_set_fade_time_and_start(@backingInt(mode), @backingInt(ch), target_duty, fade_time_ms, @backingInt(fade_mode)));
     }
 
     /// Set fade step and immediately start it.
     pub fn setFadeStepAndStart(mode: SpeedMode, ch: Channel, target_duty: u32, scale: u32, cycle_num: u32, fade_mode: FadeMode) !void {
-        try errors.espCheckError(sys.ledc_set_fade_step_and_start(@intFromEnum(mode), @intFromEnum(ch), target_duty, scale, cycle_num, @intFromEnum(fade_mode)));
+        try errors.espCheckError(sys.ledc_set_fade_step_and_start(@backingInt(mode), @backingInt(ch), target_duty, scale, cycle_num, @backingInt(fade_mode)));
     }
 };

@@ -54,7 +54,7 @@ pub const Controller = struct {
     }
 
     pub fn enable(mode: Mode) !void {
-        try errors.espCheckError(sys.esp_bt_controller_enable(@intFromEnum(mode)));
+        try errors.espCheckError(sys.esp_bt_controller_enable(@backingInt(mode)));
     }
 
     pub fn disable() !void {
@@ -68,12 +68,12 @@ pub const Controller = struct {
     /// Release memory for a BT mode that won't be used (saves heap).
     /// Call before `init` when only BLE or only Classic BT is needed.
     pub fn memRelease(mode: Mode) !void {
-        try errors.espCheckError(sys.esp_bt_controller_mem_release(@intFromEnum(mode)));
+        try errors.espCheckError(sys.esp_bt_controller_mem_release(@backingInt(mode)));
     }
 
     /// Release both controller and host memory for unused BT mode.
     pub fn memReleaseAll(mode: Mode) !void {
-        try errors.espCheckError(sys.esp_bt_mem_release(@intFromEnum(mode)));
+        try errors.espCheckError(sys.esp_bt_mem_release(@backingInt(mode)));
     }
 
     pub fn sleepEnable() !void {
