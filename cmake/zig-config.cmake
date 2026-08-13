@@ -425,9 +425,8 @@ else()
 endif()
 
 # Run `translate-c` to generate `idf-sys.zig`
-include(${CMAKE_SOURCE_DIR}/cmake/bindgen-standalone.cmake)
-bindgen_run(
-    COMMAND
+zig_run(
+    COMMAND translate-c
     ${IDF_SYS_C} -target ${ZIG_TARGET} -mcpu ${TARGET_CPU_MODEL}
     ${DEFINE_FLAGS} ${EXTRA_DEFINE_FLAGS} ${INCLUDE_FLAGS}
     OUTPUT_FILE ${IDF_SYS_ZIG}
