@@ -47,7 +47,7 @@ pub const Lock = struct {
     /// `name`: optional human-readable name for `esp_pm_dump_locks`.
     pub fn create(lock_type: LockType, arg: c_int, name: [*:0]const u8) !LockHandle {
         var handle: LockHandle = null;
-        try errors.espCheckError(sys.esp_pm_lock_create(@intFromEnum(lock_type), arg, name, &handle));
+        try errors.espCheckError(sys.esp_pm_lock_create(@backingInt(lock_type), arg, name, &handle));
         return handle;
     }
 

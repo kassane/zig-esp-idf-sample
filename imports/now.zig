@@ -116,7 +116,7 @@ fn sendCbAdapter(
     status: sys.esp_now_send_status_t,
 ) callconv(.c) void {
     if (send_cb_zig) |cb|
-        cb(@ptrCast(tx_info), @enumFromInt(status));
+        cb(@ptrCast(tx_info), @fromBackingInt(@intCast(status)));
 }
 
 // ---------------------------------------------------------------------------
@@ -302,7 +302,7 @@ pub const SmartConfig = struct {
     }
 
     pub fn setType(kind: SmartconfigType) !void {
-        try errors.espCheckError(sys.esp_smartconfig_set_type(@intFromEnum(kind)));
+        try errors.espCheckError(sys.esp_smartconfig_set_type(@backingInt(kind)));
     }
 
     pub fn setFastMode(enable: bool) !void {

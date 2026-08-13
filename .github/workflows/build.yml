@@ -11,14 +11,14 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  ZIG_VERSION: "0.16.0"
+  ZIG_VERSION: "master"
 
 jobs:
   format-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - uses: mlugg/setup-zig@main
+      - uses: zed-industries/setup-zig@main
         with:
           version: ${{ env.ZIG_VERSION }}
       - run: zig fmt --exclude patches --ast-check --check .
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@main
       
-      - uses: mlugg/setup-zig@main
+      - uses: zed-industries/setup-zig@main
         with:
           version: ${{ env.ZIG_VERSION }}
 

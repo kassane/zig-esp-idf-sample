@@ -36,26 +36,26 @@ pub const RTT = struct {
     /// Allocate an additional up-buffer (target → host).
     /// Returns the buffer index or `error.InvalidBuffer`.
     pub fn allocUpBuffer(name: [:0]const u8, buf: []u8, flags: Flags) Error!c_uint {
-        const rc = sys.SEGGER_RTT_AllocUpBuffer(name.ptr, buf.ptr, @intCast(buf.len), @intFromEnum(flags));
+        const rc = sys.SEGGER_RTT_AllocUpBuffer(name.ptr, buf.ptr, @intCast(buf.len), @backingInt(flags));
         if (rc < 0) return error.InvalidBuffer;
         return @intCast(rc);
     }
 
     /// Allocate an additional down-buffer (host → target).
     pub fn allocDownBuffer(name: [:0]const u8, buf: []u8, flags: Flags) Error!c_uint {
-        const rc = sys.SEGGER_RTT_AllocDownBuffer(name.ptr, buf.ptr, @intCast(buf.len), @intFromEnum(flags));
+        const rc = sys.SEGGER_RTT_AllocDownBuffer(name.ptr, buf.ptr, @intCast(buf.len), @backingInt(flags));
         if (rc < 0) return error.InvalidBuffer;
         return @intCast(rc);
     }
 
     /// Reconfigure an existing up-buffer.
     pub fn configUpBuffer(idx: c_uint, name: [:0]const u8, buf: []u8, flags: Flags) Error!void {
-        return rttResult(sys.SEGGER_RTT_ConfigUpBuffer(idx, name.ptr, buf.ptr, @intCast(buf.len), @intFromEnum(flags)));
+        return rttResult(sys.SEGGER_RTT_ConfigUpBuffer(idx, name.ptr, buf.ptr, @intCast(buf.len), @backingInt(flags)));
     }
 
     /// Reconfigure an existing down-buffer.
     pub fn configDownBuffer(idx: c_uint, name: [:0]const u8, buf: []u8, flags: Flags) Error!void {
-        return rttResult(sys.SEGGER_RTT_ConfigDownBuffer(idx, name.ptr, buf.ptr, @intCast(buf.len), @intFromEnum(flags)));
+        return rttResult(sys.SEGGER_RTT_ConfigDownBuffer(idx, name.ptr, buf.ptr, @intCast(buf.len), @backingInt(flags)));
     }
 
     // -------------------------------------------------------------------------
@@ -71,11 +71,11 @@ pub const RTT = struct {
     }
 
     pub fn setFlagsUpBuffer(idx: c_uint, flags: Flags) Error!void {
-        return rttResult(sys.SEGGER_RTT_SetFlagsUpBuffer(idx, @intFromEnum(flags)));
+        return rttResult(sys.SEGGER_RTT_SetFlagsUpBuffer(idx, @backingInt(flags)));
     }
 
     pub fn setFlagsDownBuffer(idx: c_uint, flags: Flags) Error!void {
-        return rttResult(sys.SEGGER_RTT_SetFlagsDownBuffer(idx, @intFromEnum(flags)));
+        return rttResult(sys.SEGGER_RTT_SetFlagsDownBuffer(idx, @backingInt(flags)));
     }
 
     // -------------------------------------------------------------------------

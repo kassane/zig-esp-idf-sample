@@ -43,7 +43,7 @@ pub const GpioNum = Num();
 
 /// Convert a GpioNum to the raw C type expected by esp-idf APIs.
 pub inline fn numToC(gpio_num: GpioNum) sys.gpio_num_t {
-    return @intFromEnum(gpio_num);
+    return @backingInt(gpio_num);
 }
 
 // ---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ pub fn resetPin(gpio_num: GpioNum) !void {
 // ---------------------------------------------------------------------------
 
 pub fn setIntrType(gpio_num: GpioNum, intr_type: IntType) !void {
-    try errors.espCheckError(sys.gpio_set_intr_type(numToC(gpio_num), @intFromEnum(intr_type)));
+    try errors.espCheckError(sys.gpio_set_intr_type(numToC(gpio_num), @backingInt(intr_type)));
 }
 
 pub fn intrEnable(gpio_num: GpioNum) !void {
@@ -169,10 +169,10 @@ pub const Level = struct {
 
 pub const Direction = struct {
     pub fn set(gpio_num: GpioNum, mode: Mode) !void {
-        try errors.espCheckError(sys.gpio_set_direction(numToC(gpio_num), @intFromEnum(mode)));
+        try errors.espCheckError(sys.gpio_set_direction(numToC(gpio_num), @backingInt(mode)));
     }
     pub fn sleepSet(gpio_num: GpioNum, mode: Mode) !void {
-        try errors.espCheckError(sys.gpio_sleep_set_direction(numToC(gpio_num), @intFromEnum(mode)));
+        try errors.espCheckError(sys.gpio_sleep_set_direction(numToC(gpio_num), @backingInt(mode)));
     }
 };
 
@@ -181,11 +181,11 @@ pub const Direction = struct {
 // ---------------------------------------------------------------------------
 
 pub fn setPullMode(gpio_num: GpioNum, pull: PullMode) !void {
-    try errors.espCheckError(sys.gpio_set_pull_mode(numToC(gpio_num), @intFromEnum(pull)));
+    try errors.espCheckError(sys.gpio_set_pull_mode(numToC(gpio_num), @backingInt(pull)));
 }
 
 pub fn sleepSetPullMode(gpio_num: GpioNum, pull: PullMode) !void {
-    try errors.espCheckError(sys.gpio_sleep_set_pull_mode(numToC(gpio_num), @intFromEnum(pull)));
+    try errors.espCheckError(sys.gpio_sleep_set_pull_mode(numToC(gpio_num), @backingInt(pull)));
 }
 
 pub const PULL = struct {
@@ -208,14 +208,14 @@ pub const PULL = struct {
 // ---------------------------------------------------------------------------
 
 pub fn setDriveCapability(gpio_num: GpioNum, strength: DriveCap) !void {
-    try errors.espCheckError(sys.gpio_set_drive_capability(numToC(gpio_num), @intFromEnum(strength)));
+    try errors.espCheckError(sys.gpio_set_drive_capability(numToC(gpio_num), @backingInt(strength)));
 }
 
 /// Returns the drive capability of the given pin.
 pub fn getDriveCapability(gpio_num: GpioNum) !DriveCap {
     var raw: sys.gpio_drive_cap_t = undefined;
     try errors.espCheckError(sys.gpio_get_drive_capability(numToC(gpio_num), &raw));
-    return @enumFromInt(raw);
+    return @fromBackingInt(@intCast(raw));
 }
 
 // ---------------------------------------------------------------------------
@@ -247,7 +247,7 @@ pub fn deepSleepHoldDis() void {
 }
 
 pub fn deepSleepWakeupEnable(gpio_num: GpioNum, intr_type: IntType) !void {
-    try errors.espCheckError(sys.gpio_deep_sleep_wakeup_enable(numToC(gpio_num), @intFromEnum(intr_type)));
+    try errors.espCheckError(sys.gpio_deep_sleep_wakeup_enable(numToC(gpio_num), @backingInt(intr_type)));
 }
 
 pub fn deepSleepWakeupDisable(gpio_num: GpioNum) !void {
@@ -271,7 +271,7 @@ pub fn sleepSelDis(gpio_num: GpioNum) !void {
 // ---------------------------------------------------------------------------
 
 pub fn wakeupEnable(gpio_num: GpioNum, intr_type: IntType) !void {
-    try errors.espCheckError(sys.gpio_wakeup_enable(numToC(gpio_num), @intFromEnum(intr_type)));
+    try errors.espCheckError(sys.gpio_wakeup_enable(numToC(gpio_num), @backingInt(intr_type)));
 }
 
 pub fn wakeupDisable(gpio_num: GpioNum) !void {

@@ -60,7 +60,7 @@ pub fn deinit() !void {
     return try errors.espCheckError(sys.esp_wifi_deinit());
 }
 pub fn setMode(mode: wifi_mode_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_mode(@intFromEnum(mode)));
+    return try errors.espCheckError(sys.esp_wifi_set_mode(@backingInt(mode)));
 }
 pub fn getMode(mode: [*]wifi_mode_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_mode(mode));
@@ -180,7 +180,7 @@ pub const Promiscuous = struct {
 };
 pub const wifiConfig = sys.wifi_config_t;
 pub fn setConfig(interface: wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
-    return try errors.espCheckError(sys.esp_wifi_set_config(@intFromEnum(interface), conf));
+    return try errors.espCheckError(sys.esp_wifi_set_config(@backingInt(interface), conf));
 }
 pub fn getConfig(interface: wifi_interface_t, conf: ?*sys.wifi_config_t) !void {
     return try errors.espCheckError(sys.esp_wifi_get_config(interface, conf));

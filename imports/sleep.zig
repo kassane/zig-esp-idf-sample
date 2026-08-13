@@ -43,7 +43,7 @@ pub const PdOption = enum(sys.esp_sleep_pd_option_t) {
 
 /// Configure the power state of a peripheral domain during sleep.
 pub fn pdConfig(domain: PdDomain, option: PdOption) !void {
-    try errors.espCheckError(sys.esp_sleep_pd_config(@intFromEnum(domain), @intFromEnum(option)));
+    try errors.espCheckError(sys.esp_sleep_pd_config(@backingInt(domain), @backingInt(option)));
 }
 
 // ---------------------------------------------------------------------------
@@ -129,7 +129,7 @@ pub fn lightSleepStart() !void {
 
 /// Get the reason the chip was last woken from sleep.
 pub fn getWakeupCause() WakeupCause {
-    return @enumFromInt(sys.esp_sleep_get_wakeup_cause());
+    return @fromBackingInt(@intCast(sys.esp_sleep_get_wakeup_cause()));
 }
 
 /// Returns true if the wakeup cause matches `cause`.

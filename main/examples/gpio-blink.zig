@@ -13,7 +13,7 @@ const log = std.log.scoped(.blink);
 const LED_PIN: idf.gpio.Num() = .@"2";
 
 export fn app_main() callconv(.c) void {
-    log.info("GPIO Blink example — toggling GPIO{d}", .{@intFromEnum(LED_PIN)});
+    log.info("GPIO Blink example — toggling GPIO{d}", .{@backingInt(LED_PIN)});
 
     idf.gpio.Direction.set(LED_PIN, .output) catch |err| {
         log.err("GPIO direction set failed: {s}", .{@errorName(err)});
@@ -32,7 +32,7 @@ export fn app_main() callconv(.c) void {
 pub const panic = idf.esp_panic.panic;
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
-        .Debug => .debug,
+        .debug => .debug,
         else => .info,
     },
     .logFn = idf.log.espLogFn,

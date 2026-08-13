@@ -155,7 +155,7 @@ fn copyZ(dest: []u8, src: []const u8) void {
 pub const panic = idf.esp_panic.panic;
 pub const std_options: std.Options = .{
     .log_level = switch (builtin.mode) {
-        .Debug => .debug,
+        .debug => .debug,
         else => .info,
     },
     .logFn = idf.log.espLogFn,

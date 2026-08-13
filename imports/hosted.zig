@@ -155,7 +155,7 @@ pub const Hosted = struct {
         external_thresholds: sys.esp_hosted_mem_monitor_threshold_t,
     ) !EspHostedCurrMemInfo {
         const config = sys.esp_hosted_config_mem_monitor_t{
-            .config = @intFromEnum(cfg),
+            .config = @backingInt(cfg),
             .report_always = report_always,
             .interval_sec = interval_sec,
             .internal_mem = internal_thresholds,
