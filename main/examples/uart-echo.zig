@@ -29,9 +29,8 @@ export fn app_main() callconv(.c) void {
         .parity = sys.UART_PARITY_DISABLE,
         .stop_bits = sys.UART_STOP_BITS_1,
         .flow_ctrl = sys.UART_HW_FLOWCTRL_DISABLE,
-        .source_clk = sys.UART_SCLK_DEFAULT,
         .rx_flow_ctrl_thresh = 0,
-        .lp_source_clk = 0,
+        .clk_source = .{.source_clk = sys.UART_SCLK_DEFAULT},
         .flags = .{ .backup_before_sleep = 0, .allow_pd = 0 },
     };
 
@@ -65,6 +64,7 @@ export fn app_main() callconv(.c) void {
             log.err("readBytes: {s}", .{@errorName(err)});
             continue;
         };
+
         if (n > 0) {
             _ = idf.uart.writeBytes(UART_PORT, buf[0..n]) catch |err| {
                 log.err("writeBytes: {s}", .{@errorName(err)});
