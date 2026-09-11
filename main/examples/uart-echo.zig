@@ -30,7 +30,7 @@ export fn app_main() callconv(.c) void {
         .stop_bits = sys.UART_STOP_BITS_1,
         .flow_ctrl = sys.UART_HW_FLOWCTRL_DISABLE,
         .rx_flow_ctrl_thresh = 0,
-        .clk_source = .{.source_clk = sys.UART_SCLK_DEFAULT},
+        .clk_source = .{ .source_clk = sys.UART_SCLK_DEFAULT },
         .flags = .{ .backup_before_sleep = 0, .allow_pd = 0 },
     };
 
