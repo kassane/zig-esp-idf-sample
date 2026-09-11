@@ -135,7 +135,7 @@ pub const PinConfig = struct {
 };
 
 pub fn setPin(port: Port, pins: PinConfig) !void {
-    return errors.espCheckError(sys.uart_set_pin(port, pins.tx, pins.rx, pins.rts, pins.cts));
+    return errors.espCheckError(sys._uart_set_pin4(port, pins.tx, pins.rx, pins.rts, pins.cts));
 }
 
 /// Drive RTS line manually (level: true = high, false = low).

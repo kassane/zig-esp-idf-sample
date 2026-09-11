@@ -53,6 +53,9 @@ endif()
 # Remove portTICK_PERIOD_MS (will be replaced with custom version)
 string(REGEX REPLACE "pub const portTICK_PERIOD_MS[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
 
+# Remove uart_config_t (will be replaced with custom version)
+string(REGEX REPLACE "pub const uart_config_t = opaque[^;]*;" "" FILE_CONTENT "${FILE_CONTENT}")
+
 # ============================================================================
 # Handle bitfield-related opaque types and unions
 # ============================================================================
@@ -151,6 +154,11 @@ if(HAS_LED_STRIP EQUAL 1)
         "led_strip/led_strip_config_t.zig"
     )
 endif()
+
+# Add UART patches
+list(APPEND PATCH_FILES
+        "uart/uart_config_t.zig"
+)
 
 # Apply each patch file
 foreach(PATCH_FILE IN LISTS PATCH_FILES)
