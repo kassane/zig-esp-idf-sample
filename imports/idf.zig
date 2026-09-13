@@ -64,6 +64,7 @@ pub const wifi = switch (currentTarget) {
     .esp32h2, .esp32h21, .esp32h4, .esp32p4 => @compileError("Wifi requires CONFIG_ESP_WIFI_ENABLED in sdkconfig"),
     else => @import("wifi"),
 };
+pub const hw_support = @import("hw_support");
 pub const sys = @import("sys");
 
 const Device = enum {
