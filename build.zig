@@ -97,7 +97,7 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "nimble", .file = "nimble.zig", .deps = &.{ "sys", "error" } },
     // ── depend on sys + log ────────────────────────
     // ── depend on sys + hw_support ────────────────────────
-    .{ .name = "panic", .file = "panic.zig", .deps = &.{ "sys", "hw_support"} },
+    .{ .name = "panic", .file = "panic.zig", .deps = &.{ "sys", "hw_support" } },
 };
 
 /// Names re-exported by the top-level "esp_idf" umbrella module (idf.zig).
@@ -106,7 +106,7 @@ const esp_idf_exports = [_][]const u8{
     "phy",         "segger", "crc",       "bluetooth", "led",   "wifi",       "gpio",   "uart",
     "i2c",         "i2s",    "spi",       "now",       "pulse", "http",       "dsp",    "panic",
     "rtos",        "nvs",    "partition", "sleep",     "event", "wdt",        "nimble", "hosted",
-    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",    "matter", "hw_support"
+    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",    "matter", "hw_support",
 };
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
