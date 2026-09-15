@@ -15,6 +15,9 @@ CONFIG_ESP_WIFI_ENABLED=y
 # CONFIG_COMPILER_STACK_CHECK_MODE_STRONG=y
 # CONFIG_COMPILER_STACK_CHECK=y
 
+# Zig uses huge amounts of stack in `print` calls in `Debug` mode
+# You may reduce it to 3584 when using `-DZIG_BUILD_TYPE=ReleaseSafe`
+CONFIG_MAIN_TASK_STACK_SIZE=8192
 
 # This allows to use 1 ms granuality for thread sleeps (10 ms by default).
 # CONFIG_FREERTOS_HZ=1000
