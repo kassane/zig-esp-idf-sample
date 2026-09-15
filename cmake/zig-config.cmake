@@ -458,11 +458,14 @@ add_custom_command(
 add_custom_target(translate_c ALL DEPENDS "${PATCHES_DONE}")
 message(STATUS "IDF_SYS_ZIG is set to: ${IDF_SYS_ZIG}")
 
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(ZIG_BUILD_TYPE "Debug")
-else()
-    set(ZIG_BUILD_TYPE "ReleaseSafe")
+if (NOT ZIG_BUILD_TYPE)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(STATUS "ZIG_BUILD_TYPE not set - defaulting to Debug build.")
+        set(ZIG_BUILD_TYPE "Debug")
+    else()
+        message(STATUS "ZIG_BUILD_TYPE not set - defaulting to ReleaseSafe build.")
+        set(ZIG_BUILD_TYPE "ReleaseSafe")
+    endif()
 endif()
 
 add_custom_target(zig_build
