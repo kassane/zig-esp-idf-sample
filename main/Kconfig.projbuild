@@ -87,6 +87,8 @@ menu "Example Configuration"
             bool "UART Echo"
         config ZIG_EXAMPLE_MATTER_LIGHT
             bool "Matter Light"
+        config ZIG_EXAMPLE_PANIC_CHECK
+            bool "Panic & Checked Illegal Behaviour"
     endchoice
 
 endmenu
