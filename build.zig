@@ -66,6 +66,7 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "phy", .file = "phy.zig", .deps = &.{"sys"} },
     .{ .name = "segger", .file = "segger.zig", .deps = &.{"sys"} },
     .{ .name = "crc", .file = "crc.zig", .deps = &.{"sys"} },
+    .{ .name = "hw_support", .file = "hw_support.zig", .deps = &.{"sys"} },
     // ── depend on sys + error ───────────────────────────────────────────
     .{ .name = "bluetooth", .file = "bluetooth.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "led", .file = "led-strip.zig", .deps = &.{ "sys", "error" } },
@@ -95,7 +96,8 @@ const module_specs = [_]ModuleSpec{
     .{ .name = "wdt", .file = "wdt.zig", .deps = &.{ "sys", "error" } },
     .{ .name = "nimble", .file = "nimble.zig", .deps = &.{ "sys", "error" } },
     // ── depend on sys + log ────────────────────────
-    .{ .name = "panic", .file = "panic.zig", .deps = &.{ "sys", "log" } },
+    // ── depend on sys + hw_support ────────────────────────
+    .{ .name = "panic", .file = "panic.zig", .deps = &.{ "sys", "hw_support" } },
 };
 
 /// Names re-exported by the top-level "esp_idf" umbrella module (idf.zig).
@@ -104,7 +106,7 @@ const esp_idf_exports = [_][]const u8{
     "phy",         "segger", "crc",       "bluetooth", "led",   "wifi",       "gpio",   "uart",
     "i2c",         "i2s",    "spi",       "now",       "pulse", "http",       "dsp",    "panic",
     "rtos",        "nvs",    "partition", "sleep",     "event", "wdt",        "nimble", "hosted",
-    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",    "matter",
+    "wifi_remote", "timer",  "ledc",      "twai",      "pm",    "pthread",    "matter", "hw_support",
 };
 
 pub fn idf_wrapped_modules(b: *std.Build) *std.Build.Module {
