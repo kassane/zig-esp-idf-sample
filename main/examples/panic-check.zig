@@ -20,7 +20,6 @@ const RTC_NOINIT_ATTR = ".rtc_noinit";
 // Cannot be initialised. If power is lost, any value is possible.
 var reboot_counter: u32 linksection(NOINIT_ATTR ++ ".zig") = 5;
 
-
 var bounds: [3]u8 = undefined;
 var small: u2 = undefined;
 
@@ -29,12 +28,12 @@ export fn app_main() callconv(.c) void {
 
     log.info("Panic / Checked Illegal behaviour example, reboot_counter = {}", .{reboot_counter});
     log.info("Tip: try compiling in different modes and see what happens! e.g.\n    idf.py build -DZIG_BUILD_TYPE=ReleaseFast", .{});
-    
+
     idf.rtos.Task.delayMs(500);
 
     // reboot_counter used as a variable, to defeat compile-time checks
     // Otherwise this code would fail to compile in any mode.
-    switch(reboot_counter) {
+    switch (reboot_counter) {
         1 => @panic("Reason? We don't need a reason!"),
         2 => unreachable, // Reached Unreachable Code
         3 => bounds[reboot_counter] = 0, // Index out of Bounds
