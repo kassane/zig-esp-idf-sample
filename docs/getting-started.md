@@ -198,6 +198,7 @@ zig-esp-idf-sample/
 │       ├── smartled-rgb.zig      # WS2812B LED strip
 │       ├── dsp-math.zig          # DSP/FFT operations
 │       └── matter-light.zig      # Matter On/Off Light
+│       └── panic-check.zig       # Checked illegal behaviour
 │
 ├── imports/              # Zig API wrappers and bindings
 │   ├── idf.zig           # Main ESP-IDF facade module
@@ -675,6 +676,7 @@ All examples are in `main/examples/`:
 - `smartled-rgb.zig` - WS2812B LED strip control (requires `espressif/led_strip`)
 - `dsp-math.zig` - FFT + power spectrum via DSP (requires `espressif/esp-dsp`)
 - `matter-light.zig` - Matter On/Off Light device (requires `espressif/esp_matter`, IDF v5.x, 4 MB flash)
+- `panic-check.zig` - Demonstrates @panic() and checked illegal behaviour at runtime.
 
 ### Configuration
 
