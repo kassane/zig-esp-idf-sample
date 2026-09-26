@@ -370,7 +370,7 @@ Components are specified in `main/idf_component.yml`:
 
 ```bash
 # Use idf.py command:
-idf.py add-dependency espressif/led_strip
+idf.py add-dependency espressif/led_strip~3.0.2
 # then
 idf.py reconfigure
 ```
@@ -387,7 +387,7 @@ idf.py reconfigure
 **1. Ensure LED strip is in `main/idf_component.yml`:**
 ```yaml
 dependencies:
-  espressif/led_strip: "*"
+  espressif/led_strip: "~3.0.2"
 ```
 
 **2. Reconfigure:**
