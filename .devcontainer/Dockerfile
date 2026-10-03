@@ -23,9 +23,9 @@ ENV QEMU_URL=https://github.com/espressif/qemu/releases/download/esp-develop-9.2
 
 # Zig v0.17.0 - xtensa
 ENV ZIG_REL=zig-relsafe-x86_64-linux-musl-baseline
-ENV ZIG_SHA256=e4469027be0b0dd6abea815f05cfd9678f4a87e9f72868750a89190371bd88f2
+ENV ZIG_SHA256=aeb04ec3b091c040dd6201f923c3f779ae13c06c9556b3d8a571f489bbe23031
 ENV ZIG_DIST=${ZIG_REL}.tar.xz
-ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/${ZIG_DIST}
+ENV ZIG_URL=https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa/${ZIG_DIST}
 
 # ZLS v0.17.0
 ENV ZLS_REL=zls-x86_64-linux-musl-baseline
