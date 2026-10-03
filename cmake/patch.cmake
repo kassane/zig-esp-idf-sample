@@ -13,7 +13,7 @@ file(READ "${TARGET_FILE}" FILE_CONTENT)
 # ============================================================================
 # Determine WiFi support based on target
 # ============================================================================
-if(CONFIG_IDF_TARGET_ESP32P4 OR CONFIG_IDF_TARGET_ESP32H2 OR CONFIG_IDF_TARGET_ESP32H21 OR CONFIG_IDF_TARGET_ESP32H4)
+if(IDF_TARGET MATCHES "^esp32(p4|h21|h2|h4)$")
     set(WIFI_SUPPORTED FALSE)
 else()
     set(WIFI_SUPPORTED TRUE)
@@ -89,23 +89,24 @@ pub const lp_aonclkrst_dev_t = extern struct { reserved: [1024]u8 };
 pub const i2c_dev_t          = extern struct { reserved: [388]u8 };
 ")
 # 4. Add gpio_dev_t with target-specific size (this must come AFTER the general remove)
-if(CONFIG_IDF_TARGET_ESP32C61 OR CONFIG_IDF_TARGET_ESP32C5 OR CONFIG_IDF_TARGET_ESP32H4)
+if(IDF_TARGET MATCHES "^esp32(c61|c5|h4)$")
     string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [3584]u8 };")
-elseif(CONFIG_IDF_TARGET_ESP32P4)
+elseif(IDF_TARGET STREQUAL "esp32p4")
     string(APPEND FILE_CONTENT "\npub const gpio_dev_t    = extern struct { reserved: [2048]u8 };")
-elseif(CONFIG_IDF_TARGET_ESP32C2 OR CONFIG_IDF_TARGET_ESP32C6 OR CONFIG_IDF_TARGET_ESP32H2)
+elseif(IDF_TARGET MATCHES "^esp32(c2|c6|h2)$")
     string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [1792]u8 };")
 else()
-    # Fallback
+    # Fallback (esp32 / esp32c3 / esp32s2 / esp32s3): gpio_dev_t removed above, still referenced by `extern var GPIO`
+    string(APPEND FILE_CONTENT "\npub const gpio_dev_t = extern struct { reserved: [4096]u8 };")
 endif()
-if(CONFIG_IDF_TARGET_ESP32P4)
+if(IDF_TARGET STREQUAL "esp32p4")
     string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [308]u8 };")
 else()
     string(APPEND FILE_CONTENT "\npub const lp_gpio_dev_t = extern struct { reserved: [1024]u8 };")
 endif()
 
 # ESP32-P4 specific: Remove xPortCanYield function
-if(CONFIG_IDF_TARGET_ESP32P4)
+if(IDF_TARGET STREQUAL "esp32p4")
     string(REGEX REPLACE "pub fn xPortCanYield\\([^)]*\\) callconv\\(\\.c\\) bool \\{([^{}]|\\{[^{}]*\\})*\\}" "" FILE_CONTENT "${FILE_CONTENT}")
 endif()
 
@@ -131,7 +132,7 @@ set(PATCH_FILES
 )
 
 # Add target-specific patches
-if(CONFIG_IDF_TARGET_ESP32P4)
+if(IDF_TARGET STREQUAL "esp32p4")
     list(APPEND PATCH_FILES "xport_can_yield.zig")
 endif()
 

@@ -18,18 +18,18 @@
         # Determine architecture-specific properties
         platformSrc = if system == "x86_64-linux" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
-            sha256 = "sha256-5EaQJ74LDdar6oFfBc/ZZ49Kh+n3KGh1CokZA3G9iPI=";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa/zig-relsafe-x86_64-linux-musl-baseline.tar.xz";
+            sha256 = "sha256-rrBOw7CRwEDdYgH5I8P3ea4TwGyVVrPYpXH0ibviMDE=";
           }
         else if system == "aarch64-linux" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
-            sha256 = "sha256-6mbHxfTfqHcsd2d7ZzIm4nZ4jYnScHjaBAeTZW7tsnQ=";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa/zig-relsafe-aarch64-linux-musl-baseline.tar.xz";
+            sha256 = "sha256-yvKVaH0W0c+TnXCfrq/FbEmfZzU5S69C8YfqPqHbfG4=";
           }
         else if system == "aarch64-darwin" then
           {
-            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa-dev/zig-relsafe-aarch64-macos-baseline.tar.xz";
-            sha256 = "sha256-NncNcPDankC6Z/2G8f6CjECSm12WN0dkG+nVq8iie3A=";
+            url = "https://github.com/kassane/zig-espressif-bootstrap/releases/download/0.17.0-xtensa/zig-relsafe-aarch64-macos-baseline.tar.xz";
+            sha256 = "sha256-rTiRBqlU2rpFJ/bRdr6rFwSLECTyZLN63CEAP7XjHWU=";
           }
         else
           throw "Unsupported platform: ${system}";
@@ -44,7 +44,7 @@
 
             (pkgs.stdenv.mkDerivation {
               pname = "zig-espressif-bootstrap";
-              version = "0.17.0-xtensa-dev";
+              version = "0.17.0-xtensa";
               src = pkgs.fetchurl platformSrc;
               dontConfigure = true;
               dontBuild = true;
