@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - uses: zed-industries/setup-zig@main
+      - uses: zed-industries/setup-zig@node24
         with:
           version: ${{ env.ZIG_VERSION }}
       - run: zig fmt --exclude patches --ast-check --check .
@@ -29,8 +29,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        idf-version: [release/v5.5, release/v6.0]
-        target: 
+        idf-version: [release/v5.5, release/v6.0, release/v6.1]
+        target:
           - esp32
           - esp32s2
           - esp32s3
@@ -42,6 +42,8 @@ jobs:
           - esp32c61
           - esp32p4
           - esp32h4
+          - esp32h21
+          - esp32s31
         exclude:
           - idf-version: release/v5.5
             target: esp32p4
@@ -51,6 +53,10 @@ jobs:
             target: esp32c61
           - idf-version: release/v5.5
             target: esp32c5
+          - idf-version: release/v5.5
+            target: esp32s31
+          - idf-version: release/v6.0
+            target: esp32s31
     steps:
       - uses: actions/checkout@main
       
@@ -100,11 +106,7 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           . ~/esp/esp-idf/export.sh
-          if [ "${{ matrix.target }}" == "esp32h4" ]; then
-            idf.py --preview set-target ${{ matrix.target }}
-          else
-            idf.py set-target ${{ matrix.target }}
-          fi
+          idf.py --preview set-target ${{ matrix.target }}
           idf.py build
 
       - name: Build (Windows)
@@ -116,11 +118,7 @@ jobs:
           $env:IDF_PATH = "$(Get-Location)"
           . .\export.ps1
           cd $env:GITHUB_WORKSPACE
-          if ("${{ matrix.target }}" -eq "esp32h4") {
-            idf.py --preview set-target ${{ matrix.target }}
-          } else {
-            idf.py set-target ${{ matrix.target }}
-          }
+          idf.py --preview set-target ${{ matrix.target }}
           Remove-Item -Path ".zig-cache" -Recurse -Force -EA SilentlyContinue
           idf.py build
 
@@ -165,7 +163,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@main
         with:
-          name: build-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || matrix.idf-version == 'release/v5.5' && 'v5.5' || matrix.idf-version }}
+          name: build-${{ matrix.target }}-${{ matrix.idf-version == 'release/v6.0' && 'v6.0' || matrix.idf-version == 'release/v5.5' && 'v5.5' || matrix.idf-version == 'release/v6.1' && 'v6.1' || matrix.idf-version }}
           path: |
             build/bootloader/bootloader.bin
             build/partition_table/partition-table.bin
