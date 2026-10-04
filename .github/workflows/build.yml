@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@main
       
-      - uses: zed-industries/setup-zig@main
+      - uses: zed-industries/setup-zig@node24
         with:
           version: ${{ env.ZIG_VERSION }}
 
