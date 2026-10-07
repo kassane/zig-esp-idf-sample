@@ -74,6 +74,12 @@ macro(check_managed_component COMPONENT_NAME VENDOR PACKAGE DEFINE_NAME)
         if(EXISTS "${API_PATH}")
             list(APPEND COMP_PATHS "${API_PATH}")
         endif()
+    elseif("${PACKAGE}" STREQUAL "esp32-camera")
+        # Public headers live in driver/ and conversions/, not in include/.
+        list(APPEND COMP_PATHS
+            "${COMP_BASE}/driver/include"
+            "${COMP_BASE}/conversions/include"
+        )
     elseif("${PACKAGE}" STREQUAL "esp_matter")
         # esp_matter is a C++ (CHIP SDK) library.
         # matter_stubs.h provides the C interface for translate-c instead.
@@ -122,3 +128,6 @@ check_managed_component("ESP-DSP" "espressif" "esp-dsp" "HAS_ESP_DSP")
 check_managed_component("ESP Wifi Remote" "espressif" "esp_wifi_remote" "HAS_ESP_WIFI_REMOTE")
 check_managed_component("ESP Hosted" "espressif" "esp_hosted" "HAS_ESP_HOSTED")
 check_managed_component("ESP Matter" "espressif" "esp_matter" "HAS_ESP_MATTER")
+check_managed_component("ESP32 Camera" "espressif" "esp32-camera" "HAS_ESP32_CAMERA")
+# esp_camera.h includes img_converters.h, which includes jpeg_decoder.h from esp_jpeg
+check_managed_component("ESP Jpeg" "espressif" "esp_jpeg" "HAS_ESP_JPEG")
