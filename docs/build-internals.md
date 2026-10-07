@@ -115,6 +115,7 @@ The build system automatically detects managed components installed via `idf.py 
 - `espressif/led_strip` → `HAS_LED_STRIP` define
 - `espressif/esp-dsp` → `HAS_ESP_DSP` define
 - `espressif/esp_bsp_devkit` → `HAS_ESP_BSP_DEVKIT` define
+- `espressif/esp32-camera` → `HAS_ESP32_CAMERA` define (its headers are in `driver/include` and `conversions/include`)
 
 **How it works:**
 1. CMake detects components in `managed_components/` directory

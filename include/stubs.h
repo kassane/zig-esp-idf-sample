@@ -166,6 +166,9 @@ extern struct stat;
 #if HAS_ESP_MATTER
 #include "matter_stubs.h"
 #endif
+#if HAS_ESP32_CAMERA
+#include "esp_camera.h"
+#endif
 
 #ifdef ESP_IDF_COMP_ESP_HTTP_SERVER_ENABLED
 static inline httpd_config_t zig_httpd_default_config(void) {
