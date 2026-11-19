@@ -398,7 +398,7 @@ pub const Internal = struct {
 };
 
 pub fn init_config_default() sys.wifi_init_config_t {
-    return sys.wifi_init_config_t{
+    var cfg = sys.wifi_init_config_t{
         .osi_funcs = @extern(*sys.wifi_osi_funcs_t, .{ .name = "g_wifi_osi_funcs" }),
         .wpa_crypto_funcs = sys.g_wifi_default_wpa_crypto_funcs,
         .static_rx_buf_num = sys.CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM,
@@ -426,4 +426,15 @@ pub fn init_config_default() sys.wifi_init_config_t {
         .dump_hesigb_enable = sys.WIFI_DUMP_HESIGB_ENABLED != 0,
         .magic = sys.WIFI_INIT_CONFIG_MAGIC,
     };
+    // Fields added in idf version 6.1
+    if (comptime @hasField(sys.wifi_init_config_t, "privacy_enhancements")) {
+        cfg.privacy_enhancements = sys.WIFI_PRIVACY_ENHANCEMENTS_ENABLED != 0;
+    }
+    if (comptime @hasField(sys.wifi_init_config_t, "rmac_auto_reset_int")) {
+        cfg.rmac_auto_reset_int = sys.WIFI_RMAC_AUTO_RESET_INTERVAL;
+    }
+    if (comptime @hasField(sys.wifi_init_config_t, "wifi_task_stack_size")) {
+        cfg.wifi_task_stack_size = sys.WIFI_TASK_STACK_SIZE;
+    }
+    return cfg;
 }
