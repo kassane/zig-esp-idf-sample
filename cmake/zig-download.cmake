@@ -37,7 +37,7 @@ if(NOT EXISTS "${ZIG_DIR}/zig")
     message(STATUS "Extracting ${ARCHIVE_EXT} ...")
     if(HOST_OS_LOWER MATCHES "windows|win")
         execute_process(
-            COMMAND powershell -NoProfile -ExecutionPolicy Bypass
+            COMMAND pwsh -NoProfile -ExecutionPolicy Bypass
             -Command "Expand-Archive -Path '${ZIG_ARCHIVE}' -DestinationPath '${CMAKE_BINARY_DIR}' -Force"
             RESULT_VARIABLE extract_result
         )
