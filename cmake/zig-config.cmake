@@ -322,6 +322,7 @@ set(INCLUDE_DIRS
     "${IDF_PATH}/components/http_parser"
     "${IDF_PATH}/components/esp-tls"
     "${IDF_PATH}/components/esp_https_ota/include"
+    "${IDF_PATH}/components/app_update/include"
     "${IDF_PATH}/components/esp_http_server/include"
     "${IDF_PATH}/components/esp_https_server/include"
     "${IDF_PATH}/components/esp_http_client/include"
